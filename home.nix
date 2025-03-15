@@ -1,14 +1,16 @@
-{ lib, pkgs, ... }: 
+{ lib, pkgs, config, ... }: 
 {
   # Enable Home Manager
   programs.home-manager.enable = true;
 
   # Import all modularized configurations
   imports = [
-    ./modules/basic-pkgs.nix
-    ./modules/kubernetes-pkgs.nix
+    ./modules/pkgs/basic-pkgs.nix
+    ./modules/pkgs/kubernetes-pkgs.nix
     ./modules/shell.nix
-    ./modules/programs.nix
+    ./modules/configs/zsh-config.nix
     ./modules/user.nix
   ];
+
+  virtualisation.docker.enable = true;
 }
