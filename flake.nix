@@ -21,7 +21,6 @@
         ${username} = nixpkgs.lib.nixosSystem {        
           inherit system;
           modules = [
-            ./configuration.nix
             ./modules/configs/docker-config.nix
           ];
         };
