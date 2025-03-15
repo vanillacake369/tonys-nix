@@ -29,7 +29,6 @@
           modules = [
             ./modules/configs/docker-config.nix
           ];
-          # docker-config.username = username;
           specialArgs = { inherit username; };
         };
       };
