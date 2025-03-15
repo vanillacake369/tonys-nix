@@ -5,10 +5,10 @@
 
   # Import all modularized configurations
   imports = [
-    ./modules/packages.nix
+    ./modules/basic-pkgs.nix
+    ./modules/kubernetes-pkgs.nix
     ./modules/shell.nix
     ./modules/programs.nix
-    ./modules/kubernetes.nix
     ./modules/user.nix
   ];
 }
