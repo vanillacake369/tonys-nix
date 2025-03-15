@@ -21,9 +21,20 @@
       lib = nixpkgs.lib;
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+      username = "limjihoon";
     in {
-      homeConfigurations = {
-        limjihoon = home-manager.lib.homeManagerConfiguration {
+      nixosConfigurations.${username} = {
+        nixpkgs.lib.nixosSystem {        
+          inherit system;
+          modules = [
+            ./modules/configs/docker-config.nix
+          ];
+          specialArgs = { inherit username; };
+        };
+      };
+
+      homeConfigurations.${username} = {
+        home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ ./home.nix ];
         };
