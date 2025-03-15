@@ -11,6 +11,4 @@
     ./modules/configs/zsh-config.nix
     ./modules/user.nix
   ];
-
-  virtualisation.docker.enable = true;
 }
