@@ -23,8 +23,8 @@
       pkgs = import nixpkgs { inherit system; };
       username = "limjihoon";
     in {
-      nixosConfigurations = {
-        ${username} = nixpkgs.lib.nixosSystem {        
+      nixosConfigurations.${username} = {
+        nixpkgs.lib.nixosSystem {        
           inherit system;
           modules = [
             ./modules/configs/docker-config.nix
@@ -33,8 +33,8 @@
         };
       };
 
-      homeConfigurations = {
-        ${username} = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations.${username} = {
+        home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ ./home.nix ];
         };
