@@ -1,14 +1,12 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
-    # Neovim
-    neovim
-    spacevim
-    # Zsh
-    zsh
-    zsh-autoenv
-    zsh-powerlevel10k
-    # fzf for command search
-    fzf
+    # kubernetes
+    kubectl
+    kubectx
+    k9s
+    stern
+    kubernetes-helm
+    kubectl-tree
   ];
 }
 
