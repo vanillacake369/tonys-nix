@@ -1,38 +1,21 @@
 { lib, pkgs, ... }: 
-let
-  username = "limjihoon";
-in
 {
+  # Enable home-manager (Maybe,,?)
+  programs.home-manager.enable = true;
+
   home = {
-    # user `inherit` to do same as `username = username;`
-    inherit username;
-
-    homeDirectory = "/home/${username}";
-
     # Install packages from https://search.nixos.org/packages
     packages = with pkgs; [
       # Says hello.  So helpful.
       hello
-      # Rainbows and flakes in terminal. How lovely
-      cowsay
-      lolcat
-      # Home Manager is available in shell
-      home-manager
+      # Zsh
+      zsh
+      zsh-autoenv
     ];
-
-    file = {
-      "hello.txt" = {
-        text = ''
-          echo "Hello, ${username}!"
-          echo '*slaps roof* This script can fit so many lines in it'
-        '';
-        executable = true;
-      };
-    };
     
     # This needs to be set to your actual username.
-    # username = "limjihoon";
-    # homeDirectory = "/home/limjihoon";
+    username = "limjihoon";
+    homeDirectory = "/home/limjihoon";
 
     # Don't ever change this after the first build.
     # It tells home-manager what the original state schema
@@ -40,7 +23,26 @@ in
     # should NOT update when you update your system!
     # stateVersion = "25.05";
     stateVersion = "23.11";
+  };
 
+  programs = {
+    zsh = {
+      enable = true;
+      enableCompletion = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+
+      oh-my-zsh = {
+        enable = true;
+        plugins = ["git"];
+        theme = "robbyrussell";
+      };
+
+      # Source zsh-autoenv manually
+      initExtra = ''
+      source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
+      '';
+    };
   };
 }
 
