@@ -2,32 +2,26 @@
   description = "very basic flake";
 
   inputs = {
-    # nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-    # nixpkgs.url = "nixpkgs/nixos-25.05";
-    # nixpkgs.url = "nixpkgs/nixos-23.11";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     home-manager = {
-      # url = "github:nix-community/home-manager/release-25.05";
-      # url = "github:nix-community/home-manager";
-      # url = "github:nix-community/home-manager/release-23.11";
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
     let
-      lib = nixpkgs.lib;
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      username = "limjihoon";
     in {
-      homeConfigurations = {
-        limjihoon = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
+      homeConfigurations = flake-utils.lib.eachDefaultSystem (system: {
+        ${username} = home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs { inherit system; };
           modules = [ ./home.nix ];
         };
-      };
+      });
     };
-
 }
+
