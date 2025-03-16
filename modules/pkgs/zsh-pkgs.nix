@@ -1,5 +1,16 @@
 { pkgs, ... }: {
-
+  home.packages = with pkgs; [
+   # Zsh
+    zsh
+    oh-my-zsh
+    zsh-autoenv
+    zsh-powerlevel10k
+    zsh-syntax-highlighting
+    zsh-fzf-tab
+    # zsh-autosuggestions
+    # fzf for command search
+    fzf
+  ];
   programs = {
     
     # Setup for zsh
@@ -31,7 +42,6 @@
       initExtra = ''
       # Apply zsh-autoenv
       source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
-      source ~/.zshrc
       '';
     };
 
