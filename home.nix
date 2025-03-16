@@ -10,7 +10,6 @@
     ./modules/pkgs/podman-pkgs.nix
     ./modules/pkgs/kubernetes-pkgs.nix
     ./modules/pkgs/jenkins-pkgs.nix
-    ./modules/shell.nix
     ./modules/configs/zsh-config.nix
     ./modules/user.nix
   ];
