@@ -1,5 +1,5 @@
 # Run nix home-manager
-setup-nix: install clean
+setup-nix: remove-zsh install clean
 
 # Install packages by nix home-manager
 install:
