@@ -4,12 +4,5 @@
     neovim
     spacevim
   ];
-  programs = {
-    
-    # Setup for neovim
-    neovim = {
-      enable = true;
-    };
-  };
 }
 
