@@ -8,20 +8,20 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }:
+  outputs = { self, nixpkgs, home-manager, ... }:
     let
-      username = "limjihoon";
+      lib = nixpkgs.lib;
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
     in {
-      homeConfigurations = flake-utils.lib.eachDefaultSystem (system: {
-        ${username} = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs { inherit system; };
+      homeConfigurations = {
+        limjihoon = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
           modules = [ ./home.nix ];
         };
-      });
+      };
     };
-}
 
+}
