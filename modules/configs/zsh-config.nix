@@ -9,6 +9,14 @@
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
 
+      shellAliases = {
+          ll = "ls -l";
+          update = "sudo nixos-rebuild switch";
+          kctx = "kubectx";
+          kns = "kubens";
+          k = "kubectl";
+      };
+      
       oh-my-zsh = {
         enable = true;
         plugins = [
