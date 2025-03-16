@@ -1,15 +1,12 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
-   # Zsh
-    zsh
-    oh-my-zsh
+    # zsh
+    # oh-my-zsh
     zsh-autoenv
-    zsh-powerlevel10k
-    zsh-syntax-highlighting
-    zsh-fzf-tab
+    # zsh-powerlevel10k
+    # zsh-syntax-highlighting
+    # zsh-fzf-tab
     # zsh-autosuggestions
-    # fzf for command search
-    fzf
   ];
   programs = {
     
