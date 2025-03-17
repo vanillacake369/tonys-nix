@@ -1,6 +1,7 @@
 # Run nix home-manager
 setup-nix: remove-nvim remove-zsh install clean apply-zsh
 
+
 # Remove nvim
 remove-nvim:
   rm -rf ~/.config/nvim
@@ -23,4 +24,4 @@ clean:
 # Apply zsh
 apply-zsh:
   exec zsh
-  chsh -s $(which zsh)
+  chsh -s /home/limjihoon/.nix-profile/bin/zsh
