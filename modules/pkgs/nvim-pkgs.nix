@@ -1,6 +1,9 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
-    # Neovim
+    spacevim
+  ];
+
+  programs = {
     neovim = {
 	enable = true;
 	defaultEditor = true;
@@ -8,7 +11,6 @@
 	vimAlias = true;
 	vimdiffAlias = true;
     };
-    spacevim
-  ];
+  };
 }
 
