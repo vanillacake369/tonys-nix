@@ -8,9 +8,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    system-manager = {
+      url = "github:numtide/system-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, system-manager, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -28,6 +32,12 @@
         };
       };
 
+      # Define system manager to cope with linux distro system
+      systemConfigs.default = system-manager.lib.makeSystemConfig {
+        modules = [
+          ./modules
+        ];
+      };
       
       # Define the Podman package
       packages.podman = import ./podman.nix { inherit pkgs; };
