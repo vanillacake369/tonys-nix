@@ -3,7 +3,7 @@
     # zsh
     # oh-my-zsh
     zsh-autoenv
-    # zsh-powerlevel10k
+    zsh-powerlevel10k
     # zsh-syntax-highlighting
     # zsh-fzf-tab
     # zsh-autosuggestions
@@ -49,6 +49,9 @@
 
         # Apply zsh-autoenv
         source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
+
+        # Apply zsh-powerlevel10k
+        source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
 
         # Enable home & end key
         case $TERM in (xterm*)
