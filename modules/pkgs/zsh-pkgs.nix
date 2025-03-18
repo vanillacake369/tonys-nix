@@ -61,6 +61,11 @@
 
         # Avoid for Home Manager to manage your shell configuration
         . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
+        # Enable session managed by systemd
+        if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
+          loginctl enable-linger "$USER"
+        fi
       '';
     };
 

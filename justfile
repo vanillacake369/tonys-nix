@@ -1,5 +1,5 @@
 # Run nix home-manager
-setup-nix: remove-nvim remove-spacevim install clean
+setup-nix: install clean
 # setup-nix: remove-nvim remove-spacevim remove-zsh install clean apply-zsh
 
 
