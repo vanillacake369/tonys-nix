@@ -1,7 +1,7 @@
 { pkgs, lib, ... }: 
 {
   home.packages = with pkgs; [
-    # spacevim
+    git
     curl 
     bash
   ];
@@ -10,6 +10,7 @@
   home.activation.installSpaceVim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "$HOME/.SpaceVim" ]; then
       echo "Installing SpaceVim..."
+      export PATH=${pkgs.git}/bin:$PATH
       ${pkgs.curl}/bin/curl -sLf https://spacevim.org/install.sh | ${pkgs.bash}/bin/bash
     else
       echo "SpaceVim already installed, skipping..."
