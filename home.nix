@@ -6,6 +6,7 @@
   # Import all modularized configurations
   imports = [
     ./modules/pkgs/just-pkgs.nix
+    ./modules/pkgs/podman-pkgs.nix
     ./modules/pkgs/kubernetes-pkgs.nix
     ./modules/pkgs/jenkins-pkgs.nix
     ./modules/pkgs/zsh-pkgs.nix
