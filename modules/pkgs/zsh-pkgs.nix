@@ -1,12 +1,7 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
-    # zsh
-    # oh-my-zsh
     zsh-autoenv
     zsh-powerlevel10k
-    # zsh-syntax-highlighting
-    # zsh-fzf-tab
-    # zsh-autosuggestions
   ];
   programs = {
     
@@ -22,6 +17,7 @@
           kctx = "kubectx";
           kns = "kubens";
           k = "kubectl";
+          m = "minikube";
           ka = "kubectl get all -o wide";
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
