@@ -15,7 +15,8 @@
     # Shell setup
     ./modules/pkgs/zsh-pkgs.nix
     ./modules/pkgs/nvim-pkgs.nix
-    
+    ./modules/pkgs/asciinema-pkgs.nix
+
     # User metadata
     ./modules/user.nix
   ];

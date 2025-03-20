@@ -3,7 +3,7 @@ setup-nix: install-uidmap install clean
 # setup-nix: remove-nvim remove-spacevim remove-zsh install-uidmap install clean apply-zsh
 
 
-# Enable
+# Enable uidmap
 install-uidmap:
   which newuidmap newgidmap || sudo apt update && sudo apt install -y uidmap
 
