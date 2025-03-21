@@ -3,9 +3,6 @@
   # Enable Home Manager
   programs.home-manager.enable = true;
 
-  # Configure backup for conflicts
-  home-manager.backupFileExtension = "backup";
-
   # Import all modularized configurations
   imports = [
     # Command runner similar to `make`
