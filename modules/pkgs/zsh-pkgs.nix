@@ -38,7 +38,6 @@
           "git"
           "kubectl"
           "kube-ps1"
-          "powerlevel10k"
         ];
         # theme = "powerlevel10k/powerlevel10k";
       };
