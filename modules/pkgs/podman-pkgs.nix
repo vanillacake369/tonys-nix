@@ -9,6 +9,11 @@
     fi
   '';
 
+  home.file.".config/containers/containers.conf".text = ''
+    [engine]
+    cgroup_manager = "cgroupfs"
+  '';
+
   home.packages = with pkgs; [
     qemu # required for `podman machine init`
     virtiofsd # required for `podman machine init`
