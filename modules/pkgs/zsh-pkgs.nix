@@ -70,9 +70,6 @@
         if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
           loginctl enable-linger "$USER"
         fi
-
-        # Enable DOCKER_HOST
-        export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
       '';
     };
 
