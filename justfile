@@ -7,6 +7,10 @@ setup-nix: install-uidmap install clean
 install-uidmap:
   which newuidmap newgidmap || sudo apt update && sudo apt install -y uidmap
 
+# Clear all dependencies
+clear-all:
+  echo y | home-manager uninstall
+
 # Remove nvim
 remove-nvim:
   rm -rf ~/.config/nvim
