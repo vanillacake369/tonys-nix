@@ -4,7 +4,7 @@
   programs.home-manager.enable = true;
 
   # Configure backup for conflicts
-  programs.home-manager.backupFileExtension = "backup";
+  home-manager.backupFileExtension = "backup";
 
   # Import all modularized configurations
   imports = [
