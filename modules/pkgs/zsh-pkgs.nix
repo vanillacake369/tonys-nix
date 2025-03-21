@@ -4,8 +4,6 @@
     zsh-powerlevel10k
   ];
 
-  home.file.".p10k.zsh".text = builtins.readFile ./p10k.zsh;
-
   programs = {
     
     # Setup for zsh
@@ -25,6 +23,14 @@
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
       };
+
+      plugins = [
+        {
+	  name = "powerlevel10k";                                                           
+	  src = pkgs.zsh-powerlevel10k;                                                     
+	  file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";  
+	}
+      ];
       
       oh-my-zsh = {
         enable = true;
@@ -52,6 +58,7 @@
 
         # Apply zsh-powerlevel10k
         # source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+	source ~/.p10k.zsh
 
         # Enable home & end key
         case $TERM in (xterm*)
