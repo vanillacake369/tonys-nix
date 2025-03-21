@@ -20,7 +20,7 @@
     podman-compose
   ];
 
-  programs.podman = {
+  services.podman = {
     enable = true;
     dockerCompat = true;
   };
