@@ -35,6 +35,10 @@
     }
   '';
 
+  # Configure DOCKER_HOST
+  home.activation.configDockerHost = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
+  '';
 
   home.packages = with pkgs; [
     qemu # required for `podman machine init`
@@ -46,16 +50,6 @@
     podman
     podman-compose
   ];
-
-  #services.podman = {
-  #  enable = true;
-  #  # dockerCompat = true;
-  #};
-
-  #home.activation.exposePodman = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-  #  systemctl --user start podman.socket || true
-  #  export PODMAN_SYSTEMD_UNIT=podman.socket
-  #'';
 
   home.sessionVariables = {
     DOCKER_HOST = "unix:///run/user/1000/podman/podman.sock";

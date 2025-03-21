@@ -1,5 +1,5 @@
 # Run nix home-manager
-setup-nix: install-uidmap install clean
+setup-nix: install-uidmap install clean apply-zsh
 # setup-nix: remove-nvim remove-spacevim remove-zsh install-uidmap install clean apply-zsh
 
 
