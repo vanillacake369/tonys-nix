@@ -29,7 +29,7 @@ remove-zsh:
 
 # Install packages by nix home-manager
 install:
-  home-manager switch --flake .#limjihoon
+  home-manager switch --flake .#limjihoon -b back
 
 # Clean redundant packages by nix gc
 clean:
