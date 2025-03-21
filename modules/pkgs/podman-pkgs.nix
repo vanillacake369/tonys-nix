@@ -22,22 +22,16 @@
         {
           "type": "insecureAcceptAnything"
         }
-      ]
-    }
-
-    {
-        "default": [
+      ],
+      "transports": {
+        "docker-daemon": {
+          "": [
             {
-                "type": "insecureAcceptAnything"
+              "type": "insecureAcceptAnything"
             }
-        ],
-        "transports":
-            {
-                "docker-daemon":
-                    {
-                        "": [{"type":"insecureAcceptAnything"}]
-                    }
-            }
+          ]
+        }
+      }
     }
   '';
 
