@@ -26,10 +26,10 @@
 
       plugins = [
         {
-	  name = "powerlevel10k";                                                           
-	  src = pkgs.zsh-powerlevel10k;                                                     
-	  file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";  
-	}
+          name = "powerlevel10k";                                                           
+          src = pkgs.zsh-powerlevel10k;                                                     
+          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";  
+        }
       ];
       
       oh-my-zsh = {
@@ -39,10 +39,9 @@
           "kubectl"
           "kube-ps1"
         ];
-        # theme = "powerlevel10k/powerlevel10k";
       };
 
-      # Source zsh-autoenv manually
+      # zsh script
       initExtra = ''
         # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
         # Initialization code that may require console input (password prompts, [y/n]
@@ -56,8 +55,7 @@
         source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
 
         # Apply zsh-powerlevel10k
-        # source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
-	source ~/.p10k.zsh
+	      source ~/.p10k.zsh
 
         # Enable home & end key
         case $TERM in (xterm*)
