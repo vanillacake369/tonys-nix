@@ -2,17 +2,30 @@
 
   # Configure Podman setting
   home.activation.configPodman = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    echo "$XDG_RUNTIME_DIR/podman"
-    if [ -d "$XDG_RUNTIME_DIR/podman" ]; then
+    # Enable podman.socket
+    if [ -S "$XDG_RUNTIME_DIR/podman/podman.socket" ]; then
       nohup podman system service --time=0 > ~/.podman-service.log 2>&1 &
       echo $! > ~/.podman-service.pid
     fi
   '';
 
+  # Configure cgroup
   home.file.".config/containers/containers.conf".text = ''
     [engine]
     cgroup_manager = "cgroupfs"
   '';
+
+  # Configure volume policy
+  home.file.".config/containers/policy.json".text = ''
+    {
+      "default": [
+        {
+          "type": "insecureAcceptAnything"
+        }
+      ]
+    }
+  '';
+
 
   home.packages = with pkgs; [
     qemu # required for `podman machine init`
