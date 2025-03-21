@@ -9,10 +9,10 @@
     fi
   '';
 
-  #home.file.".config/containers/containers.conf".text = ''
-  #  [engine]
-  #  cgroup_manager = "cgroupfs"
-  #'';
+  home.file.".config/containers/containers.conf".text = ''
+    [engine]
+    cgroup_manager = "cgroupfs"
+  '';
 
   home.packages = with pkgs; [
     qemu # required for `podman machine init`
@@ -21,19 +21,19 @@
     runc # required for OCI runtime
     podman-tui
     dive
-    # podman
+    podman
     podman-compose
   ];
 
-  services.podman = {
-    enable = true;
-    # dockerCompat = true;
-  };
+  #services.podman = {
+  #  enable = true;
+  #  # dockerCompat = true;
+  #};
 
-  home.activation.exposePodman = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    systemctl --user start podman.socket || true
-    export PODMAN_SYSTEMD_UNIT=podman.socket
-  '';
+  #home.activation.exposePodman = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  #  systemctl --user start podman.socket || true
+  #  export PODMAN_SYSTEMD_UNIT=podman.socket
+  #'';
 
   home.sessionVariables = {
     DOCKER_HOST = "unix:///run/user/1000/podman/podman.sock";
