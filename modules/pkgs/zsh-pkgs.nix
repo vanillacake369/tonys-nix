@@ -3,6 +3,9 @@
     zsh-autoenv
     zsh-powerlevel10k
   ];
+
+  home.file.".p10k.zsh".source = ../../dotfiles/p10k.zsh;
+
   programs = {
     
     # Setup for zsh
@@ -33,19 +36,6 @@
         ];
         # theme = "powerlevel10k/powerlevel10k";
       };
-
-      plugins = [
-        {
-          name = "powerlevel10k-config";
-          src = ../../dotfiles;
-          file = "p10k.zsh";
-        }
-        {
-          name = "zsh-powerlevel10k";
-          src = "${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/";
-          file = "powerlevel10k.zsh-theme";
-        }
-      ];
 
       # Source zsh-autoenv manually
       initExtra = ''
