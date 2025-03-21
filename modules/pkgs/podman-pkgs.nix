@@ -16,8 +16,17 @@
     runc # required for OCI runtime
     podman-tui
     dive
-    podman
+    # podman
     podman-compose
   ];
+
+  programs.podman = {
+    enable = true;
+    dockerCompat = true;
+  };
+
+  home.sessionVariables = {
+    DOCKER_HOST = "unix:///run/user/1000/podman/podman.sock";
+  };
 }
 
