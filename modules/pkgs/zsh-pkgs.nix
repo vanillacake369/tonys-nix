@@ -4,7 +4,7 @@
     zsh-powerlevel10k
   ];
 
-  home.file.".p10k.zsh".source = ../../dotfiles/p10k.zsh;
+  home.file.".p10k.zsh".text = builtins.readFile ./p10k.zsh;
 
   programs = {
     
