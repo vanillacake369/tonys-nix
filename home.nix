@@ -9,8 +9,8 @@
     ./modules/pkgs/just-pkgs.nix
 
     # Podman & K8S for rootless container
-    ./modules/pkgs/podman-pkgs.nix
-    ./modules/pkgs/kubernetes-pkgs.nix
+    # ./modules/pkgs/podman-pkgs.nix
+    # ./modules/pkgs/kubernetes-pkgs.nix
     
     # Shell setup
     ./modules/pkgs/zsh-pkgs.nix
