@@ -4,6 +4,7 @@
     git
     curl 
     bash
+    vimPlugins.vim-visual-multi
   ];
 
   # install spacevim if not installed
