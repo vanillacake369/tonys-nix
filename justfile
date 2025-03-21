@@ -5,7 +5,17 @@ setup-nix: install-uidmap install clean
 
 # Enable uidmap
 install-uidmap:
-  which newuidmap newgidmap || sudo apt update && sudo apt install -y uidmap
+  #!/usr/bin/env sh
+  hello='yo'
+  echo "$hello from a shell script!"
+  echo "$shell : is my current shell"
+
+  if ! command -v newuidmap >/dev/null || ! command -v newgidmap >/dev/null; then
+    echo "[!] installing uidmap via apt (requires sudo)"
+    sudo apt update && sudo apt install -y uidmap
+  else
+    echo "[✓] newuidmap and newgidmap already exist"
+  fi
 
 # Clear all dependencies
 clear-all:
