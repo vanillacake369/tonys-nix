@@ -1,966 +1,259 @@
 
 ==> Audit <==
-|---------|--------------------------------|----------|-----------|---------|---------------------|---------------------|
-| Command |              Args              | Profile  |   User    | Version |     Start Time      |      End Time       |
-|---------|--------------------------------|----------|-----------|---------|---------------------|---------------------|
-| config  | set rootless true              | minikube | limjihoon | v1.34.0 | 22 Mar 25 00:22 KST | 22 Mar 25 00:22 KST |
-| config  | set driver podman              | minikube | limjihoon | v1.34.0 | 22 Mar 25 00:22 KST | 22 Mar 25 00:22 KST |
-| start   | --driver=podman                | minikube | limjihoon | v1.34.0 | 22 Mar 25 00:22 KST |                     |
-|         | --container-runtime=containerd |          |           |         |                     |                     |
-|         | --force                        |          |           |         |                     |                     |
-|---------|--------------------------------|----------|-----------|---------|---------------------|---------------------|
+|---------|--------------------------------|----------|-----------|---------|---------------------|----------|
+| Command |              Args              | Profile  |   User    | Version |     Start Time      | End Time |
+|---------|--------------------------------|----------|-----------|---------|---------------------|----------|
+| start   | --driver=podman                | minikube | limjihoon | v1.34.0 | 22 Mar 25 14:46 KST |          |
+|         | --container-runtime=containerd |          |           |         |                     |          |
+|         | --force                        |          |           |         |                     |          |
+|---------|--------------------------------|----------|-----------|---------|---------------------|----------|
 
 
 ==> Last Start <==
-Log file created at: 2025/03/22 00:22:56
+Log file created at: 2025/03/22 14:46:51
 Running on machine: MyLaptop
 Binary: Built with gc go1.24.1 for linux/amd64
 Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
-I0322 00:22:56.398453   87460 out.go:345] Setting OutFile to fd 1 ...
-I0322 00:22:56.398618   87460 out.go:397] isatty.IsTerminal(1) = true
-I0322 00:22:56.398622   87460 out.go:358] Setting ErrFile to fd 2...
-I0322 00:22:56.398628   87460 out.go:397] isatty.IsTerminal(2) = true
-I0322 00:22:56.398877   87460 root.go:338] Updating PATH: /home/limjihoon/.minikube/bin
-I0322 00:22:56.399701   87460 out.go:352] Setting JSON to false
-I0322 00:22:56.400477   87460 start.go:129] hostinfo: {"hostname":"MyLaptop","uptime":20685,"bootTime":1742549892,"procs":41,"os":"linux","platform":"ubuntu","platformFamily":"debian","platformVersion":"22.04","kernelVersion":"5.15.167.4-microsoft-standard-WSL2","kernelArch":"x86_64","virtualizationSystem":"","virtualizationRole":"guest","hostId":"457e6407-079b-4242-8e4e-281b23e1d702"}
-I0322 00:22:56.400540   87460 start.go:139] virtualization:  guest
-I0322 00:22:56.407907   87460 out.go:177] 😄  minikube v1.34.0 on Ubuntu 22.04 (amd64)
-I0322 00:22:56.424929   87460 notify.go:220] Checking for updates...
-W0322 00:22:56.425033   87460 preload.go:293] Failed to list preload files: open /home/limjihoon/.minikube/cache/preloaded-tarball: no such file or directory
-I0322 00:22:56.429147   87460 out.go:177]     ▪ MINIKUBE_WANTUPDATENOTIFICATION=false
-I0322 00:22:56.435006   87460 out.go:177]     ▪ MINIKUBE_ROOTLESS=true
-W0322 00:22:56.449317   87460 out.go:270] ❗  minikube skips various validations when --force is supplied; this may lead to unexpected behavior
-I0322 00:22:56.449652   87460 driver.go:394] Setting default libvirt URI to qemu:///system
-I0322 00:22:56.884420   87460 podman.go:123] podman version: 5.4.1
-I0322 00:22:56.900255   87460 out.go:177] ✨  Using the podman driver based on user configuration
-I0322 00:22:56.904775   87460 start.go:297] selected driver: podman
-I0322 00:22:56.904790   87460 start.go:901] validating driver "podman" against <nil>
-I0322 00:22:56.904805   87460 start.go:912] status for podman: {Installed:true Healthy:true Running:false NeedsImprovement:false Error:<nil> Reason: Fix: Doc: Version:}
-I0322 00:22:56.904917   87460 cli_runner.go:164] Run: podman system info --format json
-I0322 00:22:57.932495   87460 cli_runner.go:217] Completed: podman system info --format json: (1.027548964s)
-I0322 00:22:57.932829   87460 info.go:288] podman info: {Host:{BuildahVersion:1.39.2 CgroupVersion:v2 Conmon:{Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/conmon Version:conmon version 2.1.13, commit: } Distribution:{Distribution:ubuntu Version:22.04} MemFree:14546153472 MemTotal:16726904832 OCIRuntime:{Name:crun Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/crun Version:crun version 1.20
-commit: 1.20
-rundir: /run/user/1000/crun
+I0322 14:46:51.394713   16006 out.go:345] Setting OutFile to fd 1 ...
+I0322 14:46:51.394869   16006 out.go:397] isatty.IsTerminal(1) = true
+I0322 14:46:51.394873   16006 out.go:358] Setting ErrFile to fd 2...
+I0322 14:46:51.394877   16006 out.go:397] isatty.IsTerminal(2) = true
+I0322 14:46:51.395034   16006 root.go:338] Updating PATH: /home/limjihoon/.minikube/bin
+W0322 14:46:51.395114   16006 root.go:314] Error reading config file at /home/limjihoon/.minikube/config/config.json: open /home/limjihoon/.minikube/config/config.json: no such file or directory
+I0322 14:46:51.401027   16006 out.go:352] Setting JSON to false
+I0322 14:46:51.401760   16006 start.go:129] hostinfo: {"hostname":"MyLaptop","uptime":42854,"bootTime":1742579557,"procs":53,"os":"linux","platform":"ubuntu","platformFamily":"debian","platformVersion":"22.04","kernelVersion":"5.15.167.4-microsoft-standard-WSL2","kernelArch":"x86_64","virtualizationSystem":"","virtualizationRole":"guest","hostId":"457e6407-079b-4242-8e4e-281b23e1d702"}
+I0322 14:46:51.401832   16006 start.go:139] virtualization:  guest
+I0322 14:46:51.407864   16006 out.go:177] 😄  minikube v1.34.0 on Ubuntu 22.04 (amd64)
+I0322 14:46:51.427359   16006 notify.go:220] Checking for updates...
+I0322 14:46:51.427394   16006 out.go:177]     ▪ MINIKUBE_WANTUPDATENOTIFICATION=false
+W0322 14:46:51.427455   16006 preload.go:293] Failed to list preload files: open /home/limjihoon/.minikube/cache/preloaded-tarball: no such file or directory
+W0322 14:46:51.436328   16006 out.go:270] ❗  minikube skips various validations when --force is supplied; this may lead to unexpected behavior
+I0322 14:46:51.436566   16006 driver.go:394] Setting default libvirt URI to qemu:///system
+W0322 14:46:51.441242   16006 podman.go:138] podman returned error: exit status 1
+I0322 14:46:51.455026   16006 out.go:177] ✨  Using the podman driver based on user configuration
+I0322 14:46:51.467144   16006 start.go:297] selected driver: podman
+I0322 14:46:51.467153   16006 start.go:901] validating driver "podman" against <nil>
+I0322 14:46:51.467164   16006 start.go:912] status for podman: {Installed:true Healthy:false Running:false NeedsImprovement:false Error:"sudo -n -k podman version --format {{.Version}}" exit status 1: sudo: a password is required Reason: Fix:Add your user to the 'sudoers' file: 'limjihoon ALL=(ALL) NOPASSWD: /usr/bin/podman' , or run 'minikube config set rootless true' Doc:https://podman.io Version:}
+I0322 14:46:51.474617   16006 out.go:201] 
+W0322 14:46:51.478358   16006 out.go:270] 💣  "sudo -n -k podman version --format {{.Version}}" exit status 1: sudo: a password is required
+W0322 14:46:51.478442   16006 out.go:270] 💡  Suggestion: Add your user to the 'sudoers' file: 'limjihoon ALL=(ALL) NOPASSWD: /usr/bin/podman' , or run 'minikube config set rootless true'
+W0322 14:46:51.478487   16006 out.go:270] 📘  Documentation: https://podman.io
+I0322 14:46:51.487937   16006 out.go:201] 
+I0322 14:46:51.502562   16006 cli_runner.go:164] Run: sudo -n podman system info --format json
+I0322 14:46:51.804614   16006 info.go:288] podman info: {Host:{BuildahVersion:1.23.1 CgroupVersion:v2 Conmon:{Package:conmon: /usr/bin/conmon Path:/usr/bin/conmon Version:conmon version 2.0.25, commit: unknown} Distribution:{Distribution:ubuntu Version:22.04} MemFree:15520374784 MemTotal:16726904832 OCIRuntime:{Name:crun Package:crun: /usr/bin/crun Path:/usr/bin/crun Version:crun version 0.17
+commit: 0e9229ae34caaebcb86f1fde18de3acaf18c6d9a
 spec: 1.0.0
-+SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:true} Uptime:5h 44m 45.00s (Approximately 0.21 days)} Registries:{Search:[]} Store:{ConfigFile:/home/limjihoon/.config/containers/storage.conf ContainerStore:{Number:0} GraphDriverName:overlay GraphOptions:{} GraphRoot:/home/limjihoon/.local/share/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:1} RunRoot:/run/user/1000/containers VolumePath:/home/limjihoon/.local/share/containers/storage/volumes}}
-I0322 00:22:57.932913   87460 start_flags.go:310] no existing cluster config was found, will generate one from the flags 
-I0322 00:22:57.933459   87460 start_flags.go:393] Using suggested 3900MB memory alloc based on sys=15952MB, container=15952MB
-I0322 00:22:57.933647   87460 start_flags.go:929] Wait components to verify : map[apiserver:true system_pods:true]
-I0322 00:22:57.940676   87460 out.go:177] 📌  Using rootless Podman driver
-I0322 00:22:57.944521   87460 cni.go:84] Creating CNI manager for ""
-I0322 00:22:57.944609   87460 cni.go:143] "podman" driver + "containerd" runtime found, recommending kindnet
-I0322 00:22:57.944617   87460 start_flags.go:319] Found "CNI" CNI - setting NetworkPlugin=cni
-I0322 00:22:57.944719   87460 start.go:340] cluster config:
-{Name:minikube KeepContext:false EmbedCerts:false MinikubeISO: KicBaseImage:gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 Memory:3900 CPUs:2 DiskSize:20000 Driver:podman HyperkitVpnKitSock: HyperkitVSockPorts:[] DockerEnv:[] ContainerVolumeMounts:[] InsecureRegistry:[] RegistryMirror:[] HostOnlyCIDR:192.168.59.1/24 HypervVirtualSwitch: HypervUseExternalSwitch:false HypervExternalAdapter: KVMNetwork:default KVMQemuURI:qemu:///system KVMGPU:false KVMHidden:false KVMNUMACount:1 APIServerPort:8443 DockerOpt:[] DisableDriverMounts:false NFSShare:[] NFSSharesRoot:/nfsshares UUID: NoVTXCheck:false DNSProxy:false HostDNSResolver:true HostOnlyNicType:virtio NatNicType:virtio SSHIPAddress: SSHUser:root SSHKey: SSHPort:22 KubernetesConfig:{KubernetesVersion:v1.31.0 ClusterName:minikube Namespace:default APIServerHAVIP: APIServerName:minikubeCA APIServerNames:[] APIServerIPs:[] DNSDomain:cluster.local ContainerRuntime:containerd CRISocket: NetworkPlugin:cni FeatureGates:KubeletInUserNamespace=true ServiceCIDR:10.96.0.0/12 ImageRepository: LoadBalancerStartIP: LoadBalancerEndIP: CustomIngressCert: RegistryAliases: ExtraOptions:[] ShouldLoadCachedImages:true EnableDefaultCNI:false CNI:} Nodes:[{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}] Addons:map[] CustomAddonImages:map[] CustomAddonRegistries:map[] VerifyComponents:map[apiserver:true system_pods:true] StartHostTimeout:6m0s ScheduledStop:<nil> ExposedPorts:[] ListenAddress: Network: Subnet: MultiNodeRequested:false ExtraDisks:0 CertExpiration:26280h0m0s Mount:false MountString:/home/limjihoon:/minikube-host Mount9PVersion:9p2000.L MountGID:docker MountIP: MountMSize:262144 MountOptions:[] MountPort:0 MountType:9p MountUID:docker BinaryMirror: DisableOptimizations:false DisableMetrics:false CustomQemuFirmwarePath: SocketVMnetClientPath: SocketVMnetPath: StaticIP: SSHAuthSock: SSHAgentPID:0 GPUs: AutoPauseInterval:1m0s}
-I0322 00:22:57.960173   87460 out.go:177] 👍  Starting "minikube" primary control-plane node in "minikube" cluster
-I0322 00:22:57.969001   87460 cache.go:121] Beginning downloading kic base image for podman with containerd
-I0322 00:22:57.973412   87460 out.go:177] 🚜  Pulling base image v0.0.45 ...
-I0322 00:22:57.977464   87460 preload.go:131] Checking if preload exists for k8s version v1.31.0 and runtime containerd
-I0322 00:22:57.977639   87460 cache.go:149] Downloading gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 to local cache
-I0322 00:22:57.977785   87460 image.go:63] Checking for gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 in local cache directory
-I0322 00:22:57.978190   87460 image.go:148] Writing gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 to local cache
-I0322 00:22:58.120352   87460 preload.go:118] Found remote preload: https://storage.googleapis.com/minikube-preloaded-volume-tarballs/v18/v1.31.0/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4
-I0322 00:22:58.120368   87460 cache.go:56] Caching tarball of preloaded images
-I0322 00:22:58.120473   87460 preload.go:131] Checking if preload exists for k8s version v1.31.0 and runtime containerd
-I0322 00:22:58.128971   87460 out.go:177] 💾  Downloading Kubernetes v1.31.0 preload ...
-I0322 00:22:58.133421   87460 preload.go:236] getting checksum for preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
-I0322 00:22:58.384258   87460 download.go:107] Downloading: https://storage.googleapis.com/minikube-preloaded-volume-tarballs/v18/v1.31.0/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4?checksum=md5:14d66fa06a3139c10b78b55b023a4cd9 -> /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4
-I0322 00:23:13.182405   87460 preload.go:247] saving checksum for preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
-I0322 00:23:13.182519   87460 preload.go:254] verifying checksum of /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
-I0322 00:23:14.205263   87460 cache.go:59] Finished verifying existence of preloaded tar for v1.31.0 on containerd
-I0322 00:23:14.205784   87460 profile.go:143] Saving config to /home/limjihoon/.minikube/profiles/minikube/config.json ...
-I0322 00:23:14.205818   87460 lock.go:35] WriteFile acquiring /home/limjihoon/.minikube/profiles/minikube/config.json: {Name:mk261e425cce3135de660e31c8c722ca5d7a59c6 Clock:{} Delay:500ms Timeout:1m0s Cancel:<nil>}
-I0322 00:23:43.507729   87460 cache.go:152] successfully saved gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 as a tarball
-E0322 00:23:43.507757   87460 cache.go:189] Error downloading kic artifacts:  not yet implemented, see issue #8426
-I0322 00:23:43.507803   87460 cache.go:194] Successfully downloaded all kic artifacts
-I0322 00:23:43.507842   87460 start.go:360] acquireMachinesLock for minikube: {Name:mk0ec3e2ab338c261ed7cbece856792361bf0f5c Clock:{} Delay:500ms Timeout:10m0s Cancel:<nil>}
-I0322 00:23:43.507951   87460 start.go:364] duration metric: took 86.8µs to acquireMachinesLock for "minikube"
-I0322 00:23:43.507986   87460 start.go:93] Provisioning new machine with config: &{Name:minikube KeepContext:false EmbedCerts:false MinikubeISO: KicBaseImage:gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 Memory:3900 CPUs:2 DiskSize:20000 Driver:podman HyperkitVpnKitSock: HyperkitVSockPorts:[] DockerEnv:[] ContainerVolumeMounts:[] InsecureRegistry:[] RegistryMirror:[] HostOnlyCIDR:192.168.59.1/24 HypervVirtualSwitch: HypervUseExternalSwitch:false HypervExternalAdapter: KVMNetwork:default KVMQemuURI:qemu:///system KVMGPU:false KVMHidden:false KVMNUMACount:1 APIServerPort:8443 DockerOpt:[] DisableDriverMounts:false NFSShare:[] NFSSharesRoot:/nfsshares UUID: NoVTXCheck:false DNSProxy:false HostDNSResolver:true HostOnlyNicType:virtio NatNicType:virtio SSHIPAddress: SSHUser:root SSHKey: SSHPort:22 KubernetesConfig:{KubernetesVersion:v1.31.0 ClusterName:minikube Namespace:default APIServerHAVIP: APIServerName:minikubeCA APIServerNames:[] APIServerIPs:[] DNSDomain:cluster.local ContainerRuntime:containerd CRISocket: NetworkPlugin:cni FeatureGates:KubeletInUserNamespace=true ServiceCIDR:10.96.0.0/12 ImageRepository: LoadBalancerStartIP: LoadBalancerEndIP: CustomIngressCert: RegistryAliases: ExtraOptions:[] ShouldLoadCachedImages:true EnableDefaultCNI:false CNI:} Nodes:[{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}] Addons:map[] CustomAddonImages:map[] CustomAddonRegistries:map[] VerifyComponents:map[apiserver:true system_pods:true] StartHostTimeout:6m0s ScheduledStop:<nil> ExposedPorts:[] ListenAddress: Network: Subnet: MultiNodeRequested:false ExtraDisks:0 CertExpiration:26280h0m0s Mount:false MountString:/home/limjihoon:/minikube-host Mount9PVersion:9p2000.L MountGID:docker MountIP: MountMSize:262144 MountOptions:[] MountPort:0 MountType:9p MountUID:docker BinaryMirror: DisableOptimizations:false DisableMetrics:false CustomQemuFirmwarePath: SocketVMnetClientPath: SocketVMnetPath: StaticIP: SSHAuthSock: SSHAgentPID:0 GPUs: AutoPauseInterval:1m0s} &{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}
-I0322 00:23:43.508074   87460 start.go:125] createHost starting for "" (driver="podman")
-I0322 00:23:43.974965   87460 out.go:235] 🔥  Creating podman container (CPUs=2, Memory=3900MB) ...
-I0322 00:23:43.975406   87460 start.go:159] libmachine.API.Create for "minikube" (driver="podman")
-I0322 00:23:43.975455   87460 client.go:168] LocalClient.Create starting
-I0322 00:23:43.975591   87460 main.go:141] libmachine: Creating CA: /home/limjihoon/.minikube/certs/ca.pem
-I0322 00:23:44.382839   87460 main.go:141] libmachine: Creating client certificate: /home/limjihoon/.minikube/certs/cert.pem
-I0322 00:23:44.540519   87460 cli_runner.go:164] Run: podman version --format {{.Version}}
-I0322 00:23:44.941182   87460 cli_runner.go:164] Run: podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
-W0322 00:23:45.336941   87460 cli_runner.go:211] podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}" returned with exit code 125
-I0322 00:23:45.336996   87460 network_create.go:284] running [podman network inspect minikube] to gather additional debugging logs...
-I0322 00:23:45.337008   87460 cli_runner.go:164] Run: podman network inspect minikube
-W0322 00:23:45.716569   87460 cli_runner.go:211] podman network inspect minikube returned with exit code 125
-I0322 00:23:45.716587   87460 network_create.go:287] error running [podman network inspect minikube]: podman network inspect minikube: exit status 125
-stdout:
-[]
-
-stderr:
-Error: network minikube: unable to find network with name or ID minikube: network not found
-I0322 00:23:45.716597   87460 network_create.go:289] output of [podman network inspect minikube]: -- stdout --
-[]
-
--- /stdout --
-** stderr ** 
-Error: network minikube: unable to find network with name or ID minikube: network not found
-
-** /stderr **
-I0322 00:23:45.716639   87460 cli_runner.go:164] Run: podman version --format {{.Version}}
-I0322 00:23:46.074225   87460 cli_runner.go:164] Run: podman network inspect podman --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
-I0322 00:23:46.402397   87460 network.go:206] using free private subnet 192.168.49.0/24: &{IP:192.168.49.0 Netmask:255.255.255.0 Prefix:24 CIDR:192.168.49.0/24 Gateway:192.168.49.1 ClientMin:192.168.49.2 ClientMax:192.168.49.254 Broadcast:192.168.49.255 IsPrivate:true Interface:{IfaceName: IfaceIPv4: IfaceMTU:0 IfaceMAC:} reservation:0xc00195c880}
-I0322 00:23:46.402423   87460 network_create.go:124] attempt to create podman network minikube 192.168.49.0/24 with gateway 192.168.49.1 and MTU of 0 ...
-I0322 00:23:46.402470   87460 cli_runner.go:164] Run: podman network create --driver=bridge --subnet=192.168.49.0/24 --gateway=192.168.49.1 --label=created_by.minikube.sigs.k8s.io=true --label=name.minikube.sigs.k8s.io=minikube minikube
-I0322 00:23:46.867799   87460 network_create.go:108] podman network minikube 192.168.49.0/24 created
-I0322 00:23:46.867816   87460 kic.go:121] calculated static IP "192.168.49.2" for the "minikube" container
-I0322 00:23:46.867870   87460 cli_runner.go:164] Run: podman ps -a --format {{.Names}}
-I0322 00:23:47.383703   87460 cli_runner.go:164] Run: podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true
-I0322 00:23:48.015052   87460 oci.go:103] Successfully created a podman volume minikube
-I0322 00:23:48.015145   87460 cli_runner.go:164] Run: podman run --rm --name minikube-preload-sidecar --label created_by.minikube.sigs.k8s.io=true --label name.minikube.sigs.k8s.io=minikube --entrypoint /usr/bin/test -v minikube:/var gcr.io/k8s-minikube/kicbase:v0.0.45 -d /var/lib
-I0322 00:25:03.206930   87460 cli_runner.go:217] Completed: podman run --rm --name minikube-preload-sidecar --label created_by.minikube.sigs.k8s.io=true --label name.minikube.sigs.k8s.io=minikube --entrypoint /usr/bin/test -v minikube:/var gcr.io/k8s-minikube/kicbase:v0.0.45 -d /var/lib: (1m15.191728277s)
-I0322 00:25:03.206960   87460 oci.go:107] Successfully prepared a podman volume minikube
-I0322 00:25:03.207046   87460 preload.go:131] Checking if preload exists for k8s version v1.31.0 and runtime containerd
-I0322 00:25:03.207084   87460 kic.go:194] Starting extracting preloaded images to volume ...
-I0322 00:25:03.207214   87460 cli_runner.go:164] Run: podman run --rm --entrypoint /usr/bin/tar --security-opt label=disable -v /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4:/preloaded.tar:ro -v minikube:/extractDir gcr.io/k8s-minikube/kicbase:v0.0.45 -I lz4 -xf /preloaded.tar -C /extractDir
-I0322 00:25:06.724983   87460 cli_runner.go:217] Completed: podman run --rm --entrypoint /usr/bin/tar --security-opt label=disable -v /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4:/preloaded.tar:ro -v minikube:/extractDir gcr.io/k8s-minikube/kicbase:v0.0.45 -I lz4 -xf /preloaded.tar -C /extractDir: (3.517637619s)
-I0322 00:25:06.725000   87460 kic.go:203] duration metric: took 3.517920019s to extract preloaded images to volume ...
-W0322 00:25:06.725114   87460 cgroups_linux.go:77] Your kernel does not support swap limit capabilities or the cgroup is not mounted.
-W0322 00:25:06.725146   87460 oci.go:243] Your kernel does not support CPU cfs period/quota or the cgroup is not mounted.
-I0322 00:25:06.725184   87460 cli_runner.go:164] Run: podman info --format "'{{json .SecurityOptions}}'"
-W0322 00:25:07.272733   87460 cli_runner.go:211] podman info --format "'{{json .SecurityOptions}}'" returned with exit code 125
-I0322 00:25:07.272797   87460 cli_runner.go:164] Run: podman run -d -t --privileged --security-opt seccomp=unconfined --tmpfs /tmp --tmpfs /run -v /lib/modules:/lib/modules:ro --hostname minikube --name minikube --label created_by.minikube.sigs.k8s.io=true --label name.minikube.sigs.k8s.io=minikube --label role.minikube.sigs.k8s.io= --label mode.minikube.sigs.k8s.io=minikube --network minikube --ip 192.168.49.2 --volume minikube:/var:exec --memory=3900mb -e container=podman --expose 8443 --publish=127.0.0.1::8443 --publish=127.0.0.1::22 --publish=127.0.0.1::2376 --publish=127.0.0.1::5000 --publish=127.0.0.1::32443 gcr.io/k8s-minikube/kicbase:v0.0.45
-I0322 00:25:08.126194   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:08.519956   87460 retry.go:31] will retry after 12.254445ms: temporary error created container "minikube" is not running yet
-I0322 00:25:08.533329   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:30.850466   87460 cli_runner.go:217] Completed: podman container inspect minikube --format={{.State.Running}}: (22.317095578s)
-I0322 00:25:30.850500   87460 retry.go:31] will retry after 16.389628ms: temporary error created container "minikube" is not running yet
-I0322 00:25:30.867933   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:31.331309   87460 retry.go:31] will retry after 26.618065ms: temporary error created container "minikube" is not running yet
-I0322 00:25:31.358786   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:31.747671   87460 retry.go:31] will retry after 41.708134ms: temporary error created container "minikube" is not running yet
-I0322 00:25:31.790352   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:32.107647   87460 retry.go:31] will retry after 63.97199ms: temporary error created container "minikube" is not running yet
-I0322 00:25:32.172564   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:32.518076   87460 retry.go:31] will retry after 67.179101ms: temporary error created container "minikube" is not running yet
-I0322 00:25:32.586251   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:32.901389   87460 retry.go:31] will retry after 115.137658ms: temporary error created container "minikube" is not running yet
-I0322 00:25:33.016983   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
-I0322 00:25:33.351314   87460 cli_runner.go:164] Run: podman inspect minikube
-I0322 00:25:33.710509   87460 errors.go:84] Postmortem inspect ("podman inspect minikube"): -- stdout --
-[
-     {
-          "Id": "d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65",
-          "Created": "2025-03-22T00:25:07.635902915+09:00",
-          "Path": "/usr/local/bin/entrypoint",
-          "Args": [
-               "/sbin/init"
-          ],
-          "State": {
-               "OciVersion": "1.2.0",
-               "Status": "exited",
-               "Running": false,
-               "Paused": false,
-               "Restarting": false,
-               "OOMKilled": false,
-               "Dead": false,
-               "Pid": 0,
-               "ExitCode": 255,
-               "Error": "",
-               "StartedAt": "2025-03-22T00:25:08.107215817+09:00",
-               "FinishedAt": "2025-03-22T00:25:08.247342718+09:00",
-               "CheckpointedAt": "0001-01-01T00:00:00Z",
-               "RestoredAt": "0001-01-01T00:00:00Z"
-          },
-          "Image": "aeed0e1d4642008f872cbedd0f6935323c1e533683c40e800e0b01d063d11a3c",
-          "ImageDigest": "sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85",
-          "ImageName": "gcr.io/k8s-minikube/kicbase:v0.0.45",
-          "Rootfs": "",
-          "Pod": "",
-          "ResolvConfPath": "/run/user/1000/containers/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/resolv.conf",
-          "HostnamePath": "/run/user/1000/containers/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/hostname",
-          "HostsPath": "/run/user/1000/containers/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/hosts",
-          "StaticDir": "/home/limjihoon/.local/share/containers/storage/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata",
-          "OCIConfigPath": "/home/limjihoon/.local/share/containers/storage/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/config.json",
-          "OCIRuntime": "crun",
-          "ConmonPidFile": "/run/user/1000/containers/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/conmon.pid",
-          "PidFile": "/run/user/1000/containers/overlay-containers/d6b9a525935f0498fed00410a4669088c1cecd79ff46b37b3df292ffc1bcca65/userdata/pidfile",
-          "Name": "minikube",
-          "RestartCount": 0,
-          "Driver": "overlay",
-          "MountLabel": "",
-          "ProcessLabel": "",
-          "AppArmorProfile": "",
-          "EffectiveCaps": [
-               "CAP_AUDIT_CONTROL",
-               "CAP_AUDIT_READ",
-               "CAP_AUDIT_WRITE",
-               "CAP_BLOCK_SUSPEND",
-               "CAP_BPF",
-               "CAP_CHECKPOINT_RESTORE",
-               "CAP_CHOWN",
-               "CAP_DAC_OVERRIDE",
-               "CAP_DAC_READ_SEARCH",
-               "CAP_FOWNER",
-               "CAP_FSETID",
-               "CAP_IPC_LOCK",
-               "CAP_IPC_OWNER",
-               "CAP_KILL",
-               "CAP_LEASE",
-               "CAP_LINUX_IMMUTABLE",
-               "CAP_MAC_ADMIN",
-               "CAP_MAC_OVERRIDE",
-               "CAP_MKNOD",
-               "CAP_NET_ADMIN",
-               "CAP_NET_BIND_SERVICE",
-               "CAP_NET_BROADCAST",
-               "CAP_NET_RAW",
-               "CAP_PERFMON",
-               "CAP_SETFCAP",
-               "CAP_SETGID",
-               "CAP_SETPCAP",
-               "CAP_SETUID",
-               "CAP_SYSLOG",
-               "CAP_SYS_ADMIN",
-               "CAP_SYS_BOOT",
-               "CAP_SYS_CHROOT",
-               "CAP_SYS_MODULE",
-               "CAP_SYS_NICE",
-               "CAP_SYS_PACCT",
-               "CAP_SYS_PTRACE",
-               "CAP_SYS_RAWIO",
-               "CAP_SYS_RESOURCE",
-               "CAP_SYS_TIME",
-               "CAP_SYS_TTY_CONFIG",
-               "CAP_WAKE_ALARM"
-          ],
-          "BoundingCaps": [
-               "CAP_AUDIT_CONTROL",
-               "CAP_AUDIT_READ",
-               "CAP_AUDIT_WRITE",
-               "CAP_BLOCK_SUSPEND",
-               "CAP_BPF",
-               "CAP_CHECKPOINT_RESTORE",
-               "CAP_CHOWN",
-               "CAP_DAC_OVERRIDE",
-               "CAP_DAC_READ_SEARCH",
-               "CAP_FOWNER",
-               "CAP_FSETID",
-               "CAP_IPC_LOCK",
-               "CAP_IPC_OWNER",
-               "CAP_KILL",
-               "CAP_LEASE",
-               "CAP_LINUX_IMMUTABLE",
-               "CAP_MAC_ADMIN",
-               "CAP_MAC_OVERRIDE",
-               "CAP_MKNOD",
-               "CAP_NET_ADMIN",
-               "CAP_NET_BIND_SERVICE",
-               "CAP_NET_BROADCAST",
-               "CAP_NET_RAW",
-               "CAP_PERFMON",
-               "CAP_SETFCAP",
-               "CAP_SETGID",
-               "CAP_SETPCAP",
-               "CAP_SETUID",
-               "CAP_SYSLOG",
-               "CAP_SYS_ADMIN",
-               "CAP_SYS_BOOT",
-               "CAP_SYS_CHROOT",
-               "CAP_SYS_MODULE",
-               "CAP_SYS_NICE",
-               "CAP_SYS_PACCT",
-               "CAP_SYS_PTRACE",
-               "CAP_SYS_RAWIO",
-               "CAP_SYS_RESOURCE",
-               "CAP_SYS_TIME",
-               "CAP_SYS_TTY_CONFIG",
-               "CAP_WAKE_ALARM"
-          ],
-          "ExecIDs": [],
-          "GraphDriver": {
-               "Name": "overlay",
-               "Data": {
-                    "LowerDir": "/home/limjihoon/.local/share/containers/storage/overlay/edf8d38bf136339feeeda62dc8a3a754728b6ecb571036fb6e8a3c51680b776b/diff",
-                    "UpperDir": "/home/limjihoon/.local/share/containers/storage/overlay/62b101c0a784f15cfafa52e2ba384749b79cbb22e19c5deec2921b3f01c38416/diff",
-                    "WorkDir": "/home/limjihoon/.local/share/containers/storage/overlay/62b101c0a784f15cfafa52e2ba384749b79cbb22e19c5deec2921b3f01c38416/work"
-               }
-          },
-          "Mounts": [
-               {
-                    "Type": "volume",
-                    "Name": "minikube",
-                    "Source": "/home/limjihoon/.local/share/containers/storage/volumes/minikube/_data",
-                    "Destination": "/var",
-                    "Driver": "local",
-                    "Mode": "",
-                    "Options": [
-                         "exec",
-                         "nosuid",
-                         "nodev",
-                         "rbind"
-                    ],
-                    "RW": true,
-                    "Propagation": "rprivate"
-               },
-               {
-                    "Type": "bind",
-                    "Source": "/lib/modules",
-                    "Destination": "/lib/modules",
-                    "Driver": "",
-                    "Mode": "",
-                    "Options": [
-                         "rbind"
-                    ],
-                    "RW": false,
-                    "Propagation": "rprivate"
-               }
-          ],
-          "Dependencies": [],
-          "NetworkSettings": {
-               "EndpointID": "",
-               "Gateway": "",
-               "IPAddress": "",
-               "IPPrefixLen": 0,
-               "IPv6Gateway": "",
-               "GlobalIPv6Address": "",
-               "GlobalIPv6PrefixLen": 0,
-               "MacAddress": "",
-               "Bridge": "",
-               "SandboxID": "",
-               "HairpinMode": false,
-               "LinkLocalIPv6Address": "",
-               "LinkLocalIPv6PrefixLen": 0,
-               "Ports": {
-                    "22/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "45941"
-                         }
-                    ],
-                    "2376/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "34479"
-                         }
-                    ],
-                    "32443/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "42911"
-                         }
-                    ],
-                    "5000/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "34411"
-                         }
-                    ],
-                    "8443/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "36703"
-                         }
-                    ]
-               },
-               "SandboxKey": "",
-               "Networks": {
-                    "minikube": {
-                         "EndpointID": "",
-                         "Gateway": "",
-                         "IPAddress": "",
-                         "IPPrefixLen": 0,
-                         "IPv6Gateway": "",
-                         "GlobalIPv6Address": "",
-                         "GlobalIPv6PrefixLen": 0,
-                         "MacAddress": "",
-                         "NetworkID": "5aeb2656758cbe3133281ec09a1e9bafa2555d0f7eb345852625543e903de467",
-                         "DriverOpts": null,
-                         "IPAMConfig": null,
-                         "Links": null,
-                         "Aliases": [
-                              "d6b9a525935f",
-                              "minikube"
-                         ]
-                    }
-               }
-          },
-          "Namespace": "",
-          "IsInfra": false,
-          "IsService": false,
-          "KubeExitCodePropagation": "invalid",
-          "lockNumber": 1,
-          "Config": {
-               "Hostname": "minikube",
-               "Domainname": "",
-               "User": "",
-               "AttachStdin": false,
-               "AttachStdout": false,
-               "AttachStderr": false,
-               "Tty": true,
-               "OpenStdin": false,
-               "StdinOnce": false,
-               "Env": [
-                    "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-                    "container=podman",
-                    "TERM=xterm",
-                    "HOSTNAME=minikube",
-                    "HOME=/root"
-               ],
-               "Cmd": null,
-               "Image": "gcr.io/k8s-minikube/kicbase:v0.0.45",
-               "Volumes": null,
-               "WorkingDir": "/",
-               "Entrypoint": [
-                    "/usr/local/bin/entrypoint",
-                    "/sbin/init"
-               ],
-               "OnBuild": null,
-               "Labels": {
-                    "created_by.minikube.sigs.k8s.io": "true",
-                    "mode.minikube.sigs.k8s.io": "minikube",
-                    "name.minikube.sigs.k8s.io": "minikube",
-                    "role.minikube.sigs.k8s.io": ""
-               },
-               "Annotations": {
-                    "io.container.manager": "libpod",
-                    "io.podman.annotations.privileged": "TRUE",
-                    "io.podman.annotations.seccomp": "unconfined",
-                    "org.opencontainers.image.stopSignal": "37",
-                    "org.systemd.property.KillSignal": "37",
-                    "org.systemd.property.TimeoutStopUSec": "uint64 10000000"
-               },
-               "StopSignal": "SIGRTMIN+3",
-               "HealthcheckOnFailureAction": "none",
-               "HealthLogDestination": "local",
-               "HealthcheckMaxLogCount": 5,
-               "HealthcheckMaxLogSize": 500,
-               "CreateCommand": [
-                    "/home/limjihoon/.nix-profile/bin/podman",
-                    "run",
-                    "-d",
-                    "-t",
-                    "--privileged",
-                    "--security-opt",
-                    "seccomp=unconfined",
-                    "--tmpfs",
-                    "/tmp",
-                    "--tmpfs",
-                    "/run",
-                    "-v",
-                    "/lib/modules:/lib/modules:ro",
-                    "--hostname",
-                    "minikube",
-                    "--name",
-                    "minikube",
-                    "--label",
-                    "created_by.minikube.sigs.k8s.io=true",
-                    "--label",
-                    "name.minikube.sigs.k8s.io=minikube",
-                    "--label",
-                    "role.minikube.sigs.k8s.io=",
-                    "--label",
-                    "mode.minikube.sigs.k8s.io=minikube",
-                    "--network",
-                    "minikube",
-                    "--ip",
-                    "192.168.49.2",
-                    "--volume",
-                    "minikube:/var:exec",
-                    "--memory=3900mb",
-                    "-e",
-                    "container=podman",
-                    "--expose",
-                    "8443",
-                    "--publish=127.0.0.1::8443",
-                    "--publish=127.0.0.1::22",
-                    "--publish=127.0.0.1::2376",
-                    "--publish=127.0.0.1::5000",
-                    "--publish=127.0.0.1::32443",
-                    "gcr.io/k8s-minikube/kicbase:v0.0.45"
-               ],
-               "Umask": "0022",
-               "Timeout": 0,
-               "StopTimeout": 10,
-               "Passwd": true,
-               "sdNotifyMode": "container",
-               "ExposedPorts": {
-                    "22/tcp": {},
-                    "2376/tcp": {},
-                    "32443/tcp": {},
-                    "5000/tcp": {},
-                    "8443/tcp": {}
-               }
-          },
-          "HostConfig": {
-               "Binds": [
-                    "minikube:/var:exec,rw,rprivate,nosuid,nodev,rbind",
-                    "/lib/modules:/lib/modules:ro,rprivate,rbind"
-               ],
-               "CgroupManager": "cgroupfs",
-               "CgroupMode": "private",
-               "ContainerIDFile": "",
-               "LogConfig": {
-                    "Type": "journald",
-                    "Config": null,
-                    "Path": "",
-                    "Tag": "",
-                    "Size": "0B"
-               },
-               "NetworkMode": "bridge",
-               "PortBindings": {
-                    "22/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "45941"
-                         }
-                    ],
-                    "2376/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "34479"
-                         }
-                    ],
-                    "32443/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "42911"
-                         }
-                    ],
-                    "5000/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "34411"
-                         }
-                    ],
-                    "8443/tcp": [
-                         {
-                              "HostIp": "127.0.0.1",
-                              "HostPort": "36703"
-                         }
-                    ]
-               },
-               "RestartPolicy": {
-                    "Name": "no",
-                    "MaximumRetryCount": 0
-               },
-               "AutoRemove": false,
-               "AutoRemoveImage": false,
-               "Annotations": {
-                    "io.container.manager": "libpod",
-                    "io.podman.annotations.privileged": "TRUE",
-                    "io.podman.annotations.seccomp": "unconfined",
-                    "org.opencontainers.image.stopSignal": "37",
-                    "org.systemd.property.KillSignal": "37",
-                    "org.systemd.property.TimeoutStopUSec": "uint64 10000000"
-               },
-               "VolumeDriver": "",
-               "VolumesFrom": null,
-               "CapAdd": [],
-               "CapDrop": [],
-               "Dns": [],
-               "DnsOptions": [],
-               "DnsSearch": [],
-               "ExtraHosts": [],
-               "HostsFile": "",
-               "GroupAdd": [],
-               "IpcMode": "shareable",
-               "Cgroup": "",
-               "Cgroups": "default",
-               "Links": null,
-               "OomScoreAdj": 0,
-               "PidMode": "private",
-               "Privileged": true,
-               "PublishAllPorts": false,
-               "ReadonlyRootfs": false,
-               "SecurityOpt": [
-                    "seccomp=unconfined",
-                    "unmask=all"
-               ],
-               "Tmpfs": {
-                    "/run": "rw,rprivate,nosuid,nodev,tmpcopyup",
-                    "/tmp": "rw,rprivate,nosuid,nodev,tmpcopyup"
-               },
-               "UTSMode": "private",
-               "UsernsMode": "",
-               "ShmSize": 65536000,
-               "Runtime": "oci",
-               "ConsoleSize": [
-                    0,
-                    0
-               ],
-               "Isolation": "",
-               "CpuShares": 0,
-               "Memory": 4089446400,
-               "NanoCpus": 0,
-               "CgroupParent": "",
-               "BlkioWeight": 0,
-               "BlkioWeightDevice": null,
-               "BlkioDeviceReadBps": null,
-               "BlkioDeviceWriteBps": null,
-               "BlkioDeviceReadIOps": null,
-               "BlkioDeviceWriteIOps": null,
-               "CpuPeriod": 0,
-               "CpuQuota": 0,
-               "CpuRealtimePeriod": 0,
-               "CpuRealtimeRuntime": 0,
-               "CpusetCpus": "",
-               "CpusetMems": "",
-               "Devices": [],
-               "DiskQuota": 0,
-               "KernelMemory": 0,
-               "MemoryReservation": 0,
-               "MemorySwap": 8178892800,
-               "MemorySwappiness": -1,
-               "OomKillDisable": false,
-               "PidsLimit": 0,
-               "Ulimits": [
-                    {
-                         "Name": "RLIMIT_NOFILE",
-                         "Soft": 1048576,
-                         "Hard": 1048576
-                    },
-                    {
-                         "Name": "RLIMIT_NPROC",
-                         "Soft": 63780,
-                         "Hard": 63780
-                    }
-               ],
-               "CpuCount": 0,
-               "CpuPercent": 0,
-               "IOMaximumIOps": 0,
-               "IOMaximumBandwidth": 0,
-               "CgroupConf": null
-          },
-          "UseImageHosts": false,
-          "UseImageHostname": false
-     }
-]
-
--- /stdout --
-I0322 00:25:33.710572   87460 cli_runner.go:164] Run: podman logs --timestamps minikube
-I0322 00:25:34.208855   87460 errors.go:91] Postmortem logs ("podman logs --timestamps minikube"): -- stdout --
-2025-03-22T00:25:08.111802000+09:00 + userns=
-2025-03-22T00:25:08.112062000+09:00 + grep -Eqv '0[[:space:]]+0[[:space:]]+4294967295' /proc/self/uid_map
-2025-03-22T00:25:08.112204000+09:00 + userns=1
-2025-03-22T00:25:08.112282000+09:00 + echo 'INFO: running in a user namespace (experimental)'
-2025-03-22T00:25:08.112413000+09:00 INFO: running in a user namespace (experimental)
-2025-03-22T00:25:08.112489000+09:00 + validate_userns
-2025-03-22T00:25:08.112538000+09:00 + [[ -z 1 ]]
-2025-03-22T00:25:08.112607000+09:00 + local nofile_hard
-2025-03-22T00:25:08.112657000+09:00 ++ ulimit -Hn
-2025-03-22T00:25:08.112740000+09:00 + nofile_hard=1048576
-2025-03-22T00:25:08.112789000+09:00 + local nofile_hard_expected=64000
-2025-03-22T00:25:08.112884000+09:00 + [[ 1048576 -lt 64000 ]]
-2025-03-22T00:25:08.112980000+09:00 + [[ -f /sys/fs/cgroup/cgroup.controllers ]]
-2025-03-22T00:25:08.113050000+09:00 + for f in cpu memory pids
-2025-03-22T00:25:08.113100000+09:00 + grep -qw cpu /sys/fs/cgroup/cgroup.controllers
-2025-03-22T00:25:08.113165000+09:00 + for f in cpu memory pids
-2025-03-22T00:25:08.113235000+09:00 + grep -qw memory /sys/fs/cgroup/cgroup.controllers
-2025-03-22T00:25:08.113849000+09:00 + for f in cpu memory pids
-2025-03-22T00:25:08.113964000+09:00 + grep -qw pids /sys/fs/cgroup/cgroup.controllers
-2025-03-22T00:25:08.115055000+09:00 + configure_containerd
-2025-03-22T00:25:08.115177000+09:00 + local snapshotter=
-2025-03-22T00:25:08.115231000+09:00 + [[ -n 1 ]]
-2025-03-22T00:25:08.115303000+09:00 + sed -i 's/restrict_oom_score_adj = false/restrict_oom_score_adj = true/' /etc/containerd/config.toml
-2025-03-22T00:25:08.116755000+09:00 + [[ -z '' ]]
-2025-03-22T00:25:08.116868000+09:00 + overlayfs_preferrable
-2025-03-22T00:25:08.116926000+09:00 + [[ -z 1 ]]
-2025-03-22T00:25:08.116994000+09:00 + [[ -e /sys/module/overlay/parameters/permit_mounts_in_userns ]]
-2025-03-22T00:25:08.117162000+09:00 ++ mktemp -d
-2025-03-22T00:25:08.117897000+09:00 + tmp=/tmp/tmp.IrAXSd0gLx
-2025-03-22T00:25:08.118024000+09:00 + mkdir -p /tmp/tmp.IrAXSd0gLx/l /tmp/tmp.IrAXSd0gLx/u /tmp/tmp.IrAXSd0gLx/w /tmp/tmp.IrAXSd0gLx/m
-2025-03-22T00:25:08.118979000+09:00 + mount -t overlay -o lowerdir=/tmp/tmp.IrAXSd0gLx/l,upperdir=/tmp/tmp.IrAXSd0gLx/u,workdir=/tmp/tmp.IrAXSd0gLx/w overlay /tmp/tmp.IrAXSd0gLx/m
-2025-03-22T00:25:08.120423000+09:00 + umount /tmp/tmp.IrAXSd0gLx/m
-2025-03-22T00:25:08.122198000+09:00 + rm -rf /tmp/tmp.IrAXSd0gLx
-2025-03-22T00:25:08.123261000+09:00 + grep -q _t: /proc/self/attr/current
-2025-03-22T00:25:08.123978000+09:00 grep: /proc/self/attr/current: Invalid argument
-2025-03-22T00:25:08.124063000+09:00 + return 0
-2025-03-22T00:25:08.124181000+09:00 + [[ -z '' ]]
-2025-03-22T00:25:08.124505000+09:00 ++ stat -f -c %T /kind
-2025-03-22T00:25:08.125547000+09:00 + container_filesystem=overlayfs
-2025-03-22T00:25:08.125695000+09:00 + [[ overlayfs == \z\f\s ]]
-2025-03-22T00:25:08.125805000+09:00 + [[ -n '' ]]
-2025-03-22T00:25:08.125901000+09:00 + configure_proxy
-2025-03-22T00:25:08.126012000+09:00 + mkdir -p /etc/systemd/system.conf.d/
-2025-03-22T00:25:08.127381000+09:00 + [[ ! -z '' ]]
-2025-03-22T00:25:08.127575000+09:00 + cat
-2025-03-22T00:25:08.128997000+09:00 + fix_mount
-2025-03-22T00:25:08.129211000+09:00 + echo 'INFO: ensuring we can execute mount/umount even with userns-remap'
-2025-03-22T00:25:08.129292000+09:00 INFO: ensuring we can execute mount/umount even with userns-remap
-2025-03-22T00:25:08.129381000+09:00 ++ which mount
-2025-03-22T00:25:08.130706000+09:00 ++ which umount
-2025-03-22T00:25:08.131829000+09:00 + chown root:root /usr/bin/mount /usr/bin/umount
-2025-03-22T00:25:08.147665000+09:00 ++ which mount
-2025-03-22T00:25:08.149056000+09:00 ++ which umount
-2025-03-22T00:25:08.149854000+09:00 + chmod -s /usr/bin/mount /usr/bin/umount
-2025-03-22T00:25:08.152035000+09:00 +++ which mount
-2025-03-22T00:25:08.152956000+09:00 ++ stat -f -c %T /usr/bin/mount
-2025-03-22T00:25:08.153961000+09:00 + [[ overlayfs == \a\u\f\s ]]
-2025-03-22T00:25:08.154110000+09:00 + echo 'INFO: remounting /sys read-only'
-2025-03-22T00:25:08.154221000+09:00 INFO: remounting /sys read-only
-2025-03-22T00:25:08.154320000+09:00 + mount -o remount,ro /sys
-2025-03-22T00:25:08.155630000+09:00 mount: /sys: permission denied.
-2025-03-22T00:25:08.155944000+09:00 + [[ -n 1 ]]
-2025-03-22T00:25:08.156096000+09:00 + echo 'INFO: UserNS: ignoring mount fail'
-2025-03-22T00:25:08.156200000+09:00 INFO: UserNS: ignoring mount fail
-2025-03-22T00:25:08.156262000+09:00 + echo 'INFO: making mounts shared'
-2025-03-22T00:25:08.156372000+09:00 INFO: making mounts shared
-2025-03-22T00:25:08.156481000+09:00 + mount --make-rshared /
-2025-03-22T00:25:08.157396000+09:00 + retryable_fix_cgroup
-2025-03-22T00:25:08.157813000+09:00 ++ seq 0 10
-2025-03-22T00:25:08.158647000+09:00 + for i in $(seq 0 10)
-2025-03-22T00:25:08.158811000+09:00 + fix_cgroup
-2025-03-22T00:25:08.158927000+09:00 + [[ -f /sys/fs/cgroup/cgroup.controllers ]]
-2025-03-22T00:25:08.159019000+09:00 + echo 'INFO: detected cgroup v2'
-2025-03-22T00:25:08.159110000+09:00 INFO: detected cgroup v2
-2025-03-22T00:25:08.159219000+09:00 + return
-2025-03-22T00:25:08.159297000+09:00 + return
-2025-03-22T00:25:08.159399000+09:00 + fix_machine_id
-2025-03-22T00:25:08.159501000+09:00 + echo 'INFO: clearing and regenerating /etc/machine-id'
-2025-03-22T00:25:08.159578000+09:00 INFO: clearing and regenerating /etc/machine-id
-2025-03-22T00:25:08.159688000+09:00 + rm -f /etc/machine-id
-2025-03-22T00:25:08.160253000+09:00 + systemd-machine-id-setup
-2025-03-22T00:25:08.163666000+09:00 Initializing machine ID from random generator.
-2025-03-22T00:25:08.184512000+09:00 + fix_product_name
-2025-03-22T00:25:08.184730000+09:00 + [[ -f /sys/class/dmi/id/product_name ]]
-2025-03-22T00:25:08.184838000+09:00 + fix_product_uuid
-2025-03-22T00:25:08.184947000+09:00 + [[ ! -f /kind/product_uuid ]]
-2025-03-22T00:25:08.185026000+09:00 + cat /proc/sys/kernel/random/uuid
-2025-03-22T00:25:08.185903000+09:00 + [[ -f /sys/class/dmi/id/product_uuid ]]
-2025-03-22T00:25:08.186061000+09:00 + [[ -f /sys/devices/virtual/dmi/id/product_uuid ]]
-2025-03-22T00:25:08.186168000+09:00 + select_iptables
-2025-03-22T00:25:08.186247000+09:00 + local mode num_legacy_lines num_nft_lines
-2025-03-22T00:25:08.186857000+09:00 ++ grep -c '^-'
-2025-03-22T00:25:08.189375000+09:00 ++ true
-2025-03-22T00:25:08.189657000+09:00 + num_legacy_lines=0
-2025-03-22T00:25:08.190683000+09:00 ++ grep -c '^-'
-2025-03-22T00:25:08.195331000+09:00 ++ true
-2025-03-22T00:25:08.195547000+09:00 + num_nft_lines=0
-2025-03-22T00:25:08.195667000+09:00 + '[' 0 -ge 0 ']'
-2025-03-22T00:25:08.195776000+09:00 + mode=legacy
-2025-03-22T00:25:08.195886000+09:00 + echo 'INFO: setting iptables to detected mode: legacy'
-2025-03-22T00:25:08.195997000+09:00 INFO: setting iptables to detected mode: legacy
-2025-03-22T00:25:08.196098000+09:00 + update-alternatives --set iptables /usr/sbin/iptables-legacy
-2025-03-22T00:25:08.196174000+09:00 + echo 'retryable update-alternatives: --set iptables /usr/sbin/iptables-legacy'
-2025-03-22T00:25:08.196227000+09:00 + local 'args=--set iptables /usr/sbin/iptables-legacy'
-2025-03-22T00:25:08.196327000+09:00 ++ seq 0 15
-2025-03-22T00:25:08.197284000+09:00 + for i in $(seq 0 15)
-2025-03-22T00:25:08.197447000+09:00 + /usr/bin/update-alternatives --set iptables /usr/sbin/iptables-legacy
-2025-03-22T00:25:08.213285000+09:00 + return
-2025-03-22T00:25:08.213441000+09:00 + update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-2025-03-22T00:25:08.213526000+09:00 + echo 'retryable update-alternatives: --set ip6tables /usr/sbin/ip6tables-legacy'
-2025-03-22T00:25:08.213580000+09:00 + local 'args=--set ip6tables /usr/sbin/ip6tables-legacy'
-2025-03-22T00:25:08.213925000+09:00 ++ seq 0 15
-2025-03-22T00:25:08.214638000+09:00 + for i in $(seq 0 15)
-2025-03-22T00:25:08.214762000+09:00 + /usr/bin/update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-2025-03-22T00:25:08.225176000+09:00 + return
-2025-03-22T00:25:08.225349000+09:00 + enable_network_magic
-2025-03-22T00:25:08.225434000+09:00 + local docker_embedded_dns_ip=127.0.0.11
-2025-03-22T00:25:08.225529000+09:00 + local docker_host_ip
-2025-03-22T00:25:08.226778000+09:00 ++ head -n1 /dev/fd/63
-2025-03-22T00:25:08.227043000+09:00 ++ cut '-d ' -f1
-2025-03-22T00:25:08.227164000+09:00 +++ timeout 5 getent ahostsv4 host.docker.internal
-2025-03-22T00:25:08.230148000+09:00 + docker_host_ip=192.168.45.124
-2025-03-22T00:25:08.230333000+09:00 + [[ -z 192.168.45.124 ]]
-2025-03-22T00:25:08.230441000+09:00 + [[ 192.168.45.124 =~ ^127\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
-2025-03-22T00:25:08.230543000+09:00 + iptables-save
-2025-03-22T00:25:08.230915000+09:00 + iptables-restore
-2025-03-22T00:25:08.233243000+09:00 + sed -e 's/-d 127.0.0.11/-d 192.168.45.124/g' -e 's/-A OUTPUT \(.*\) -j DOCKER_OUTPUT/\0\n-A PREROUTING \1 -j DOCKER_OUTPUT/' -e 's/--to-source :53/--to-source 192.168.45.124:53/g' -e 's/p -j DNAT --to-destination 127.0.0.11/p --dport 53 -j DNAT --to-destination 127.0.0.11/g'
-2025-03-22T00:25:08.234392000+09:00 + cp /etc/resolv.conf /etc/resolv.conf.original
-2025-03-22T00:25:08.236103000+09:00 ++ sed -e s/127.0.0.11/192.168.45.124/g /etc/resolv.conf.original
-2025-03-22T00:25:08.237140000+09:00 + replaced='search dns.podman
-2025-03-22T00:25:08.237301000+09:00 nameserver 192.168.49.1'
-2025-03-22T00:25:08.237410000+09:00 + [[ '' == '' ]]
-2025-03-22T00:25:08.237491000+09:00 + echo 'search dns.podman
-2025-03-22T00:25:08.237603000+09:00 nameserver 192.168.49.1'
-2025-03-22T00:25:08.237705000+09:00 + files_to_update=('/etc/kubernetes/manifests/etcd.yaml' '/etc/kubernetes/manifests/kube-apiserver.yaml' '/etc/kubernetes/manifests/kube-controller-manager.yaml' '/etc/kubernetes/manifests/kube-scheduler.yaml' '/etc/kubernetes/controller-manager.conf' '/etc/kubernetes/scheduler.conf' '/kind/kubeadm.conf' '/var/lib/kubelet/kubeadm-flags.env')
-2025-03-22T00:25:08.237816000+09:00 + local files_to_update
-2025-03-22T00:25:08.237921000+09:00 + local should_fix_certificate=false
-2025-03-22T00:25:08.238380000+09:00 ++ cut '-d ' -f1
-2025-03-22T00:25:08.238536000+09:00 ++ head -n1 /dev/fd/63
-2025-03-22T00:25:08.239125000+09:00 ++++ hostname
-2025-03-22T00:25:08.239930000+09:00 +++ timeout 5 getent ahostsv4 minikube
-2025-03-22T00:25:08.242546000+09:00 + curr_ipv4=192.168.49.2
-2025-03-22T00:25:08.242742000+09:00 + echo 'INFO: Detected IPv4 address: 192.168.49.2'
-2025-03-22T00:25:08.242833000+09:00 INFO: Detected IPv4 address: 192.168.49.2
-2025-03-22T00:25:08.242944000+09:00 + '[' -f /kind/old-ipv4 ']'
-2025-03-22T00:25:08.243038000+09:00 + [[ -n 192.168.49.2 ]]
-2025-03-22T00:25:08.243147000+09:00 + echo -n 192.168.49.2
-2025-03-22T00:25:08.244050000+09:00 ++ cut '-d ' -f1
-2025-03-22T00:25:08.244234000+09:00 ++ head -n1 /dev/fd/63
-2025-03-22T00:25:08.245105000+09:00 ++++ hostname
-2025-03-22T00:25:08.246300000+09:00 +++ timeout 5 getent ahostsv6 minikube
-2025-03-22T00:25:08.249177000+09:00 + curr_ipv6=::ffff:192.168.49.2
-2025-03-22T00:25:08.249368000+09:00 + echo 'INFO: Detected IPv6 address: ::ffff:192.168.49.2'
-2025-03-22T00:25:08.249505000+09:00 INFO: Detected IPv6 address: ::ffff:192.168.49.2
-2025-03-22T00:25:08.249628000+09:00 + '[' -f /kind/old-ipv6 ']'
-2025-03-22T00:25:08.249736000+09:00 + [[ -n ::ffff:192.168.49.2 ]]
-2025-03-22T00:25:08.249820000+09:00 + echo -n ::ffff:192.168.49.2
-2025-03-22T00:25:08.249964000+09:00 + false
-2025-03-22T00:25:08.250092000+09:00 ++ uname -a
-2025-03-22T00:25:08.250932000+09:00 + echo 'entrypoint completed: Linux minikube 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux'
-2025-03-22T00:25:08.251059000+09:00 entrypoint completed: Linux minikube 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
-2025-03-22T00:25:08.251194000+09:00 + exec /sbin/init
-2025-03-22T00:25:08.254944000+09:00 systemd 249.11-0ubuntu3.12 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY -P11KIT -QRENCODE +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
-2025-03-22T00:25:08.255132000+09:00 Detected virtualization wsl.
-2025-03-22T00:25:08.255244000+09:00 Detected architecture x86-64.
-2025-03-22T00:25:08.255372000+09:00 
-2025-03-22T00:25:08.255487000+09:00 Welcome to [1mUbuntu 22.04.4 LTS[0m!
-2025-03-22T00:25:08.255590000+09:00 
-2025-03-22T00:25:08.255688000+09:00 [0;1;31mFailed to create /init.scope control group: Permission denied[0m
-2025-03-22T00:25:08.255759000+09:00 [0;1;31mFailed to allocate manager object: Permission denied[0m
-2025-03-22T00:25:08.255860000+09:00 [[0;1;31m!!!!!![0m] Failed to allocate manager object.
-2025-03-22T00:25:08.255932000+09:00 [0;1;31mExiting PID 1...[0m
-
--- /stdout --
-I0322 00:25:34.208904   87460 cli_runner.go:164] Run: podman system info --format json
-I0322 00:25:35.110658   87460 info.go:288] podman info: {Host:{BuildahVersion:1.39.2 CgroupVersion:v2 Conmon:{Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/conmon Version:conmon version 2.1.13, commit: } Distribution:{Distribution:ubuntu Version:22.04} MemFree:10924085248 MemTotal:16726904832 OCIRuntime:{Name:crun Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/crun Version:crun version 1.20
-commit: 1.20
-rundir: /run/user/1000/crun
-spec: 1.0.0
-+SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:true} Uptime:5h 47m 22.00s (Approximately 0.21 days)} Registries:{Search:[]} Store:{ConfigFile:/home/limjihoon/.config/containers/storage.conf ContainerStore:{Number:1} GraphDriverName:overlay GraphOptions:{} GraphRoot:/home/limjihoon/.local/share/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:2} RunRoot:/run/user/1000/containers VolumePath:/home/limjihoon/.local/share/containers/storage/volumes}}
-I0322 00:25:35.110683   87460 errors.go:106] postmortem podman info: {Host:{BuildahVersion:1.39.2 CgroupVersion:v2 Conmon:{Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/conmon Version:conmon version 2.1.13, commit: } Distribution:{Distribution:ubuntu Version:22.04} MemFree:10924085248 MemTotal:16726904832 OCIRuntime:{Name:crun Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/crun Version:crun version 1.20
-commit: 1.20
-rundir: /run/user/1000/crun
-spec: 1.0.0
-+SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:true} Uptime:5h 47m 22.00s (Approximately 0.21 days)} Registries:{Search:[]} Store:{ConfigFile:/home/limjihoon/.config/containers/storage.conf ContainerStore:{Number:1} GraphDriverName:overlay GraphOptions:{} GraphRoot:/home/limjihoon/.local/share/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:2} RunRoot:/run/user/1000/containers VolumePath:/home/limjihoon/.local/share/containers/storage/volumes}}
-I0322 00:25:35.110724   87460 network_create.go:284] running [podman network inspect minikube] to gather additional debugging logs...
-I0322 00:25:35.110734   87460 cli_runner.go:164] Run: podman network inspect minikube
-I0322 00:25:35.559220   87460 network_create.go:289] output of [podman network inspect minikube]: -- stdout --
-[
-     {
-          "name": "minikube",
-          "id": "5aeb2656758cbe3133281ec09a1e9bafa2555d0f7eb345852625543e903de467",
-          "driver": "bridge",
-          "network_interface": "podman1",
-          "created": "2025-03-22T00:23:46.864469197+09:00",
-          "subnets": [
-               {
-                    "subnet": "192.168.49.0/24",
-                    "gateway": "192.168.49.1"
-               }
-          ],
-          "ipv6_enabled": false,
-          "internal": false,
-          "dns_enabled": true,
-          "labels": {
-               "created_by.minikube.sigs.k8s.io": "true",
-               "name.minikube.sigs.k8s.io": "minikube"
-          },
-          "ipam_options": {
-               "driver": "host-local"
-          },
-          "containers": {}
-     }
-]
-
--- /stdout --
-I0322 00:25:35.559286   87460 cli_runner.go:164] Run: podman system info --format json
-I0322 00:25:36.413561   87460 info.go:288] podman info: {Host:{BuildahVersion:1.39.2 CgroupVersion:v2 Conmon:{Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/conmon Version:conmon version 2.1.13, commit: } Distribution:{Distribution:ubuntu Version:22.04} MemFree:10920214528 MemTotal:16726904832 OCIRuntime:{Name:crun Package:Unknown Path:/nix/store/6lz3z75kcsm59iq2mxrscnd417kwq1m8-podman-helper-binary-wrapper/bin/crun Version:crun version 1.20
-commit: 1.20
-rundir: /run/user/1000/crun
-spec: 1.0.0
-+SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +CRIU +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:true} Uptime:5h 47m 24.00s (Approximately 0.21 days)} Registries:{Search:[]} Store:{ConfigFile:/home/limjihoon/.config/containers/storage.conf ContainerStore:{Number:1} GraphDriverName:overlay GraphOptions:{} GraphRoot:/home/limjihoon/.local/share/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:2} RunRoot:/run/user/1000/containers VolumePath:/home/limjihoon/.local/share/containers/storage/volumes}}
-I0322 00:25:36.413600   87460 client.go:171] duration metric: took 1m52.438140669s to LocalClient.Create
-I0322 00:25:38.413719   87460 start.go:128] duration metric: took 1m54.905630517s to createHost
-I0322 00:25:38.413731   87460 start.go:83] releasing machines lock for "minikube", held for 1m54.905773617s
-W0322 00:25:38.413777   87460 start.go:714] error starting host: creating host: create: creating: create kic node: container name "minikube": log: 2025-03-22T00:25:08.255688000+09:00 [0;1;31mFailed to create /init.scope control group: Permission denied[0m
-2025-03-22T00:25:08.255759000+09:00 [0;1;31mFailed to allocate manager object: Permission denied[0m
-2025-03-22T00:25:08.255860000+09:00 [[0;1;31m!!!!!![0m] Failed to allocate manager object.
-2025-03-22T00:25:08.255932000+09:00 [0;1;31mExiting PID 1...[0m: container exited unexpectedly
-I0322 00:25:38.414134   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Status}}
-I0322 00:25:38.872285   87460 stop.go:39] StopHost: minikube
-W0322 00:25:38.872503   87460 register.go:133] "Stopping" was not found within the registered steps for "Initial Minikube Setup": [Initial Minikube Setup Selecting Driver Downloading Artifacts Starting Node Updating Driver Pulling Base Image Running on Localhost Local OS Release Creating Container Creating VM Running Remotely Preparing Kubernetes Generating certificates Booting control plane Configuring RBAC rules Configuring CNI Configuring Localhost Environment Verifying Kubernetes Enabling Addons Done]
-I0322 00:25:38.877634   87460 out.go:177] ✋  Stopping node "minikube"  ...
-I0322 00:25:38.881194   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Status}}
-I0322 00:25:39.309783   87460 stop.go:87] host is in state Stopped
-I0322 00:25:39.309856   87460 main.go:141] libmachine: Stopping "minikube"...
-I0322 00:25:39.309930   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Status}}
-I0322 00:25:39.663616   87460 stop.go:66] stop err: Machine "minikube" is already stopped.
-I0322 00:25:39.663647   87460 stop.go:69] host is already stopped
-W0322 00:25:40.664074   87460 register.go:133] "Stopping" was not found within the registered steps for "Initial Minikube Setup": [Initial Minikube Setup Selecting Driver Downloading Artifacts Starting Node Updating Driver Pulling Base Image Running on Localhost Local OS Release Creating Container Creating VM Running Remotely Preparing Kubernetes Generating certificates Booting control plane Configuring RBAC rules Configuring CNI Configuring Localhost Environment Verifying Kubernetes Enabling Addons Done]
-I0322 00:25:40.671927   87460 out.go:177] 🔥  Deleting "minikube" in podman ...
-I0322 00:25:40.677264   87460 cli_runner.go:164] Run: podman container inspect -f {{.Id}} minikube
-I0322 00:25:40.977865   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Status}}
-I0322 00:25:41.276116   87460 cli_runner.go:164] Run: podman exec --privileged -t minikube /bin/bash -c "sudo init 0"
-W0322 00:25:41.581890   87460 cli_runner.go:211] podman exec --privileged -t minikube /bin/bash -c "sudo init 0" returned with exit code 255
-I0322 00:25:41.581907   87460 oci.go:650] error shutdown minikube: podman exec --privileged -t minikube /bin/bash -c "sudo init 0": exit status 255
++SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:false} Uptime:11h 54m 13.98s (Approximately 0.46 days)} Registries:{Search:[]} Store:{ConfigFile:/etc/containers/storage.conf ContainerStore:{Number:0} GraphDriverName:overlay GraphOptions:{} GraphRoot:/var/lib/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:1} RunRoot:/run/containers/storage VolumePath:/var/lib/containers/storage/volumes}}
+I0322 14:46:51.804798   16006 start_flags.go:310] no existing cluster config was found, will generate one from the flags 
+I0322 14:46:51.805463   16006 start_flags.go:393] Using suggested 3900MB memory alloc based on sys=15952MB, container=15952MB
+I0322 14:46:51.805594   16006 start_flags.go:929] Wait components to verify : map[apiserver:true system_pods:true]
+I0322 14:46:51.819434   16006 out.go:177] 📌  Using Podman driver with root privileges
+I0322 14:46:51.828374   16006 cni.go:84] Creating CNI manager for ""
+I0322 14:46:51.828632   16006 cni.go:143] "podman" driver + "containerd" runtime found, recommending kindnet
+I0322 14:46:51.828638   16006 start_flags.go:319] Found "CNI" CNI - setting NetworkPlugin=cni
+I0322 14:46:51.828700   16006 start.go:340] cluster config:
+{Name:minikube KeepContext:false EmbedCerts:false MinikubeISO: KicBaseImage:gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 Memory:3900 CPUs:2 DiskSize:20000 Driver:podman HyperkitVpnKitSock: HyperkitVSockPorts:[] DockerEnv:[] ContainerVolumeMounts:[] InsecureRegistry:[] RegistryMirror:[] HostOnlyCIDR:192.168.59.1/24 HypervVirtualSwitch: HypervUseExternalSwitch:false HypervExternalAdapter: KVMNetwork:default KVMQemuURI:qemu:///system KVMGPU:false KVMHidden:false KVMNUMACount:1 APIServerPort:8443 DockerOpt:[] DisableDriverMounts:false NFSShare:[] NFSSharesRoot:/nfsshares UUID: NoVTXCheck:false DNSProxy:false HostDNSResolver:true HostOnlyNicType:virtio NatNicType:virtio SSHIPAddress: SSHUser:root SSHKey: SSHPort:22 KubernetesConfig:{KubernetesVersion:v1.31.0 ClusterName:minikube Namespace:default APIServerHAVIP: APIServerName:minikubeCA APIServerNames:[] APIServerIPs:[] DNSDomain:cluster.local ContainerRuntime:containerd CRISocket: NetworkPlugin:cni FeatureGates: ServiceCIDR:10.96.0.0/12 ImageRepository: LoadBalancerStartIP: LoadBalancerEndIP: CustomIngressCert: RegistryAliases: ExtraOptions:[] ShouldLoadCachedImages:true EnableDefaultCNI:false CNI:} Nodes:[{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}] Addons:map[] CustomAddonImages:map[] CustomAddonRegistries:map[] VerifyComponents:map[apiserver:true system_pods:true] StartHostTimeout:6m0s ScheduledStop:<nil> ExposedPorts:[] ListenAddress: Network: Subnet: MultiNodeRequested:false ExtraDisks:0 CertExpiration:26280h0m0s Mount:false MountString:/home/limjihoon:/minikube-host Mount9PVersion:9p2000.L MountGID:docker MountIP: MountMSize:262144 MountOptions:[] MountPort:0 MountType:9p MountUID:docker BinaryMirror: DisableOptimizations:false DisableMetrics:false CustomQemuFirmwarePath: SocketVMnetClientPath: SocketVMnetPath: StaticIP: SSHAuthSock: SSHAgentPID:0 GPUs: AutoPauseInterval:1m0s}
+I0322 14:46:51.837612   16006 out.go:177] 👍  Starting "minikube" primary control-plane node in "minikube" cluster
+I0322 14:46:51.840824   16006 cache.go:121] Beginning downloading kic base image for podman with containerd
+I0322 14:46:51.849816   16006 out.go:177] 🚜  Pulling base image v0.0.45 ...
+I0322 14:46:51.863706   16006 cache.go:149] Downloading gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 to local cache
+I0322 14:46:51.864000   16006 preload.go:131] Checking if preload exists for k8s version v1.31.0 and runtime containerd
+I0322 14:46:51.865356   16006 image.go:63] Checking for gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 in local cache directory
+I0322 14:46:51.867454   16006 image.go:148] Writing gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 to local cache
+I0322 14:46:51.998096   16006 preload.go:118] Found remote preload: https://storage.googleapis.com/minikube-preloaded-volume-tarballs/v18/v1.31.0/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4
+I0322 14:46:51.998126   16006 cache.go:56] Caching tarball of preloaded images
+I0322 14:46:51.998323   16006 preload.go:131] Checking if preload exists for k8s version v1.31.0 and runtime containerd
+I0322 14:46:52.010434   16006 out.go:177] 💾  Downloading Kubernetes v1.31.0 preload ...
+I0322 14:46:52.014996   16006 preload.go:236] getting checksum for preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
+I0322 14:46:52.251527   16006 download.go:107] Downloading: https://storage.googleapis.com/minikube-preloaded-volume-tarballs/v18/v1.31.0/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4?checksum=md5:14d66fa06a3139c10b78b55b023a4cd9 -> /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4
+I0322 14:47:17.401847   16006 cache.go:152] successfully saved gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 as a tarball
+I0322 14:47:24.634248   16006 preload.go:247] saving checksum for preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
+I0322 14:47:24.634318   16006 preload.go:254] verifying checksum of /home/limjihoon/.minikube/cache/preloaded-tarball/preloaded-images-k8s-v18-v1.31.0-containerd-overlay2-amd64.tar.lz4 ...
+I0322 14:47:25.244804   16006 cache.go:59] Finished verifying existence of preloaded tar for v1.31.0 on containerd
+I0322 14:47:25.245042   16006 profile.go:143] Saving config to /home/limjihoon/.minikube/profiles/minikube/config.json ...
+I0322 14:47:25.245060   16006 lock.go:35] WriteFile acquiring /home/limjihoon/.minikube/profiles/minikube/config.json: {Name:mk261e425cce3135de660e31c8c722ca5d7a59c6 Clock:{} Delay:500ms Timeout:1m0s Cancel:<nil>}
+E0322 14:47:25.245181   16006 cache.go:189] Error downloading kic artifacts:  not yet implemented, see issue #8426
+I0322 14:47:25.245228   16006 cache.go:194] Successfully downloaded all kic artifacts
+I0322 14:47:25.245239   16006 start.go:360] acquireMachinesLock for minikube: {Name:mk0ec3e2ab338c261ed7cbece856792361bf0f5c Clock:{} Delay:500ms Timeout:10m0s Cancel:<nil>}
+I0322 14:47:25.245274   16006 start.go:364] duration metric: took 28.8µs to acquireMachinesLock for "minikube"
+I0322 14:47:25.245288   16006 start.go:93] Provisioning new machine with config: &{Name:minikube KeepContext:false EmbedCerts:false MinikubeISO: KicBaseImage:gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 Memory:3900 CPUs:2 DiskSize:20000 Driver:podman HyperkitVpnKitSock: HyperkitVSockPorts:[] DockerEnv:[] ContainerVolumeMounts:[] InsecureRegistry:[] RegistryMirror:[] HostOnlyCIDR:192.168.59.1/24 HypervVirtualSwitch: HypervUseExternalSwitch:false HypervExternalAdapter: KVMNetwork:default KVMQemuURI:qemu:///system KVMGPU:false KVMHidden:false KVMNUMACount:1 APIServerPort:8443 DockerOpt:[] DisableDriverMounts:false NFSShare:[] NFSSharesRoot:/nfsshares UUID: NoVTXCheck:false DNSProxy:false HostDNSResolver:true HostOnlyNicType:virtio NatNicType:virtio SSHIPAddress: SSHUser:root SSHKey: SSHPort:22 KubernetesConfig:{KubernetesVersion:v1.31.0 ClusterName:minikube Namespace:default APIServerHAVIP: APIServerName:minikubeCA APIServerNames:[] APIServerIPs:[] DNSDomain:cluster.local ContainerRuntime:containerd CRISocket: NetworkPlugin:cni FeatureGates: ServiceCIDR:10.96.0.0/12 ImageRepository: LoadBalancerStartIP: LoadBalancerEndIP: CustomIngressCert: RegistryAliases: ExtraOptions:[] ShouldLoadCachedImages:true EnableDefaultCNI:false CNI:} Nodes:[{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}] Addons:map[] CustomAddonImages:map[] CustomAddonRegistries:map[] VerifyComponents:map[apiserver:true system_pods:true] StartHostTimeout:6m0s ScheduledStop:<nil> ExposedPorts:[] ListenAddress: Network: Subnet: MultiNodeRequested:false ExtraDisks:0 CertExpiration:26280h0m0s Mount:false MountString:/home/limjihoon:/minikube-host Mount9PVersion:9p2000.L MountGID:docker MountIP: MountMSize:262144 MountOptions:[] MountPort:0 MountType:9p MountUID:docker BinaryMirror: DisableOptimizations:false DisableMetrics:false CustomQemuFirmwarePath: SocketVMnetClientPath: SocketVMnetPath: StaticIP: SSHAuthSock: SSHAgentPID:0 GPUs: AutoPauseInterval:1m0s} &{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}
+I0322 14:47:25.245322   16006 start.go:125] createHost starting for "" (driver="podman")
+I0322 14:47:25.258014   16006 out.go:235] 🔥  Creating podman container (CPUs=2, Memory=3900MB) ...
+I0322 14:47:25.258512   16006 start.go:159] libmachine.API.Create for "minikube" (driver="podman")
+I0322 14:47:25.258544   16006 client.go:168] LocalClient.Create starting
+I0322 14:47:25.258630   16006 main.go:141] libmachine: Creating CA: /home/limjihoon/.minikube/certs/ca.pem
+I0322 14:47:25.413052   16006 main.go:141] libmachine: Creating client certificate: /home/limjihoon/.minikube/certs/cert.pem
+I0322 14:47:25.566494   16006 cli_runner.go:164] Run: sudo -n podman version --format {{.Version}}
+I0322 14:47:25.786771   16006 cli_runner.go:164] Run: sudo -n podman network inspect minikube --format "{{range .plugins}}{{if eq .type "bridge"}}{{(index (index .ipam.ranges 0) 0).subnet}},{{(index (index .ipam.ranges 0) 0).gateway}}{{end}}{{end}}"
+I0322 14:47:25.991563   16006 network_create.go:77] Found existing network {name:minikube subnet:0xc0019f4390 gateway:[0 0 0 0 0 0 0 0 0 0 255 255 192 168 49 1] mtu:0}
+I0322 14:47:25.991648   16006 kic.go:121] calculated static IP "192.168.49.2" for the "minikube" container
+I0322 14:47:25.991857   16006 cli_runner.go:164] Run: sudo -n podman ps -a --format {{.Names}}
+I0322 14:47:26.225149   16006 cli_runner.go:164] Run: sudo -n podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true
+W0322 14:47:26.360992   16006 cli_runner.go:211] sudo -n podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true returned with exit code 125
+I0322 14:47:26.361018   16006 client.go:171] duration metric: took 1.1024703s to LocalClient.Create
+I0322 14:47:28.361695   16006 start.go:128] duration metric: took 3.11634036s to createHost
+I0322 14:47:28.361715   16006 start.go:83] releasing machines lock for "minikube", held for 3.11643324s
+W0322 14:47:28.361736   16006 start.go:714] error starting host: creating host: create: creating: setting up container node: creating volume for minikube container: sudo -n podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true: exit status 125
 stdout:
 
 stderr:
-Error: can only create exec sessions on running containers: container state improper
-I0322 00:25:42.582564   87460 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Status}}
-I0322 00:25:43.014034   87460 oci.go:658] container minikube status is Stopped
-I0322 00:25:43.014047   87460 oci.go:670] Successfully shutdown container minikube
-I0322 00:25:43.014087   87460 cli_runner.go:164] Run: podman rm -f -v minikube
-I0322 00:25:43.385161   87460 cli_runner.go:164] Run: podman container inspect -f {{.Id}} minikube
-W0322 00:25:43.712849   87460 cli_runner.go:211] podman container inspect -f {{.Id}} minikube returned with exit code 125
-I0322 00:25:43.712975   87460 cli_runner.go:164] Run: podman version --format {{.Version}}
-I0322 00:25:43.994241   87460 cli_runner.go:164] Run: podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
-I0322 00:25:44.296626   87460 cli_runner.go:164] Run: podman network rm minikube
-W0322 00:25:44.611136   87460 out.go:270] 🤦  StartHost failed, but will try again: creating host: create: creating: create kic node: container name "minikube": log: 2025-03-22T00:25:08.255688000+09:00 [0;1;31mFailed to create /init.scope control group: Permission denied[0m
-2025-03-22T00:25:08.255759000+09:00 [0;1;31mFailed to allocate manager object: Permission denied[0m
-2025-03-22T00:25:08.255860000+09:00 [[0;1;31m!!!!!![0m] Failed to allocate manager object.
-2025-03-22T00:25:08.255932000+09:00 [0;1;31mExiting PID 1...[0m: container exited unexpectedly
-I0322 00:25:44.611189   87460 start.go:729] Will try again in 5 seconds ...
-I0322 00:25:49.614278   87460 start.go:360] acquireMachinesLock for minikube: {Name:mk0ec3e2ab338c261ed7cbece856792361bf0f5c Clock:{} Delay:500ms Timeout:10m0s Cancel:<nil>}
-I0322 00:25:49.614469   87460 start.go:364] duration metric: took 154.1µs to acquireMachinesLock for "minikube"
-I0322 00:25:49.614502   87460 start.go:93] Provisioning new machine with config: &{Name:minikube KeepContext:false EmbedCerts:false MinikubeISO: KicBaseImage:gcr.io/k8s-minikube/kicbase:v0.0.45@sha256:81df288595202a317b1a4dc2506ca2e4ed5f22373c19a441b88cfbf4b9867c85 Memory:3900 CPUs:2 DiskSize:20000 Driver:podman HyperkitVpnKitSock: HyperkitVSockPorts:[] DockerEnv:[] ContainerVolumeMounts:[] InsecureRegistry:[] RegistryMirror:[] HostOnlyCIDR:192.168.59.1/24 HypervVirtualSwitch: HypervUseExternalSwitch:false HypervExternalAdapter: KVMNetwork:default KVMQemuURI:qemu:///system KVMGPU:false KVMHidden:false KVMNUMACount:1 APIServerPort:8443 DockerOpt:[] DisableDriverMounts:false NFSShare:[] NFSSharesRoot:/nfsshares UUID: NoVTXCheck:false DNSProxy:false HostDNSResolver:true HostOnlyNicType:virtio NatNicType:virtio SSHIPAddress: SSHUser:root SSHKey: SSHPort:22 KubernetesConfig:{KubernetesVersion:v1.31.0 ClusterName:minikube Namespace:default APIServerHAVIP: APIServerName:minikubeCA APIServerNames:[] APIServerIPs:[] DNSDomain:cluster.local ContainerRuntime:containerd CRISocket: NetworkPlugin:cni FeatureGates:KubeletInUserNamespace=true ServiceCIDR:10.96.0.0/12 ImageRepository: LoadBalancerStartIP: LoadBalancerEndIP: CustomIngressCert: RegistryAliases: ExtraOptions:[] ShouldLoadCachedImages:true EnableDefaultCNI:false CNI:} Nodes:[{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}] Addons:map[] CustomAddonImages:map[] CustomAddonRegistries:map[] VerifyComponents:map[apiserver:true system_pods:true] StartHostTimeout:6m0s ScheduledStop:<nil> ExposedPorts:[] ListenAddress: Network: Subnet: MultiNodeRequested:false ExtraDisks:0 CertExpiration:26280h0m0s Mount:false MountString:/home/limjihoon:/minikube-host Mount9PVersion:9p2000.L MountGID:docker MountIP: MountMSize:262144 MountOptions:[] MountPort:0 MountType:9p MountUID:docker BinaryMirror: DisableOptimizations:false DisableMetrics:false CustomQemuFirmwarePath: SocketVMnetClientPath: SocketVMnetPath: StaticIP: SSHAuthSock: SSHAgentPID:0 GPUs: AutoPauseInterval:1m0s} &{Name: IP: Port:8443 KubernetesVersion:v1.31.0 ContainerRuntime:containerd ControlPlane:true Worker:true}
-I0322 00:25:49.614614   87460 start.go:125] createHost starting for "" (driver="podman")
-I0322 00:25:49.626024   87460 out.go:235] 🔥  Creating podman container (CPUs=2, Memory=3900MB) ...
-I0322 00:25:49.626399   87460 start.go:159] libmachine.API.Create for "minikube" (driver="podman")
-I0322 00:25:49.626428   87460 client.go:168] LocalClient.Create starting
-I0322 00:25:49.626589   87460 main.go:141] libmachine: Reading certificate data from /home/limjihoon/.minikube/certs/ca.pem
-I0322 00:25:49.626697   87460 main.go:141] libmachine: Decoding PEM data...
-I0322 00:25:49.626725   87460 main.go:141] libmachine: Parsing certificate...
-I0322 00:25:49.626833   87460 main.go:141] libmachine: Reading certificate data from /home/limjihoon/.minikube/certs/cert.pem
-I0322 00:25:49.626904   87460 main.go:141] libmachine: Decoding PEM data...
-I0322 00:25:49.626929   87460 main.go:141] libmachine: Parsing certificate...
-I0322 00:25:49.627631   87460 cli_runner.go:164] Run: podman version --format {{.Version}}
-I0322 00:25:50.026000   87460 cli_runner.go:164] Run: podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
-W0322 00:25:50.427422   87460 cli_runner.go:211] podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}" returned with exit code 125
-I0322 00:25:50.427470   87460 network_create.go:284] running [podman network inspect minikube] to gather additional debugging logs...
-I0322 00:25:50.427481   87460 cli_runner.go:164] Run: podman network inspect minikube
-W0322 00:25:50.838216   87460 cli_runner.go:211] podman network inspect minikube returned with exit code 125
-I0322 00:25:50.838235   87460 network_create.go:287] error running [podman network inspect minikube]: podman network inspect minikube: exit status 125
+Error: volume with name minikube already exists: volume already exists
+I0322 14:47:28.362565   16006 cli_runner.go:164] Run: sudo -n podman container inspect minikube --format={{.State.Status}}
+W0322 14:47:28.486458   16006 cli_runner.go:211] sudo -n podman container inspect minikube --format={{.State.Status}} returned with exit code 125
+I0322 14:47:28.486499   16006 delete.go:82] Unable to get host status for minikube, assuming it has already been deleted: state: unknown state "minikube": sudo -n podman container inspect minikube --format={{.State.Status}}: exit status 125
 stdout:
-[]
 
 stderr:
-Error: network minikube: unable to find network with name or ID minikube: network not found
-I0322 00:25:50.838245   87460 network_create.go:289] output of [podman network inspect minikube]: -- stdout --
-[]
-
--- /stdout --
-** stderr ** 
-Error: network minikube: unable to find network with name or ID minikube: network not found
-
-** /stderr **
-I0322 00:25:50.838341   87460 cli_runner.go:164] Run: podman version --format {{.Version}}
-I0322 00:25:51.267035   87460 cli_runner.go:164] Run: podman network inspect podman --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
-I0322 00:25:51.661257   87460 network.go:209] skipping subnet 192.168.49.0/24 that is reserved: &{IP:192.168.49.0 Netmask:255.255.255.0 Prefix:24 CIDR:192.168.49.0/24 Gateway:192.168.49.1 ClientMin:192.168.49.2 ClientMax:192.168.49.254 Broadcast:192.168.49.255 IsPrivate:true Interface:{IfaceName: IfaceIPv4: IfaceMTU:0 IfaceMAC:} reservation:<nil>}
-I0322 00:25:51.661497   87460 network.go:206] using free private subnet 192.168.58.0/24: &{IP:192.168.58.0 Netmask:255.255.255.0 Prefix:24 CIDR:192.168.58.0/24 Gateway:192.168.58.1 ClientMin:192.168.58.2 ClientMax:192.168.58.254 Broadcast:192.168.58.255 IsPrivate:true Interface:{IfaceName: IfaceIPv4: IfaceMTU:0 IfaceMAC:} reservation:0xc0016276a0}
-I0322 00:25:51.661508   87460 network_create.go:124] attempt to create podman network minikube 192.168.58.0/24 with gateway 192.168.58.1 and MTU of 0 ...
-I0322 00:25:51.661544   87460 cli_runner.go:164] Run: podman network create --driver=bridge --subnet=192.168.58.0/24 --gateway=192.168.58.1 --label=created_by.minikube.sigs.k8s.io=true --label=name.minikube.sigs.k8s.io=minikube minikube
-I0322 00:25:52.011086   87460 network_create.go:108] podman network minikube 192.168.58.0/24 created
-I0322 00:25:52.011101   87460 kic.go:121] calculated static IP "192.168.58.2" for the "minikube" container
-I0322 00:25:52.011154   87460 cli_runner.go:164] Run: podman ps -a --format {{.Names}}
-I0322 00:25:52.345685   87460 cli_runner.go:164] Run: podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true
-W0322 00:25:52.682266   87460 cli_runner.go:211] podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true returned with exit code 125
-I0322 00:25:52.682296   87460 client.go:171] duration metric: took 3.055864546s to LocalClient.Create
-I0322 00:25:54.682694   87460 start.go:128] duration metric: took 5.068062176s to createHost
-I0322 00:25:54.682717   87460 start.go:83] releasing machines lock for "minikube", held for 5.068234476s
-W0322 00:25:54.682922   87460 out.go:270] 😿  Failed to start podman container. Running "minikube delete" may fix it: creating host: create: creating: setting up container node: creating volume for minikube container: podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true: exit status 125
+Error: error inspecting object: no such container minikube
+W0322 14:47:28.486574   16006 out.go:270] 🤦  StartHost failed, but will try again: creating host: create: creating: setting up container node: creating volume for minikube container: sudo -n podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true: exit status 125
 stdout:
 
 stderr:
 Error: volume with name minikube already exists: volume already exists
 
-I0322 00:25:54.698768   87460 out.go:201] 
-W0322 00:25:54.705302   87460 out.go:270] ❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: creating host: create: creating: setting up container node: creating volume for minikube container: podman volume create minikube --label name.minikube.sigs.k8s.io=minikube --label created_by.minikube.sigs.k8s.io=true: exit status 125
+I0322 14:47:28.486686   16006 start.go:729] Will try again in 5 seconds ...
+I0322 14:47:33.489630   16006 start.go:360] acquireMachinesLock for minikube: {Name:mk0ec3e2ab338c261ed7cbece856792361bf0f5c Clock:{} Delay:500ms Timeout:10m0s Cancel:<nil>}
+I0322 14:47:33.489897   16006 start.go:364] duration metric: took 223.2µs to acquireMachinesLock for "minikube"
+I0322 14:47:33.489935   16006 start.go:96] Skipping create...Using existing machine configuration
+I0322 14:47:33.489944   16006 fix.go:54] fixHost starting: 
+I0322 14:47:33.490547   16006 cli_runner.go:164] Run: sudo -n podman container inspect minikube --format={{.State.Status}}
+W0322 14:47:33.608670   16006 cli_runner.go:211] sudo -n podman container inspect minikube --format={{.State.Status}} returned with exit code 125
+I0322 14:47:33.608702   16006 fix.go:112] recreateIfNeeded on minikube: state= err=unknown state "minikube": sudo -n podman container inspect minikube --format={{.State.Status}}: exit status 125
 stdout:
 
 stderr:
-Error: volume with name minikube already exists: volume already exists
+Error: error inspecting object: no such container minikube
+I0322 14:47:33.608712   16006 fix.go:117] machineExists: true. err=unknown state "minikube": sudo -n podman container inspect minikube --format={{.State.Status}}: exit status 125
+stdout:
 
-W0322 00:25:54.705432   87460 out.go:270] 
-W0322 00:25:54.707339   87460 out.go:293] [31m╭───────────────────────────────────────────────────────────────────────────────────────────╮[0m
+stderr:
+Error: error inspecting object: no such container minikube
+W0322 14:47:33.608716   16006 fix.go:138] unexpected machine state, will restart: unknown state "minikube": sudo -n podman container inspect minikube --format={{.State.Status}}: exit status 125
+stdout:
+
+stderr:
+Error: error inspecting object: no such container minikube
+I0322 14:47:33.615426   16006 out.go:177] 🔄  Restarting existing podman container for "minikube" ...
+I0322 14:47:33.622855   16006 cli_runner.go:164] Run: sudo -n podman start --cgroup-manager cgroupfs minikube
+W0322 14:47:33.792780   16006 cli_runner.go:211] sudo -n podman start --cgroup-manager cgroupfs minikube returned with exit code 125
+I0322 14:47:33.792859   16006 cli_runner.go:164] Run: sudo -n podman inspect minikube
+I0322 14:47:33.998436   16006 errors.go:84] Postmortem inspect ("sudo -n podman inspect minikube"): -- stdout --
+[
+    {
+        "Name": "minikube",
+        "Driver": "local",
+        "Mountpoint": "/var/lib/containers/storage/volumes/minikube/_data",
+        "CreatedAt": "2025-03-22T13:08:46.534371528+09:00",
+        "Labels": {
+            "created_by.minikube.sigs.k8s.io": "true",
+            "name.minikube.sigs.k8s.io": "minikube"
+        },
+        "Scope": "local",
+        "Options": {}
+    }
+]
+
+-- /stdout --
+I0322 14:47:33.998578   16006 cli_runner.go:164] Run: sudo -n podman logs --timestamps minikube
+W0322 14:47:34.150849   16006 cli_runner.go:211] sudo -n podman logs --timestamps minikube returned with exit code 125
+W0322 14:47:34.150865   16006 errors.go:89] Failed to get postmortem logs. sudo -n podman logs --timestamps minikube :sudo -n podman logs --timestamps minikube: exit status 125
+stdout:
+
+stderr:
+Error: no container with name or ID "minikube" found: no such container
+I0322 14:47:34.150931   16006 cli_runner.go:164] Run: sudo -n podman system info --format json
+I0322 14:47:34.455685   16006 info.go:288] podman info: {Host:{BuildahVersion:1.23.1 CgroupVersion:v2 Conmon:{Package:conmon: /usr/bin/conmon Path:/usr/bin/conmon Version:conmon version 2.0.25, commit: unknown} Distribution:{Distribution:ubuntu Version:22.04} MemFree:14202019840 MemTotal:16726904832 OCIRuntime:{Name:crun Package:crun: /usr/bin/crun Path:/usr/bin/crun Version:crun version 0.17
+commit: 0e9229ae34caaebcb86f1fde18de3acaf18c6d9a
+spec: 1.0.0
++SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:false} Uptime:11h 54m 53.06s (Approximately 0.46 days)} Registries:{Search:[]} Store:{ConfigFile:/etc/containers/storage.conf ContainerStore:{Number:0} GraphDriverName:overlay GraphOptions:{} GraphRoot:/var/lib/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:1} RunRoot:/run/containers/storage VolumePath:/var/lib/containers/storage/volumes}}
+I0322 14:47:34.455715   16006 errors.go:106] postmortem podman info: {Host:{BuildahVersion:1.23.1 CgroupVersion:v2 Conmon:{Package:conmon: /usr/bin/conmon Path:/usr/bin/conmon Version:conmon version 2.0.25, commit: unknown} Distribution:{Distribution:ubuntu Version:22.04} MemFree:14202019840 MemTotal:16726904832 OCIRuntime:{Name:crun Package:crun: /usr/bin/crun Path:/usr/bin/crun Version:crun version 0.17
+commit: 0e9229ae34caaebcb86f1fde18de3acaf18c6d9a
+spec: 1.0.0
++SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:false} Uptime:11h 54m 53.06s (Approximately 0.46 days)} Registries:{Search:[]} Store:{ConfigFile:/etc/containers/storage.conf ContainerStore:{Number:0} GraphDriverName:overlay GraphOptions:{} GraphRoot:/var/lib/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:1} RunRoot:/run/containers/storage VolumePath:/var/lib/containers/storage/volumes}}
+I0322 14:47:34.455773   16006 network_create.go:284] running [podman network inspect minikube] to gather additional debugging logs...
+I0322 14:47:34.455807   16006 cli_runner.go:164] Run: sudo -n podman network inspect minikube
+I0322 14:47:34.669129   16006 network_create.go:289] output of [sudo -n podman network inspect minikube]: -- stdout --
+[
+    {
+        "args": {
+            "podman_labels": {
+                "created_by.minikube.sigs.k8s.io": "true",
+                "name.minikube.sigs.k8s.io": "minikube"
+            }
+        },
+        "cniVersion": "1.0.0",
+        "name": "minikube",
+        "plugins": [
+            {
+                "bridge": "cni-podman1",
+                "hairpinMode": true,
+                "ipMasq": true,
+                "ipam": {
+                    "ranges": [
+                        [
+                            {
+                                "gateway": "192.168.49.1",
+                                "subnet": "192.168.49.0/24"
+                            }
+                        ]
+                    ],
+                    "routes": [
+                        {
+                            "dst": "0.0.0.0/0"
+                        }
+                    ],
+                    "type": "host-local"
+                },
+                "isGateway": true,
+                "type": "bridge"
+            },
+            {
+                "capabilities": {
+                    "portMappings": true
+                },
+                "type": "portmap"
+            },
+            {
+                "backend": "",
+                "type": "firewall"
+            },
+            {
+                "type": "tuning"
+            },
+            {
+                "capabilities": {
+                    "aliases": true
+                },
+                "domainName": "dns.podman",
+                "type": "dnsname"
+            }
+        ]
+    }
+]
+
+-- /stdout --
+I0322 14:47:34.669244   16006 cli_runner.go:164] Run: sudo -n podman system info --format json
+I0322 14:47:34.962477   16006 info.go:288] podman info: {Host:{BuildahVersion:1.23.1 CgroupVersion:v2 Conmon:{Package:conmon: /usr/bin/conmon Path:/usr/bin/conmon Version:conmon version 2.0.25, commit: unknown} Distribution:{Distribution:ubuntu Version:22.04} MemFree:14201278464 MemTotal:16726904832 OCIRuntime:{Name:crun Package:crun: /usr/bin/crun Path:/usr/bin/crun Version:crun version 0.17
+commit: 0e9229ae34caaebcb86f1fde18de3acaf18c6d9a
+spec: 1.0.0
++SYSTEMD +SELINUX +APPARMOR +CAP +SECCOMP +EBPF +YAJL} SwapFree:4294967296 SwapTotal:4294967296 Arch:amd64 Cpus:8 Eventlogger:journald Hostname:MyLaptop Kernel:5.15.167.4-microsoft-standard-WSL2 Os:linux Security:{Rootless:false} Uptime:11h 54m 53.56s (Approximately 0.46 days)} Registries:{Search:[]} Store:{ConfigFile:/etc/containers/storage.conf ContainerStore:{Number:0} GraphDriverName:overlay GraphOptions:{} GraphRoot:/var/lib/containers/storage GraphStatus:{BackingFilesystem:extfs NativeOverlayDiff:true SupportsDType:true UsingMetacopy:false} ImageStore:{Number:1} RunRoot:/run/containers/storage VolumePath:/var/lib/containers/storage/volumes}}
+I0322 14:47:34.962556   16006 fix.go:56] duration metric: took 1.47261339s for fixHost
+I0322 14:47:34.962564   16006 start.go:83] releasing machines lock for "minikube", held for 1.47265353s
+W0322 14:47:34.962680   16006 out.go:270] 😿  Failed to start podman container. Running "minikube delete" may fix it: driver start: start: sudo -n podman start --cgroup-manager cgroupfs minikube: exit status 125
+stdout:
+
+stderr:
+Error: no container with name or ID "minikube" found: no such container
+
+I0322 14:47:34.978010   16006 out.go:201] 
+W0322 14:47:34.993168   16006 out.go:270] ❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: driver start: start: sudo -n podman start --cgroup-manager cgroupfs minikube: exit status 125
+stdout:
+
+stderr:
+Error: no container with name or ID "minikube" found: no such container
+
+W0322 14:47:34.993240   16006 out.go:270] 
+W0322 14:47:34.994206   16006 out.go:293] [31m╭───────────────────────────────────────────────────────────────────────────────────────────╮[0m
 [31m│[0m                                                                                           [31m│[0m
 [31m│[0m    😿  If the above advice does not help, please let us know:                             [31m│[0m
 [31m│[0m    👉  https://github.com/kubernetes/minikube/issues/new/choose                           [31m│[0m
@@ -968,6 +261,6 @@ W0322 00:25:54.707339   87460 out.go:293] [31m╭──────────
 [31m│[0m    Please run `minikube logs --file=logs.txt` and attach logs.txt to the GitHub issue.    [31m│[0m
 [31m│[0m                                                                                           [31m│[0m
 [31m╰───────────────────────────────────────────────────────────────────────────────────────────╯[0m
-I0322 00:25:54.724955   87460 out.go:201] 
+I0322 14:47:35.005242   16006 out.go:201] 
 
 
