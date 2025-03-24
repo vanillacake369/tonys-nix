@@ -45,3 +45,14 @@ clean:
 apply-zsh:
   exec zsh
   chsh -s /home/limjihoon/.nix-profile/bin/zsh
+
+# Enable shared mount for rootless podman
+enable-shared-mount:
+  #!/usr/bin/env bash
+  PROPAGATION=$(findmnt -no PROPAGATION /)
+
+  if [[ "$PROPAGATION" != *"shared"* ]]; then
+    echo "[!] configuring shared mount for podman"
+  else
+    echo "[✓] shared mount already configured for podman"
+  fi
