@@ -1,11 +1,18 @@
 { pkgs, lib, ... }: {
 
   # Configure Podman setting
-  home.activation.configPodman = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.configSocket = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Enable podman.socket
     if [ -S "$XDG_RUNTIME_DIR/podman/podman.socket" ]; then
       nohup podman system service --time=0 > ~/.podman-service.log 2>&1 &
       echo $! > ~/.podman-service.pid
+    fi
+  '';
+
+  # Configure shared mount
+  home.activation.configSharedMount = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ -S "findmnt -o TARGET,PROPAGATION / | grep shared" ]; then
+      sudo mount --make-rshared /
     fi
   '';
 
