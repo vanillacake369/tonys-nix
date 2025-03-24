@@ -4,6 +4,42 @@ This repo is my personal setup for any linux distro based system using flakes an
 
 This consist of these following packages
 
+```md
+asciinema-2.4.0
+bash-interactive-5.2p37
+bash-interactive-5.2p37-man
+curl-8.12.1-bin
+curl-8.12.1-man
+fzf-0.60.3
+fzf-0.60.3-man
+git-2.48.1
+hm-session-vars.sh
+home-configuration-reference-manpage
+home-manager
+jq-1.7.1-bin
+jq-1.7.1-man
+just-1.39.0
+just-1.39.0-man
+k9s-0.40.5
+kubectl-1.32.2
+kubectl-1.32.2-man
+kubectl-tree-0.4.3
+kubectx-0.9.5
+kubernetes-helm-3.17.1
+man-db-2.13.0
+minikube-1.34.0
+neovim-0.10.4
+nix-zsh-completions-0.5.1
+oh-my-zsh-2025-02-19
+powerlevel10k-1.20.14
+shared-mime-info-2.4
+stern-1.32.0
+vimplugin-vim-visual-multi-2024-09-01
+zsh-5.9
+zsh-5.9-man
+zsh-autoenv-unstable-2017-12-16
+```
+
 # Guidelines
 
 > My personal post on Nix Tutorial is on [my post](https://velog.io/@vanillacake369/Nix-Tutorial)
