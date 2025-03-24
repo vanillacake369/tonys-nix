@@ -9,13 +9,6 @@
     fi
   '';
 
-  # Configure shared mount
-  home.activation.configSharedMount = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ -S "findmnt -o TARGET,PROPAGATION / | grep shared" ]; then
-      sudo mount --make-rshared /
-    fi
-  '';
-
   # Configure cgroup
   home.file.".config/containers/containers.conf".text = ''
     [engine]
