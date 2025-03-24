@@ -1,7 +1,33 @@
 # Run nix home-manager
-setup-nix: install-uidmap install clean apply-zsh
-# setup-nix: remove-nvim remove-spacevim remove-zsh install-uidmap install clean apply-zsh
+setup-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount
 
+
+# Install nix
+install-nix:
+  #!/usr/bin/env sh
+  nix=$(which nix)
+  if [[ -z "$nix" ]]; then
+    echo "[!] Installing Nix"
+    # sh <(curl -L https://nixos.org/nix/install) --daemon
+  else
+    echo "[✓] Nix installed already"
+  fi
+
+  
+# Install Home Manager
+install-home-manager:
+  #!/usr/bin/env sh
+  homeManager=$(command -v home-manager 2>/dev/null)
+
+  if [ -z "$homeManager" ]; then
+    echo "[!] Installing Home Manager"
+    nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+    nix-channel --update
+    # Command below has already inside of ~/.zshrc, so no worries :-)
+    # . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+  else
+    echo "[✓] Home Manger installed already"
+  fi
 
 # Enable uidmap
 install-uidmap:
