@@ -1,5 +1,5 @@
 # Run nix home-manager
-setup-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount
+setup-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount run-minikube
 
 
 # Username of current shell
