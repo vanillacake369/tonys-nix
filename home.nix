@@ -5,8 +5,9 @@
 
   # Import all modularized configurations
   imports = [
-    # Command runner similar to `make`
+    # Command runner
     ./modules/pkgs/just-pkgs.nix
+    ./modules/pkgs/lua-pkgs.nix
 
     # Podman & K8S for rootless container
     ./modules/pkgs/podman-pkgs.nix
