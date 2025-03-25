@@ -86,3 +86,29 @@ enable-shared-mount:
   else
     echo "[✓] shared mount already configured for podman"
   fi
+
+# Minikube on podman
+run-minikube:
+  #!/usr/bin/env sh
+  if minikube profile list 2>/dev/null | grep -q podman; then
+    echo "[✓] Minikube is running on Podman"
+  else
+    echo "[!] Minikube is not running on Podman or no profiles exist"
+    sudo podman volume rm minikube
+    minikube delete --all --purge
+    sudo mount --make-rshared /
+    minikube config set rootless true
+    minikube start --driver=podman --container-runtime=containerd --force
+  fi
+
+
+driver := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Config.Driver'`
+active := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Active'`
+active_kube_context := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .ActiveKubeContext'`
+is_podman_driver := if driver == "podman" { "Yes"} else {"No"}
+
+check-vars:
+    @echo "Driver: {{driver}}"
+    @echo "Active: {{active}}"
+    @echo "ActiveKubeContext: {{active_kube_context}}"
+    @echo "{{is_podman_driver}}"
