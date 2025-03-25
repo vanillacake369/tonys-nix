@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   # Configure Minikube on podman
   home.activation.configSocket = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Enable podman.socket
