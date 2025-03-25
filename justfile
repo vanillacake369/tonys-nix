@@ -88,27 +88,32 @@ enable-shared-mount:
   fi
 
 # Minikube on podman
-run-minikube:
-  #!/usr/bin/env sh
-  if minikube profile list 2>/dev/null | grep -q podman; then
-    echo "[✓] Minikube is running on Podman"
-  else
-    echo "[!] Minikube is not running on Podman or no profiles exist"
-    sudo podman volume rm minikube
-    minikube delete --all --purge
-    sudo mount --make-rshared /
-    minikube config set rootless true
-    minikube start --driver=podman --container-runtime=containerd --force
-  fi
-
-
 driver := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Config.Driver'`
 active := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Active'`
 active_kube_context := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .ActiveKubeContext'`
-is_podman_driver := if driver == "podman" { "Yes"} else {"No"}
 
-check-vars:
-    @echo "Driver: {{driver}}"
-    @echo "Active: {{active}}"
-    @echo "ActiveKubeContext: {{active_kube_context}}"
-    @echo "{{is_podman_driver}}"
+run-minikube:
+  #!/usr/bin/env lua
+
+  function isDriverPodman(driver)
+    local stripedDriver = driver:gsub("%s+", "")
+    return stripedDriver == "podman"
+  end
+  function isActive(active)
+    return active == true
+  end
+  function isActiveKubeContext(kubeContext)
+    return kubeContext == true
+  end
+  
+  local isValidStatus = isDriverPodman( "{{driver}}" ) and isActive( {{active}} ) and isActiveKubeContext( {{active_kube_context}} )
+  if isValidStatus then
+    print("[✓] Minikube is running on Podman")
+  else
+    print("[!] Minikube is not running on Podman or not in active context")
+    os.execute('podman volume rm minikube')
+    os.execute('minikube delete --all --purge')
+    os.execute('sudo mount --make-rshared /')
+    os.execute('minikube config set rootless true')
+    os.execute('minikube start --driver=podman --container-runtime=containerd --force')
+  end

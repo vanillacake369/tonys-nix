@@ -31,6 +31,8 @@
         plenary-nvim
         gruvbox-material
         mini-nvim
+        vim-just
+        vim-visual-multi
       ];
     };
   };
