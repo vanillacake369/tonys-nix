@@ -9,6 +9,7 @@
     dive
     podman
     podman-compose
+    cni
   ];
 
   home.sessionVariables = {
