@@ -25,7 +25,18 @@
       homeConfigurations = {
         limjihoon = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./home.nix ];
+          modules = [ 
+            ./home.nix, 
+            ./limjihoon-user.nix 
+          ];
+        };
+
+        jihoon = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ 
+            ./home.nix,
+            ./jihoon-user.nix 
+          ];
         };
       };
 
