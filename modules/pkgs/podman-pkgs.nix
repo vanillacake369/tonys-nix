@@ -1,5 +1,20 @@
 { pkgs, lib, ... }: {
 
+  home.packages = with pkgs; [
+    qemu # required for `podman machine init`
+    virtiofsd # required for `podman machine init`
+    crun # required for OCI runtime
+    runc # required for OCI runtime
+    podman-tui
+    dive
+    podman
+    podman-compose
+  ];
+
+  home.sessionVariables = {
+    DOCKER_HOST = "unix:///run/user/1000/podman/podman.sock";
+  };
+
   # Configure Podman setting
   home.activation.configSocket = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Enable podman.socket
@@ -39,19 +54,4 @@
   home.activation.configDockerHost = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export DOCKER_HOST=unix:///run/user/1000/podman/podman.sock
   '';
-
-  home.packages = with pkgs; [
-    qemu # required for `podman machine init`
-    virtiofsd # required for `podman machine init`
-    crun # required for OCI runtime
-    runc # required for OCI runtime
-    podman-tui
-    dive
-    podman
-    podman-compose
-  ];
-
-  home.sessionVariables = {
-    DOCKER_HOST = "unix:///run/user/1000/podman/podman.sock";
-  };
 }
