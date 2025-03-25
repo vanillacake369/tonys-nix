@@ -42,15 +42,17 @@ zsh-autoenv-unstable-2017-12-16
 
 # Guidelines
 
-> My personal post on Nix Tutorial is on [my post](https://velog.io/@vanillacake369/Nix-Tutorial)
+> I've wrote about Nix Tutorial on [my post](https://velog.io/@vanillacake369/Nix-Tutorial)
+>
+> You can get much more deeper infos on there.
 >
 > If you're not familiar with korean, plz turn on google translation 😅
 
 ## Prerequisite
 
-If you can, it would be lovely if you have [just](https://github.com/casey/just) already in your linux distro.
+It would be lovely if you have [just](https://github.com/casey/just) already in your linux distro.
 
-If you have one, simply command `just` on root directory of this repo.
+If you have one, follow [setup-configuration](https://github.com/vanillacake369/nix-tutorial#setup-configuration) step, and simply command `just` on root directory of this repo.
 
 Everything will be done within justfile for you 😉.
 
@@ -109,25 +111,51 @@ file in your shell configuration.
 
 You need to fix your username and os in order to correctly use this.
 
+1. Create your own ${username}.nix file like this
+
 `modules/user.nix`
 ```nix
 # Replace username, homeDirectory
 { ... }: {
   home.username = "${username}";
-  home.homeDirectory = "${homeDirectory";
+  home.homeDirectory = "${homeDirectory}";
   home.stateVersion = "23.11"; # Don't change after first setup
 }
 ```
 
+2. Fix ${system}, and add your own ${username}.nix in homeConfigurations
+
 `justfile`
 ```nix
-,,,
+{
+  ,,,
 
-# Replace username
-install:
-  home-manager switch --flake .#limjihoon -b back
+  outputs = { self, nixpkgs, home-manager, system-manager, ... }:
+    let
+      
+      ,,,
 
-,,,
+      # Fix system based on your arch of linux distro
+      system = ${system};
+      # system = "x86_64-linux";
+      
+      ,,,
+
+    in {
+      # Define the home configuration
+      homeConfigurations = {
+        ${username}= home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ 
+            ./home.nix
+            ./${your user configuration path}.nix
+          ];
+        };
+      };
+
+      ,,,
+    };
+}
 ```
 
 ### Command manually, and after that utilize just command :-)
