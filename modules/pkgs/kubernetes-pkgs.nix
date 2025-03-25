@@ -1,6 +1,6 @@
 { pkgs, lib, ... }: {
   # Configure Minikube on podman
-  home.activation.configSocket = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.checkAndRunMinikube = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     # Enable podman.socket
     # Check if any profile uses Podman (suppressing stderr)
     if minikube profile list 2>/dev/null | grep -q podman; then
