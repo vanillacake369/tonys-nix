@@ -2,6 +2,10 @@
 setup-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount
 
 
+# Username of current shell
+USERNAME := `whoami`
+
+
 # Install nix
 install-nix:
   #!/usr/bin/env sh
@@ -61,7 +65,7 @@ remove-zsh:
 
 # Install packages by nix home-manager
 install:
-  home-manager switch --flake .#limjihoon -b back
+  home-manager switch --flake .#{{USERNAME}} -b back
 
 # Clean redundant packages by nix gc
 clean:
