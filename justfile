@@ -74,7 +74,7 @@ clean:
 # Apply zsh
 apply-zsh:
   exec zsh
-  chsh -s /home/limjihoon/.nix-profile/bin/zsh
+  chsh -s /home/#{{USERNAME}}/.nix-profile/bin/zsh
 
 # Enable shared mount for rootless podman
 enable-shared-mount:
