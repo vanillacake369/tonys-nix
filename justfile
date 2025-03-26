@@ -74,8 +74,11 @@ clean:
 
 # Apply zsh
 apply-zsh:
-  exec zsh
-  chsh -s /home/#{{USERNAME}}/.nix-profile/bin/zsh
+  #!/usr/bin/env sh
+  if ! grep -qx "/home/{{USERNAME}}/.nix-profile/bin/zsh" /etc/shells; then \
+    echo "/home/{{USERNAME}}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells; \
+  fi
+  chsh -s /home/{{USERNAME}}/.nix-profile/bin/zsh
 
 # Enable shared mount for rootless podman
 enable-shared-mount:
