@@ -91,11 +91,12 @@ enable-shared-mount:
     echo "[✓] shared mount already configured for podman"
   fi
 
-# Minikube on podman
+# Status of minikube on podman
 driver := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Config.Driver'`
 active := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Active'`
 active_kube_context := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .ActiveKubeContext'`
 
+# Run minikube on podman
 run-minikube:
   #!/usr/bin/env lua
 
