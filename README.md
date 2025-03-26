@@ -183,6 +183,97 @@ If you'd like to utilize package installation at just one command, command `just
 It'll all settle up just for you, like its named of.
 
 
+
+# Help me! Minikube not able to ran on podman ! 😭
+
+I'm willing to help for those who've undergo the same issue as I was.
+
+If you're in a situation like this, plz follow the guidelines.
+
+```sh
+I0325 19:59:01.584962   25996 cli_runner.go:164] Run: podman container inspect -f {{.Id}} minikube
+W0325 19:59:01.780690   25996 cli_runner.go:211] podman container inspect -f {{.Id}} minikube returned with exit code 125
+I0325 19:59:01.780740   25996 cli_runner.go:164] Run: podman version --format {{.Version}}
+I0325 19:59:02.016209   25996 cli_runner.go:164] Run: podman network inspect minikube --format "{{range .}}{{if eq .Driver "bridge"}}{{(index .Subnets 0).Subnet}},{{(index .Subnets 0).Gateway}}{{end}}{{end}}"
+I0325 19:59:02.256393   25996 cli_runner.go:164] Run: podman network rm minikube
+W0325 19:59:02.501754   25996 out.go:270] 🤦  StartHost failed, but will try again: creating host: create: creating: create kic node: container name "minikube": log: 2025-03-25T19:58:31.500324000+09:00 [0;1;31mFailed to create /init.scope control group: Permission denied[0m
+2025-03-25T19:58:31.500394000+09:00 [0;1;31mFailed to allocate manager object: Permission denied[0m
+2025-03-25T19:58:31.500450000+09:00 [[0;1;31m!!!!!![0m] Failed to allocate manager object.
+2025-03-25T19:58:31.500515000+09:00 [0;1;31mExiting PID 1...[0m: container exited unexpectedly
+```
+
+## Reason/Solution
+
+### Missing dependencies
+
+Podman requires these in order to make it right.
+
+If you've missed any, podman won't be able to create minikube container for you.
+
+```nix
+cni
+dbus ## this should be running on systemd inside your system
+qemu # required for `podman machine init`
+virtiofsd # required for `podman machine init`
+crun # required for Podman OCI runtime
+runc # required for minikube requiring containerd
+```
+
+For cni plugin, you can follow [this guideline](https://sarc.io/index.php/cloud/2366-broken-network-functionality-for-cni-plugins#google_vignette) as well.
+
+### Cgroup must be enabled and should be v2
+
+Check your current cgroup [How do I check cgroup v2 is installed on my machine?](https://unix.stackexchange.com/questions/471476/how-do-i-check-cgroup-v2-is-installed-on-my-machine)
+
+```sh
+grep cgroup /proc/filesystems
+```
+
+If you're on wsl2, the default cgroup version is v1.
+
+You should follow [this guideline](https://stackoverflow.com/questions/73021599/how-to-enable-cgroup-v2-in-wsl2)
+
+```sh
+[wsl2]
+kernelCommandLine = cgroup_no_v1=all
+```
+
+### Check mount filesystem
+
+```sh
+sudo mount --make-rshared /
+```
+
+### Last but not least,,, log & make assumption with your own hypothesis
+
+I'd like to advice you to log it first.
+
+
+```sh
+minikube logs --file=logs.txt
+```
+
+In my case, I've found podman couldn't create minikube container, and kept retrying.
+
+The core issuee was dbus not running on systemd.
+
+(I was on wsl2 , and after re-install everything solved my problem. )
+
+```md
+I0325 19:58:30.825542   25996 cli_runner.go:164] Run: podman run -d -t --privileged --security-opt seccomp=unconfined --tmpfs /tmp --tmpfs /run -v /lib/modules:/lib/modules:ro --hostname minikube --name minikube --label created_by.minikube.sigs.k8s.io=true --label name.minikube.sigs.k8s.io=minikube --label role.minikube.sigs.k8s.io= --label mode.minikube.sigs.k8s.io=minikube --network minikube --ip 192.168.49.2 --volume minikube:/var:exec --memory=3900mb -e container=podman --expose 8443 --publish=127.0.0.1::8443 --publish=127.0.0.1::22 --publish=127.0.0.1::2376 --publish=127.0.0.1::5000 --publish=127.0.0.1::32443 gcr.io/k8s-minikube/kicbase:v0.0.45
+I0325 19:58:31.351209   25996 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
+I0325 19:58:31.637436   25996 retry.go:31] will retry after 13.83625ms: temporary error created container "minikube" is not running yet
+I0325 19:58:31.651972   25996 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
+I0325 19:58:35.577161   25996 cli_runner.go:217] Completed: podman container inspect minikube --format={{.State.Running}}: (3.925164502s)
+I0325 19:58:35.577184   25996 retry.go:31] will retry after 18.852255ms: temporary error created container "minikube" is not running yet
+I0325 19:58:35.596544   25996 cli_runner.go:164] Run: podman container inspect minikube --format={{.State.Running}}
+```
+
+So I'd recommend you to log minikube, and compare the success case.
+
+Here's my [success log](https://drive.google.com/file/d/1A0jV8h8gtTF3QWs43nlj4-AHPlik8Mke/view?usp=sharing)
+
+
 # Help yourself ! 😋
 
 Now enjoy diving into big lake of nix modules/flakes !
