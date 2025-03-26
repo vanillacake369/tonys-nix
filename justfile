@@ -1,10 +1,14 @@
 # Run nix home-manager
-setup-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount run-minikube
+setup-nix: install-pckgs # install-nix
 
+# Initial setup
+initial-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount run-minikube
+
+# Install pckgs
+install-pckgs: install clean run-minikube
 
 # Username of current shell
 USERNAME := `whoami`
-
 
 # Install nix
 install-nix:
