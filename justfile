@@ -12,7 +12,7 @@ install-nix:
   nix=$(which nix)
   if [[ -z "$nix" ]]; then
     echo "[!] Installing Nix"
-    # sh <(curl -L https://nixos.org/nix/install) --daemon
+    sh <(curl -L https://nixos.org/nix/install) --daemon
   else
     echo "[✓] Nix installed already"
   fi
@@ -27,6 +27,7 @@ install-home-manager:
     echo "[!] Installing Home Manager"
     nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
     nix-channel --update
+    nix-shell '<home-manager>' -A install
     # Command below has already inside of ~/.zshrc, so no worries :-)
     # . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
   else
