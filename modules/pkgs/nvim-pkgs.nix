@@ -32,7 +32,7 @@
         gruvbox-material
         mini-nvim
         vim-just
-        vim-visual-multi
+        # vim-visual-multi
       ];
     };
   };

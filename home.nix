@@ -12,6 +12,9 @@
     # Podman & K8S for rootless container
     ./modules/pkgs/podman-pkgs.nix
     ./modules/pkgs/kubernetes-pkgs.nix
+
+    # Ollama
+    ./modules/pkgs/ollama-pkgs.nix
     
     # Shell setup
     ./modules/pkgs/zsh-pkgs.nix
