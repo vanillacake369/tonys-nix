@@ -8,6 +8,7 @@
     kubernetes-helm
     kubectl-tree
     minikube
+    kubernetes-helm
   ];
 }
 
