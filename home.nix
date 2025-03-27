@@ -19,6 +19,8 @@
     # Java
     ./modules/pkgs/java-pkgs.nix
 
+    # AWS
+    ./modules/pkgs/aws-pkgs.nix
     
     # Shell setup
     ./modules/pkgs/zsh-pkgs.nix
