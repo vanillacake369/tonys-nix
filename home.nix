@@ -15,6 +15,10 @@
 
     # Ollama
     ./modules/pkgs/ollama-pkgs.nix
+
+    # Java
+    ./modules/pkgs/java-pkgs.nix
+
     
     # Shell setup
     ./modules/pkgs/zsh-pkgs.nix
