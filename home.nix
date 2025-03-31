@@ -18,6 +18,7 @@
 
     # Java
     ./modules/pkgs/java-pkgs.nix
+    ./modules/pkgs/liquibase-pkgs.nix
 
     # AWS
     ./modules/pkgs/aws-pkgs.nix
