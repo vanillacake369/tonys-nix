@@ -70,6 +70,15 @@
         if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
           loginctl enable-linger "$USER"
         fi
+
+        # Add k8s fzf REPL
+kgjq() {
+    (
+      FZF_DEFAULT_OPTS=""
+      kubectl get "$@" -o json > /tmp/kgjq.json
+      echo "" | fzf --print-query --preview 'jq . /tmp/kgjq.json'
+    )
+  }
       '';
     };
 
