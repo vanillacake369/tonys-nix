@@ -31,6 +31,11 @@
     cgroup_manager = "cgroupfs"
   '';
 
+  # Configure docker hub
+  home.file.".config/containers/registries.conf".text = ''
+    unqualified-search-registries = ["docker.io"]
+  '';
+
   # Configure volume policy
   home.file.".config/containers/policy.json".text = ''
     {
