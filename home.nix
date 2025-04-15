@@ -16,8 +16,9 @@
     # Ollama
     ./modules/pkgs/ollama-pkgs.nix
 
-    # Java
+    # Development Tools
     ./modules/pkgs/java-pkgs.nix
+    ./modules/pkgs/k6-pkgs.nix
 
     # AWS
     ./modules/pkgs/aws-pkgs.nix
