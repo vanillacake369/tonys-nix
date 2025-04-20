@@ -9,7 +9,6 @@
     kubectl-tree
     minikube
     kubernetes-helm
-    lazydocker
   ];
 }
 
