@@ -5,7 +5,7 @@ setup-nix: install-pckgs # install-nix
 initial-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount run-minikube
 
 # Install pckgs
-install-pckgs: install clean apply-zsh run-minikube
+install-pckgs: install clean apply-zsh # run-minikube
 
 # Username of current shell
 USERNAME := `whoami`
