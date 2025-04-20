@@ -130,15 +130,17 @@
     google-chrome
     jetbrains.idea-ultimate
     jetbrains.goland
+    youtube-music
+    ticktick
     # Multigesture on touchpad 
     fusuma
     xdotool
     # Programming Languages
     go
     zulu17
-    # Applications
-    youtube-music
-    ticktick
+    # Container
+    docker
+    lazydocker
   ];
 
   # Turn on docker
