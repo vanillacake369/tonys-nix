@@ -21,7 +21,17 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
     in {
-      # Define the home configuration
+      # Define nixos configuration
+      nixosConfigurations = {
+        nixos = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./home.nix
+            ./configuration.nix
+          ];
+        };
+      };
+      # Define the home-manager configuration
       homeConfigurations = {
         limjihoon = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
