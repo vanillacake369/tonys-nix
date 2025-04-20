@@ -141,6 +141,9 @@
     ticktick
   ];
 
+  # Turn on docker
+  virtualisation.docker.enable = true;  
+
   programs.java.enable = true;
 
   # environment.variables.JAVA_HOME = "${pkgs.zulu17}";
