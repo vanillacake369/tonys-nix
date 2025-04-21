@@ -10,7 +10,6 @@
     ./modules/pkgs/lua-pkgs.nix
 
     # Podman & K8S for rootless container
-    # ./modules/pkgs/podman-pkgs.nix
     ./modules/pkgs/kubernetes-pkgs.nix
 
     # Ollama
@@ -28,7 +27,6 @@
     ./modules/pkgs/nvim-pkgs.nix
     ./modules/pkgs/asciinema-pkgs.nix
     ./modules/pkgs/jq-pkgs.nix
-    ./modules/pkgs/ssh-pkgs.nix
   ];
 
 }
