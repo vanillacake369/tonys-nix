@@ -28,6 +28,7 @@
     ./modules/pkgs/nvim-pkgs.nix
     ./modules/pkgs/asciinema-pkgs.nix
     ./modules/pkgs/jq-pkgs.nix
+    ./modules/pkgs/ssh-pkgs.nix
   ];
 
 }
