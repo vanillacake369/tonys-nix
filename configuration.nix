@@ -132,6 +132,7 @@
     jetbrains.goland
     youtube-music
     ticktick
+    slack
     # Multigesture on touchpad 
     fusuma
     xdotool
