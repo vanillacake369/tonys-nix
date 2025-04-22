@@ -21,6 +21,10 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
     in {
+      # Overlay on chromium for wayland multi gesture
+      overlays.default = (final: prev: {
+        google-chrome = prev.google-chrome.override { commandLineArgs = "--enable-features=TouchpadOverscrollHistoryNavigation"; };
+      });
       # Define nixos configuration
       nixosConfigurations = {
         nixos = nixpkgs.lib.nixosSystem {
