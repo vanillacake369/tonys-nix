@@ -1,14 +1,9 @@
-# Run nix home-manager
-setup-nix: install-pckgs # install-nix
-
-# Initial setup
-initial-nix: remove-nvim remove-spacevim remove-zsh install-nix install-home-manager install-uidmap install clean apply-zsh enable-shared-mount run-minikube
-
 # Install pckgs
-install-pckgs: install clean apply-zsh # run-minikube
+install-pckgs: install clean apply-zsh
 
 # Username of current shell
 USERNAME := `whoami`
+HOSTNAME := `hostname`
 
 # Install nix
 install-nix:
@@ -67,6 +62,10 @@ remove-spacevim:
 remove-zsh:
   rm -rf ~/.zshrc
   sudo apt-get --purge remove zsh 
+
+# Init packages of nixos
+init-nixos:
+  sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
 
 # Install packages by nix home-manager
 install:
