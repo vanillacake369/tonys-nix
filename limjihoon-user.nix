@@ -41,16 +41,4 @@
         binding = "<Ctrl><Alt>m";
       };
   };
-
-  xdg.desktopEntries = {
-    google-chrome-stable = {
-      name = "Chrome WebBrowser";
-      exec = "google-chrome-stable --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation";
-      icon = "${pkgs.morewaita-icon-theme}/share/icons/MoreWaita/apps/scalable/com.google.Chrome.svg";
-      genericName = "Web Browser";
-      terminal = false;
-      categories = [ "Application" "Network" "WebBrowser" ];
-      mimeType = [ "text/html" "text/xml" ];
-    };
-  };
 }
