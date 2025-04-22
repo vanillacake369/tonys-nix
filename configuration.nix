@@ -104,6 +104,10 @@
     ];
   };
 
+  environment.shells = with pkgs; [ zsh ];
+  users.defaultUserShell = pkgs.zsh;
+  programs.zsh.enable = true;
+
   # Install firefox.
   programs.firefox.enable = true;
 
