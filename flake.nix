@@ -19,7 +19,10 @@
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs { 
+        inherit system;
+        overlays = [ self.overlays.default ];
+      };
     in {
       # Overlay on chromium for wayland multi gesture
       overlays.default = (final: prev: {
