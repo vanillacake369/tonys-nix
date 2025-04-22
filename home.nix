@@ -3,27 +3,6 @@
   # Enable Home Manager
   programs.home-manager.enable = true;
 
-  services.fusuma = {
-    enable = true;
-    extraPackages = with pkgs; [ xdotool ];
-    settings = {
-      threshold = { swipe = 0.1; };
-      interval = { swipe = 0.7; };
-      swipe = {
-        "3" = {
-          left = {
-            # GNOME: Switch to left workspace
-            command = "xdotool key ctrl+alt+Left";
-          };
-          right = {
-            # GNOME: Switch to right workspace
-            command = "xdotool key ctrl+alt+Right";
-          };
-        };
-      };
-    };
-  };
-
   # Import all modularized configurations
   imports = [
     # Command runner
