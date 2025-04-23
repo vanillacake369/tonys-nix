@@ -1,9 +1,12 @@
-# Install pckgs
-install-pckgs: install clean apply-zsh
-
 # Username of current shell
 USERNAME := `whoami`
 HOSTNAME := `hostname`
+
+# Initiate all configration
+install-all: install-nix install-home-manager install-uidmap install-pckgs
+
+
+########### *** INSTALLATION *** ##########
 
 # Install nix
 install-nix:
@@ -15,7 +18,6 @@ install-nix:
   else
     echo "[✓] Nix installed already"
   fi
-
   
 # Install Home Manager
 install-home-manager:
@@ -43,37 +45,13 @@ install-uidmap:
     echo "[✓] newuidmap and newgidmap already exist"
   fi
 
-# Clear all dependencies
-clear-all:
-  echo y | home-manager uninstall
-
-# Remove nvim
-remove-nvim:
-  rm -rf ~/.config/nvim
-  rm -rf ~/.local/share/nvim
-  rm -rf ~/.cache/nvim
-
-# Remove spacevim
-remove-spacevim:
-  rm -rf ~/.nix-profile/bin/spacevim
-  rm -rf ~/.SpaceVim*
-  
-# Remove zsh
-remove-zsh:
-  rm -rf ~/.zshrc
-  sudo apt-get --purge remove zsh 
-
 # Init packages of nixos
 init-nixos:
   sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
 
 # Install packages by nix home-manager
-install:
-  home-manager switch --flake .#{{USERNAME}} -b back
-
-# Clean redundant packages by nix gc
-clean:
-  nix-collect-garbage -d
+install-pckgs *USER=USERNAME:
+  home-manager switch --flake .#{{USER}} -b back
 
 # Apply zsh
 apply-zsh:
@@ -83,6 +61,31 @@ apply-zsh:
   fi
   chsh -s /home/{{USERNAME}}/.nix-profile/bin/zsh
   source ~/.zshrc
+
+
+
+########### *** CLEANER *** ##########
+
+# Clean redundant packages by nix gc
+clean:
+  nix-collect-garbage -d
+
+# Clear all dependencies
+clear-all:
+  echo y | home-manager uninstall
+
+# Remove all previous configs
+remove-configs:
+  rm -rf ~/.config/nvim
+  rm -rf ~/.local/share/nvim
+  rm -rf ~/.cache/nvim
+  rm -rf ~/.nix-profile/bin/spacevim
+  rm -rf ~/.SpaceVim*
+  rm -rf ~/.zshrc
+  sudo apt-get --purge remove zsh 
+
+
+########### *** APPLICATION *** ##########
 
 # Enable shared mount for rootless podman
 enable-shared-mount:
