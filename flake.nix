@@ -32,10 +32,19 @@
       };
       # Define the home-manager configuration
       homeConfigurations = {
+        hama = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ 
+            ./hama-home.nix
+            ./limjihoon-user.nix 
+          ];
+        };
+      
         limjihoon = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
-            ./home.nix
+            # ./home.nix
+            ./hama-home.nix
             ./limjihoon-user.nix 
           ];
         };
