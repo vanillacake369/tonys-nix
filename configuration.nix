@@ -50,47 +50,43 @@
     };
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
+  services = {
+    xserver = {
+      enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+      xkb = {
+        layout = "us";
+        variant = "";
+      };
+    };
+    libinput = {
+      enable = true;
+      toucepad = {
+        tapping = true;
+        disableWhileTyping = true;
+        clickMethod = "buttonareas";
+        middleEmulation = true;
+        accelSpeed = "0.3"; # Adjust this value to tweak responsiveness
+      };
+      additionalOptions = ''
+        Option "PalmDetection" "on"
+        Option "TappingButtonMap" "lmr"
+      '';
+    };
+    printing.enable = true;
+    pipewire = {
+        enable = true;
+        alsa.enable = true;
+        alsa.support32Bit = true;
+        pulse.enable = true;
+    };
+    pulseaudio.enable = true;
   };
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.xserver.libinput = {
-    enable = true;
-    tapping = true;
-    clickMethod = "buttonareas";
-    disableWhileTyping = true;
-    middleEmulation = true;
-
-    accelSpeed = "0.3"; # Adjust this value to tweak responsiveness
-
-    additionalOptions = ''
-      Option "PalmDetection" "on"
-      Option "TappingButtonMap" "lmr"
-    '';
-  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.limjihoon = {
@@ -101,8 +97,15 @@
     #  thunderbird
     ];
   };
+ 
+  # Allow experimental-features 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  environment.shells = with pkgs; [ zsh ];
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
+  # List packages installed in system profile. To search, run:
+  # $ nix search wget
   users.defaultUserShell = pkgs.zsh;
   programs.zsh.enable = true;
 
@@ -114,15 +117,7 @@
     enable = true;
     defaultEditor = true;
   };
-
-  # Allow experimental-features 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  environment.shells = with pkgs; [ zsh ];
   environment.systemPackages = with pkgs; [
     # Korean Input
     ibus
@@ -152,11 +147,6 @@
 
   # Turn on docker
   virtualisation.docker.enable = true;  
-
-  programs.java.enable = true;
-
-  # environment.variables.JAVA_HOME = "${pkgs.zulu17}";
-  environment.sessionVariables.JAVA_HOME = "${pkgs.zulu17}";
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
