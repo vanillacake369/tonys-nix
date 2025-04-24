@@ -88,13 +88,18 @@
   security.rtkit.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.limjihoon = {
-    isNormalUser = true;
-    description = "Limjihoon";
-    extraGroups = [ "networkmanager" "wheel" "input" "docker" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
+  users = {
+    defaultUserShell = pkgs.zsh;
+    users = {
+      limjihoon = {
+        isNormalUser = true;
+        description = "Limjihoon";
+        extraGroups = [ "networkmanager" "wheel" "input" "docker" ];
+        packages = with pkgs; [
+        #  thunderbird
+        ];
+      };
+    };
   };
  
   # Allow experimental-features 
@@ -103,14 +108,8 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  users.defaultUserShell = pkgs.zsh;
-
-  # Install firefox.
+  programs.zsh.enable = true;
   programs.firefox.enable = true;
-
-  # Install neovim
   programs.neovim = {
     enable = true;
     defaultEditor = true;
