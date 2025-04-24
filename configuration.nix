@@ -63,7 +63,7 @@
     };
     libinput = {
       enable = true;
-      toucepad = {
+      touchpad = {
         tapping = true;
         disableWhileTyping = true;
         clickMethod = "buttonareas";
