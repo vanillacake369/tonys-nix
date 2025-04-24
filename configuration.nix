@@ -146,6 +146,10 @@
     # Container
     docker
     lazydocker
+    # Shell
+    screen
+    openvpn
+    openvpn3
   ];
 
   # Turn on docker
