@@ -81,7 +81,7 @@
           )
         }
         # Git log with preview
-        glog() {
+        gitlog() {
           (
             git log --oneline | fzf --preview 'git show --name-only {1}'
           )
