@@ -73,7 +73,7 @@
 
         # ** Add REPL of fzf for k8s [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
         # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
-        kgjq() {
+        karti() {
             (
               FZF_DEFAULT_OPTS=""
               kubectl get "$@" -o json > /tmp/kgjq.json
