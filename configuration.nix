@@ -68,12 +68,12 @@
         disableWhileTyping = true;
         clickMethod = "buttonareas";
         middleEmulation = true;
-        accelSpeed = "0.3"; # Adjust this value to tweak responsiveness
-      };
-      additionalOptions = ''
-        Option "PalmDetection" "on"
-        Option "TappingButtonMap" "lmr"
-      '';
+        accelSpeed = "0.3";
+        additionalOptions = ''
+          Option "PalmDetection" "on"
+          Option "TappingButtonMap" "lmr"
+        '';
+     };
     };
     printing.enable = true;
     pipewire = {
