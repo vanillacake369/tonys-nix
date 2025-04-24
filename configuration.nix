@@ -150,6 +150,7 @@
     screen
     openvpn
     openvpn3
+    dpkg
   ];
 
   # Turn on docker
