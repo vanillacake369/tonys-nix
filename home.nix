@@ -12,12 +12,11 @@
     # Podman & K8S for rootless container
     ./modules/pkgs/kubernetes-pkgs.nix
 
-    # Ollama
-    ./modules/pkgs/ollama-pkgs.nix
-
     # Development Tools
     ./modules/pkgs/java-pkgs.nix
+    ./modules/pkgs/go-pkgs.nix
     ./modules/pkgs/k6-pkgs.nix
+    ./modules/pkgs/lazydocker-pkgs.nix
 
     # AWS
     ./modules/pkgs/aws-pkgs.nix
