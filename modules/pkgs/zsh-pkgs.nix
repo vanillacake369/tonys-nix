@@ -50,6 +50,11 @@
           source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
         fi
 
+        # Enable fzf on zsh
+        if [ -n "${commands[fzf-share]}" ]; then
+          source "$(fzf-share)/key-bindings.zsh"
+          source "$(fzf-share)/completion.zsh"
+        fi
 
         # Apply zsh-autoenv
         source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
@@ -73,7 +78,7 @@
 
         # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
         # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
-        kg() {
+        kube-manifest() {
           kubectl get $* -o name | \
               fzf --preview 'kubectl get {} -o yaml' \
                   --bind "ctrl-\:execute(kubectl get {+} -o yaml | nvim )" \
