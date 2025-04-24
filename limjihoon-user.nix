@@ -2,6 +2,8 @@
   home.username = "limjihoon";
   home.homeDirectory = "/home/limjihoon";
   home.stateVersion = "23.11"; # Don't change after first setup
+
+  # Applied keybindings :: https://heywoodlh.io/nixos-gnome-settings-and-keyboard-shortcuts
   dconf.settings = {
     "org/gnome/settings-daemon/plugins/media-keys" = {
         next = [ "<Shift><Control>n" ];
