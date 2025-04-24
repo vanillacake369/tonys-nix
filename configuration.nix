@@ -106,7 +106,6 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   users.defaultUserShell = pkgs.zsh;
-  programs.zsh.enable = true;
 
   # Install firefox.
   programs.firefox.enable = true;
@@ -116,6 +115,24 @@
     enable = true;
     defaultEditor = true;
   };
+
+  systemd.services = {
+    fusuma = {
+      description = "Start fusuma to handle swipe";
+      wantedBy = [ "default.target" ];
+      after = [ "graphical-session.target" ];
+      restartIfChanged = false;
+
+      serviceConfig = {
+        User = "limjihoon";
+        Group = "users";
+        Restart = "on-failure";
+        ExecStart = "${pkgs.fusuma}/bin/fusuma -c ${./fusuma.yaml}";
+        Environment = "PATH=\"$${PATH}:/run/current-system/sw/bin\" DISPLAY=':0.0' XDG_SESSION_TYPE=x11 XAUTHORITY='/home/ebardie/.Xauthority'";
+      };
+    };
+  };
+  
   environment.shells = with pkgs; [ zsh ];
   environment.systemPackages = with pkgs; [
     # Korean Input
@@ -132,6 +149,7 @@
     # Multigesture on touchpad 
     fusuma
     xdotool
+    ydotool
     # Programming Languages
     go
     zulu17
