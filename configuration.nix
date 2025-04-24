@@ -94,7 +94,7 @@
       limjihoon = {
         isNormalUser = true;
         description = "Limjihoon";
-        extraGroups = [ "networkmanager" "wheel" "input" "docker" ];
+        extraGroups = [ "networkmanager" "wheel" "input" ];
         packages = with pkgs; [
         #  thunderbird
         ];

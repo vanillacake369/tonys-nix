@@ -73,13 +73,13 @@
 
         # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
         # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
-        karti() {
-          (
-            FZF_DEFAULT_OPTS=""
-            kubectl get "$@" -o json > /tmp/kgjq.json
-            echo "" | fzf --print-query --preview 'jq . /tmp/kgjq.json'
-          )
-        }
+        kg() {
+          kubectl get $* -o name | \
+              fzf --preview 'kubectl get {} -o yaml' \
+                  --bind "ctrl-\:execute(kubectl get {+} -o yaml | nvim )" \
+                  --bind "ctrl-r:reload(kubectl get $* -o name)" --header 'Press CTRL-R to reload' \
+                  --bind "ctrl-]:execute(kubectl edit {+})";
+         }
         # Git log with preview
         gitlog() {
           (
