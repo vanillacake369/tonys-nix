@@ -28,6 +28,7 @@
     ./modules/pkgs/asciinema-pkgs.nix
     ./modules/pkgs/jq-pkgs.nix
     ./modules/pkgs/ripgrep-pkgs.nix
+    ./modules/pkgs/tree-pkgs.nix
   ];
 
 }
