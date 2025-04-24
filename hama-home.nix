@@ -27,7 +27,7 @@
     ./modules/pkgs/nvim-pkgs.nix
     ./modules/pkgs/asciinema-pkgs.nix
     ./modules/pkgs/jq-pkgs.nix
-    ./modules/pkgs/trash-cli-pkgs.nix
+    ./modules/pkgs/ripgrep-pkgs.nix
   ];
 
 }
