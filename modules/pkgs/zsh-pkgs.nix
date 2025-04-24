@@ -71,16 +71,33 @@
           loginctl enable-linger "$USER"
         fi
 
-        # ** Add REPL of fzf for k8s [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
+        # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
         # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
         karti() {
-            (
-              FZF_DEFAULT_OPTS=""
-              kubectl get "$@" -o json > /tmp/kgjq.json
-              echo "" | fzf --print-query --preview 'jq . /tmp/kgjq.json'
-            )
+          (
+            FZF_DEFAULT_OPTS=""
+            kubectl get "$@" -o json > /tmp/kgjq.json
+            echo "" | fzf --print-query --preview 'jq . /tmp/kgjq.json'
+          )
         }
-
+        # Git log with preview
+        glog() {
+          (
+            git log --oneline | fzf --preview 'git show --name-only {1}'
+          )
+        }
+        # Show proccess
+        pslog() {
+          (
+            ps axo pid,rss,comm --no-headers | fzf --preview 'ps o args {1}; ps mu {1}'
+          )
+        }
+        # Show package dependencies
+        pckg-dep() {
+          (
+            apt-cache search . | fzf --preview 'apt-cache depends {1}'
+          )
+        }
       '';
     };
 
