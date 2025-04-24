@@ -10,46 +10,44 @@
       ./hardware-configuration.nix
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  # Bootloader
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+  };
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
+  networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
+  };
+ 
   # Set your time zone.
   time.timeZone = "Asia/Seoul";
 
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.supportedLocales = [ 
-    "en_US.UTF-8/UTF-8" 
-    "ko_KR.UTF-8/UTF-8" 
-  ];
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "ko_KR.UTF-8";
-    LC_IDENTIFICATION = "ko_KR.UTF-8";
-    LC_MEASUREMENT = "ko_KR.UTF-8";
-    LC_MONETARY = "ko_KR.UTF-8";
-    LC_NAME = "ko_KR.UTF-8";
-    LC_NUMERIC = "ko_KR.UTF-8";
-    LC_PAPER = "ko_KR.UTF-8";
-    LC_TELEPHONE = "ko_KR.UTF-8";
-    LC_TIME = "ko_KR.UTF-8";
-  };
-
-  i18n.inputMethod = {
-    enabled = "ibus";
-    ibus.engines = with pkgs.ibus-engines; [ hangul ];
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    supportedLocales = [ 
+        "en_US.UTF-8/UTF-8" 
+        "ko_KR.UTF-8/UTF-8" 
+      ];
+    extraLocaleSettings = {
+        LC_ADDRESS = "ko_KR.UTF-8";
+        LC_IDENTIFICATION = "ko_KR.UTF-8";
+        LC_MEASUREMENT = "ko_KR.UTF-8";
+        LC_MONETARY = "ko_KR.UTF-8";
+        LC_NAME = "ko_KR.UTF-8";
+        LC_NUMERIC = "ko_KR.UTF-8";
+        LC_PAPER = "ko_KR.UTF-8";
+        LC_TELEPHONE = "ko_KR.UTF-8";
+        LC_TIME = "ko_KR.UTF-8";
+     };
+    inputMethod = {
+        enabled = "ibus";
+        ibus.engines = with pkgs.ibus-engines; [ hangul ];
+    };
   };
 
   # Enable the X11 windowing system.
@@ -150,9 +148,6 @@
     screen
     openvpn
     openvpn3
-    dpkg
-    wget
-    apt
   ];
 
   # Turn on docker
