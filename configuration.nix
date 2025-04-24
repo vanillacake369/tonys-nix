@@ -151,6 +151,7 @@
     openvpn
     openvpn3
     dpkg
+    wget
   ];
 
   # Turn on docker
