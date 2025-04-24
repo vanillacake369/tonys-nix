@@ -50,12 +50,6 @@
           source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
         fi
 
-        # Enable fzf on zsh
-        if [ -n "${commands[fzf-share]}" ]; then
-          source "$(fzf-share)/key-bindings.zsh"
-          source "$(fzf-share)/completion.zsh"
-        fi
-
         # Apply zsh-autoenv
         source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
 
