@@ -28,6 +28,7 @@
     ./modules/pkgs/jq-pkgs.nix
     ./modules/pkgs/ripgrep-pkgs.nix
     ./modules/pkgs/tree-pkgs.nix
+    ./modules/pkgs/bat-pkgs.nix
   ];
 
 }
