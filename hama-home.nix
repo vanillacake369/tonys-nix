@@ -23,13 +23,13 @@
     ./modules/pkgs/aws-pkgs.nix
     
     # Shell setup
-    ./modules/pkgs/zsh-pkgs.nix
     ./modules/pkgs/nvim-pkgs.nix
     ./modules/pkgs/asciinema-pkgs.nix
     ./modules/pkgs/jq-pkgs.nix
     ./modules/pkgs/ripgrep-pkgs.nix
     ./modules/pkgs/tree-pkgs.nix
     ./modules/pkgs/bat-pkgs.nix
+    ./modules/pkgs/xclip-pkgs.nix
   ];
 
 }
