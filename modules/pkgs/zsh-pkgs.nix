@@ -23,6 +23,7 @@
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
           cat = "batcat";
+          copy = "xclip -selection clipboard";
       };
 
       plugins = [
