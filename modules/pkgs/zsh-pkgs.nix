@@ -22,6 +22,7 @@
           ka = "kubectl get all -o wide";
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
+          cat = "batcat";
       };
 
       plugins = [
@@ -82,7 +83,7 @@
         # Git log with preview
         gitlog() {
           (
-            git log --oneline | fzf --preview 'git show --name-only {1}'
+            git log --oneline | fzf --preview 'git show --color=always {1}'
           )
         }
         # Show proccess
