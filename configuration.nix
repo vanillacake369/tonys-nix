@@ -109,6 +109,7 @@
   nixpkgs.config.allowUnfree = true;
 
   programs.zsh.enable = true;
+  programs.java.enable = true;
   programs.firefox.enable = true;
   programs.neovim = {
     enable = true;
@@ -154,7 +155,12 @@
       defaultNetwork.settings.dns_enabled = true;
     };
   };
-
+  # Initiate user podman.socket
+  systemd.user.sockets.podman = {
+    enable = true;
+    wantedBy = [ "default.target" ];
+  };
+  
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
