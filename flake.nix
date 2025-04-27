@@ -43,8 +43,7 @@
         limjihoon = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
-            # ./home.nix
-            ./hama-home.nix
+            ./home.nix
             ./limjihoon-user.nix 
           ];
         };
