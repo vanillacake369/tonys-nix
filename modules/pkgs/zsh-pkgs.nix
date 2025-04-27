@@ -22,7 +22,7 @@
           ka = "kubectl get all -o wide";
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
-          cat = "batcat";
+          cat = "bat --style=plain";
           copy = "xclip -selection clipboard";
       };
 
