@@ -109,7 +109,10 @@
   nixpkgs.config.allowUnfree = true;
 
   programs.zsh.enable = true;
-  programs.java.enable = true;
+  programs.java = {
+    enable = true;
+    package = pkgs.zulu17;
+  };
   programs.firefox.enable = true;
   programs.neovim = {
     enable = true;
