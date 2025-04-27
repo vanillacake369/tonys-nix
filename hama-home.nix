@@ -29,7 +29,6 @@
     ./modules/pkgs/ripgrep-pkgs.nix
     ./modules/pkgs/tree-pkgs.nix
     ./modules/pkgs/bat-pkgs.nix
-    ./modules/pkgs/eza-pkgs.nix
     ./modules/pkgs/xclip-pkgs.nix
     ./modules/pkgs/screen-pkgs.nix
   ];
