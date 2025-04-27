@@ -22,8 +22,9 @@
           ka = "kubectl get all -o wide";
           ks = "kubectl get services -o wide";
           kap = "kubectl apply -f ";
-          cat = "bat --style=plain";
+          cat = "bat --style=plain --paging=never";
           copy = "xclip -selection clipboard";
+          grep = "rg";
       };
 
       plugins = [
