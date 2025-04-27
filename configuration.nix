@@ -138,6 +138,7 @@
     screen
     openvpn
     openvpn3
+    ghostty
   ];
 
   # Enable common container config files in /etc/containers
