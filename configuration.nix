@@ -113,6 +113,9 @@
     enable = true;
     package = pkgs.zulu17;
   };
+  # environment.variables = {
+  #  JAVA_HOME = "${pkgs.zulu17}/lib/openjdk";
+  # };
   programs.firefox.enable = true;
   programs.neovim = {
     enable = true;
