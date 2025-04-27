@@ -5,33 +5,15 @@
 
   # Import all modularized configurations
   imports = [
-    # Command runner
-    ./modules/pkgs/just-pkgs.nix
-    ./modules/pkgs/lua-pkgs.nix
-
-    # Podman & K8S for rootless container
-    ./modules/pkgs/kubernetes-pkgs.nix
-
-    # Development Tools
-    ./modules/pkgs/java-pkgs.nix
-    ./modules/pkgs/go-pkgs.nix
-    ./modules/pkgs/k6-pkgs.nix
-    ./modules/pkgs/lazydocker-pkgs.nix
-
-    # AWS
-    ./modules/pkgs/aws-pkgs.nix
+    # Infra
+    ./modules/pkgs/k8s.nix
     
-    # Shell setup
-    ./modules/pkgs/zsh-pkgs.nix
-    ./modules/pkgs/nvim-pkgs.nix
-    ./modules/pkgs/asciinema-pkgs.nix
-    ./modules/pkgs/jq-pkgs.nix
-    ./modules/pkgs/ripgrep-pkgs.nix
-    ./modules/pkgs/tree-pkgs.nix
-    ./modules/pkgs/bat-pkgs.nix
-    ./modules/pkgs/xclip-pkgs.nix
-    ./modules/pkgs/screen-pkgs.nix
-    ./modules/pkgs/gradle-pkgs.nix
-  ];
+    # Langs
+    ./modules/pkgs/language.nix
 
+    # Shell
+    ./modules/pkgs/apps.nix
+    ./modules/pkgs/nvim.nix
+    ./modules/pkgs/zsh.nix
+  ];
 }
