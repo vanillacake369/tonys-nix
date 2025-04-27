@@ -31,6 +31,7 @@
     ./modules/pkgs/bat-pkgs.nix
     ./modules/pkgs/xclip-pkgs.nix
     ./modules/pkgs/screen-pkgs.nix
+    ./modules/pkgs/gradle-pkgs.nix
   ];
 
 }
