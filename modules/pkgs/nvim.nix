@@ -1,9 +1,5 @@
-{ pkgs, lib, ... }: 
-{
+{ pkgs, lib, ... }: {
   home.packages = with pkgs; [
-    git
-    curl 
-    bash
     vimPlugins.vim-visual-multi
   ];
 
@@ -36,5 +32,6 @@
       ];
     };
   };
+
 }
 
