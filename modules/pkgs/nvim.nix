@@ -28,6 +28,7 @@
         gruvbox-material
         mini-nvim
         vim-just
+        yazi-nvim
         # vim-visual-multi
       ];
     };
