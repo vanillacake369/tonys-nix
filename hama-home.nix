@@ -15,5 +15,6 @@
     ./modules/pkgs/apps.nix
     ./modules/pkgs/nvim.nix
     ./modules/pkgs/zsh.nix
+    ./modules/pkgs/shell.nix
   ];
 }
