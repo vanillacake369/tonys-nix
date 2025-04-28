@@ -6,15 +6,15 @@
   # Import all modularized configurations
   imports = [
     # Infra
-    ./modules/pkgs/k8s.nix
+    ./modules/k8s.nix
     
     # Langs
-    ./modules/pkgs/language.nix
+    ./modules/language.nix
 
     # Shell
-    ./modules/pkgs/apps.nix
-    ./modules/pkgs/nvim.nix
-    ./modules/pkgs/zsh.nix
-    ./modules/pkgs/shell.nix
+    ./modules/apps.nix
+    ./modules/nvim.nix
+    ./modules/zsh.nix
+    ./modules/shell.nix
   ];
 }
