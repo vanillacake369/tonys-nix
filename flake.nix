@@ -3,19 +3,18 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
     system-manager = {
       url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, system-manager, ... }:
+  outputs = { self, nixpkgs, home-manager, system-manager, nixos-wsl, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -26,7 +25,11 @@
         nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            ./configuration.nix
+	    nixos-wsl.nixosModules.default
+	    {
+	      system.stateVersion = "24.05";
+	      wsl.enable = true;
+	    }
           ];
         };
       };
@@ -38,13 +41,19 @@
             ./hama-home.nix
             ./limjihoon-user.nix 
           ];
-        };
-      
+        };     
         limjihoon = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
             ./home.nix
             ./limjihoon-user.nix 
+          ];
+        };        
+	nixos = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ 
+            ./hama-home.nix
+            ./nixos-user.nix 
           ];
         };
       };
