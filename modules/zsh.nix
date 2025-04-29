@@ -100,6 +100,15 @@
             apt-cache search . | fzf --preview 'apt-cache depends {1}'
           )
         }
+        # Show systemd
+        systemdlog() {
+          (
+            find /etc/systemd/system/  -name "*.service" | \
+              fzf --preview 'cat {}' \
+                  --bind "ctrl-i:execute(nvim {})" \
+                      --bind "ctrl-s:execute(cat {} | copy)"
+          )
+        }
       '';
     };
 

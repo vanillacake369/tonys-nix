@@ -3,6 +3,11 @@
   # Enable Home Manager
   programs.home-manager.enable = true;
 
+  # Import dotfiles
+  home.file = {
+    ".config/nix".source = ./dotfiles/nix;
+  };
+
   # Import all modularized configurations
   imports = [
     # Infra
