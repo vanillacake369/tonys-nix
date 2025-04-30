@@ -38,7 +38,7 @@
         hama = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
-            ./hama-home.nix
+             ./home.nix
             ./limjihoon-user.nix 
           ];
         };     
@@ -52,7 +52,7 @@
         nixos = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
-            ./hama-home.nix
+            ./home.nix
             ./nixos-user.nix 
           ];
         };
