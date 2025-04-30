@@ -14,9 +14,9 @@
   # Import all modularized configurations
   imports = [
     # Infra
-    ./modules/k8s.nix
+    ./modules/infra.nix
     
-    # Langs
+    # Dev
     ./modules/language.nix
 
     # Shell

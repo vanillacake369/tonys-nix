@@ -5,7 +5,6 @@
     gradle
     just
     go
-    k6
     lua
   ];
   home.sessionVariables = {
