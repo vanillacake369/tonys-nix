@@ -9,7 +9,6 @@
     lua
   ];
   home.sessionVariables = {
-    FOO = "Hello";
     JAVA_HOME = "${pkgs.zulu17}";
   };
 }
