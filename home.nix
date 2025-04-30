@@ -2,6 +2,9 @@
 {
   # Enable Home Manager
   programs.home-manager.enable = true;
+ 
+  # Set env automatically
+  targets.genericLinux.enable = true;
 
   # Import dotfiles
   home.file = {

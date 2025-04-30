@@ -1,4 +1,5 @@
 { pkgs, ... }: {
+
   home.packages = with pkgs; [
     asciinema
     asciinema-agg   
@@ -7,7 +8,6 @@
     bat
     jq
     k6
-    git
     curl 
     bash
     vimPlugins.vim-visual-multi
@@ -17,5 +17,11 @@
     openssh
     xclip
   ];
+
+  programs.git = {
+    enable = true;
+    userName  = "limjihoon";
+    userEmail = "lonelynight1026@gmail.com";
+  };
 }
 
