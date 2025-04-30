@@ -1,12 +1,12 @@
 { pkgs, ... }: {
+  
   home.packages = with pkgs; [
     zsh-autoenv
     zsh-powerlevel10k
   ];
 
+  # Setup for zsh
   programs = {
-    
-    # Setup for zsh
     zsh = {
       enable = true;
       enableCompletion = true;

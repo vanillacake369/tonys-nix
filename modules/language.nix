@@ -1,4 +1,5 @@
 { pkgs, ... }: {
+
   home.packages = with pkgs; [
     zulu17
     gradle
@@ -9,6 +10,7 @@
   ];
   home.sessionVariables = {
     FOO = "Hello";
+    JAVA_HOME = "${pkgs.zulu17}";
   };
 }
 

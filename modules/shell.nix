@@ -1,4 +1,5 @@
 { pkgs, ... }: {
+
   home.packages = with pkgs; [
     asciinema
     asciinema-agg   
@@ -17,6 +18,7 @@
     openssh
     xclip
   ];
+
   programs = {
     yazi = {
       enable = true;
