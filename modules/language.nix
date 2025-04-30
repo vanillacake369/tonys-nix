@@ -7,5 +7,8 @@
     k6
     lua
   ];
+  home.sessionVariables = {
+    FOO = "Hello";
+  };
 }
 
