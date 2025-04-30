@@ -78,9 +78,9 @@
         kube-manifest() {
           kubectl get $* -o name | \
               fzf --preview 'kubectl get {} -o yaml' \
-                  --bind "ctrl-\:execute(kubectl get {+} -o yaml | nvim )" \
-                  --bind "ctrl-r:reload(kubectl get $* -o name)" --header 'Press CTRL-R to reload' \
-                  --bind "ctrl-]:execute(kubectl edit {+})";
+                  --bind "ctrl-r:reload(kubectl get $* -o name)" \
+                  --bind "ctrl-i:execute(kubectl edit {+})" \
+                  --header 'Ctrl-I: live edit | Ctrl-R: reload list';
          }
         # Git log with preview
         gitlog() {
