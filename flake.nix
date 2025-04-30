@@ -25,11 +25,11 @@
         nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-	    nixos-wsl.nixosModules.default
-	    {
-	      system.stateVersion = "24.05";
-	      wsl.enable = true;
-	    }
+            nixos-wsl.nixosModules.default
+            {
+              system.stateVersion = "24.05";
+              wsl.enable = true;
+            }
           ];
         };
       };
@@ -49,7 +49,7 @@
             ./limjihoon-user.nix 
           ];
         };        
-	nixos = home-manager.lib.homeManagerConfiguration {
+        nixos = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [ 
             ./hama-home.nix
@@ -57,7 +57,6 @@
           ];
         };
       };
-
       # Define system manager to cope with linux distro system
       systemConfigs.default = system-manager.lib.makeSystemConfig {
         modules = [
