@@ -17,6 +17,7 @@
     screen
     openssh
     xclip
+    neofetch
   ];
 
   programs = {
