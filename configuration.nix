@@ -96,7 +96,6 @@
         description = "Limjihoon";
         extraGroups = [ "networkmanager" "wheel" "input" ];
         packages = with pkgs; [
-        #  thunderbird
         ];
       };
     };
@@ -107,27 +106,13 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
-
-  programs.zsh.enable = true;
-  programs.java = {
-    enable = true;
-    package = pkgs.zulu17;
-  };
-  # environment.variables = {
-  #  JAVA_HOME = "${pkgs.zulu17}/lib/openjdk";
-  # };
-  programs.firefox.enable = true;
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-  };
   
   environment.shells = with pkgs; [ zsh ];
   environment.systemPackages = with pkgs; [
     # Korean Input
     ibus
     ibus-engines.hangul
-    noto-fonts-cjk-sans         # or other Korean fonts like unfonts
+    noto-fonts-cjk-sans
     # Applications
     google-chrome
     jetbrains.idea-ultimate
@@ -135,17 +120,13 @@
     youtube-music
     ticktick
     slack
-    # Multigesture on touchpad 
-    xdotool
+    firefox
     # Container
     dive # look into docker image layers
     podman-tui # status of containers in the terminal
     docker-compose # start group of containers for dev
     # Shell
     screen
-    openvpn
-    openvpn3
-    ghostty
   ];
 
   # Enable common container config files in /etc/containers
@@ -161,12 +142,34 @@
       defaultNetwork.settings.dns_enabled = true;
     };
   };
-  # Initiate user podman.socket
+
+  # Initiate podman.sock on user session
+  # ToDo : How can I move podman to home-manager ??
   systemd.user.sockets.podman = {
     enable = true;
-    wantedBy = [ "default.target" ];
+    description = "Podman API Socket";
+    wantedBy = [ "sockets.target" ];
+    listenStreams = [ "%t/podman/podman.sock" ];
+    socketConfig = {
+      SocketMode = "0660";
+    };
+  }; 
+
+  # Initiate minikube systemd service
+  systemd.services.minikube = {
+    enable = true;
+    description = "Init Minikube Cluster";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.minikube}/bin/minikube start";
+      RemainAfterExit = true;
+      ExecStop = "${pkgs.minikube}/bin/minikube stop";
+      StandardOutput = "journal";
+      After = "podman.service";
+    };
+    wantedBy = [ "multi-user.target" ];
   };
-  
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -193,5 +196,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }
