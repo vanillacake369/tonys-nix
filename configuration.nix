@@ -143,6 +143,8 @@
     };
   };
 
+  boot.kernelParams = [ "module_blacklist=i915" ];
+
 #  # Initiate podman.sock on user session
 #  # ToDo : How can I move podman to home-manager ??
 #  systemd.user.sockets.podman = {
