@@ -143,32 +143,32 @@
     };
   };
 
-  # Initiate podman.sock on user session
-  # ToDo : How can I move podman to home-manager ??
-  systemd.user.sockets.podman = {
-    enable = true;
-    description = "Podman API Socket";
-    wantedBy = [ "sockets.target" ];
-    listenStreams = [ "%t/podman/podman.sock" ];
-    socketConfig = {
-      SocketMode = "0660";
-    };
-  }; 
-
-  # Initiate minikube systemd service
-  systemd.services.minikube = {
-    enable = true;
-    description = "Init Minikube Cluster";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.minikube}/bin/minikube start";
-      RemainAfterExit = true;
-      ExecStop = "${pkgs.minikube}/bin/minikube stop";
-      StandardOutput = "journal";
-      After = "podman.service";
-    };
-    wantedBy = [ "multi-user.target" ];
-  };
+#  # Initiate podman.sock on user session
+#  # ToDo : How can I move podman to home-manager ??
+#  systemd.user.sockets.podman = {
+#    enable = true;
+#    description = "Podman API Socket";
+#    wantedBy = [ "sockets.target" ];
+#    listenStreams = [ "%t/podman/podman.sock" ];
+#    socketConfig = {
+#      SocketMode = "0660";
+#    };
+#  }; 
+#
+#  # Initiate minikube systemd service
+#  systemd.services.minikube = {
+#    enable = true;
+#    description = "Init Minikube Cluster";
+#    serviceConfig = {
+#      Type = "oneshot";
+#      ExecStart = "${pkgs.minikube}/bin/minikube start";
+#      RemainAfterExit = true;
+#      ExecStop = "${pkgs.minikube}/bin/minikube stop";
+#      StandardOutput = "journal";
+#      After = "podman.service";
+#    };
+#    wantedBy = [ "multi-user.target" ];
+#  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
