@@ -156,21 +156,21 @@
 
   # Initiate minikube systemd service
   # ToDo : How can I move this to home-manager ??
-  systemd.user.services.minikube = {
-    enable = true;
-    description = "Init Minikube Cluster";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" "podman.socket" ];
-    requires = [ "network-online.target" "podman.socket" ];
-    serviceConfig = {
-      Type = "simple";
-      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
-      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
-      ExecStop = "${pkgs.minikube}/bin/minikube stop";
-      StandardOutput = "journal";
-      RemainAfterExit = true;
-    };
-  };
+#  systemd.user.services.minikube = {
+#    enable = true;
+#    description = "Init Minikube Cluster";
+#    wantedBy = [ "multi-user.target" ];
+#    after = [ "network-online.target" "podman.socket" ];
+#    requires = [ "network-online.target" "podman.socket" ];
+#    serviceConfig = {
+#      Type = "simple";
+#      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
+#      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
+#      ExecStop = "${pkgs.minikube}/bin/minikube stop";
+#      StandardOutput = "journal";
+#      RemainAfterExit = true;
+#    };
+#  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
