@@ -154,18 +154,6 @@
     };
   };
 
-  # Initiate podman.sock on user session
-  # ToDo : How can I move this to home-manager ??
-  systemd.user.sockets.podman = {
-    enable = true;
-    description = "Podman API Socket";
-    wantedBy = [ "sockets.target" ];
-    listenStreams = [ "%t/podman/podman.sock" ];
-    socketConfig = {
-      SocketMode = "0660";
-    };
-  };
-
   # Initiate minikube systemd service
   # ToDo : How can I move this to home-manager ??
   systemd.user.services.minikube = {
