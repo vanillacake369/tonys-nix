@@ -155,7 +155,7 @@
   };
 
   # Initiate podman.sock on user session
-  # ToDo : How can I move podman to home-manager ??
+  # ToDo : How can I move this to home-manager ??
   systemd.user.sockets.podman = {
     enable = true;
     description = "Podman API Socket";
@@ -164,21 +164,23 @@
     socketConfig = {
       SocketMode = "0660";
     };
-  }; 
+  };
 
   # Initiate minikube systemd service
-  systemd.services.minikube = {
+  # ToDo : How can I move this to home-manager ??
+  systemd.user.services.minikube = {
     enable = true;
     description = "Init Minikube Cluster";
     wantedBy = [ "multi-user.target" ];
     after = [ "network-online.target" "podman.socket" ];
     requires = [ "network-online.target" "podman.socket" ];
     serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.minikube}/bin/minikube start";
-      RemainAfterExit = true;
+      Type = "simple";
+      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
+      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
       ExecStop = "${pkgs.minikube}/bin/minikube stop";
       StandardOutput = "journal";
+      RemainAfterExit = true;
     };
   };
 
