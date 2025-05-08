@@ -156,40 +156,20 @@
 
   # Initiate minikube systemd service
   # ToDo : How can I move this to home-manager ??
-#  systemd.user.services.minikube = {
-#    enable = true;
-#    description = "Init Minikube Cluster";
-#    wantedBy = [ "multi-user.target" ];
-#    after = [ "network-online.target" "podman.socket" ];
-#    requires = [ "network-online.target" "podman.socket" ];
-#    serviceConfig = {
-#      Type = "simple";
-#      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
-#      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
-#      ExecStop = "${pkgs.minikube}/bin/minikube stop";
-#      StandardOutput = "journal";
-#      RemainAfterExit = true;
-#    };
-#  };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  systemd.user.services.minikube = {
+    enable = true;
+    description = "Init Minikube Cluster";
+    wantedBy = [ "default.target" ];
+    after = [ "podman.socket" ];
+    requires = [ "podman.socket" ];
+    serviceConfig = {
+      Type = "simple";
+      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
+      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
+      ExecStop = "${pkgs.minikube}/bin/minikube stop";
+      RemainAfterExit = true;
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
