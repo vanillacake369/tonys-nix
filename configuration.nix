@@ -106,6 +106,17 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  programs.zsh.enable = true;
+  programs.java = {
+    enable = true;
+    package = pkgs.zulu17;
+  };
+  programs.firefox.enable = true;
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
   
   environment.shells = with pkgs; [ zsh ];
   environment.systemPackages = with pkgs; [
@@ -143,34 +154,33 @@
     };
   };
 
-  boot.kernelParams = [ "module_blacklist=i915" ];
+  # Initiate podman.sock on user session
+  # ToDo : How can I move podman to home-manager ??
+  systemd.user.sockets.podman = {
+    enable = true;
+    description = "Podman API Socket";
+    wantedBy = [ "sockets.target" ];
+    listenStreams = [ "%t/podman/podman.sock" ];
+    socketConfig = {
+      SocketMode = "0660";
+    };
+  }; 
 
-#  # Initiate podman.sock on user session
-#  # ToDo : How can I move podman to home-manager ??
-#  systemd.user.sockets.podman = {
-#    enable = true;
-#    description = "Podman API Socket";
-#    wantedBy = [ "sockets.target" ];
-#    listenStreams = [ "%t/podman/podman.sock" ];
-#    socketConfig = {
-#      SocketMode = "0660";
-#    };
-#  }; 
-#
-#  # Initiate minikube systemd service
-#  systemd.services.minikube = {
-#    enable = true;
-#    description = "Init Minikube Cluster";
-#    serviceConfig = {
-#      Type = "oneshot";
-#      ExecStart = "${pkgs.minikube}/bin/minikube start";
-#      RemainAfterExit = true;
-#      ExecStop = "${pkgs.minikube}/bin/minikube stop";
-#      StandardOutput = "journal";
-#      After = "podman.service";
-#    };
-#    wantedBy = [ "multi-user.target" ];
-#  };
+  # Initiate minikube systemd service
+  systemd.services.minikube = {
+    enable = true;
+    description = "Init Minikube Cluster";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network-online.target" "podman.socket" ];
+    requires = [ "network-online.target" "podman.socket" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.minikube}/bin/minikube start";
+      RemainAfterExit = true;
+      ExecStop = "${pkgs.minikube}/bin/minikube stop";
+      StandardOutput = "journal";
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
