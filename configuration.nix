@@ -138,6 +138,7 @@
     docker-compose # start group of containers for dev
     # Shell
     screen
+    vagrant
   ];
 
   # Enable common container config files in /etc/containers
