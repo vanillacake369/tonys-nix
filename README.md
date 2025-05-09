@@ -35,6 +35,8 @@ kubernetes-helm-3.17.3
 lua-5.2.4
 man-db-2.13.0
 minikube-1.34.0
+neofetch-unstable-2021-12-10
+neofetch-unstable-2021-12-10-man
 neovim-0.11.0
 nix-zsh-completions-0.5.1
 oh-my-zsh-2025-04-13
