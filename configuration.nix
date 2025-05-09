@@ -45,7 +45,8 @@
         LC_TIME = "ko_KR.UTF-8";
      };
     inputMethod = {
-        enabled = "ibus";
+        enable = true;
+        type = "ibus";
         ibus.engines = with pkgs.ibus-engines; [ hangul ];
     };
   };
