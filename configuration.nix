@@ -101,8 +101,11 @@
     };
   };
  
-  # Allow experimental-features 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Allow experimental-features
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "@wheel" ];
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
