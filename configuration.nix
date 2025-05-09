@@ -132,6 +132,11 @@
     ticktick
     slack
     firefox
+    libreoffice
+    hunspell
+    hunspellDicts.en_US
+    hunspellDicts.ko_KR
+    hunspellDicts.ko-kr
     # Container
     dive # look into docker image layers
     podman-tui # status of containers in the terminal
