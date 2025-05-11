@@ -132,6 +132,7 @@
     google-chrome
     jetbrains.idea-ultimate
     jetbrains.goland
+    vscode
     youtube-music
     ticktick
     slack
