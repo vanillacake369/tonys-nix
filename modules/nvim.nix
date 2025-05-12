@@ -1,9 +1,5 @@
 { pkgs, lib, ... }: {
 
-  home.packages = with pkgs; [
-    vimPlugins.vim-visual-multi
-  ];
-
   # install spacevim if not installed
   home.activation.installSpaceVim = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -d "$HOME/.SpaceVim" ]; then
@@ -30,7 +26,7 @@
         mini-nvim
         vim-just
         yazi-nvim
-        # vim-visual-multi
+        vim-visual-multi
       ];
     };
   };
