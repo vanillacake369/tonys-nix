@@ -78,10 +78,10 @@
     };
     printing.enable = true;
     pipewire = {
-        enable = true;
-        alsa.enable = true;
-        alsa.support32Bit = true;
-        pulse.enable = true;
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
     };
   };
 
@@ -149,7 +149,6 @@
     # Shell
     screen
     vagrant
-    gtk4
   ];
 
   # Enable common container config files in /etc/containers
