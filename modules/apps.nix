@@ -10,7 +10,6 @@
     k6
     curl 
     bash
-    vimPlugins.vim-visual-multi
     tree
     ripgrep
     screen
