@@ -53,6 +53,7 @@
 
 
   services = {
+    nfs.server.enable = true;
     xserver = {
       enable = true;
       displayManager.gdm.enable = true;
@@ -95,7 +96,12 @@
       limjihoon = {
         isNormalUser = true;
         description = "Limjihoon";
-        extraGroups = [ "networkmanager" "wheel" "input" ];
+        extraGroups = [ 
+          "networkmanager" 
+          "wheel" 
+          "input" 
+          "vboxusers"
+        ];
         packages = with pkgs; [
         ];
       };
@@ -153,14 +159,13 @@
   ];
 
   # Enable common container config files in /etc/containers
-  virtualisation.containers.enable = true;
   virtualisation = {
+    containers.enable = true;
+    virtualbox.host.enable = true;
     podman = {
       enable = true;
-
       # Create a `docker` alias for podman, to use it as a drop-in replacement
       dockerCompat = true;
-
       # Required for containers under podman-compose to be able to talk to each other.
       defaultNetwork.settings.dns_enabled = true;
     };
@@ -187,6 +192,11 @@
   networking = {
     firewall = {
       enable = true;
+      # Add firewall exception for libvirt provider when using NFSv4
+      interfaces."virbr1" = {                                   
+        allowedTCPPorts = [ 2049 ];                                               
+        allowedUDPPorts = [ 2049 ];                                               
+      };
 #      allowedTCPPorts = [ 
 #        80
 #        443 
