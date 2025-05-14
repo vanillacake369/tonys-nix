@@ -156,6 +156,7 @@
     # Shell
     screen
     vagrant
+    lsof
   ];
 
   # Enable common container config files in /etc/containers
