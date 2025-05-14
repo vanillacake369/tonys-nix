@@ -157,6 +157,7 @@
     screen
     vagrant
     lsof
+    psmisc
   ];
 
   # Enable common container config files in /etc/containers
