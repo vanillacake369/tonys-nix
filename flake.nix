@@ -25,6 +25,18 @@
               commandLineArgs =
                 "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
             };
+            vscode = prev.vscode.override {
+              commandLineArgs =
+                 "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
+            };
+#            slack = prev.slack.override {
+#              commandLineArgs =
+#                 "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
+#            };
+#            ticktick = prev.ticktick.override {
+#              commandLineArgs =
+#                 "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
+#            };
         })];
         config.allowUnfree = true;
       };
