@@ -29,6 +29,15 @@
               commandLineArgs =
                  "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
             };
+            slack = pkgs.symlinkJoin {
+              name = "slack";
+              paths = [ prev.slack ];
+              buildInputs = [ pkgs.makeWrapper ];
+              postBuild = ''
+                wrapProgram $out/bin/slack \
+                  --add-flags "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3"
+              '';
+            };
 #            slack = prev.slack.override {
 #              commandLineArgs =
 #                 "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
