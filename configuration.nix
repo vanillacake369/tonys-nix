@@ -114,9 +114,6 @@
     trusted-users = [ "root" "@wheel" ];
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   programs.zsh.enable = true;
   programs.java = {
     enable = true;

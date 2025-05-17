@@ -20,13 +20,21 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { 
         inherit system;
+        overlays = [(final: prev: {
+            google-chrome = prev.google-chrome.override {
+              commandLineArgs =
+                "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
+            };
+        })];
         config.allowUnfree = true;
       };
     in {
+      packages.${system}.google-chrome = pkgs.google-chrome;
       # Define nixos configuration
       nixosConfigurations = {
         nixos = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          inherit system;
+          inherit pkgs;
           modules = [
             ./configuration.nix
           ];
