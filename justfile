@@ -3,7 +3,7 @@ USERNAME := `whoami`
 HOSTNAME := `hostname`
 
 # Initiate all configration
-install-all: install-nix install-home-manager install-uidmap install-pckgs clean
+install-all: install-nix install-home-manager install-uidmap init-nixos install-pckgs clean
 
 
 ########### *** INSTALLATION *** ##########
@@ -69,6 +69,7 @@ apply-zsh:
 # Clean redundant packages by nix gc
 clean:
   nix-collect-garbage -d
+  sudo nix-collect-garbage -d
 
 # Clear all dependencies
 clear-all:
