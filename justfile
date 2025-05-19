@@ -3,7 +3,7 @@ USERNAME := `whoami`
 HOSTNAME := `hostname`
 
 # Initiate all configration
-install-all: install-nix install-home-manager install-uidmap init-nixos install-pckgs clean
+install-all: install-nix install-home-manager install-uidmap install-pckgs clean
 
 
 ########### *** INSTALLATION *** ##########
