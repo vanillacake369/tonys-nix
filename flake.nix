@@ -42,7 +42,6 @@
         config.allowUnfree = true;
       };
     in {
-      packages.${system}.google-chrome = pkgs.google-chrome;
       # Define nixos configuration
       nixosConfigurations = {
         nixos = nixpkgs.lib.nixosSystem {
