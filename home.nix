@@ -9,6 +9,7 @@
   # Import dotfiles
   home.file = {
     ".config/nix".source = ./dotfiles/nix;
+    ".config/nvim".source = ./dotfiles/nvim;
   };
 
   # Import all modularized configurations
