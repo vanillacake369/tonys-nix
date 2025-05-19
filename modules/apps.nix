@@ -15,6 +15,7 @@
     hunspellDicts.ko_KR
     hunspellDicts.ko-kr
     obsidian
+    drawio
   ];
 
   programs.git = {
