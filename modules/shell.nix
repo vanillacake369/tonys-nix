@@ -18,6 +18,9 @@
     openssh
     xclip
     neofetch
+    vagrant
+    lsof
+    psmisc
   ];
 
   programs = {

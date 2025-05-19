@@ -131,30 +131,10 @@
     ibus
     ibus-engines.hangul
     noto-fonts-cjk-sans
-    # Applications
-    google-chrome
-    jetbrains.idea-ultimate
-    jetbrains.goland
-    vscode
-    youtube-music
-    ticktick
-    slack
-    firefox
-    libreoffice
-    hunspell
-    hunspellDicts.en_US
-    hunspellDicts.ko_KR
-    hunspellDicts.ko-kr
-    obsidian
     # Container
     dive # look into docker image layers
     podman-tui # status of containers in the terminal
     docker-compose # start group of containers for dev
-    # Shell
-    screen
-    vagrant
-    lsof
-    psmisc
   ];
 
   # Enable common container config files in /etc/containers

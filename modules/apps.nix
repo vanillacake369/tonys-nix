@@ -1,20 +1,20 @@
 { pkgs, ... }: {
 
   home.packages = with pkgs; [
-    asciinema
-    asciinema-agg   
-    awscli2
-    ssm-session-manager-plugin
-    bat
-    jq
-    k6
-    curl 
-    bash
-    tree
-    ripgrep
-    screen
-    openssh
-    xclip
+    google-chrome
+    jetbrains.idea-ultimate
+    jetbrains.goland
+    vscode
+    youtube-music
+    ticktick
+    slack
+    firefox
+    libreoffice
+    hunspell
+    hunspellDicts.en_US
+    hunspellDicts.ko_KR
+    hunspellDicts.ko-kr
+    obsidian
   ];
 
   programs.git = {
