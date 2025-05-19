@@ -6,6 +6,7 @@
     just
     go
     lua
+    gcc
   ];
   home.sessionVariables = {
     JAVA_HOME = "${pkgs.zulu17}";
