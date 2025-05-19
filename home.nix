@@ -9,6 +9,7 @@
   # Import dotfiles
   home.file = {
     ".config/nix".source = ./dotfiles/nix;
+    ".config/nixpkgs".source = ./dotfiles/nixpkgs;
     ".config/nvim".source = ./dotfiles/nvim;
   };
 
