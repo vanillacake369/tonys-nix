@@ -91,10 +91,9 @@
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
-    defaultUserShell = pkgs.zsh;
     users = {
       limjihoon = {
-        useDefaultShell = true;
+        shell = pkgs.zsh;
         isNormalUser = true;
         description = "Limjihoon";
         extraGroups = [ 
