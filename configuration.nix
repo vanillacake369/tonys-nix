@@ -94,6 +94,7 @@
     defaultUserShell = pkgs.zsh;
     users = {
       limjihoon = {
+        useDefaultShell = true;
         isNormalUser = true;
         description = "Limjihoon";
         extraGroups = [ 
