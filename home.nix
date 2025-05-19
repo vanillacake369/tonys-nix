@@ -20,7 +20,7 @@
     ./modules/language.nix
 
     # Shell
-    # ./modules/apps.nix
+    ./modules/apps.nix
     ./modules/nvim.nix
     ./modules/zsh.nix
     ./modules/shell.nix
