@@ -1,0 +1,2 @@
+# exclue open vpn config file
+*.ovpn
