@@ -16,6 +16,8 @@
     hunspellDicts.ko-kr
     obsidian
     drawio
+    openvpn
+    openvpn3
   ];
 
   programs.git = {
