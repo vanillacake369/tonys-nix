@@ -18,6 +18,7 @@
     drawio
     openvpn
     openvpn3
+    discord
   ];
 
   programs.git = {
