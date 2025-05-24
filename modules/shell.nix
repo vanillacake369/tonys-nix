@@ -18,7 +18,7 @@
     openssh
     xclip
     neofetch
-    # vagrant
+    vagrant
     lsof
     psmisc
     wayland-utils
