@@ -22,6 +22,7 @@
     lsof
     psmisc
     wayland-utils
+    tmux
   ];
 
   programs = {
