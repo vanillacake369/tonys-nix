@@ -4,7 +4,6 @@
     google-chrome
     jetbrains.idea-ultimate
     jetbrains.goland
-    vscode
     youtube-music
     ticktick
     slack
@@ -14,7 +13,6 @@
     hunspellDicts.en_US
     hunspellDicts.ko_KR
     hunspellDicts.ko-kr
-    obsidian
     drawio
     openvpn
     openvpn3
