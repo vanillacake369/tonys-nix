@@ -21,6 +21,7 @@
     # vagrant
     lsof
     psmisc
+    wayland-utils
   ];
 
   programs = {
