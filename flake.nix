@@ -25,10 +25,6 @@
             commandLineArgs =
               "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
           };
-          vscode = prev.vscode.override {
-            commandLineArgs =
-               "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
-          };
           slack = pkgs.symlinkJoin {
             name = "slack";
             paths = [ prev.slack ];
