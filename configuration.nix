@@ -19,11 +19,6 @@
     kernelParams = [ "kvm.enable_virt_at_load=0" ];
     blacklistedKernelModules = [ "kvm" "kvm_intel" "kvm_amd" ];
   };
-
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-  };
  
   # Set your time zone.
   time.timeZone = "Asia/Seoul";
@@ -86,6 +81,21 @@
       alsa.support32Bit = true;
       pulse.enable = true;
     };
+    openssh = {
+      enable = true;
+      startWhenNeeded = true;
+      ports = [ 22 ];
+      allowSFTP = false;
+      settings = {
+        PasswordAuthentication = false;
+        AllowUsers = null;
+        UseDns = false;
+        X11Forwarding = false;
+        PermitRootLogin = "prohibit-password";
+        KbdInteractiveAuthentication = false;
+      };
+    };
+    fail2ban.enable = true;
   };
 
   # Enable sound with pipewire.
@@ -171,21 +181,19 @@
 
   # Firewall of inbound traffic
   networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
     firewall = {
       enable = true;
       # Add firewall exception for libvirt provider when using NFSv4
-      interfaces."virbr1" = {                                   
-        allowedTCPPorts = [ 2049 ];                                               
-        allowedUDPPorts = [ 2049 ];                                               
+      interfaces."virbr1" = {
+        allowedTCPPorts = [ 2049 ];
+        allowedUDPPorts = [ 2049 ];
       };
-#      allowedTCPPorts = [ 
-#        80
-#        443 
-#      ];
-#      allowedUDPPortRanges = [
-#        { from = 4000; to = 4007; }
-#        { from = 8000; to = 8010; }
-#      ];
+      # Allow ssh port
+      allowedTCPPorts = [
+        22
+      ];
     };
   };
 
