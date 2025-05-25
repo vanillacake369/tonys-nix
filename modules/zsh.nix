@@ -25,6 +25,7 @@
           cat = "bat --style=plain --paging=never";
           copy = "xclip -selection clipboard";
           grep = "rg";
+          clear = "clear -x";
       };
 
       plugins = [
