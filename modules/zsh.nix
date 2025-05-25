@@ -14,18 +14,18 @@
       syntaxHighlighting.enable = true;
 
       shellAliases = {
-          ll = "ls -l";
-          kctx = "kubectx";
-          kns = "kubens";
-          k = "kubectl";
-          m = "minikube";
-          ka = "kubectl get all -o wide";
-          ks = "kubectl get services -o wide";
-          kap = "kubectl apply -f ";
-          cat = "bat --style=plain --paging=never";
-          copy = "xclip -selection clipboard";
-          grep = "rg";
-          clear = "clear -x";
+        ll = "ls -l";
+        kctx = "kubectx";
+        kns = "kubens";
+        k = "kubectl";
+        m = "minikube";
+        ka = "kubectl get all -o wide";
+        ks = "kubectl get services -o wide";
+        kap = "kubectl apply -f ";
+        cat = "bat --style=plain --paging=never";
+        copy = "xclip -selection clipboard";
+        grep = "rg";
+        clear = "clear -x";
       };
 
       plugins = [
