@@ -6,8 +6,8 @@
   # Applied keybindings :: https://heywoodlh.io/nixos-gnome-settings-and-keyboard-shortcuts
   dconf.settings = {
     "org/gnome/settings-daemon/plugins/media-keys" = {
-        volume-up = [ "<Shift><Control>Up" ];
-        volume-down = [ "<Shift><Control>Down" ];
+        volume-up = [ "<Ctrl><Alt>Up" ];
+        volume-down = [ "<Ctrl><Alt>Down" ];
         next = [ "<Shift><Control>n" ];
         previous = [ "<Shift><Control>p" ];
         play = [ "<Shift><Control>space" ];
