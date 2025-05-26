@@ -11,10 +11,8 @@
     git
     curl 
     bash
-    vimPlugins.vim-visual-multi
     tree
     ripgrep
-    screen
     openssh
     xclip
     neofetch
@@ -22,7 +20,8 @@
     lsof
     psmisc
     wayland-utils
-    tmux
+    zellij
+    htop
   ];
 
   programs = {
