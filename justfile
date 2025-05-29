@@ -1,12 +1,25 @@
-# Username of current shell
+########### *** GLOBAL VARIABLE *** ##########
+# Env of user, host, os
 USERNAME := `whoami`
 HOSTNAME := `hostname`
+OS_TYPE := `bash -euo pipefail -c '           \
+  if [[ -d /etc/nixos ]]; then                \
+    echo nixos;                               \
+  elif grep -qiE "(Microsoft|WSL)" /proc/version; then \
+    echo wsl;                                 \
+  elif [[ "$(uname -s)" == "Darwin" ]]; then  \
+    echo darwin;                              \
+  else                                        \
+    echo unsupported;                         \
+  fi'`
 
-# Initiate all configration
-install-all: install-nix install-home-manager install-uidmap install-pckgs clean
+
 
 
 ########### *** INSTALLATION *** ##########
+
+# Initiate all configration
+install-all: install-nix install-home-manager install-uidmap install-pckgs clean
 
 # Install nix
 install-nix:
@@ -18,7 +31,7 @@ install-nix:
   else
     echo "[✓] Nix installed already"
   fi
-  
+
 # Install Home Manager
 install-home-manager:
   #!/usr/bin/env sh
@@ -50,8 +63,8 @@ init-nixos:
   sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
 
 # Install packages by nix home-manager
-install-pckgs *USER=USERNAME:
-  home-manager switch --flake .#{{USER}} -b back
+install-pckgs *HM_CONFIG=OS_TYPE:
+  home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
 
 # Apply zsh
 apply-zsh:
@@ -98,35 +111,3 @@ enable-shared-mount:
   else
     echo "[✓] shared mount already configured for podman"
   fi
-
-# # Status of minikube on podman
-# driver := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Config.Driver'`
-# active := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .Active'`
-# active_kube_context := `minikube profile list -o json | jq -r '.valid[] | select(.Name == "minikube") | .ActiveKubeContext'`
-# 
-# # Run minikube on podman
-# run-minikube:
-#   #!/usr/bin/env lua
-# 
-#   function isDriverPodman(driver)
-#     local stripedDriver = driver:gsub("%s+", "")
-#     return stripedDriver == "podman"
-#   end
-#   function isActive(active)
-#     return active == true
-#   end
-#   function isActiveKubeContext(kubeContext)
-#     return kubeContext == true
-#   end
-#   
-#   local isValidStatus = isDriverPodman( "{{driver}}" ) and isActive( {{active}} ) and isActiveKubeContext( {{active_kube_context}} )
-#   if isValidStatus then
-#     print("[✓] Minikube is running on Podman")
-#   else
-#     print("[!] Minikube is not running on Podman or not in active context")
-#     os.execute('podman volume rm minikube')
-#     os.execute('minikube delete --all --purge')
-#     os.execute('sudo mount --make-rshared /')
-#     os.execute('minikube config set rootless true')
-#     os.execute('minikube start --driver=podman --container-runtime=containerd --force')
-#   end

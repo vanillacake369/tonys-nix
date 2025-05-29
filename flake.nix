@@ -53,7 +53,7 @@
       # Define the home-manager configuration
       homeConfigurations = {
         # WSL Home Manager configuration
-        limjihoon-wsl = home-manager.lib.homeManagerConfiguration {
+        hm-wsl = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./home.nix
@@ -65,7 +65,7 @@
           };
         };
         # NixOS Home Manager configuration
-        limjihoon-nixos = home-manager.lib.homeManagerConfiguration {
+        hm-nixos = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           modules = [
             ./home.nix
