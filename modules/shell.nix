@@ -1,6 +1,9 @@
-{ pkgs, ... }: {
+{ pkgs, lib, isWsl, ... }: 
 
-  home.packages = with pkgs; [
+with pkgs;
+
+{
+  home.packages = [
     asciinema
     asciinema-agg   
     awscli2
@@ -22,6 +25,8 @@
     wayland-utils
     zellij
     htop
+  ] ++ lib.optionals (!isWsl) [
+    vagrant
   ];
 
   programs = {

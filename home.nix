@@ -1,4 +1,5 @@
-{ lib, pkgs, config, ... }: 
+{ lib, pkgs, config, isLinux, isDarwin, isWsl, ... }:
+
 {
   # Enable Home Manager
   programs.home-manager.enable = true;
@@ -14,18 +15,20 @@
     ".screenrc".source = ./dotfiles/screen/.screenrc;
   };
 
-  # Import all modularized configurations
+  # Core pkgs
+  # Pass isLinux, isDarwin, isWsl
   imports = [
-    # Infra
     ./modules/infra.nix
-    
-    # Dev
     ./modules/language.nix
-
-    # Shell
-    ./modules/apps.nix
     ./modules/nvim.nix
     ./modules/zsh.nix
     ./modules/shell.nix
-  ];
+  ]
+  # NixOs / Darwin pkgs
+  ++ (lib.optionals (isLinux || isDarwin) [
+    ./modules/apps.nix
+  ])
+  # WSL pkgs
+  ++ (lib.optionals isWsl [
+  ]);
 }
