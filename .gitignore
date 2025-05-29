@@ -1,2 +1,5 @@
-# exclue open vpn config file
+# Exclude open vpn config file
 *.ovpn
+
+# Exclude .idea
+.idea/

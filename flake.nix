@@ -37,9 +37,12 @@
         })];
         config.allowUnfree = true;
       };
-      isLinux = pkgs.stdenv.isLinux;
-      isDarwin = pkgs.stdenv.isDarwin;
-      isWsl = builtins.stringLength (builtins.getEnv "WSL_DISTRO_NAME") > 0;
+      # isLinux = pkgs.stdenv.isLinux;
+      # isDarwin = pkgs.stdenv.isDarwin;;
+      # isWsl = builtins.stringLength (builtins.getEnv "WSL_DISTRO_NAME") > 0;
+      isLinux = true;
+      isDarwin = false;
+      isWsl = true;
     in {
       # Define nixos configuration
       nixosConfigurations = {
