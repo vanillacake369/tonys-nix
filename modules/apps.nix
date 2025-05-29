@@ -17,6 +17,7 @@
     openvpn
     openvpn3
     discord
+    warp-terminal
   ];
 
   programs.git = {
