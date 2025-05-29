@@ -25,7 +25,7 @@
     ./modules/shell.nix
   ]
   # NixOs / Darwin pkgs
-  ++ (lib.optionals (isLinux || isDarwin) [
+  ++ (lib.optionals (isLinux || isDarwin && !isWsl) [
     ./modules/apps.nix
   ])
   # WSL pkgs

@@ -19,7 +19,6 @@ with pkgs;
     openssh
     xclip
     neofetch
-    vagrant
     lsof
     psmisc
     wayland-utils
