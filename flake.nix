@@ -37,12 +37,8 @@
         })];
         config.allowUnfree = true;
       };
-      # isLinux = pkgs.stdenv.isLinux;
-      # isDarwin = pkgs.stdenv.isDarwin;;
-      # isWsl = builtins.stringLength (builtins.getEnv "WSL_DISTRO_NAME") > 0;
-      isLinux = true;
-      isDarwin = false;
-      isWsl = true;
+      isLinux = pkgs.stdenv.isLinux;
+      isDarwin = pkgs.stdenv.isDarwin;
     in {
       # Define nixos configuration
       nixosConfigurations = {
@@ -56,14 +52,28 @@
       };
       # Define the home-manager configuration
       homeConfigurations = {
-         limjihoon = home-manager.lib.homeManagerConfiguration {
+        # WSL Home Manager configuration
+        limjihoon-wsl = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ 
+          modules = [
             ./home.nix
-            ./limjihoon-user.nix 
+            ./limjihoon-user.nix
           ];
           extraSpecialArgs = {
-            inherit isLinux isDarwin isWsl;
+            inherit isLinux isDarwin;
+            isWsl = true;
+          };
+        };
+        # NixOS Home Manager configuration
+        limjihoon-nixos = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [
+            ./home.nix
+            ./limjihoon-user.nix
+          ];
+          extraSpecialArgs = {
+            inherit isLinux isDarwin;
+            isWsl = false;
           };
         };
       };
