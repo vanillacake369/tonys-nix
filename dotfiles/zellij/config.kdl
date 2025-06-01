@@ -355,7 +355,8 @@ default_mode "normal"
 // Default value: 10000
 // 
 // scroll_buffer_size 10000
- 
+
+// ** COPY/PASTE COMMAND :: X11 **
 // Provide a command to execute when copying text. The text will be piped to
 // the stdin of the program to perform the copy. This can be used with
 // terminal emulators which do not support the OSC 52 ANSI control sequence
@@ -365,8 +366,7 @@ default_mode "normal"
 // copy_command "xclip -selection clipboard" // x11
 // copy_command "wl-copy"                    // wayland
 // copy_command "pbcopy"                     // osx
-// 
-// copy_command "pbcopy"
+copy_command "xclip -selection clipboard" // x11
  
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
@@ -376,6 +376,7 @@ default_mode "normal"
 //   - primary
 // 
 // copy_clipboard "primary"
+copy_clipboard "system"
  
 // Enable automatic copying (and clearing) of selection when releasing mouse
 // Default: true
