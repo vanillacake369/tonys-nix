@@ -4,6 +4,7 @@
     google-chrome
     jetbrains.idea-ultimate
     jetbrains.goland
+    jetbrains.datagrip
     youtube-music
     ticktick
     slack
