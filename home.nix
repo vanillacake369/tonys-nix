@@ -12,6 +12,7 @@
     ".config/nix".source = ./dotfiles/nix;
     ".config/nixpkgs".source = ./dotfiles/nixpkgs;
     ".config/nvim".source = ./dotfiles/nvim;
+    ".config/zellij".source = ./dotfiles/zellij;
     ".screenrc".source = ./dotfiles/screen/.screenrc;
   };
 
