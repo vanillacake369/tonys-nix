@@ -143,10 +143,6 @@
     ibus
     ibus-engines.hangul
     noto-fonts-cjk-sans
-    # Container
-    dive # look into docker image layers
-    podman-tui # status of containers in the terminal
-    docker-compose # start group of containers for dev
   ];
 
   # Enable common container config files in /etc/containers
@@ -159,23 +155,6 @@
       dockerCompat = true;
       # Required for containers under podman-compose to be able to talk to each other.
       defaultNetwork.settings.dns_enabled = true;
-    };
-  };
-
-  # Initiate minikube systemd service
-  # ToDo : How can I move this to home-manager ??
-  systemd.user.services.minikube = {
-    enable = true;
-    description = "Init Minikube Cluster";
-    wantedBy = [ "default.target" ];
-    after = [ "podman.socket" ];
-    requires = [ "podman.socket" ];
-    serviceConfig = {
-      Type = "simple";
-      Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
-      ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
-      ExecStop = "${pkgs.minikube}/bin/minikube stop";
-      RemainAfterExit = true;
     };
   };
 

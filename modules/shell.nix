@@ -10,7 +10,6 @@ with pkgs;
     ssm-session-manager-plugin
     bat
     jq
-    k6
     git
     curl 
     bash
