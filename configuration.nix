@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports =
@@ -48,7 +48,7 @@
     };
   };
 
-
+  # NFS / X-SERVER / PIPEWIRE / OPENSSH
   services = {
     nfs.server.enable = true;
     xserver = {
@@ -59,6 +59,11 @@
         layout = "us";
         variant = "";
       };
+      config = lib.mkAfter ''
+        Section "ServerFlags"
+          Option "DontVTSwitch" "True"
+        EndSection
+      '';
     };
     libinput = {
       enable = true;
