@@ -117,15 +117,13 @@
           case $1 in
             -h)
               shift
-              regex=$1
-              matching_files=$(rg -l --hidden ${regex} | fzf --exit-0 --preview="rg --color=always -n '${regex}' {} ")
+              matching_files=$(rg -l --hidden $1 | fzf --exit-0 --preview="rg --color=always -n '$1' {} ")
               ;;
             *)
-              regex=$1
-              matching_files=$(rg -l -- ${regex} | fzf --exit-0 --preview="rg --color=always -n -- '${regex}' {} ")
+              matching_files=$(rg -l -- $1 | fzf --exit-0 --preview="rg --color=always -n -- '$1' {} ")
               ;;
           esac
-          [[ -n "$matching_files" ]] && ${EDITOR} "${matching_files}" -c/${regex}
+          [[ -n "$matching_files" ]] && ${"\$EDITOR"} "${"\$matching_files"}" -c/$1
         }
       '';
     };
