@@ -15,15 +15,15 @@ with pkgs;
     bash
     tree
     ripgrep
-    openssh
-    xclip
     neofetch
     lsof
     psmisc
-    wayland-utils
     zellij
     htop
   ] ++ lib.optionals (!isWsl) [
+    openssh
+    wayland-utils
+    xclip
     vagrant
   ];
 
