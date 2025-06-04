@@ -4,6 +4,10 @@
 
 { config, pkgs, lib, ... }:
 
+let
+  userHome = config.users.users.limjihoon.home;
+in
+
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -53,8 +57,6 @@
     nfs.server.enable = true;
     xserver = {
       enable = true;
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
       xkb = {
         layout = "us";
         variant = "";
@@ -65,6 +67,8 @@
         EndSection
       '';
     };
+    displayManager.gdm.enable = true;
+    desktopManager.gnome.enable = true;
     libinput = {
       enable = true;
       touchpad = {
@@ -101,6 +105,14 @@
       };
     };
     fail2ban.enable = true;
+    openvpn.servers.hamaVPN = {
+      autoStart = false;
+      config = ''
+        config ${userHome}/my-nixos/openvpn/lonelynight1026.ovpn
+        auth-user-pass ${userHome}/my-nixos/openvpn/secret
+      '';
+      updateResolvConf = true;
+    };
   };
 
   # Enable sound with pipewire.
