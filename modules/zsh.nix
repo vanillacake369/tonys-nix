@@ -110,6 +110,23 @@
                       --bind "ctrl-s:execute(cat {} | copy)"
           )
         }
+        # Search by keyword
+        search() {
+          [[ $# -eq 0 ]] && { echo "provide regex argument"; return }
+          local matching_files
+          case $1 in
+            -h)
+              shift
+              regex=$1
+              matching_files=$(rg -l --hidden ${regex} | fzf --exit-0 --preview="rg --color=always -n '${regex}' {} ")
+              ;;
+            *)
+              regex=$1
+              matching_files=$(rg -l -- ${regex} | fzf --exit-0 --preview="rg --color=always -n -- '${regex}' {} ")
+              ;;
+          esac
+          [[ -n "$matching_files" ]] && ${EDITOR} "${matching_files}" -c/${regex}
+        }
       '';
     };
 
