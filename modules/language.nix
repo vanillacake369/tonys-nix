@@ -5,8 +5,9 @@
     gradle
     just
     go
-    lua
     gcc
+    lua54Packages.lua
+    lua54Packages.luaunit
   ];
   home.sessionVariables = {
     JAVA_HOME = "${pkgs.zulu17}";
