@@ -8,14 +8,11 @@
     stern
     kubernetes-helm
     kubectl-tree
-  ] ++ lib.optionals (isWsl) [
     oxker
   ] ++ lib.optionals (!isWsl) [
     minikube
-    lazydocker
     dive
     podman-tui
-    docker-compose
   ];
 
   # TODO : Activate only when isWsl == false
