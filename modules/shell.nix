@@ -1,9 +1,6 @@
-{ pkgs, lib, isWsl, ... }: 
+{ pkgs, lib, isWsl, ... }: {
 
-with pkgs;
-
-{
-  home.packages = [
+  home.packages = with pkgs; [
     asciinema
     asciinema-agg   
     awscli2
@@ -20,10 +17,10 @@ with pkgs;
     psmisc
     zellij
     htop
+    xclip
   ] ++ lib.optionals (!isWsl) [
     openssh
     wayland-utils
-    xclip
     vagrant
   ];
 
