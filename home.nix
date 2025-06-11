@@ -26,10 +26,10 @@
     ./modules/nvim.nix
     ./modules/zsh.nix
     ./modules/shell.nix
+    ./modules/apps.nix
   ]
   # NixOs / Darwin pkgs
   ++ (lib.optionals (!isWsl && isLinux || isDarwin) [
-    ./modules/apps.nix
   ])
   # WSL pkgs
   ++ (lib.optionals isWsl [
