@@ -1,6 +1,8 @@
-{ pkgs, ... }: {
+{ pkgs, isWsl, ... }: {
 
   home.packages = with pkgs; [
+    claude-code
+  ] ++ lib.optionals (!isWsl) [
     google-chrome
     jetbrains.idea-ultimate
     jetbrains.goland
@@ -21,11 +23,4 @@
     warp-terminal
     code-cursor
   ];
-
-  programs.git = {
-    enable = true;
-    userName  = "limjihoon";
-    userEmail = "lonelynight1026@gmail.com";
-  };
 }
-
