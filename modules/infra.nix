@@ -1,8 +1,5 @@
-{ pkgs, lib, isWsl, ... }: 
-
-with pkgs;
-
-{
+{ pkgs, lib, isWsl, ... }: {
+  
   home.packages = with pkgs; [
     k6
     kubectl
