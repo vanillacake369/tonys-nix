@@ -22,6 +22,7 @@
     openssh
     wayland-utils
     vagrant
+    google-authenticator
   ];
 
   programs = {
@@ -29,7 +30,7 @@
       enable = true;
       userName  = "limjihoon";
       userEmail = "lonelynight1026@gmail.com";
-    }
+    };
     yazi = {
       enable = true;
       enableZshIntegration = true;
