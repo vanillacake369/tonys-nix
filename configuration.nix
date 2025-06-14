@@ -110,7 +110,6 @@ in
       autoStart = false;
       config = ''
         config ${userHome}/my-nixos/openvpn/lonelynight1026.ovpn
-        auth-user-pass ${userHome}/my-nixos/openvpn/secret
       '';
       updateResolvConf = true;
     };
