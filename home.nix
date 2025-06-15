@@ -1,4 +1,4 @@
-{ lib, pkgs, config, isLinux, isDarwin, isWsl, ... }:
+{lib, pkgs, config, isLinux, isDarwin, isWsl, ... }:
 
 {
   # Enable Home Manager
