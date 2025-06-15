@@ -13,7 +13,7 @@
     ".config/nixpkgs".source = ./dotfiles/nixpkgs;
     # ** I'm in learning lua by scratch --> https://programmingpercy.tech/blog/learn-how-to-use-neovim-as-ide/ **
     # ".config/nvim".source = ./dotfiles/learn-nvim;
-    ".config/nvim".source = ./dotfiles/nvim;
+    ".config/nvim".source = ./dotfiles/lazyvim;
     ".config/zellij".source = ./dotfiles/zellij;
     ".screenrc".source = ./dotfiles/screen/.screenrc;
   };
