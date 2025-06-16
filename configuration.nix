@@ -54,6 +54,9 @@ in
 
   # NFS / X-SERVER / PIPEWIRE / OPENSSH
   services = {
+    logind = {
+      lidSwitch = "hybrid-sleep";
+    };
     nfs.server.enable = true;
     xserver = {
       enable = true;
