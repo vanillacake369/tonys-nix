@@ -5,14 +5,19 @@
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 return {
-  -- add gruvbox
-  { "ellisonleao/gruvbox.nvim" },
+  -- Colorscheme :: catppuccin
+  { 
+    "catppuccin/nvim", 
+    name = "catppuccin", 
+    priority = 1000,
+    lazy = false
+  },
 
-  -- Configure LazyVim to load gruvbox
+  -- Configure LazyVim
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "gruvbox",
+      colorscheme = "catppuccin",
     },
   },
 
@@ -139,17 +144,6 @@ return {
           return "😄"
         end,
       })
-    end,
-  },
-
-  -- or you can return new options to override all the defaults
-  {
-    "nvim-lualine/lualine.nvim",
-    event = "VeryLazy",
-    opts = function()
-      return {
-        --[[add your custom lualine config here]]
-      }
     end,
   },
 
