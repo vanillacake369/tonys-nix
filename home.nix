@@ -1,9 +1,17 @@
-{lib, pkgs, config, isLinux, isDarwin, isWsl, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  isLinux,
+  isDarwin,
+  isWsl,
+  ...
+}:
 
 {
   # Enable Home Manager
   programs.home-manager.enable = true;
- 
+
   # Set env automatically
   targets.genericLinux.enable = true;
 
@@ -20,18 +28,19 @@
 
   # Core pkgs
   # Pass isLinux, isDarwin, isWsl
-  imports = [
-    ./modules/infra.nix
-    ./modules/language.nix
-    ./modules/nvim.nix
-    ./modules/zsh.nix
-    ./modules/shell.nix
-    ./modules/apps.nix
-  ]
-  # NixOs / Darwin pkgs
-  ++ (lib.optionals (!isWsl && isLinux || isDarwin) [
-  ])
-  # WSL pkgs
-  ++ (lib.optionals isWsl [
-  ]);
+  imports =
+    [
+      ./modules/infra.nix
+      ./modules/language.nix
+      ./modules/nvim.nix
+      ./modules/zsh.nix
+      ./modules/shell.nix
+      ./modules/apps.nix
+    ]
+    # NixOs / Darwin pkgs
+    ++ (lib.optionals (!isWsl && isLinux || isDarwin) [
+    ])
+    # WSL pkgs
+    ++ (lib.optionals isWsl [
+    ]);
 }
