@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+{
 
   programs = {
     neovim = {
@@ -18,7 +19,7 @@
         yazi-nvim
         vim-visual-multi
         packer-nvim
-	lazygit-nvim
+        lazygit-nvim
       ];
     };
   };

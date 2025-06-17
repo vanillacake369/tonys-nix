@@ -1,5 +1,6 @@
-{ pkgs, ... }: {
-  
+{ pkgs, ... }:
+{
+
   home.packages = with pkgs; [
     zsh-autoenv
     zsh-powerlevel10k
@@ -30,12 +31,12 @@
 
       plugins = [
         {
-          name = "powerlevel10k";                                                           
-          src = pkgs.zsh-powerlevel10k;                                                     
-          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";  
+          name = "powerlevel10k";
+          src = pkgs.zsh-powerlevel10k;
+          file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
         }
       ];
-      
+
       oh-my-zsh = {
         enable = true;
         plugins = [
@@ -47,84 +48,84 @@
 
       # zsh script
       initContent = ''
-        # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-        # Initialization code that may require console input (password prompts, [y/n]
-        # confirmations, etc.) must go above this block; everything else may go below.
-        if [[ -r "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-          source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
-        fi
+                # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+                # Initialization code that may require console input (password prompts, [y/n]
+                # confirmations, etc.) must go above this block; everything else may go below.
+                if [[ -r "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+                  source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+                fi
 
-        # Apply zsh-autoenv
-        source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
+                # Apply zsh-autoenv
+                source ${pkgs.zsh-autoenv}/share/zsh-autoenv/autoenv.zsh
 
-        # Apply zsh-powerlevel10k
-	      source ~/.p10k.zsh
+                # Apply zsh-powerlevel10k
+        	      source ~/.p10k.zsh
 
-        # Enable home & end key
-        case $TERM in (xterm*)
-        bindkey '^[[H' beginning-of-line
-        bindkey '^[[F' end-of-line
-        esac
+                # Enable home & end key
+                case $TERM in (xterm*)
+                bindkey '^[[H' beginning-of-line
+                bindkey '^[[F' end-of-line
+                esac
 
-        # Avoid for Home Manager to manage your shell configuration
-        . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+                # Avoid for Home Manager to manage your shell configuration
+                . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 
-        # Enable session managed by systemd
-        if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
-          loginctl enable-linger "$USER"
-        fi
+                # Enable session managed by systemd
+                if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
+                  loginctl enable-linger "$USER"
+                fi
 
-        # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
-        # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
-        kube-manifest() {
-          kubectl get $* -o name | \
-              fzf --preview 'kubectl get {} -o yaml' \
-                  --bind "ctrl-r:reload(kubectl get $* -o name)" \
-                  --bind "ctrl-i:execute(kubectl edit {+})" \
-                  --header 'Ctrl-I: live edit | Ctrl-R: reload list';
-         }
-        # Git log with preview
-        gitlog() {
-          (
-            git log --oneline | fzf --preview 'git show --color=always {1}'
-          )
-        }
-        # Show proccess
-        pslog() {
-          (
-            ps axo pid,rss,comm --no-headers | fzf --preview 'ps o args {1}; ps mu {1}'
-          )
-        }
-        # Show package dependencies
-        pckg-dep() {
-          (
-            apt-cache search . | fzf --preview 'apt-cache depends {1}'
-          )
-        }
-        # Show systemd
-        systemdlog() {
-          (
-            find /etc/systemd/system/  -name "*.service" | \
-              fzf --preview 'cat {}' \
-                  --bind "ctrl-i:execute(nvim {})" \
-                      --bind "ctrl-s:execute(cat {} | copy)"
-          )
-        }
-        # Search by keyword
-        search() {
-          [[ $# -eq 0 ]] && { echo "provide regex argument"; return }
-          local matching_files
-          case $1 in
-            -h)
-              shift
-              matching_files=$(rg -l --hidden $1 | fzf --exit-0 --preview="rg --color=always -n '$1' {} ")
-              ;;
-            *)
-              matching_files=$(rg -l -- $1 | fzf --exit-0 --preview="rg --color=always -n -- '$1' {} ")
-              ;;
-          esac
-          [[ -n "$matching_files" ]] && ${"\$EDITOR"} "${"\$matching_files"}" -c/$1
-        }
+                # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**
+                # Get manifest of k8s resources :: e.g.) kgjq deploy nginx
+                kube-manifest() {
+                  kubectl get $* -o name | \
+                      fzf --preview 'kubectl get {} -o yaml' \
+                          --bind "ctrl-r:reload(kubectl get $* -o name)" \
+                          --bind "ctrl-i:execute(kubectl edit {+})" \
+                          --header 'Ctrl-I: live edit | Ctrl-R: reload list';
+                 }
+                # Git log with preview
+                gitlog() {
+                  (
+                    git log --oneline | fzf --preview 'git show --color=always {1}'
+                  )
+                }
+                # Show proccess
+                pslog() {
+                  (
+                    ps axo pid,rss,comm --no-headers | fzf --preview 'ps o args {1}; ps mu {1}'
+                  )
+                }
+                # Show package dependencies
+                pckg-dep() {
+                  (
+                    apt-cache search . | fzf --preview 'apt-cache depends {1}'
+                  )
+                }
+                # Show systemd
+                systemdlog() {
+                  (
+                    find /etc/systemd/system/  -name "*.service" | \
+                      fzf --preview 'cat {}' \
+                          --bind "ctrl-i:execute(nvim {})" \
+                              --bind "ctrl-s:execute(cat {} | copy)"
+                  )
+                }
+                # Search by keyword
+                search() {
+                  [[ $# -eq 0 ]] && { echo "provide regex argument"; return }
+                  local matching_files
+                  case $1 in
+                    -h)
+                      shift
+                      matching_files=$(rg -l --hidden $1 | fzf --exit-0 --preview="rg --color=always -n '$1' {} ")
+                      ;;
+                    *)
+                      matching_files=$(rg -l -- $1 | fzf --exit-0 --preview="rg --color=always -n -- '$1' {} ")
+                      ;;
+                  esac
+                  [[ -n "$matching_files" ]] && ${"\$EDITOR"} "${"\$matching_files"}" -c/$1
+                }
       '';
     };
 
@@ -137,10 +138,9 @@
         "--info=inline"
         "--border=rounded"
         "--margin=1"
-        "--padding=1" 
+        "--padding=1"
       ];
     };
 
   };
 }
-

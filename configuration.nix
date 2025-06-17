@@ -2,17 +2,22 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   userHome = config.users.users.limjihoon.home;
 in
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Bootloader
   boot = {
@@ -21,18 +26,22 @@ in
       efi.canTouchEfiVariables = true;
     };
     kernelParams = [ "kvm.enable_virt_at_load=0" ];
-    blacklistedKernelModules = [ "kvm" "kvm_intel" "kvm_amd" ];
+    blacklistedKernelModules = [
+      "kvm"
+      "kvm_intel"
+      "kvm_amd"
+    ];
   };
- 
+
   # Set your time zone.
   time.timeZone = "Asia/Seoul";
 
   # Select internationalisation properties.
   i18n = {
     defaultLocale = "en_US.UTF-8";
-    supportedLocales = [ 
-      "en_US.UTF-8/UTF-8" 
-      "ko_KR.UTF-8/UTF-8" 
+    supportedLocales = [
+      "en_US.UTF-8/UTF-8"
+      "ko_KR.UTF-8/UTF-8"
     ];
     extraLocaleSettings = {
       LC_ADDRESS = "ko_KR.UTF-8";
@@ -44,7 +53,7 @@ in
       LC_PAPER = "ko_KR.UTF-8";
       LC_TELEPHONE = "ko_KR.UTF-8";
       LC_TIME = "ko_KR.UTF-8";
-     };
+    };
     inputMethod = {
       enable = true;
       type = "ibus";
@@ -84,7 +93,7 @@ in
           Option "PalmDetection" "on"
           Option "TappingButtonMap" "lmr"
         '';
-     };
+      };
     };
     printing.enable = true;
     pipewire = {
@@ -145,10 +154,10 @@ in
         shell = pkgs.zsh;
         isNormalUser = true;
         description = "Limjihoon";
-        extraGroups = [ 
-          "networkmanager" 
-          "wheel" 
-          "input" 
+        extraGroups = [
+          "networkmanager"
+          "wheel"
+          "input"
           "vboxusers"
         ];
         packages = with pkgs; [
@@ -156,11 +165,17 @@ in
       };
     };
   };
- 
+
   # Allow experimental-features
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "root" "@wheel" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    trusted-users = [
+      "root"
+      "@wheel"
+    ];
   };
 
   programs.zsh.enable = true;
@@ -173,7 +188,7 @@ in
     enable = true;
     defaultEditor = true;
   };
-  
+
   environment.shells = with pkgs; [ zsh ];
   environment.systemPackages = with pkgs; [
     # Korean Input

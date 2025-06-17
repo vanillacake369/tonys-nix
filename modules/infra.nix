@@ -1,19 +1,28 @@
-{ pkgs, lib, isWsl, ... }: {
-  
-  home.packages = with pkgs; [
-    k6
-    kubectl
-    kubectx
-    k9s
-    stern
-    kubernetes-helm
-    kubectl-tree
-    oxker
-  ] ++ lib.optionals (!isWsl) [
-    minikube
-    dive
-    podman-tui
-  ];
+{
+  pkgs,
+  lib,
+  isWsl,
+  ...
+}:
+{
+
+  home.packages =
+    with pkgs;
+    [
+      k6
+      kubectl
+      kubectx
+      k9s
+      stern
+      kubernetes-helm
+      kubectl-tree
+      oxker
+    ]
+    ++ lib.optionals (!isWsl) [
+      minikube
+      dive
+      podman-tui
+    ];
 
   # TODO : Activate only when isWsl == false
   # Initiate podman systemd service
@@ -47,4 +56,3 @@
   #   };
   # };
 }
-
