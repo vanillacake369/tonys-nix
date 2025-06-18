@@ -104,68 +104,9 @@ return {
     opts = {
       ensure_installed = {
         "bash",
-        "json",
-        "lua",
-        "markdown",
-        "markdown_inline",
         "query",
         "regex",
         "vim",
-        "yaml",
-        "nix",
-        "go",
-        "gomod",
-        "gowork",
-        "gosum",
-        "java",
-        "dockerfile",
-      },
-    },
-  },
-
-  -- lspconfig
-  {
-    "neovim/nvim-lspconfig",
-    name = "lspconfig.nixd",
-    ft = { "nix" },
-    opts = {
-      servers = {
-        nixd = {
-          cmd = { "nixd" },
-          settings = {
-            nixd = {
-              nixpkgs = {
-                expr = "import (builtins.getFlake(toString ./.)).inputs.nixpkgs { }",
-              },
-              formatting = {
-                command = { "alejandra" },
-              },
-              options = {
-                nixos = {
-                  expr = "let flake = builtins.getFlake(toString ./.); in flake.nixosConfigurations.limjihoon.options",
-                },
-                home_manager = {
-                  expr = "let flake = builtins.getFlake(toString ./.); in flake.homeConfigurations.limjihoon.options",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-    config = function(_, opts)
-      require("lspconfig").nixd.setup(opts)
-    end,
-  },
-
-  -- Formatter :: conform
-  {
-    "stevearc/conform.nvim",
-    optional = true,
-    opts = {
-      formatters_by_ft = {
-        nix = { "nixfmt" },
-        go = { "goimports", "gofumpt" },
       },
     },
   },
@@ -181,20 +122,5 @@ return {
         end,
       })
     end,
-  },
-
-  -- add any tools you want to have installed below
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "stylua",
-        "shellcheck",
-        "shfmt",
-        "flake8",
-        "gomodifytags",
-        "impl",
-      },
-    },
   },
 }
