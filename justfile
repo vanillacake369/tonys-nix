@@ -81,8 +81,12 @@ apply-zsh:
 
 # Clean redundant packages by nix gc
 clean:
+  #!/usr/bin/env sh
   nix-collect-garbage -d
-  sudo nix-collect-garbage -d
+  # if not wsl, gc for nixos
+  if [[ ! $(grep -i Microsoft /proc/version) ]]; then
+    sudo nix-collect-garbage -d
+  fi
 
 # Clear all dependencies
 clear-all:
