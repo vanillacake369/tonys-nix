@@ -24,7 +24,5 @@
       openvpn
       openvpn3
       discord
-      warp-terminal
-      code-cursor
     ];
 }
