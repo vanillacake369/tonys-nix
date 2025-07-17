@@ -221,9 +221,12 @@ in
         allowedTCPPorts = [ 2049 ];
         allowedUDPPorts = [ 2049 ];
       };
-      # Allow ssh port
+      # Allow ports
       allowedTCPPorts = [
+        # SSH
         22
+        # OpenVpn for hamalab
+        10521
       ];
     };
   };
