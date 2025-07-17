@@ -18,7 +18,7 @@ OS_TYPE := `bash -euo pipefail -c '           \
 
 ########### *** INSTALLATION *** ##########
 
-# Initiate all configration
+# Initiate all configuration
 install-all: install-nix install-home-manager install-uidmap install-pckgs clean
 
 # Install nix
@@ -34,7 +34,7 @@ install-nix:
 
 # Install Home Manager
 install-home-manager:
-  #!/usr/bin/env sh
+  #!/usr/bin/env bash
   homeManager=$(command -v home-manager 2>/dev/null)
 
   if [ -z "$homeManager" ]; then
@@ -45,12 +45,12 @@ install-home-manager:
     # Command below has already inside of ~/.zshrc, so no worries :-)
     # . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
   else
-    echo "[✓] Home Manger installed already"
+    echo "[✓] Home Manager installed already"
   fi
 
 # Enable uidmap
 install-uidmap:
-  #!/usr/bin/env sh
+  #!/usr/bin/env bash
   if ! command -v newuidmap >/dev/null || ! command -v newgidmap >/dev/null; then
     echo "[!] installing uidmap via apt (requires sudo)"
     sudo apt update && sudo apt install -y uidmap
@@ -68,12 +68,11 @@ install-pckgs *HM_CONFIG=OS_TYPE:
 
 # Apply zsh
 apply-zsh:
-  #!/usr/bin/env sh
-  if ! grep -qx "/home/{{USERNAME}}/.nix-profile/bin/zsh" /etc/shells; then \
-    echo "/home/{{USERNAME}}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells; \
+  #!/usr/bin/env bash
+  if ! grep -qx "/home/{{USERNAME}}/.nix-profile/bin/zsh" /etc/shells; then
+    echo "/home/{{USERNAME}}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells
   fi
   chsh -s /home/{{USERNAME}}/.nix-profile/bin/zsh
-  source ~/.zshrc
 
 
 
@@ -81,10 +80,10 @@ apply-zsh:
 
 # Clean redundant packages by nix gc
 clean:
-  #!/usr/bin/env sh
+  #!/usr/bin/env bash
   nix-collect-garbage -d
   # if not wsl, gc for nixos
-  if [[ ! $(grep -i Microsoft /proc/version) ]]; then
+  if ! grep -qi Microsoft /proc/version 2>/dev/null; then
     sudo nix-collect-garbage -d
   fi
 
@@ -100,7 +99,7 @@ remove-configs:
   rm -rf ~/.nix-profile/bin/spacevim
   rm -rf ~/.SpaceVim*
   rm -rf ~/.zshrc
-  sudo apt-get --purge remove zsh 
+  sudo apt-get --purge remove zsh
 
 
 ########### *** APPLICATION *** ##########
@@ -112,6 +111,8 @@ enable-shared-mount:
 
   if [[ "$PROPAGATION" != *"shared"* ]]; then
     echo "[!] configuring shared mount for podman"
+    sudo mount --make-rshared /
+    echo "[✓] shared mount configured for podman"
   else
     echo "[✓] shared mount already configured for podman"
   fi
