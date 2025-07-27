@@ -61,5 +61,28 @@
         # switch-to-workspace-left = [ "<Ctrl><Shift><Alt>Left" ];
         # switch-to-workspace-right = [ "<Ctrl><Shift><Alt>Right" ];
       };
+
+      # Power management and idle settings
+      "org/gnome/desktop/session" = {
+        idle-delay = 900; # 15 minutes before considering system idle
+      };
+
+      "org/gnome/desktop/screensaver" = {
+        lock-enabled = true;
+        lock-delay = 0; # Lock immediately when screensaver activates
+      };
+
+      "org/gnome/settings-daemon/plugins/power" = {
+        # AC power settings
+        sleep-inactive-ac-type = "suspend";
+        sleep-inactive-ac-timeout = 1800; # 30 minutes
+
+        # Battery power settings  
+        sleep-inactive-battery-type = "suspend";
+        sleep-inactive-battery-timeout = 900; # 15 minutes
+
+        # Power button action
+        power-button-action = "interactive"; # Show power off dialog
+      };
   };
 }

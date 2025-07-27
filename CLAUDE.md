@@ -90,3 +90,24 @@ The justfile automatically detects the environment:
 - Standard Linux: Default fallback
 
 Use the appropriate home-manager configuration based on your environment.
+
+## Troubleshooting
+
+### Building/Testing
+```bash
+just                    # Test full installation pipeline
+nix flake check         # Validate flake syntax and structure
+home-manager switch --flake .#hm-wsl --dry-run    # Test WSL config without applying
+home-manager switch --flake .#hm-nixos --dry-run  # Test NixOS config without applying
+```
+
+### Common Issues
+- **Podman/Minikube fails**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
+- **Korean input not working**: Verify `ibus-hangul` is installed and running
+- **Flake lock conflicts**: Delete `flake.lock` and run `nix flake lock` to regenerate
+
+### Development Workflow
+1. Modify configuration in relevant module files
+2. Test with dry-run: `home-manager switch --flake .#hm-{env} --dry-run`
+3. Apply changes: `just install-pckgs` or `home-manager switch --flake .#hm-{env}`
+4. Clean up: `just clean` to remove old generations
