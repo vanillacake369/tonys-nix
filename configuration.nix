@@ -92,6 +92,7 @@ in
         additionalOptions = ''
           Option "PalmDetection" "on"
           Option "TappingButtonMap" "lmr"
+          Option "ScrollPixelDistance" "50"
         '';
       };
     };
@@ -225,8 +226,6 @@ in
       allowedTCPPorts = [
         # SSH
         22
-        # OpenVpn for hamalab
-        10521
       ];
     };
   };

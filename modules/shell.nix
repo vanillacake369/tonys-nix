@@ -30,7 +30,6 @@
     ++ lib.optionals (!isWsl) [
       openssh
       wayland-utils
-      vagrant
       google-authenticator
     ];
 
