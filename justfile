@@ -12,6 +12,22 @@ OS_TYPE := `bash -euo pipefail -c '           \
   else                                        \
     echo unsupported;                         \
   fi'`
+SYSTEM_ARCH := `bash -euo pipefail -c '       \
+  if [[ "$(uname -s)" == "Darwin" ]]; then    \
+    if [[ "$(uname -m)" == "arm64" ]]; then   \
+      echo aarch64-darwin;                    \
+    else                                      \
+      echo x86_64-darwin;                     \
+    fi                                        \
+  elif [[ "$(uname -s)" == "Linux" ]]; then  \
+    if [[ "$(uname -m)" == "aarch64" ]]; then \
+      echo aarch64-linux;                     \
+    else                                      \
+      echo x86_64-linux;                      \
+    fi                                        \
+  else                                        \
+    echo unsupported;                         \
+  fi'`
 
 
 
@@ -60,22 +76,22 @@ install-uidmap:
 
 # Install packages by nix home-manager
 # If nixos, it'll run nixos-rebuild & home-manager
-install-pckgs *HM_CONFIG=OS_TYPE:
+install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   #!/usr/bin/env bash
-  if [[ "{{HM_CONFIG}}" == "nixos" ]]; then
+  if [[ "{{OS_TYPE}}" == "nixos" ]]; then
     sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
   fi
   
   case "{{HM_CONFIG}}" in
-    "wsl"|"nixos"|"darwin")
+    "x86_64-linux"|"aarch64-linux"|"x86_64-darwin"|"aarch64-darwin")
       home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
       ;;
     "unsupported")
-      echo "[!] Unsupported OS type. Please manually specify config (wsl, nixos, or darwin)"
+      echo "[!] Unsupported system architecture. Please manually specify config"
       exit 1
       ;;
     *)
-      echo "[!] Unknown OS type: {{HM_CONFIG}}. Trying anyway..."
+      echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying anyway..."
       home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
       ;;
   esac
