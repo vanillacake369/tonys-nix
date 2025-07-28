@@ -17,7 +17,6 @@
       jq
       git
       curl
-      bash
       tree
       ripgrep
       neofetch
