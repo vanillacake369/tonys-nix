@@ -98,18 +98,6 @@ return {
     },
   },
 
-  -- Treesitter parsers
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        "bash",
-        "query",
-        "regex",
-        "vim",
-      },
-    },
-  },
 
   -- the opts function can also be used to change the default opts:
   {
