@@ -58,12 +58,13 @@ install-uidmap:
     echo "[✓] newuidmap and newgidmap already exist"
   fi
 
-# Init packages of nixos
-init-nixos:
-  sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
-
 # Install packages by nix home-manager
+# If nixos, it'll run nixos-rebuild & home-manager
 install-pckgs *HM_CONFIG=OS_TYPE:
+  #!/usr/bin/env bash
+  if [[ "{{HM_CONFIG}}" == "nixos" ]]; then
+    sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
+  fi
   home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
 
 # Apply zsh
