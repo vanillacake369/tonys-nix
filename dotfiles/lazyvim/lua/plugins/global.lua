@@ -65,6 +65,12 @@ return {
     "mg979/vim-visual-multi",
   },
 
+  -- Justfile syntax
+  {
+    "NoahTheDuke/vim-just",
+    ft = { "just" },
+  },
+
   -- override nvim-cmp and add cmp-emoji
   {
     "hrsh7th/nvim-cmp",
@@ -125,6 +131,24 @@ return {
         end,
         mode = "",
         desc = "Format buffer",
+      },
+    },
+    opts = {
+      formatters_by_ft = {
+        nix = { "alejandra" },
+        go = { "goimports", "gofumpt" },
+      },
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+      -- Debug: Ensure alejandra is available
+      formatters = {
+        alejandra = {
+          command = "alejandra",
+          args = { "--quiet" },
+          stdin = true,
+        },
       },
     },
   },
