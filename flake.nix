@@ -100,16 +100,28 @@
           )
         );
       
-      # Home-manager configurations - flattened structure
+      # Home-manager configurations - separate WSL and non-WSL configs
       homeConfigurations = lib.listToAttrs (
-        map (system: {
-          name = "hm-${system}";
-          value = builders.mkHomeConfig { 
-            inherit system; 
-            isWsl = builtins.pathExists /proc/version && 
-                    lib.hasInfix "Microsoft" (builtins.readFile /proc/version);
-          };
-        }) supportedSystems
+        lib.flatten (
+          map (system: [
+            # Non-WSL configuration
+            {
+              name = "hm-${system}";
+              value = builders.mkHomeConfig { 
+                inherit system; 
+                isWsl = false;
+              };
+            }
+            # WSL configuration
+            {
+              name = "hm-wsl-${system}";
+              value = builders.mkHomeConfig { 
+                inherit system; 
+                isWsl = true;
+              };
+            }
+          ]) supportedSystems
+        )
       );
       
       # Define system manager to cope with linux distro system

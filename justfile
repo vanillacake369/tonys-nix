@@ -78,7 +78,7 @@ install-uidmap:
 # If nixos, it'll run nixos-rebuild & home-manager
 install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   #!/usr/bin/env bash
-  echo "[DEBUG] OS_TYPE={{OS_TYPE}}, HM_CONFIG={{HM_CONFIG}}, HOSTNAME={{HOSTNAME}}"
+  echo "OS_TYPE={{OS_TYPE}}, HM_CONFIG={{HM_CONFIG}}, HOSTNAME={{HOSTNAME}}"
   
   if [[ "{{OS_TYPE}}" == "nixos" ]]; then
     sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
@@ -86,16 +86,26 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   
   case "{{HM_CONFIG}}" in
     "x86_64-linux"|"aarch64-linux"|"x86_64-darwin"|"aarch64-darwin")
-      echo "[DEBUG] Running: home-manager switch --flake .#hm-{{HM_CONFIG}} -b back"
-      home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      if [[ "{{OS_TYPE}}" == "wsl" ]]; then
+        echo "Running: home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back"
+        home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back
+      else
+        echo "Running: home-manager switch --flake .#hm-{{HM_CONFIG}} -b back"
+        home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      fi
       ;;
     "unsupported")
       echo "[!] Unsupported system architecture. Please manually specify config"
       exit 1
       ;;
     *)
-      echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying anyway..."
-      home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      if [[ "{{OS_TYPE}}" == "wsl" ]]; then
+        echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying WSL config anyway..."
+        home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back
+      else
+        echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying anyway..."
+        home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      fi
       ;;
   esac
 
