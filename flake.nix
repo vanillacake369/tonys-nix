@@ -100,14 +100,17 @@
           )
         );
       
-      # Home-manager configurations using forAllSystems approach
-      homeConfigurations = forAllSystems (system: {
-        "hm-${system}" = builders.mkHomeConfig { 
-          inherit system; 
-          isWsl = builtins.pathExists /proc/version && 
-                  lib.hasInfix "Microsoft" (builtins.readFile /proc/version);
-        };
-      });
+      # Home-manager configurations - flattened structure
+      homeConfigurations = lib.listToAttrs (
+        map (system: {
+          name = "hm-${system}";
+          value = builders.mkHomeConfig { 
+            inherit system; 
+            isWsl = builtins.pathExists /proc/version && 
+                    lib.hasInfix "Microsoft" (builtins.readFile /proc/version);
+          };
+        }) supportedSystems
+      );
       
       # Define system manager to cope with linux distro system
       systemConfigs.default = system-manager.lib.makeSystemConfig {

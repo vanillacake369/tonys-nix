@@ -78,12 +78,15 @@ install-uidmap:
 # If nixos, it'll run nixos-rebuild & home-manager
 install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   #!/usr/bin/env bash
+  echo "[DEBUG] OS_TYPE={{OS_TYPE}}, HM_CONFIG={{HM_CONFIG}}, HOSTNAME={{HOSTNAME}}"
+  
   if [[ "{{OS_TYPE}}" == "nixos" ]]; then
     sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
   fi
   
   case "{{HM_CONFIG}}" in
     "x86_64-linux"|"aarch64-linux"|"x86_64-darwin"|"aarch64-darwin")
+      echo "[DEBUG] Running: home-manager switch --flake .#hm-{{HM_CONFIG}} -b back"
       home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
       ;;
     "unsupported")
