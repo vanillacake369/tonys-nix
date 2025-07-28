@@ -12,15 +12,20 @@
       url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
       self,
       nixpkgs,
+      nixos-wsl,
       home-manager,
       system-manager,
-      nixos-wsl,
+      nix-darwin,
       ...
     }:
     let
@@ -69,13 +74,39 @@
             ./configuration.nix
           ];
         });
+
+      # Define macos configuration for multiple hostnames and architectures
+      darwinConfigurations = 
+        let 
+          darwinSystems = [ "x86_64-darwin" "aarch64-darwin" ];
+          mkDarwinConfig = hostname: system:
+            let systemConfig = builders.mkSystem system;
+            in nix-darwin.lib.darwinSystem {
+              inherit system;
+              pkgs = systemConfig.pkgs;
+              modules = [
+                ./configuration.nix
+              ];
+            };
+        in
+        lib.listToAttrs (
+          lib.flatten (
+            map (hostname: 
+              map (system: {
+                name = "${hostname}-${system}";
+                value = mkDarwinConfig hostname system;
+              }) darwinSystems
+            ) hostnames
+          )
+        );
+
       
-      # Clean home-manager configurations without duplication
-      # Primary -> WSL, NixOS
-      # Secondary(fallback) -> Other OS
+      # Home-manager configurations aligned with justfile OS detection
       homeConfigurations = {
+        # Primary configurations for specific environments
         hm-wsl = builders.mkHomeConfig { system = "x86_64-linux"; isWsl = true; };
         hm-nixos = builders.mkHomeConfig { system = "x86_64-linux"; isWsl = false; };
+        hm-darwin = builders.mkHomeConfig { system = "aarch64-darwin"; isWsl = false; };
       } // (forAllSystems (system: {
         "hm-${system}" = builders.mkHomeConfig { inherit system; isWsl = false; };
       }));
