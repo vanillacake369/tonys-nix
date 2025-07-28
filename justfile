@@ -65,7 +65,20 @@ install-pckgs *HM_CONFIG=OS_TYPE:
   if [[ "{{HM_CONFIG}}" == "nixos" ]]; then
     sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
   fi
-  home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+  
+  case "{{HM_CONFIG}}" in
+    "wsl"|"nixos"|"darwin")
+      home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      ;;
+    "unsupported")
+      echo "[!] Unsupported OS type. Please manually specify config (wsl, nixos, or darwin)"
+      exit 1
+      ;;
+    *)
+      echo "[!] Unknown OS type: {{HM_CONFIG}}. Trying anyway..."
+      home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
+      ;;
+  esac
 
 # Apply zsh
 apply-zsh:
