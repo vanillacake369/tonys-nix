@@ -73,13 +73,13 @@
       };
 
       "org/gnome/settings-daemon/plugins/power" = {
-        # AC power settings
-        sleep-inactive-ac-type = "suspend";
-        sleep-inactive-ac-timeout = 1800; # 30 minutes
+        # AC power settings - never suspend on AC power
+        sleep-inactive-ac-type = "nothing";
+        sleep-inactive-ac-timeout = 0; # Never sleep
 
-        # Battery power settings  
-        sleep-inactive-battery-type = "suspend";
-        sleep-inactive-battery-timeout = 900; # 15 minutes
+        # Battery power settings - never suspend on battery
+        sleep-inactive-battery-type = "nothing";
+        sleep-inactive-battery-timeout = 0; # Never sleep
 
         # Power button action
         power-button-action = "interactive"; # Show power off dialog
