@@ -10,22 +10,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
-        "bash",
-        "json",
-        "lua",
-        "markdown",
-        "markdown_inline",
-        "query",
-        "regex",
-        "vim",
-        "yaml",
         "nix",
-        "go",
-        "gomod",
-        "gowork",
-        "gosum",
-        "java",
-        "dockerfile",
       },
     },
   },
@@ -64,11 +49,14 @@ return {
   -- Formatter :: conform
   {
     "stevearc/conform.nvim",
-    optional = true,
     opts = {
       formatters_by_ft = {
-        nix = { "nixfmt" },
+        nix = { "alejandra" },
         go = { "goimports", "gofumpt" },
+      },
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
       },
     },
   },

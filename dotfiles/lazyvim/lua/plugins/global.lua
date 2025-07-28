@@ -98,7 +98,7 @@ return {
     },
   },
 
-  -- Rreesitter parsers
+  -- Treesitter parsers
   {
     "nvim-treesitter/nvim-treesitter",
     opts = {
@@ -122,5 +122,22 @@ return {
         end,
       })
     end,
+  },
+
+  -- Conform.nvim formatter
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>cf",
+        function()
+          require("conform").format({ async = true, lsp_fallback = true })
+        end,
+        mode = "",
+        desc = "Format buffer",
+      },
+    },
   },
 }
