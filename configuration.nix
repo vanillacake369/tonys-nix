@@ -1,19 +1,14 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 {
   config,
   pkgs,
   lib,
   ...
-}:
-
-let
+}: let
   userHome = config.users.users.limjihoon.home;
-in
-
-{
+in {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -25,7 +20,7 @@ in
       systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
-    kernelParams = [ "kvm.enable_virt_at_load=0" ];
+    kernelParams = ["kvm.enable_virt_at_load=0"];
     blacklistedKernelModules = [
       "kvm"
       "kvm_intel"
@@ -57,7 +52,7 @@ in
     inputMethod = {
       enable = true;
       type = "ibus";
-      ibus.engines = with pkgs.ibus-engines; [ hangul ];
+      ibus.engines = with pkgs.ibus-engines; [hangul];
     };
   };
 
@@ -106,7 +101,7 @@ in
     openssh = {
       enable = true;
       startWhenNeeded = true;
-      ports = [ 22 ];
+      ports = [22];
       allowSFTP = false;
       settings = {
         PasswordAuthentication = false;
@@ -190,7 +185,7 @@ in
     defaultEditor = true;
   };
 
-  environment.shells = with pkgs; [ zsh ];
+  environment.shells = with pkgs; [zsh];
   environment.systemPackages = with pkgs; [
     # Korean Input
     ibus
@@ -219,8 +214,8 @@ in
       enable = true;
       # Add firewall exception for libvirt provider when using NFSv4
       interfaces."virbr1" = {
-        allowedTCPPorts = [ 2049 ];
-        allowedUDPPorts = [ 2049 ];
+        allowedTCPPorts = [2049];
+        allowedUDPPorts = [2049];
       };
       # Allow ports
       allowedTCPPorts = [
