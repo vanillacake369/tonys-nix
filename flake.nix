@@ -99,17 +99,15 @@
             ) hostnames
           )
         );
-
       
-      # Home-manager configurations aligned with justfile OS detection
-      homeConfigurations = {
-        # Primary configurations for specific environments
-        hm-wsl = builders.mkHomeConfig { system = "x86_64-linux"; isWsl = true; };
-        hm-nixos = builders.mkHomeConfig { system = "x86_64-linux"; isWsl = false; };
-        hm-darwin = builders.mkHomeConfig { system = "aarch64-darwin"; isWsl = false; };
-      } // (forAllSystems (system: {
-        "hm-${system}" = builders.mkHomeConfig { inherit system; isWsl = false; };
-      }));
+      # Home-manager configurations using forAllSystems approach
+      homeConfigurations = forAllSystems (system: {
+        "hm-${system}" = builders.mkHomeConfig { 
+          inherit system; 
+          isWsl = builtins.pathExists /proc/version && 
+                  lib.hasInfix "Microsoft" (builtins.readFile /proc/version);
+        };
+      });
       
       # Define system manager to cope with linux distro system
       systemConfigs.default = system-manager.lib.makeSystemConfig {
