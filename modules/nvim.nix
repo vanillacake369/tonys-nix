@@ -8,8 +8,8 @@
       viAlias = true;
       vimAlias = true;
       vimdiffAlias = true;
-      # Let LazyVim manage all plugins instead of Nix
-      plugins = [ ];
+      # All configuration resides in dotfiles/lazyvim
+      plugins = with pkgs.vimPlugins; [ LazyVim ];
     };
   };
 
