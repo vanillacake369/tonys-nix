@@ -81,6 +81,14 @@
         sleep-inactive-battery-type = "nothing";
         sleep-inactive-battery-timeout = 0; # Never sleep
 
+        # Screen blanking settings - keep screen on
+        sleep-inactive-ac-blank-timeout = 0; # Never blank screen on AC
+        sleep-inactive-battery-blank-timeout = 0; # Never blank screen on battery
+
+        # Disable screen dimming
+        idle-dim = false; # Don't dim screen when idle
+        ambient-enabled = false; # Disable adaptive brightness
+
         # Power button action
         power-button-action = "interactive"; # Show power off dialog
       };
