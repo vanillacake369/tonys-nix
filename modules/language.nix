@@ -5,6 +5,7 @@
     zulu17
     gradle
     just
+    gnumake
     go
     gotools
     gofumpt
