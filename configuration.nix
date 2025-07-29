@@ -59,7 +59,7 @@ in {
   # NFS / X-SERVER / PIPEWIRE / OPENSSH
   services = {
     logind = {
-      lidSwitch = "hybrid-sleep";
+      lidSwitch = "ignore";
     };
     nfs.server.enable = true;
     xserver = {
