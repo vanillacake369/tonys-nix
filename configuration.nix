@@ -191,6 +191,8 @@ in {
     ibus
     ibus-engines.hangul
     noto-fonts-cjk-sans
+    # CPU Usage with cutty catty
+    gnomeExtensions.runcat
   ];
 
   # Enable common container config files in /etc/containers

@@ -24,5 +24,11 @@
       openvpn
       openvpn3
       discord
+      # MacOs Apps
+      hidden-bar
+      aldente
+      bartender
+      yabai
+      skhd
     ];
 }

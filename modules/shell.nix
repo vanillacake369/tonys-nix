@@ -26,6 +26,7 @@
       htop
       xclip
       autossh
+      navi
     ]
     ++ lib.optionals (!isWsl) [
       openssh
