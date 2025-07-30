@@ -25,6 +25,7 @@
       zellij
       htop
       xclip
+      autossh
     ]
     ++ lib.optionals (!isWsl) [
       openssh
