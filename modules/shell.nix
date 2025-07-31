@@ -26,6 +26,7 @@
       htop
       xclip
       autossh
+      redli
     ]
     ++ lib.optionals (!isWsl) [
       openssh
