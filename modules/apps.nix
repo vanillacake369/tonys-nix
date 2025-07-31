@@ -1,8 +1,9 @@
-{ pkgs, isWsl, ... }:
 {
-
-  home.packages =
-    with pkgs;
+  pkgs,
+  isWsl,
+  ...
+}: {
+  home.packages = with pkgs;
     [
       claude-code
     ]
@@ -11,7 +12,6 @@
       jetbrains.idea-ultimate
       jetbrains.goland
       jetbrains.datagrip
-      youtube-music
       ticktick
       slack
       firefox
