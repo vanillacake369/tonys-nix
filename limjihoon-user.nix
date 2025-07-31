@@ -44,6 +44,11 @@
       command = "google-chrome-stable";
       binding = "<Ctrl><Alt>c";
     };
+    "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4" = {
+      name = "youtube music desktop";
+      command = "ytmdesktop";
+      binding = "<Ctrl><Alt>m";
+    };
     "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5" = {
       name = "Capture";
       command = "gnome-screenshot -i";
