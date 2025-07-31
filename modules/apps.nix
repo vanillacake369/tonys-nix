@@ -1,6 +1,8 @@
 {
+  lib,
   pkgs,
   isWsl,
+  isDarwin,
   ...
 }: {
   home.packages = with pkgs;
@@ -25,6 +27,8 @@
       openvpn3
       discord
       ytmdesktop
+    ]
+    ++ lib.optionals isDarwin [
       # MacOs Apps
       hidden-bar
       aldente
