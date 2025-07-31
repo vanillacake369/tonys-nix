@@ -4,33 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a personal Nix configuration repository using flakes and home-manager for managing Linux/WSL development environments. The configuration provides a comprehensive development setup with tools for Go, Java, Kubernetes, Docker, and more.
+This is a personal Nix configuration repository using flakes and home-manager for managing multi-platform development environments (NixOS, WSL, macOS). The configuration provides a comprehensive development setup with tools for Go, Java, Kubernetes, Docker, and modern CLI utilities.
 
 ## Essential Commands
 
 ### Primary workflow (recommended)
 ```bash
-just                    # Install everything (nix, home-manager, packages)
-just install-pckgs      # Install packages using home-manager
-just clean              # Clean up old Nix generations
+just install-all           # Complete installation pipeline (nix, home-manager, packages)
+just install-pckgs         # Install packages using home-manager (auto-detects system)
+just clean                 # Clean up old Nix generations
 ```
 
 ### Individual installation steps
 ```bash
 just install-nix                    # Install Nix package manager
 just install-home-manager           # Install home-manager
-just install-uidmap                 # Install uidmap for containers
+just install-uidmap                 # Install uidmap for containers (Linux only)
 just apply-zsh                      # Configure zsh as default shell
 ```
 
 ### System-specific configurations
 ```bash
-just init-nixos                     # Apply NixOS system configuration
-just install-pckgs wsl             # Install WSL-specific packages
-just install-pckgs nixos           # Install NixOS-specific packages
+# Architecture-specific installations (auto-detected)
+just install-pckgs x86_64-linux     # 64-bit Linux
+just install-pckgs aarch64-linux    # ARM64 Linux  
+just install-pckgs x86_64-darwin    # Intel macOS
+just install-pckgs aarch64-darwin   # Apple Silicon macOS
 ```
 
-### Maintenance
+### Maintenance and cleanup
 ```bash
 just clean                         # Garbage collect old Nix generations
 just clear-all                     # Uninstall home-manager completely
@@ -40,74 +42,121 @@ just enable-shared-mount           # Enable shared mount for rootless podman
 
 ### Manual home-manager operations
 ```bash
-home-manager switch --flake .#hm-wsl -b back      # WSL configuration
-home-manager switch --flake .#hm-nixos -b back    # NixOS configuration
-nix-collect-garbage -d                            # Manual garbage collection
+# Architecture-aware configurations
+home-manager switch --flake .#hm-wsl-x86_64-linux -b back     # WSL x64
+home-manager switch --flake .#hm-aarch64-linux -b back        # ARM64 Linux
+home-manager switch --flake .#hm-x86_64-darwin -b back        # Intel macOS
+home-manager switch --flake .#hm-aarch64-darwin -b back       # Apple Silicon macOS
+nix-collect-garbage -d                                        # Manual garbage collection
 ```
 
-## Architecture
+## Repository Structure
 
-### Configuration Structure
-- **flake.nix**: Main flake definition with inputs/outputs and system configurations
+### Core Configuration Files
+- **flake.nix**: Main flake definition with multi-platform support (NixOS, WSL, macOS)
 - **home.nix**: Core home-manager configuration importing all modules
 - **configuration.nix**: NixOS system configuration (GNOME, services, security)
-- **{username}-user.nix**: User-specific settings (username, home directory)
+- **hardware-configuration.nix**: NixOS hardware-specific settings
+- **justfile**: Build automation with environment detection
+- **limjihoon-user.nix**: Primary user configuration
+- **nixos-user.nix**: NixOS-specific user settings
 
-### Module Organization
-- **modules/apps.nix**: Desktop applications (browsers, editors, productivity tools)
-- **modules/infra.nix**: Infrastructure tools (Docker, Kubernetes, cloud tools)
-- **modules/language.nix**: Programming language support (Go, Java, Node.js)
-- **modules/nvim.nix**: Neovim configuration and plugins
-- **modules/shell.nix**: Shell utilities (git, fzf, ripgrep, etc.)
-- **modules/zsh.nix**: Zsh configuration with oh-my-zsh and powerlevel10k
+### Module Organization (`modules/`)
+- **apps.nix**: Desktop applications (browsers, editors, productivity tools)
+- **infra.nix**: Infrastructure and DevOps tools (Docker, Kubernetes, cloud CLI)
+- **language.nix**: Programming language support (Go, Java, Node.js, Python)
+- **nvim.nix**: Neovim configuration and plugin management
+- **shell.nix**: Shell utilities (git, fzf, ripgrep, modern CLI tools)
+- **zsh.nix**: Zsh configuration with oh-my-zsh and powerlevel10k
 
-### Dotfiles Management
-Configuration files are symlinked from `dotfiles/` directory:
-- `dotfiles/lazyvim/`: LazyVim Neovim configuration
-- `dotfiles/zellij/`: Terminal multiplexer configuration
-- `dotfiles/nix/` and `dotfiles/nixpkgs/`: Nix-specific configs
+### Dotfiles Management (`dotfiles/`)
+Configuration files are symlinked from dotfiles directory:
+- **lazyvim/**: Complete LazyVim Neovim configuration with language support
+- **learn-nvim/**: Alternative/experimental Neovim setup
+- **zellij/**: Terminal multiplexer configuration and layouts
+- **nix/** and **nixpkgs/**: Nix-specific configuration files
+- **autohotkey/**: Windows automation scripts (for WSL environments)
+- **screen/**: Screen session configurations
 
-### Multi-Environment Support
-The flake supports multiple configurations:
-- **hm-wsl**: Home-manager configuration for WSL environments
-- **hm-nixos**: Home-manager configuration for native NixOS
-- **nixos**: Full NixOS system configuration
+### Library Functions (`lib/`)
+- **builders.nix**: Custom Nix builders and utility functions
+
+### Multi-Platform Support
+The flake provides architecture-aware configurations:
+- **hm-x86_64-linux**: Standard Linux (64-bit)
+- **hm-aarch64-linux**: ARM64 Linux
+- **hm-wsl-x86_64-linux**: Windows Subsystem for Linux
+- **hm-x86_64-darwin**: Intel macOS
+- **hm-aarch64-darwin**: Apple Silicon macOS
+- **nixos**: Full NixOS system configuration for host systems
 
 ### Key Features
+- Multi-platform support with automatic environment detection
 - Rootless Podman with Docker compatibility
-- Korean input support (ibus-hangul)
-- GNOME desktop environment with custom configurations
+- Korean input support (ibus-hangul) for desktop environments
+- GNOME desktop environment with Wayland optimizations
 - SSH hardening with Google Authenticator 2FA
-- Development tools for cloud-native and Kubernetes workflows
-- Comprehensive shell environment with modern CLI tools
+- Comprehensive development environment for cloud-native workflows
+- Modern shell environment with extensive CLI tooling
 
 ## Environment Detection
 
-The justfile automatically detects the environment:
-- WSL: Detected via `/proc/version` containing "Microsoft"
-- NixOS: Detected by existence of `/etc/nixos`
-- Darwin: Detected via `uname -s`
-- Standard Linux: Default fallback
+The justfile automatically detects your system and architecture:
 
-Use the appropriate home-manager configuration based on your environment.
+### Operating System Detection
+- **WSL**: Detected via `/proc/version` containing "Microsoft" 
+- **NixOS**: Detected by existence of `/etc/nixos` directory
+- **macOS**: Detected via `uname -s` returning "Darwin"
+- **Standard Linux**: Default fallback for other Linux distributions
+
+### Architecture Detection  
+- **x86_64**: Intel/AMD 64-bit systems
+- **aarch64**: ARM64 systems (Apple Silicon, ARM servers)
+- Auto-selects appropriate flake configuration based on detected platform
+
+## Development Workflow
+
+### Standard Development Process
+1. **Modify configurations**: Edit relevant files in `modules/` or core config files
+2. **Test changes**: Use dry-run to validate without applying changes
+3. **Apply changes**: Run `just install-pckgs` for automatic platform detection
+4. **Clean up**: Run `just clean` to remove old generations and free disk space
+
+### Testing and Validation
+```bash
+just install-all                                           # Test complete installation pipeline
+nix flake check                                           # Validate flake syntax and structure
+home-manager switch --flake .#hm-x86_64-linux --dry-run  # Test Linux config without applying
+home-manager switch --flake .#hm-wsl-x86_64-linux --dry-run # Test WSL config without applying
+home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon config without applying
+```
 
 ## Troubleshooting
 
-### Building/Testing
+### Common Issues and Solutions
+- **Podman/Minikube container failures**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
+- **Korean input not working**: Verify `ibus-hangul` is installed and running (`ibus-daemon -drx`)
+- **Flake lock conflicts**: Delete `flake.lock` and regenerate with `nix flake lock`
+- **Home-manager build failures**: Check for syntax errors with `nix flake check`
+- **Architecture mismatch**: Verify correct platform detection with `just install-pckgs`
+
+### Debugging Commands
 ```bash
-just                    # Test full installation pipeline
-nix flake check         # Validate flake syntax and structure
-home-manager switch --flake .#hm-wsl --dry-run    # Test WSL config without applying
-home-manager switch --flake .#hm-nixos --dry-run  # Test NixOS config without applying
+# Check system detection
+echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
+
+# Validate flake configurations
+nix flake show                  # List all available configurations
+nix eval .#homeConfigurations   # Show home-manager configurations
+
+# Test specific configurations
+home-manager build --flake .#hm-x86_64-linux    # Build without applying
+nix build .#homeConfigurations.hm-x86_64-linux.activationPackage  # Direct nix build
 ```
 
-### Common Issues
-- **Podman/Minikube fails**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
-- **Korean input not working**: Verify `ibus-hangul` is installed and running
-- **Flake lock conflicts**: Delete `flake.lock` and run `nix flake lock` to regenerate
-
-### Development Workflow
-1. Modify configuration in relevant module files
-2. Test with dry-run: `home-manager switch --flake .#hm-{env} --dry-run`
-3. Apply changes: `just install-pckgs` or `home-manager switch --flake .#hm-{env}`
-4. Clean up: `just clean` to remove old generations
+### Clean Installation (Reset)
+```bash
+just clear-all        # Remove home-manager completely
+just remove-configs   # Remove all dotfiles and configurations
+just install-all      # Fresh installation from scratch
+```
