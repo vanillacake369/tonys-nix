@@ -24,6 +24,7 @@
       openvpn
       openvpn3
       discord
+      ytmdesktop
       # MacOs Apps
       hidden-bar
       aldente
