@@ -197,7 +197,14 @@ in {
 
   # Enable common container config files in /etc/containers
   virtualisation = {
-    containers.enable = true;
+    containers = {
+      enable = true;
+      registries = {
+        search = ["docker.io"]; # could be replaced with 'quay.io'
+        insecure = [];
+        block = [];
+      };
+    };
     virtualbox.host.enable = true;
     podman = {
       enable = true;
