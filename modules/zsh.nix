@@ -27,6 +27,9 @@
         copy = "xclip -selection clipboard";
         grep = "rg";
         clear = "clear -x";
+        # Container compose aliases for compatibility
+        docker-compose = "podman-compose";
+        "docker compose" = "podman compose";
       };
 
       plugins = [

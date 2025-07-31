@@ -7,18 +7,18 @@ Supports NixOS, WSL, macOS, and standard Linux distributions with automatic envi
 
 - **Multi-platform support**: NixOS, WSL, macOS (Intel & Apple Silicon), Linux
 - **Automated setup**: One-command installation with environment detection
-- **Development tools**: Go, Java, Kubernetes, Docker, modern CLI utilities
+- **Development tools**: Go, Java, Kubernetes, Podman with compose support, modern CLI utilities
 - **Desktop environment**: GNOME with Wayland optimizations (NixOS)
 - **Shell configuration**: Zsh with oh-my-zsh and powerlevel10k
 - **Editor setup**: Neovim with LazyVim configuration
-- **Container support**: Rootless Podman with Docker compatibility
+- **Container support**: Rootless Podman with Docker compatibility and podman-compose
 
 ## 📦 Included Packages
 
 Packages are automatically managed through home-manager modules. Key categories include:
 
 - **Development**: Go, Java (Zulu), Node.js, Python
-- **DevOps**: kubectl, helm, k9s, minikube, AWS CLI, Terraform
+- **DevOps**: kubectl, helm, k9s, minikube, podman-compose, AWS CLI
 - **Editors**: Neovim (LazyVim), VS Code, JetBrains IDEs
 - **Shell**: Zsh, oh-my-zsh, powerlevel10k, modern CLI tools (bat, fzf, ripgrep)
 - **Applications**: Firefox, Chrome, Slack, Obsidian, LibreOffice

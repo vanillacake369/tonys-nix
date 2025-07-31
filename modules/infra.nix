@@ -3,12 +3,11 @@
   lib,
   isWsl,
   ...
-}:
-{
-
-  home.packages =
-    with pkgs;
+}: {
+  home.packages = with pkgs;
     [
+      # Container orchestration tools
+      podman-compose
       k6
       kubectl
       kubectx

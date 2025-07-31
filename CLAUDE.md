@@ -92,7 +92,7 @@ The flake provides architecture-aware configurations:
 
 ### Key Features
 - Multi-platform support with automatic environment detection
-- Rootless Podman with Docker compatibility
+- Rootless Podman with Docker compatibility and podman-compose support
 - Korean input support (ibus-hangul) for desktop environments
 - GNOME desktop environment with Wayland optimizations
 - SSH hardening with Google Authenticator 2FA
