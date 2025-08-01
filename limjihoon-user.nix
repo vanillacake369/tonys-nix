@@ -1,6 +1,8 @@
 {
+  lib,
   config,
   pkgs,
+  isWsl ? false,
   ...
 }: {
   home.username = "limjihoon";
@@ -8,7 +10,7 @@
   home.stateVersion = "23.11"; # Don't change after first setup
 
   # Applied keybindings :: https://heywoodlh.io/nixos-gnome-settings-and-keyboard-shortcuts
-  dconf.settings = {
+  dconf.settings = lib.mkIf (!isWsl) {
     "org/gnome/settings-daemon/plugins/media-keys" = {
       volume-up = ["<Ctrl><Alt>Up"];
       volume-down = ["<Ctrl><Alt>Down"];
