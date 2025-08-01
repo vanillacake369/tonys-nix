@@ -1,4 +1,7 @@
 app := "WindowsTerminal.exe"
+chrome := "chrome.exe"
+docker := "Docker Desktop.exe"
+
 ^!t:: {
     if WinExist("ahk_exe " app) {
         if !WinActive("ahk_exe " app) {
@@ -10,5 +13,29 @@ app := "WindowsTerminal.exe"
     } else {
         ; Run("wt.exe", , "Max")
         Run("wt.exe")
+    }
+}
+
+^!c:: {
+    if WinExist("ahk_exe " chrome) {
+        if !WinActive("ahk_exe " chrome) {
+            WinActivate("ahk_exe " chrome)
+        } else {
+            WinMinimize("ahk_exe " chrome)
+        }
+    } else {
+        Run("chrome.exe")
+    }
+}
+
+^!d:: {
+    if WinExist("ahk_exe " docker) {
+        if !WinActive("ahk_exe " docker) {
+            WinActivate("ahk_exe " docker)
+        } else {
+            WinMinimize("ahk_exe " docker)
+        }
+    } else {
+        Run("Docker Desktop.exe")
     }
 }
