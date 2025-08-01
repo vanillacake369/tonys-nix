@@ -121,10 +121,10 @@
                   case $1 in
                     -h)
                       shift
-                      matching_files=$(rg -l --hidden $1 | fzf --exit-0 --preview="rg --color=always -n '$1' {} ")
+                      matching_files=$(rg -l --hidden $1 | fzf --exit-0 --preview="rg --color=always -n -A 20 '$1' {} ")
                       ;;
                     *)
-                      matching_files=$(rg -l -- $1 | fzf --exit-0 --preview="rg --color=always -n -- '$1' {} ")
+                      matching_files=$(rg -l -- $1 | fzf --exit-0 --preview="rg --color=always -n -A 20 -- '$1' {} ")
                       ;;
                   esac
                   [[ -n "$matching_files" ]] && ${"\$EDITOR"} "${"\$matching_files"}" -c/$1
