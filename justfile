@@ -81,6 +81,35 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   echo "OS_TYPE={{OS_TYPE}}, HM_CONFIG={{HM_CONFIG}}, HOSTNAME={{HOSTNAME}}"
   
   if [[ "{{OS_TYPE}}" == "nixos" ]]; then
+    # Validate hardware configuration for NixOS
+    echo "[!] Checking hardware configuration..."
+    
+    if [[ ! -f "hardware-configuration.nix" ]]; then
+      echo "[!] hardware-configuration.nix not found. Generating for this machine..."
+      sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+      echo "[✓] Generated hardware-configuration.nix"
+    else
+      # Get current hardware config and compare key identifiers
+      current_hw=$(sudo nixos-generate-config --show-hardware-config 2>/dev/null)
+      existing_hw=$(cat hardware-configuration.nix 2>/dev/null)
+      
+      # Extract key hardware identifiers for comparison
+      current_uuids=$(echo "$current_hw" | grep -o 'by-uuid/[^"]*' | sort)
+      existing_uuids=$(echo "$existing_hw" | grep -o 'by-uuid/[^"]*' | sort)
+      
+      current_modules=$(echo "$current_hw" | grep -E 'availableKernelModules|kernelModules' | sort)
+      existing_modules=$(echo "$existing_hw" | grep -E 'availableKernelModules|kernelModules' | sort)
+      
+      if [[ "$current_uuids" != "$existing_uuids" ]] || [[ "$current_modules" != "$existing_modules" ]]; then
+        echo "[!] Hardware configuration mismatch detected. Updating..."
+        echo "  - Disk UUIDs or kernel modules differ from current hardware"
+        sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+        echo "[✓] Updated hardware-configuration.nix for this machine"
+      else
+        echo "[✓] Hardware configuration matches current machine"
+      fi
+    fi
+    
     sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
   fi
   

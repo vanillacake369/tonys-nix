@@ -1,5 +1,18 @@
+# Hardware-specific configuration (generate per machine)
+hardware-configuration.nix
+
 # Exclude open vpn config file
 openvpn
 
 # Exclude .idea
 .idea/
+
+# Nix build artifacts
+result
+result-*
+
+# Temporary files
+*~
+.DS_Store
+*.swp
+*.swo

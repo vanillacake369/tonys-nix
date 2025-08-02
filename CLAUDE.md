@@ -122,6 +122,33 @@ The justfile automatically detects your system and architecture:
 3. **Apply changes**: Run `just install-pckgs` for automatic platform detection
 4. **Clean up**: Run `just clean` to remove old generations and free disk space
 
+### Multi-Host Deployment
+When deploying to multiple NixOS machines:
+
+#### Initial Setup on New NixOS Host
+```bash
+# 1. Clone repository
+git clone <repository-url>
+cd tonys-nix
+
+# 2. Generate hardware configuration for this machine
+sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+
+# 3. Apply configuration
+just install-all
+```
+
+#### Updating Existing Hosts
+```bash
+# Pull latest changes
+git pull
+
+# Apply updates (hardware-configuration.nix remains unchanged)
+just install-pckgs
+```
+
+> **Important**: `hardware-configuration.nix` is excluded from git because it contains machine-specific settings (disk UUIDs, kernel modules, CPU types) that differ between hosts.
+
 ### Testing and Validation
 ```bash
 just install-all                                           # Test complete installation pipeline
@@ -134,6 +161,8 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 ## Troubleshooting
 
 ### Common Issues and Solutions
+- **Hardware configuration missing**: Generate with `sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix`
+- **Boot/filesystem errors on new machine**: Ensure hardware-configuration.nix matches the current machine's hardware
 - **Podman/Minikube container failures**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
 - **Korean input not working**: Verify `ibus-hangul` is installed and running (`ibus-daemon -drx`)
 - **Flake lock conflicts**: Delete `flake.lock` and regenerate with `nix flake lock`
@@ -144,6 +173,10 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 ```bash
 # Check system detection
 echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
+
+# Hardware configuration validation
+sudo nixos-generate-config --show-hardware-config  # Preview hardware config
+ls -la hardware-configuration.nix                  # Check if hardware config exists
 
 # Validate flake configurations
 nix flake show                  # List all available configurations
