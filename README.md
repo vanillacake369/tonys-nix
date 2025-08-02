@@ -92,6 +92,34 @@ The configuration automatically detects your username and system architecture. H
 2. **Module Selection**: Modify `home.nix` to enable/disable specific modules
 3. **Package Selection**: Edit individual module files in `modules/` directory
 
+### Multi-Host Deployment
+
+This configuration is designed to work across multiple machines. When setting up on a new NixOS host:
+
+#### For NixOS Systems
+
+1. **Clone the repository** on your new machine
+2. **Generate hardware configuration** for the new machine:
+   ```bash
+   sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+   ```
+3. **Apply the configuration**:
+   ```bash
+   just install-all
+   ```
+
+> **Note**: `hardware-configuration.nix` is excluded from git (`.gitignore`) because it contains machine-specific settings like disk UUIDs, kernel modules, and CPU types that differ between hosts.
+
+#### For Non-NixOS Systems (WSL, macOS, Linux)
+
+The configuration works seamlessly across different hosts since home-manager doesn't require hardware-specific settings:
+
+```bash
+git clone <your-repo>
+cd my-nixos
+just install-all
+```
+
 ### Supported Configurations
 
 The flake automatically selects the appropriate configuration:
