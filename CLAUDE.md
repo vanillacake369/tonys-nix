@@ -38,6 +38,7 @@ just clean                         # Garbage collect old Nix generations
 just clear-all                     # Uninstall home-manager completely
 just remove-configs                # Remove all dotfiles and configs
 just enable-shared-mount           # Enable shared mount for rootless podman
+just performance-test              # Run comprehensive Nix performance analysis
 ```
 
 ### Manual home-manager operations
@@ -152,6 +153,7 @@ just install-pckgs
 ### Testing and Validation
 ```bash
 just install-all                                           # Test complete installation pipeline
+just performance-test                                      # Analyze Nix performance and configuration
 nix flake check                                           # Validate flake syntax and structure
 home-manager switch --flake .#hm-x86_64-linux --dry-run  # Test Linux config without applying
 home-manager switch --flake .#hm-wsl-x86_64-linux --dry-run # Test WSL config without applying
@@ -207,6 +209,9 @@ nix store optimise --dry-run  # Preview deduplication savings
 ```bash
 # Check system detection
 echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
+
+# Performance and configuration analysis
+just performance-test           # Comprehensive Nix performance analysis
 
 # Hardware configuration validation
 sudo nixos-generate-config --show-hardware-config  # Preview hardware config
