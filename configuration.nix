@@ -65,12 +65,12 @@ in {
       lidSwitch = "ignore";
     };
     # SSD optimization: limit systemd journal size and rotation
-    journald.settings = {
-      SystemMaxUse = "500M";
-      SystemMaxFileSize = "50M";
-      SystemMaxFiles = 10;
-      MaxRetentionSec = "1month";
-    };
+    journald.extraConfig = ''
+      SystemMaxUse=500M
+      SystemMaxFileSize=50M
+      SystemMaxFiles=10
+      MaxRetentionSec=1month
+    '';
     nfs.server.enable = true;
     xserver = {
       enable = true;
