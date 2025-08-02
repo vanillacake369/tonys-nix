@@ -56,7 +56,7 @@ nix-collect-garbage -d                                        # Manual garbage c
 - **flake.nix**: Main flake definition with multi-platform support (NixOS, WSL, macOS)
 - **home.nix**: Core home-manager configuration importing all modules
 - **configuration.nix**: NixOS system configuration (GNOME, services, security)
-- **hardware-configuration.nix**: NixOS hardware-specific settings
+- **hardware-configuration.nix**: (gitignored) NixOS hardware-specific settings (stored in /etc/nixos/)
 - **justfile**: Build automation with environment detection
 - **limjihoon-user.nix**: Primary user configuration
 - **nixos-user.nix**: NixOS-specific user settings
@@ -132,7 +132,7 @@ git clone <repository-url>
 cd tonys-nix
 
 # 2. Generate hardware configuration for this machine
-sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
 
 # 3. Apply configuration
 just install-all
@@ -143,11 +143,11 @@ just install-all
 # Pull latest changes
 git pull
 
-# Apply updates (hardware-configuration.nix remains unchanged)
+# Apply updates (hardware-configuration.nix in /etc/nixos/ remains unchanged)
 just install-pckgs
 ```
 
-> **Important**: `hardware-configuration.nix` is excluded from git because it contains machine-specific settings (disk UUIDs, kernel modules, CPU types) that differ between hosts.
+> **Important**: `hardware-configuration.nix` is excluded from git and stored in `/etc/nixos/` because it contains machine-specific settings (disk UUIDs, kernel modules, CPU types) that differ between hosts. The flake uses `--impure` flag to access this system-level configuration.
 
 ### Testing and Validation
 ```bash
@@ -161,8 +161,10 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 ## Troubleshooting
 
 ### Common Issues and Solutions
-- **Hardware configuration missing**: Generate with `sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix`
-- **Boot/filesystem errors on new machine**: Ensure hardware-configuration.nix matches the current machine's hardware
+- **Hardware configuration missing**: Generate with `sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix`
+- **Boot/filesystem errors on new machine**: Ensure `/etc/nixos/hardware-configuration.nix` matches the current machine's hardware
+- **Flake evaluation errors with hardware config**: The flake uses `--impure` flag to access `/etc/nixos/hardware-configuration.nix` outside the git tree
+- **services.journald.settings error**: Use `services.journald.extraConfig` instead (fixed in current configuration)
 - **Podman/Minikube container failures**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
 - **Korean input not working**: Verify `ibus-hangul` is installed and running (`ibus-daemon -drx`)
 - **Flake lock conflicts**: Delete `flake.lock` and regenerate with `nix flake lock`
@@ -175,7 +177,7 @@ When setting up on a new NixOS machine, optimize the hardware configuration for 
 #### Mount Options Explained:
 - **`noatime`**: Prevents file access time updates, reducing write operations
 - **`discard=async`**: Enables asynchronous TRIM for better SSD wear leveling
-- **Important**: These options must be added per-machine since hardware-configuration.nix is gitignored
+- **Important**: These options must be added per-machine in `/etc/nixos/hardware-configuration.nix` since it's gitignored and machine-specific
 
 #### Automatic SSD Optimizations (Already Configured):
 - **Binary caches**: Reduces local builds by 80-90%
@@ -203,7 +205,7 @@ echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
 
 # Hardware configuration validation
 sudo nixos-generate-config --show-hardware-config  # Preview hardware config
-ls -la hardware-configuration.nix                  # Check if hardware config exists
+ls -la /etc/nixos/hardware-configuration.nix       # Check if hardware config exists
 
 # Validate flake configurations
 nix flake show                  # List all available configurations
