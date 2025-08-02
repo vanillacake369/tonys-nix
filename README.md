@@ -152,10 +152,11 @@ just apply-zsh            # Configure zsh shell
 
 This configuration includes several optimizations to reduce SSD wear and extend drive lifespan:
 
-### Automatic Optimizations
+### Automatic Performance & SSD Optimizations
+- **Store Auto-Optimization**: Automatic deduplication reduces store size and improves I/O performance
+- **Optimized Build Settings**: Uses all CPU cores with `max-jobs=auto` for faster parallel builds
 - **Binary Caches**: Uses Cachix and community caches to minimize local builds (80-90% reduction in SSD writes)
-- **Tmpfs Mounts**: Build directories (`/tmp`, `/var/tmp`) use RAM instead of SSD storage
-- **Smart Garbage Collection**: Weekly automatic cleanup instead of frequent manual runs
+- **Smart Garbage Collection**: Daily automatic cleanup with 7-day retention for optimal performance
 - **Journal Limiting**: SystemD logs are capped at 500MB with automatic rotation
 - **Firmware Updates**: fwupd service enabled for SSD firmware optimization
 
@@ -199,6 +200,20 @@ sudo smartctl -a /dev/nvme0n1
 **services.journald.settings Error**
 - **Symptom**: "The option 'services.journald.settings' does not exist"
 - **Solution**: Already fixed in current configuration (uses `extraConfig` instead)
+
+**Slow Nix Builds/Installations**
+- **Symptoms**: Nix installs taking longer than expected, large store sizes
+- **Solutions**:
+  ```bash
+  # Check current store size
+  du -sh /nix/store
+  
+  # Run manual store optimization
+  nix store optimise
+  
+  # Check if auto-optimization is enabled
+  nix show-config | grep auto-optimise
+  ```
 
 #### Minikube + Podman Issues
 
@@ -262,6 +277,7 @@ container exited unexpectedly
 - **Package conflicts**: Run `just clean` to remove old generations
 - **Shell not updating**: Restart terminal or run `exec zsh`
 - **Permission issues**: Ensure user is in required groups (docker, wheel)
+- **Performance issues**: Check store optimization status and consider manual `nix store optimise`
 
 ### Getting Help
 

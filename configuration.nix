@@ -171,7 +171,7 @@ in {
     };
   };
 
-  # Allow experimental-features and configure binary caches for SSD optimization
+  # Nix configuration optimized for performance and SSD longevity
   nix.settings = {
     experimental-features = [
       "nix-command"
@@ -181,7 +181,11 @@ in {
       "root"
       "@wheel"
     ];
-    # Binary caches to reduce local builds and SSD writes
+    # Performance optimizations
+    auto-optimise-store = true;  # Enable store deduplication for better performance
+    max-jobs = "auto";          # Use all available cores (8 cores detected)
+    cores = 0;                  # Use all available cores per job
+    # Binary caches to reduce local builds (removed duplicate cache.nixos.org)
     substituters = [
       "https://cache.nixos.org/"
       "https://nix-community.cachix.org"
@@ -194,11 +198,11 @@ in {
     ];
   };
 
-  # SSD optimization: automatic garbage collection with longer intervals
+  # Optimized garbage collection for better performance and SSD longevity
   nix.gc = {
     automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 14d";
+    dates = "daily";                     # More frequent cleanup for better performance
+    options = "--delete-older-than 7d";  # Shorter retention for smaller store size
   };
 
   programs.zsh.enable = true;

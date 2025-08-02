@@ -165,6 +165,8 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 - **Boot/filesystem errors on new machine**: Ensure `/etc/nixos/hardware-configuration.nix` matches the current machine's hardware
 - **Flake evaluation errors with hardware config**: The flake uses `--impure` flag to access `/etc/nixos/hardware-configuration.nix` outside the git tree
 - **services.journald.settings error**: Use `services.journald.extraConfig` instead (fixed in current configuration)
+- **Slow Nix builds/installs**: Check if `auto-optimise-store` is enabled and store size with `du -sh /nix/store`
+- **Large Nix store size**: Run `nix store optimise` manually or ensure automatic optimization is enabled
 - **Podman/Minikube container failures**: Run `just enable-shared-mount` and ensure cgroup v2 is enabled
 - **Korean input not working**: Verify `ibus-hangul` is installed and running (`ibus-daemon -drx`)
 - **Flake lock conflicts**: Delete `flake.lock` and regenerate with `nix flake lock`
@@ -179,9 +181,11 @@ When setting up on a new NixOS machine, optimize the hardware configuration for 
 - **`discard=async`**: Enables asynchronous TRIM for better SSD wear leveling
 - **Important**: These options must be added per-machine in `/etc/nixos/hardware-configuration.nix` since it's gitignored and machine-specific
 
-#### Automatic SSD Optimizations (Already Configured):
-- **Binary caches**: Reduces local builds by 80-90%
-- **Weekly GC**: Automatic cleanup every 7 days, keeps 14 days of generations
+#### Automatic Performance & SSD Optimizations (Already Configured):
+- **Store auto-optimization**: Automatic deduplication reduces store size and improves I/O performance
+- **Optimized build settings**: Uses all 8 CPU cores with `max-jobs=auto` and `cores=0`
+- **Daily GC with 7-day retention**: More frequent cleanup for better performance and smaller store size
+- **Binary caches**: Reduces local builds by 80-90% (cache.nixos.org, nix-community, devenv)
 - **Journal limits**: SystemD logs capped at 500MB with monthly rotation
 - **fwupd**: Firmware update capability for SSD optimization
 
@@ -194,8 +198,9 @@ sudo fwupdmgr refresh && sudo fwupdmgr get-updates
 # Monitor SSD wear (if smartmontools available)
 sudo smartctl -a /dev/nvme0n1
 
-# Check tmpfs usage
-df -h /tmp /var/tmp
+# Check Nix store size and optimization status
+du -sh /nix/store
+nix store optimise --dry-run  # Preview deduplication savings
 ```
 
 ### Debugging Commands
