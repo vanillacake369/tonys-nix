@@ -27,9 +27,6 @@
         copy = "xclip -selection clipboard";
         grep = "rg";
         clear = "clear -x";
-        # Container compose aliases for compatibility
-        docker-compose = "podman-compose";
-        "docker compose" = "podman compose";
       };
 
       plugins = [
@@ -76,6 +73,19 @@
                 # Enable session managed by systemd
                 if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
                   loginctl enable-linger "$USER"
+                fi
+
+                # Smart container compose aliases - use podman if available, fallback to docker
+                if command -v podman-compose >/dev/null 2>&1; then
+                  alias docker-compose='podman-compose'
+                elif command -v docker-compose >/dev/null 2>&1; then
+                  alias docker-compose='docker-compose'
+                fi
+
+                if command -v podman >/dev/null 2>&1; then
+                  alias docker-compose-new='podman compose'
+                elif command -v docker >/dev/null 2>&1; then
+                  alias docker-compose-new='docker compose'
                 fi
 
                 # ** Add REPL of fzf [Reference](https://sbulav.github.io/kubernetes/using-fzf-with-kubectl/)**

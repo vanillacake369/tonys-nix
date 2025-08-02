@@ -7,7 +7,6 @@
   home.packages = with pkgs;
     [
       # Container orchestration tools
-      podman-compose
       k6
       kubectl
       kubectx
@@ -20,6 +19,7 @@
     ++ lib.optionals (!isWsl) [
       minikube
       dive
+      podman-compose
       podman-tui
     ];
 
