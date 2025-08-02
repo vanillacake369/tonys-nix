@@ -63,6 +63,13 @@ in {
     logind = {
       lidSwitch = "ignore";
     };
+    # SSD optimization: limit systemd journal size and rotation
+    journald.settings = {
+      SystemMaxUse = "500M";
+      SystemMaxFileSize = "50M";
+      SystemMaxFiles = 10;
+      MaxRetentionSec = "1month";
+    };
     nfs.server.enable = true;
     xserver = {
       enable = true;
@@ -164,7 +171,7 @@ in {
     };
   };
 
-  # Allow experimental-features
+  # Allow experimental-features and configure binary caches for SSD optimization
   nix.settings = {
     experimental-features = [
       "nix-command"
@@ -174,6 +181,24 @@ in {
       "root"
       "@wheel"
     ];
+    # Binary caches to reduce local builds and SSD writes
+    substituters = [
+      "https://cache.nixos.org/"
+      "https://nix-community.cachix.org"
+      "https://devenv.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+    ];
+  };
+
+  # SSD optimization: automatic garbage collection with longer intervals
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 14d";
   };
 
   programs.zsh.enable = true;
@@ -195,7 +220,12 @@ in {
     noto-fonts-cjk-sans
     # CPU Usage with cutty catty
     gnomeExtensions.runcat
+    # SSD optimization: firmware updates
+    fwupd
   ];
+
+  # Enable fwupd service for firmware updates
+  services.fwupd.enable = true;
 
   # Enable common container config files in /etc/containers
   virtualisation = {

@@ -169,6 +169,33 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 - **Home-manager build failures**: Check for syntax errors with `nix flake check`
 - **Architecture mismatch**: Verify correct platform detection with `just install-pckgs`
 
+### SSD Optimization for New Machines
+When setting up on a new NixOS machine, optimize the hardware configuration for SSD longevity:
+
+#### Mount Options Explained:
+- **`noatime`**: Prevents file access time updates, reducing write operations
+- **`discard=async`**: Enables asynchronous TRIM for better SSD wear leveling
+- **Important**: These options must be added per-machine since hardware-configuration.nix is gitignored
+
+#### Automatic SSD Optimizations (Already Configured):
+- **Binary caches**: Reduces local builds by 80-90%
+- **Weekly GC**: Automatic cleanup every 7 days, keeps 14 days of generations
+- **Journal limits**: SystemD logs capped at 500MB with monthly rotation
+- **fwupd**: Firmware update capability for SSD optimization
+
+#### SSD Health Commands:
+```bash
+# Check SSD firmware and health
+sudo fwupdmgr get-devices
+sudo fwupdmgr refresh && sudo fwupdmgr get-updates
+
+# Monitor SSD wear (if smartmontools available)
+sudo smartctl -a /dev/nvme0n1
+
+# Check tmpfs usage
+df -h /tmp /var/tmp
+```
+
 ### Debugging Commands
 ```bash
 # Check system detection

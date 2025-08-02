@@ -150,13 +150,13 @@ apply-zsh:
 
 ########### *** CLEANER *** ##########
 
-# Clean redundant packages by nix gc
+# Clean redundant packages by nix gc ( older than 2 weeks )
 clean:
   #!/usr/bin/env bash
-  nix-collect-garbage -d
+  nix-collect-garbage -d --delete-older-than 14d
   # if not wsl, gc for nixos
   if ! grep -qi Microsoft /proc/version 2>/dev/null; then
-    sudo nix-collect-garbage -d
+    sudo nix-collect-garbage -d --delete-older-than 14d
   fi
 
 # Clear all dependencies
