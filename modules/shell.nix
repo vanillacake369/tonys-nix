@@ -3,11 +3,8 @@
   lib,
   isWsl,
   ...
-}:
-{
-
-  home.packages =
-    with pkgs;
+}: {
+  home.packages = with pkgs;
     [
       asciinema
       asciinema-agg
@@ -27,6 +24,7 @@
       xclip
       autossh
       redli
+      smartmontools
     ]
     ++ lib.optionals (!isWsl) [
       openssh
