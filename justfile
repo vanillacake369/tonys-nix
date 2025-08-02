@@ -110,7 +110,7 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
       fi
     fi
     
-    sudo nixos-rebuild switch --flake .#{{HOSTNAME}}
+    sudo nixos-rebuild switch --flake .#{{HOSTNAME}} --impure
   fi
   
   case "{{HM_CONFIG}}" in
