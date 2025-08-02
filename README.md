@@ -101,14 +101,14 @@ This configuration is designed to work across multiple machines. When setting up
 1. **Clone the repository** on your new machine
 2. **Generate hardware configuration** for the new machine:
    ```bash
-   sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
+   sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
    ```
 3. **Apply the configuration**:
    ```bash
    just install-all
    ```
 
-> **Note**: `hardware-configuration.nix` is excluded from git (`.gitignore`) because it contains machine-specific settings like disk UUIDs, kernel modules, and CPU types that differ between hosts.
+> **Note**: `hardware-configuration.nix` is excluded from git and stored in `/etc/nixos/` because it contains machine-specific settings like disk UUIDs, kernel modules, and CPU types that differ between hosts. The flake uses `--impure` flag to access this system-level configuration.
 
 #### For Non-NixOS Systems (WSL, macOS, Linux)
 
@@ -160,7 +160,7 @@ This configuration includes several optimizations to reduce SSD wear and extend 
 - **Firmware Updates**: fwupd service enabled for SSD firmware optimization
 
 ### Manual Hardware Optimizations
-For NixOS systems, add these mount options to your `hardware-configuration.nix`:
+For NixOS systems, add these mount options to your `/etc/nixos/hardware-configuration.nix`:
 
 ```nix
 fileSystems."/" = {
@@ -186,6 +186,19 @@ sudo smartctl -a /dev/nvme0n1
 ## 🐛 Troubleshooting
 
 ### Common Issues
+
+#### NixOS Configuration Issues
+
+**Hardware Configuration Missing**
+- **Symptom**: "path does not exist" or "fileSystems option does not specify root" errors
+- **Solution**: Generate hardware config in the correct location:
+  ```bash
+  sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
+  ```
+
+**services.journald.settings Error**
+- **Symptom**: "The option 'services.journald.settings' does not exist"
+- **Solution**: Already fixed in current configuration (uses `extraConfig` instead)
 
 #### Minikube + Podman Issues
 
