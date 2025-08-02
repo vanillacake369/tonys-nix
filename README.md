@@ -138,6 +138,9 @@ just install-all    # Complete setup pipeline
 just install-pckgs  # Install/update packages
 just clean         # Clean old generations
 
+# Performance and diagnostics
+just performance-test      # Run comprehensive Nix performance analysis
+
 # Specific installations
 just install-nix           # Install Nix package manager
 just install-home-manager  # Install home-manager
@@ -205,6 +208,9 @@ sudo smartctl -a /dev/nvme0n1
 - **Symptoms**: Nix installs taking longer than expected, large store sizes
 - **Solutions**:
   ```bash
+  # Run comprehensive performance analysis
+  just performance-test
+  
   # Check current store size
   du -sh /nix/store
   
@@ -281,6 +287,7 @@ container exited unexpectedly
 
 ### Getting Help
 
+- Run `just performance-test` for comprehensive system analysis
 - Check `CLAUDE.md` for detailed development workflows
 - Review individual module files in `modules/` for specific configurations
 - File issues on the repository for bugs or feature requests

@@ -81,17 +81,17 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
   echo "OS_TYPE={{OS_TYPE}}, HM_CONFIG={{HM_CONFIG}}, HOSTNAME={{HOSTNAME}}"
   
   if [[ "{{OS_TYPE}}" == "nixos" ]]; then
-    # Validate hardware configuration for NixOS
+    # Validate hardware configuration for NixOS (stored in /etc/nixos/)
     echo "[!] Checking hardware configuration..."
     
-    if [[ ! -f "hardware-configuration.nix" ]]; then
-      echo "[!] hardware-configuration.nix not found. Generating for this machine..."
-      sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
-      echo "[✓] Generated hardware-configuration.nix"
+    if [[ ! -f "/etc/nixos/hardware-configuration.nix" ]]; then
+      echo "[!] /etc/nixos/hardware-configuration.nix not found. Generating for this machine..."
+      sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
+      echo "[✓] Generated /etc/nixos/hardware-configuration.nix"
     else
       # Get current hardware config and compare key identifiers
       current_hw=$(sudo nixos-generate-config --show-hardware-config 2>/dev/null)
-      existing_hw=$(cat hardware-configuration.nix 2>/dev/null)
+      existing_hw=$(cat /etc/nixos/hardware-configuration.nix 2>/dev/null)
       
       # Extract key hardware identifiers for comparison
       current_uuids=$(echo "$current_hw" | grep -o 'by-uuid/[^"]*' | sort)
@@ -103,8 +103,8 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
       if [[ "$current_uuids" != "$existing_uuids" ]] || [[ "$current_modules" != "$existing_modules" ]]; then
         echo "[!] Hardware configuration mismatch detected. Updating..."
         echo "  - Disk UUIDs or kernel modules differ from current hardware"
-        sudo nixos-generate-config --show-hardware-config > hardware-configuration.nix
-        echo "[✓] Updated hardware-configuration.nix for this machine"
+        sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
+        echo "[✓] Updated /etc/nixos/hardware-configuration.nix for this machine"
       else
         echo "[✓] Hardware configuration matches current machine"
       fi
@@ -188,3 +188,54 @@ enable-shared-mount:
   else
     echo "[✓] shared mount already configured for podman"
   fi
+
+# Run comprehensive Nix performance analysis
+performance-test:
+  #!/usr/bin/env bash
+  echo "=== NIX PERFORMANCE TEST RESULTS ==="
+  echo "Timestamp: $(date)"
+  echo ""
+  
+  echo "1. STORE METRICS:"
+  echo "   Store size: $(du -sh /nix/store | cut -f1)"
+  echo "   Store paths: $(find /nix/store -maxdepth 1 -type d | wc -l)"
+  echo "   Disk usage: $(df -h /nix/store | tail -1 | awk '{print $3 "/" $2 " (" $5 " full)"}')"
+  echo ""
+  
+  echo "2. CONFIGURATION STATUS:"
+  echo "   Auto-optimise: $(grep "auto-optimise-store" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
+  echo "   Max jobs: $(grep "max-jobs" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
+  echo "   Cores: $(grep "cores" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
+  echo "   CPU cores available: $(nproc)"
+  echo ""
+  
+  echo "3. BINARY CACHE STATUS:"
+  echo "   Substituters:"
+  grep "substituters" /etc/nix/nix.conf | cut -d= -f2 | tr ' ' '\n' | sed 's/^/     - /'
+  echo ""
+  
+  echo "4. GARBAGE COLLECTION:"
+  if systemctl is-enabled nix-gc.timer >/dev/null 2>&1; then
+    echo "   GC Timer: $(systemctl is-enabled nix-gc.timer) ($(systemctl is-active nix-gc.timer))"
+    echo "   GC Schedule: $(systemctl show nix-gc.timer | grep OnCalendar | cut -d= -f2)"
+  else
+    echo "   GC Timer: Not available via systemctl"
+  fi
+  echo ""
+  
+  echo "5. QUICK PERFORMANCE TEST:"
+  echo "   Testing small package installation speed..."
+  start_time=$(date +%s.%N)
+  nix shell nixpkgs#hello --command hello >/dev/null 2>&1
+  end_time=$(date +%s.%N)
+  duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "N/A")
+  echo "   Hello world test: ${duration}s"
+  echo ""
+  
+  echo "6. STORE OPTIMIZATION POTENTIAL:"
+  echo "   Checking for duplicate store paths..."
+  store_links=$(find /nix/store -type l | wc -l 2>/dev/null || echo "0")
+  echo "   Symlinks in store: $store_links"
+  echo ""
+  
+  echo "=== END PERFORMANCE TEST ==="
