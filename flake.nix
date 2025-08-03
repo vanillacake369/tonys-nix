@@ -8,12 +8,16 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    system-manager = {
-      url = "github:numtide/system-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-generators = {
+      url = "github:nix-community/nixos-generators";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    system-manager = {
+      url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -23,8 +27,9 @@
     nixpkgs,
     nixos-wsl,
     home-manager,
-    system-manager,
     nix-darwin,
+    nixos-generators,
+    system-manager,
     ...
   }: let
     lib = nixpkgs.lib;
@@ -62,16 +67,19 @@
     hostnames = ["HAMA" "nixos"];
   in {
     # Define nixos configuration for multiple hostnames
-    nixosConfigurations = lib.genAttrs hostnames (hostname: let
-      systemConfig = builders.mkSystem "x86_64-linux";
-    in
-      nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        pkgs = systemConfig.pkgs;
-        modules = [
-          ./configuration.nix
-        ];
-      });
+    # Only create nixosConfigurations if we can access /etc (actual NixOS system)
+    nixosConfigurations = lib.optionalAttrs (builtins.pathExists /etc) (
+      lib.genAttrs hostnames (hostname: let
+        systemConfig = builders.mkSystem "x86_64-linux";
+      in
+        nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          pkgs = systemConfig.pkgs;
+          modules = [
+            ./configuration.nix
+          ];
+        })
+    );
 
     # Define macos configuration for multiple hostnames and architectures
     darwinConfigurations = let
@@ -123,6 +131,41 @@
           }
         ])
         supportedSystems
+      )
+    );
+
+    # Image generation using nixos-generators with multiple formats
+    packages = forAllSystems (system: let
+      # Define available formats with metadata
+      formats = {
+        iso = { 
+          format = "iso"; 
+          description = "Bootable ISO image for installation/live boot"; 
+        };
+        virtualbox = { 
+          format = "virtualbox"; 
+          description = "VirtualBox OVA image"; 
+        };
+        vmware = { 
+          format = "vmware"; 
+          description = "VMware VMDK image"; 
+        };
+        qcow = { 
+          format = "qcow"; 
+          description = "QEMU qcow image for KVM/libvirt"; 
+        };
+      };
+      
+      # Generate image packages for each format
+      mkImage = name: config: nixos-generators.nixosGenerate {
+        inherit system;
+        modules = [ ./configuration.nix ];
+        format = config.format;
+      };
+    in
+      # Only generate Linux images (nixos-generators doesn't support Darwin)
+      lib.optionalAttrs (lib.hasSuffix "-linux" system) (
+        lib.mapAttrs mkImage formats
       )
     );
 

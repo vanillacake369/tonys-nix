@@ -12,6 +12,7 @@ Supports NixOS, WSL, macOS, and standard Linux distributions with automatic envi
 - **Shell configuration**: Zsh with oh-my-zsh and powerlevel10k
 - **Editor setup**: Neovim with LazyVim configuration
 - **Container support**: Rootless Podman with Docker compatibility and podman-compose
+- **Image generation**: Create ISOs, VM images (VirtualBox, VMware, qcow2), and container images
 
 ## 📦 Included Packages
 
@@ -141,6 +142,12 @@ just clean         # Clean old generations
 # Performance and diagnostics
 just performance-test      # Run comprehensive Nix performance analysis
 
+# Image generation
+just list-image-formats    # Show available image formats
+just build-image <format>  # Build specific image format
+just build-all-images      # Build all image formats
+just show-images           # Show built images and sizes
+
 # Specific installations
 just install-nix           # Install Nix package manager
 just install-home-manager  # Install home-manager
@@ -186,6 +193,60 @@ sudo fwupdmgr refresh && sudo fwupdmgr get-updates
 # Monitor SSD usage (if available)
 sudo smartctl -a /dev/nvme0n1
 ```
+
+## 🖼️ Image Generation
+
+Create bootable ISOs and VM images from your NixOS configuration using nixos-generators.
+
+### Quick Start
+
+```bash
+# List available formats
+just list-image-formats
+
+# Build bootable ISO
+just build-image iso
+
+# Build VirtualBox image
+just build-image virtualbox
+
+# Build all formats
+just build-all-images
+
+# Check built images
+just show-images
+```
+
+### Supported Formats
+
+| Format | Description | Architecture Support |
+|--------|-------------|---------------------|
+| `iso` | Bootable installation ISO | x86_64-linux, aarch64-linux |
+| `virtualbox` | VirtualBox OVA image | x86_64-linux, aarch64-linux |
+| `vmware` | VMware VMDK image | x86_64-linux, aarch64-linux |
+| `qcow` | QEMU/KVM qcow image | x86_64-linux, aarch64-linux |
+
+### Use Cases
+
+- **Installation Media**: Create bootable USB drives for NixOS installation
+- **Virtual Machines**: Deploy consistent environments in VirtualBox, VMware, or KVM
+- **Cloud Deployment**: Use qcow images for cloud platforms
+
+> **Note**: For Docker containers, use official NixOS Docker images. This configuration is optimized for VM and installation media generation.
+
+### Advanced Usage
+
+```bash
+# Build for specific architecture
+just build-image-arch iso x86_64-linux
+just build-image-arch qcow aarch64-linux
+
+# Direct nix commands
+nix build .#iso                           # Current architecture
+nix build .#packages.x86_64-linux.iso     # Specific architecture
+```
+
+> **Note**: Image generation requires significant disk space (10GB+) and build time. Use binary caches to speed up the process.
 
 ## 🐛 Troubleshooting
 
