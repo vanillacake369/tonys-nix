@@ -3,6 +3,9 @@ hardware-configuration.nix
 
 # Exclude open vpn config file
 openvpn
+*.openvpn
+ovpn
+*.ovpn
 
 # Exclude .idea
 .idea/
