@@ -41,6 +41,15 @@ just enable-shared-mount           # Enable shared mount for rootless podman
 just performance-test              # Run comprehensive Nix performance analysis
 ```
 
+### Image generation
+```bash
+just list-image-formats            # Show available image formats with descriptions
+just build-image <format>          # Build specific format for current architecture
+just build-image-arch <format> <arch>  # Build specific format for specific architecture
+just build-all-images              # Build all formats for current architecture
+just show-images                   # Show built images and their sizes
+```
+
 ### Manual home-manager operations
 ```bash
 # Architecture-aware configurations
@@ -232,3 +241,124 @@ just clear-all        # Remove home-manager completely
 just remove-configs   # Remove all dotfiles and configurations
 just install-all      # Fresh installation from scratch
 ```
+
+## Image Generation
+
+### Overview
+This flake includes nixos-generators integration for creating various system images. You can generate bootable ISOs, VM images, and container images from your NixOS configuration.
+
+### Available Formats
+The following image formats are supported with automatic multi-architecture generation:
+
+| Format | Description | Use Case |
+|--------|-------------|----------|
+| `iso` | Bootable ISO image | Installation media, live boot |
+| `virtualbox` | VirtualBox OVA | VirtualBox virtualization |
+| `vmware` | VMware VMDK | VMware virtualization |
+| `qcow` | QEMU qcow | KVM/libvirt, cloud deployments |
+
+### Architecture Support
+Images are automatically generated for Linux architectures:
+- **x86_64-linux**: Intel/AMD 64-bit systems
+- **aarch64-linux**: ARM64 systems
+
+### Basic Usage
+
+#### List Available Formats
+```bash
+just list-image-formats
+```
+
+#### Build Single Image
+```bash
+# Build for current architecture
+just build-image iso
+just build-image virtualbox
+just build-image qcow
+
+# Build for specific architecture
+just build-image-arch iso x86_64-linux
+just build-image-arch qcow aarch64-linux
+```
+
+#### Build All Images
+```bash
+# Build all formats for current architecture
+just build-all-images
+```
+
+#### Check Built Images
+```bash
+# Show built images and their sizes
+just show-images
+```
+
+### Direct Nix Commands
+You can also use nix build directly:
+
+```bash
+# Current system architecture
+nix build .#iso
+nix build .#virtualbox
+nix build .#qcow
+
+# Specific architecture
+nix build .#packages.x86_64-linux.iso
+nix build .#packages.aarch64-linux.qcow
+```
+
+### Use Cases
+
+#### Installation Media
+```bash
+# Create bootable installation ISO
+just build-image iso
+# Burn to USB: dd if=result/iso/nixos.iso of=/dev/sdX bs=4M status=progress
+```
+
+#### Virtual Machines
+```bash
+# VirtualBox
+just build-image virtualbox
+# Import result/virtualbox/*.ova in VirtualBox
+
+# VMware
+just build-image vmware
+# Import result/vmware/*.vmdk in VMware
+
+# KVM/libvirt
+just build-image qcow
+# Use result/qcow/*.qcow with virt-manager
+```
+
+#### Note on Docker Containers
+For Docker containers, use official NixOS Docker images instead of generating custom images from this configuration. Our setup is optimized for VM and installation media generation.
+
+### Troubleshooting Image Generation
+
+#### Common Issues
+- **"No such flake output attribute"**: Ensure you're using a Linux architecture (x86_64-linux or aarch64-linux)
+- **Build timeouts**: Large images may take time; increase timeout with `--timeout 3600`
+- **Disk space**: Image generation requires significant disk space; ensure at least 10GB free
+- **Memory usage**: Building multiple images simultaneously may require 8GB+ RAM
+
+#### Debugging Commands
+```bash
+# Check available outputs
+nix flake show
+
+# Validate specific image configuration
+nix build .#packages.x86_64-linux.iso --dry-run
+
+# Build with verbose output
+nix build .#iso --verbose
+
+# Check image metadata
+nix eval .#packages.x86_64-linux.iso.meta --json
+```
+
+#### Performance Tips
+- Use binary caches to avoid rebuilding (already configured)
+- Build images one at a time if memory is limited
+- Clean old results: `rm result*` before building new images
+- Use `just show-images` to monitor disk usage

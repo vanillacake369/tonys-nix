@@ -9,12 +9,14 @@
 }: let
   userHome = config.users.users.limjihoon.home;
 in {
-  imports = [
+  imports = 
     # Include the results of the hardware scan.
     # NOTE: hardware-configuration.nix is stored in /etc/nixos/ (outside flake)
     # Generate it on each new machine with: sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
-    /etc/nixos/hardware-configuration.nix
-  ];
+    # Only import if the file exists (for actual NixOS systems)
+    lib.optionals (builtins.pathExists /etc/nixos/hardware-configuration.nix) [
+      /etc/nixos/hardware-configuration.nix
+    ];
 
   # Bootloader
   boot = {
@@ -256,7 +258,7 @@ in {
     hostName = "nixos";
     networkmanager.enable = true;
     firewall = {
-      enable = true;
+      enable = lib.mkDefault true;  # Allow override for image formats that disable firewall
       # Add firewall exception for libvirt provider when using NFSv4
       interfaces."virbr1" = {
         allowedTCPPorts = [2049];

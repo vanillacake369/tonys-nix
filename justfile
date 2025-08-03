@@ -220,3 +220,79 @@ performance-test:
   echo ""
   
   echo "=== END PERFORMANCE TEST ==="
+
+
+########### *** IMAGE GENERATION *** ##########
+
+# List available image formats with descriptions
+list-image-formats:
+  #!/usr/bin/env bash
+  echo "Available image formats for {{SYSTEM_ARCH}}:"
+  echo ""
+  echo "Format        Description"
+  echo "----------    -----------"
+  echo "iso           Bootable ISO image for installation/live boot"
+  echo "virtualbox    VirtualBox OVA image"
+  echo "vmware        VMware VMDK image"
+  echo "qcow          QEMU qcow image for KVM/libvirt"
+  echo ""
+  echo "Usage: just build-image <format>"
+  echo ""
+  echo "Note: For Docker containers, use official NixOS Docker images instead."
+
+# Build specific image format for current architecture
+build-image FORMAT:
+  #!/usr/bin/env bash
+  echo "[!] Building {{FORMAT}} image for {{SYSTEM_ARCH}}..."
+  if ! nix build .#{{FORMAT}}; then
+    echo "[✗] Failed to build {{FORMAT}} image"
+    echo "    Run 'just list-image-formats' to see available formats"
+    exit 1
+  fi
+  echo "[✓] Successfully built {{FORMAT}} image"
+  echo "    Output: $(readlink result)"
+
+# Build specific image format for specific architecture
+build-image-arch FORMAT ARCH:
+  #!/usr/bin/env bash
+  echo "[!] Building {{FORMAT}} image for {{ARCH}}..."
+  if ! nix build .#packages.{{ARCH}}.{{FORMAT}}; then
+    echo "[✗] Failed to build {{FORMAT}} image for {{ARCH}}"
+    echo "    Supported architectures: x86_64-linux, aarch64-linux"
+    echo "    Run 'just list-image-formats' to see available formats"
+    exit 1
+  fi
+  echo "[✓] Successfully built {{FORMAT}} image for {{ARCH}}"
+  echo "    Output: $(readlink result)"
+
+# Build all image formats for current architecture
+build-all-images:
+  #!/usr/bin/env bash
+  echo "[!] Building all image formats for {{SYSTEM_ARCH}}..."
+  formats=("iso" "virtualbox" "vmware" "qcow")
+  failed=()
+  
+  for format in "${formats[@]}"; do
+    echo "Building $format..."
+    if nix build .#$format; then
+      echo "[✓] $format built successfully"
+    else
+      echo "[✗] $format build failed"
+      failed+=("$format")
+    fi
+    echo ""
+  done
+  
+  if [ ${#failed[@]} -eq 0 ]; then
+    echo "[✓] All image formats built successfully"
+  else
+    echo "[!] Some formats failed: ${failed[*]}"
+    exit 1
+  fi
+
+# Show built images and their sizes
+show-images:
+  #!/usr/bin/env bash
+  echo "Built images in ./result*:"
+  echo ""
+  ls -lh result* 2>/dev/null | awk '{print $9, $5}' | column -t || echo "No images found. Run 'just build-image <format>' first."
