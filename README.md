@@ -13,6 +13,7 @@ Supports NixOS, WSL, macOS, and standard Linux distributions with automatic envi
 - **Editor setup**: Neovim with LazyVim configuration
 - **Container support**: Rootless Podman with Docker compatibility and podman-compose
 - **Image generation**: Create ISOs, VM images (VirtualBox, VMware, qcow2), and container images
+- **Dynamic binary support**: nix-ld enabled for running non-Nix executables seamlessly
 
 ## 📦 Included Packages
 
@@ -345,6 +346,14 @@ container exited unexpectedly
 - **Shell not updating**: Restart terminal or run `exec zsh`
 - **Permission issues**: Ensure user is in required groups (docker, wheel)
 - **Performance issues**: Check store optimization status and consider manual `nix store optimise`
+
+#### Running Dynamically Linked Executables
+
+**nix-ld Support**: This configuration includes nix-ld, which allows running non-Nix dynamically linked executables. If you encounter "No such file or directory" errors when running downloaded binaries:
+
+- The system is already configured with essential libraries for most CLI tools
+- For specific missing libraries, check error messages and add them to `programs.nix-ld.libraries` in configuration.nix
+- Common use case: Running Python tools installed outside Nix (e.g., via pip in virtual environments)
 
 ### Getting Help
 

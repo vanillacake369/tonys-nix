@@ -108,6 +108,7 @@ The flake provides architecture-aware configurations:
 - SSH hardening with Google Authenticator 2FA
 - Comprehensive development environment for cloud-native workflows
 - Modern shell environment with extensive CLI tooling
+- nix-ld support for running dynamically linked executables
 
 ## Environment Detection
 
@@ -183,6 +184,7 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 - **Flake lock conflicts**: Delete `flake.lock` and regenerate with `nix flake lock`
 - **Home-manager build failures**: Check for syntax errors with `nix flake check`
 - **Architecture mismatch**: Verify correct platform detection with `just install-pckgs`
+- **Dynamically linked executables failing**: nix-ld is enabled with essential libraries; add missing libraries to `programs.nix-ld.libraries` in configuration.nix
 
 ### SSD Optimization for New Machines
 When setting up on a new NixOS machine, optimize the hardware configuration for SSD longevity:
