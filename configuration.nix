@@ -217,6 +217,26 @@ in {
     enable = true;
     defaultEditor = true;
   };
+  
+  # Enable nix-ld for running dynamically linked executables
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      # Basic system libraries
+      stdenv.cc.cc
+      zlib
+      openssl
+      curl
+      
+      # Python-related libraries (for claude-monitor and other Python tools)
+      libffi
+      glib
+      
+      # CLI tool dependencies
+      ncurses
+      readline
+    ];
+  };
 
   environment.shells = with pkgs; [zsh];
   environment.systemPackages = with pkgs; [
