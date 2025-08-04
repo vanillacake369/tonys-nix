@@ -27,6 +27,7 @@
         copy = "xclip -selection clipboard";
         grep = "rg";
         clear = "clear -x";
+        claude-monitor = "uv tool run claude-monitor";
       };
 
       plugins = [
