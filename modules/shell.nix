@@ -25,6 +25,7 @@
       autossh
       redli
       smartmontools
+      expect
     ]
     ++ lib.optionals (!isWsl) [
       openssh
