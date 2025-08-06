@@ -6,9 +6,7 @@
   isDarwin,
   isWsl,
   ...
-}:
-
-{
+}: {
   # Enable Home Manager
   programs.home-manager.enable = true;
 
@@ -22,6 +20,17 @@
     ".config/nvim".source = ./dotfiles/lazyvim;
     ".config/zellij".source = ./dotfiles/zellij;
     ".screenrc".source = ./dotfiles/screen/.screenrc;
+
+    # Claude configuration
+    ".claude/commands".source = ./dotfiles/claude/commands;
+    ".claude/config/notification_states.json" = {
+      source = ./dotfiles/claude/config/notification_states.json;
+      optional = true;
+    };
+    ".claude/credentials.json" = {
+      source = ./dotfiles/claude/credentials.json;
+      optional = true;
+    };
   };
 
   # Core pkgs
@@ -37,8 +46,8 @@
     ]
     # NixOs / Darwin pkgs
     ++ (lib.optionals (!isWsl && isLinux || isDarwin) [
-    ])
+      ])
     # WSL pkgs
     ++ (lib.optionals isWsl [
-    ]);
+      ]);
 }
