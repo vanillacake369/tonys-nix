@@ -21,10 +21,8 @@
     ".config/zellij".source = ./dotfiles/zellij;
     ".screenrc".source = ./dotfiles/screen/.screenrc;
 
-    # Claude configuration
+    # Claude configuration - only manage static files
     ".claude/commands".source = ./dotfiles/claude/commands;
-    ".claude/config/notification_states.json".source = ./dotfiles/claude/config/notification_states.json;
-    ".claude/credentials.json".source = ./dotfiles/claude/credentials.json;
   };
 
   # Core pkgs
