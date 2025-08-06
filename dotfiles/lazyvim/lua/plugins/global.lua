@@ -5,19 +5,24 @@
 -- * disable/enabled LazyVim plugins
 -- * override the configuration of LazyVim plugins
 return {
-  -- Colorscheme :: catppuccin
+  -- Colorscheme :: material.nvim
   {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "marko-cerovac/material.nvim",
+    name = "material",
     priority = 1000,
     lazy = false,
+    config = function()
+      vim.g.material_style = "darker"
+      require("material").setup({})
+      vim.cmd("colorscheme material")
+    end,
   },
 
   -- Configure LazyVim
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin",
+      colorscheme = "material",
     },
   },
 
