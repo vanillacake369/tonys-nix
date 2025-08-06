@@ -23,14 +23,8 @@
 
     # Claude configuration
     ".claude/commands".source = ./dotfiles/claude/commands;
-    ".claude/config/notification_states.json" = {
-      source = ./dotfiles/claude/config/notification_states.json;
-      optional = true;
-    };
-    ".claude/credentials.json" = {
-      source = ./dotfiles/claude/credentials.json;
-      optional = true;
-    };
+    ".claude/config/notification_states.json".source = ./dotfiles/claude/config/notification_states.json;
+    ".claude/credentials.json".source = ./dotfiles/claude/credentials.json;
   };
 
   # Core pkgs
