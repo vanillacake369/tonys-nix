@@ -19,3 +19,9 @@ result-*
 .DS_Store
 *.swp
 *.swo
+
+# Claude dynamic data (keep local-only)
+dotfiles/claude/todos/
+dotfiles/claude/projects/
+dotfiles/claude/shell-snapshots/
+dotfiles/claude/statsig/
