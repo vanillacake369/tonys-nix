@@ -9,6 +9,7 @@
   home.packages = with pkgs;
     [
       claude-code
+      openvpn
     ]
     ++ lib.optionals (!isWsl) [
       google-chrome
@@ -29,7 +30,6 @@
       hunspellDicts.en_US
       hunspellDicts.ko_KR
       hunspellDicts.ko-kr
-      openvpn
       openvpn3
     ]
     ++ lib.optionals isDarwin [
@@ -39,5 +39,7 @@
       bartender
       yabai
       skhd
+      # Slack has known issues on macOS Sequoia, may need Homebrew fallback
+      # slack
     ];
 }

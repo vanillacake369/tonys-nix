@@ -24,7 +24,7 @@
         ks = "kubectl get services -o wide";
         kap = "kubectl apply -f ";
         cat = "bat --style=plain --paging=never";
-        copy = "xclip -selection clipboard";
+        copy = if pkgs.stdenv.isDarwin then "pbcopy" else "xclip -selection clipboard";
         grep = "rg";
         clear = "clear -x";
         claude-monitor = "uv tool run claude-monitor";
@@ -118,15 +118,29 @@
                     apt-cache search . | fzf --preview 'apt-cache depends {1}'
                   )
                 }
-                # Show systemd
-                systemdlog() {
-                  (
-                    find /etc/systemd/system/  -name "*.service" | \
-                      fzf --preview 'cat {}' \
-                          --bind "ctrl-i:execute(nvim {})" \
-                              --bind "ctrl-s:execute(cat {} | copy)"
-                  )
-                }
+                # Show systemd (Linux only)
+                ${lib.optionalString pkgs.stdenv.isLinux ''
+                  systemdlog() {
+                    (
+                      find /etc/systemd/system/  -name "*.service" | \
+                        fzf --preview 'cat {}' \
+                            --bind "ctrl-i:execute(nvim {})" \
+                                --bind "ctrl-s:execute(cat {} | copy)"
+                    )
+                  }
+                ''}
+                # Show launchd services (macOS only)
+                ${lib.optionalString pkgs.stdenv.isDarwin ''
+                  systemdlog() {
+                    (
+                      launchctl list | \
+                        fzf --preview 'launchctl print system/{1} 2>/dev/null || launchctl print user/$(id -u)/{1} 2>/dev/null || echo "Service details not available"' \
+                            --bind "ctrl-i:execute(nvim /Library/LaunchDaemons/{1}.plist 2>/dev/null || nvim /System/Library/LaunchDaemons/{1}.plist 2>/dev/null || nvim ~/Library/LaunchAgents/{1}.plist 2>/dev/null || echo 'Plist file not found')" \
+                            --bind "ctrl-s:execute(launchctl print system/{1} 2>/dev/null | pbcopy || launchctl print user/$(id -u)/{1} 2>/dev/null | pbcopy)" \
+                            --header 'Ctrl-I: edit plist | Ctrl-R: reload list | Ctrl-S: copy service info'
+                    )
+                  }
+                ''}
                 # Search by keyword
                 search() {
                   [[ $# -eq 0 ]] && { echo "provide regex argument"; return }
