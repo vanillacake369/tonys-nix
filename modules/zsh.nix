@@ -28,6 +28,9 @@
         grep = "rg";
         clear = "clear -x";
         claude-monitor = "uv tool run claude-monitor";
+      } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        # macOS-specific aliases
+        hidden-bar = "open ~/.nix-profile/Applications/\"Hidden Bar.app\"";
       };
 
       plugins = [
