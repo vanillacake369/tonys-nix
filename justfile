@@ -157,6 +157,54 @@ remove-configs:
 
 ########### *** APPLICATION *** ##########
 
+# Source environment variables (requires scripts/env.sh file)
+source-env:
+  #!/usr/bin/env bash
+  if [[ -f "scripts/env.sh" ]]; then
+    echo "[!] Sourcing environment variables from scripts/env.sh"
+    source scripts/env.sh
+    echo "[✓] Environment variables loaded"
+    echo "    AQUANURI_TARGET_URL: ${AQUANURI_TARGET_URL:-not set}"
+    echo "    AQUANURI_LOCAL_PORT: ${AQUANURI_LOCAL_PORT:-not set}"
+    echo "    HAMA_VPN_PW: ${HAMA_VPN_PW:+***set***}"
+  else
+    echo "[!] scripts/env.sh not found"
+    echo "    Create scripts/env.sh with your environment variables"
+    exit 1
+  fi
+
+# Connect to Aquanuri development database (requires env vars)
+aquanuri-connect:
+  #!/usr/bin/env bash
+  if [[ -f "scripts/env.sh" ]]; then
+    source scripts/env.sh
+  fi
+  
+  if [[ -z "${AQUANURI_TARGET_URL:-}" ]]; then
+    echo "[!] Environment variables not loaded. Run 'just source-env' first"
+    exit 1
+  fi
+  
+  echo "[!] Starting SSH tunnel to Aquanuri database..."
+  echo "    Target: ${AQUANURI_TARGET_URL}"
+  echo "    Local port: ${AQUANURI_LOCAL_PORT}"
+  scripts/aquanuri-dev.sh
+
+# Connect to VPN (requires HAMA_VPN_PW env var)
+vpn-connect CONFIG="lonelynight1026.ovpn":
+  #!/usr/bin/env bash
+  if [[ -f "scripts/env.sh" ]]; then
+    source scripts/env.sh
+  fi
+  
+  if [[ -z "${HAMA_VPN_PW:-}" ]]; then
+    echo "[!] HAMA_VPN_PW environment variable not set. Run 'just source-env' first"
+    exit 1
+  fi
+  
+  echo "[!] Connecting to VPN with config: {{CONFIG}}"
+  scripts/openvpn-auto.sh {{CONFIG}}
+
 # Enable shared mount for rootless podman
 enable-shared-mount:
   #!/usr/bin/env bash

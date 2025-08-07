@@ -82,7 +82,19 @@ return {
     dependencies = { "hrsh7th/cmp-emoji" },
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
+      local cmp = require("cmp")
       table.insert(opts.sources, { name = "emoji" })
+      
+      -- Custom keymaps
+      opts.mapping = cmp.mapping.preset.insert({
+        ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<Down>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<Up>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+        ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        ["<Esc>"] = cmp.mapping.abort(),
+        ["<C-Space>"] = cmp.mapping.complete(),
+      })
     end,
   },
 
