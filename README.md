@@ -140,6 +140,11 @@ just install-all    # Complete setup pipeline
 just install-pckgs  # Install/update packages
 just clean         # Clean old generations
 
+# Development connections (requires scripts/env.sh)
+just source-env            # Load development environment variables
+just aquanuri-connect      # Connect to Aquanuri database via SSH tunnel  
+just vpn-connect [config]  # Connect to VPN (default: lonelynight1026.ovpn)
+
 # Performance and diagnostics
 just performance-test      # Run comprehensive Nix performance analysis
 
@@ -346,6 +351,43 @@ container exited unexpectedly
 - **Shell not updating**: Restart terminal or run `exec zsh`
 - **Permission issues**: Ensure user is in required groups (docker, wheel)
 - **Performance issues**: Check store optimization status and consider manual `nix store optimise`
+
+#### Development Environment Connections
+
+This repository includes scripts for development environment connections that require credentials:
+
+**Environment Variables Missing**:
+- **Symptom**: "Required environment variable not set" errors when running connection scripts
+- **Solution**: Create and load environment variables:
+  ```bash
+  # Create scripts/env.sh with your credentials (gitignored)
+  cat > scripts/env.sh << 'EOF'
+  #!/bin/bash
+  # Environment variables for development connections
+  
+  # Aquanuri database connection (SSH tunnel)
+  export AQUANURI_BASTION_URL="your-bastion-host-ip"       # e.g. "10.0.13.122"
+  export AQUANURI_BASTION_PW="your-ssh-password"           # SSH password
+  export AQUANURI_BASTION_PORT="3306"                      # Remote MySQL port
+  export AQUANURI_TARGET_URL="your-target-server-ip"       # e.g. "146.56.44.51"
+  export AQUANURI_LOCAL_PORT="3307"                        # Local port for tunnel
+  
+  # VPN connection
+  export HAMA_VPN_PW="your-vpn-password"                   # OpenVPN private key password
+  EOF
+  
+  # Then load and use them:
+  just source-env        # Load environment variables
+  just aquanuri-connect  # SSH tunnel to database
+  just vpn-connect       # VPN connection
+  ```
+
+**SSH/VPN Connection Issues**:
+- **Symptom**: Password prompts not being handled automatically
+- **Solutions**:
+  - Ensure environment variables are loaded: `just source-env`
+  - Check debug output in the connection scripts
+  - Verify network connectivity to target hosts
 
 #### Running Dynamically Linked Executables
 
