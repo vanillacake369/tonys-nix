@@ -18,11 +18,25 @@
     ".config/nix".source = ./dotfiles/nix;
     ".config/nixpkgs".source = ./dotfiles/nixpkgs;
     ".config/nvim".source = ./dotfiles/lazyvim;
-    ".config/zellij".source = ./dotfiles/zellij;
     ".screenrc".source = ./dotfiles/screen/.screenrc;
 
     # Claude configuration - only manage static files
     ".claude/commands".source = ./dotfiles/claude/commands;
+  };
+
+  # Zellij terminal multiplexer with platform-aware copy command
+  programs.zellij = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      # Platform-aware copy command
+      copy_command = if isDarwin then "pbcopy" else "xclip -selection clipboard";
+      copy_clipboard = "system";
+      copy_on_select = true;
+      mouse_mode = true;
+      show_startup_tips = false;
+      default_mode = "normal";
+    };
   };
 
   # Core pkgs
