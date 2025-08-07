@@ -35,7 +35,7 @@ SYSTEM_ARCH := `bash -euo pipefail -c '       \
 ########### *** INSTALLATION *** ##########
 
 # Initiate all configuration
-install-all: install-nix install-home-manager install-uidmap install-pckgs clean
+install-all: install-nix install-home-manager (install-uidmap-conditional) install-pckgs clean
 
 # Install nix
 install-nix:
@@ -64,14 +64,28 @@ install-home-manager:
     echo "[✓] Home Manager installed already"
   fi
 
-# Enable uidmap
+# Enable uidmap (Linux only)
 install-uidmap:
   #!/usr/bin/env bash
+  if [[ "$(uname -s)" != "Linux" ]]; then
+    echo "[!] uidmap installation skipped - not supported on $(uname -s)"
+    exit 0
+  fi
+  
   if ! command -v newuidmap >/dev/null || ! command -v newgidmap >/dev/null; then
     echo "[!] installing uidmap via apt (requires sudo)"
     sudo apt update && sudo apt install -y uidmap
   else
     echo "[✓] newuidmap and newgidmap already exist"
+  fi
+
+# Conditional uidmap install - only run on Linux
+install-uidmap-conditional:
+  #!/usr/bin/env bash
+  if [[ "{{OS_TYPE}}" == "darwin" ]]; then
+    echo "[✓] uidmap installation skipped on macOS"
+  else
+    just install-uidmap
   fi
 
 # Install packages by nix home-manager

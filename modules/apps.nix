@@ -3,6 +3,7 @@
   pkgs,
   isWsl,
   isDarwin,
+  isLinux,
   ...
 }: {
   home.packages = with pkgs;
@@ -14,7 +15,6 @@
       jetbrains.idea-ultimate
       jetbrains.goland
       jetbrains.datagrip
-      ticktick
       slack
       firefox
       libreoffice
@@ -27,6 +27,10 @@
       openvpn3
       discord
       ytmdesktop
+    ]
+    ++ lib.optionals (isLinux && !isWsl) [
+      # Linux-specific apps  
+      ticktick
     ]
     ++ lib.optionals isDarwin [
       # MacOs Apps
