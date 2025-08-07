@@ -27,6 +27,10 @@
     ".config/zellij/config.kdl".source = 
       if isDarwin then ./dotfiles/zellij/config.kdl.darwin
       else ./dotfiles/zellij/config.kdl.linux;
+  } // lib.optionalAttrs isDarwin {
+    # macOS-specific configurations
+    ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
+    ".skhdrc".source = ./dotfiles/skhd/skhdrc;
   };
 
   # Core pkgs
