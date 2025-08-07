@@ -1,3 +1,5 @@
+Fix error with optimized solutions among various options
+
 # Context
 Here's an error situation 
 #$ARGUMENTS

@@ -25,3 +25,38 @@ dotfiles/claude/todos/
 dotfiles/claude/projects/
 dotfiles/claude/shell-snapshots/
 dotfiles/claude/statsig/
+
+# Security-sensitive files (credentials, keys, passwords)
+scripts/env.sh
+scripts/*.env
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*_rsa
+*_ed25519
+credentials.json
+secrets/
+*.password
+*.passwd
+
+# Development and runtime files
+.vscode/
+*.log
+*.pid
+node_modules/
+.npm/
+.cache/
+.tmp/
+tmp/
+
+# macOS specific
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Windows specific
+Thumbs.db
+Desktop.ini
