@@ -71,10 +71,12 @@
                 # Avoid for Home Manager to manage your shell configuration
                 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 
-                # Enable session managed by systemd
-                if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
-                  loginctl enable-linger "$USER"
-                fi
+                # Enable session managed by systemd (Linux only)
+                ${lib.optionalString pkgs.stdenv.isLinux ''
+                  if ! loginctl show-user "$USER" | grep -q "Linger=yes"; then
+                    loginctl enable-linger "$USER"
+                  fi
+                ''}
 
                 # Smart container compose aliases - use podman if available, fallback to docker
                 if command -v podman-compose >/dev/null 2>&1; then
