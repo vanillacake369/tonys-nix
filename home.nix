@@ -10,8 +10,8 @@
   # Enable Home Manager
   programs.home-manager.enable = true;
 
-  # Set env automatically
-  targets.genericLinux.enable = true;
+  # Set env automatically (Linux only)
+  targets.genericLinux.enable = isLinux;
 
   # Import dotfiles
   home.file = {
