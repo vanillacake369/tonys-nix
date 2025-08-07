@@ -41,6 +41,13 @@ just enable-shared-mount           # Enable shared mount for rootless podman
 just performance-test              # Run comprehensive Nix performance analysis
 ```
 
+### Development connections
+```bash
+just source-env                    # Load environment variables from scripts/env.sh
+just aquanuri-connect              # Connect to Aquanuri development database via SSH tunnel
+just vpn-connect [config]          # Connect to VPN (default: lonelynight1026.ovpn)
+```
+
 ### Image generation
 ```bash
 just list-image-formats            # Show available image formats with descriptions
@@ -185,6 +192,8 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 - **Home-manager build failures**: Check for syntax errors with `nix flake check`
 - **Architecture mismatch**: Verify correct platform detection with `just install-pckgs`
 - **Dynamically linked executables failing**: nix-ld is enabled with essential libraries; add missing libraries to `programs.nix-ld.libraries` in configuration.nix
+- **Environment variables not loaded**: Run `just source-env` to load development credentials from `scripts/env.sh`
+- **SSH/VPN connection issues**: Check environment variables are set with `just source-env`, then use `just aquanuri-connect` or `just vpn-connect`
 
 ### SSD Optimization for New Machines
 When setting up on a new NixOS machine, optimize the hardware configuration for SSD longevity:
@@ -364,3 +373,87 @@ nix eval .#packages.x86_64-linux.iso.meta --json
 - Build images one at a time if memory is limited
 - Clean old results: `rm result*` before building new images
 - Use `just show-images` to monitor disk usage
+
+## Development Environment Setup
+
+### Environment Variables and Connections
+
+This repository includes scripts for connecting to development resources. These require environment variables stored in `scripts/env.sh`.
+
+#### Setting Up Development Connections
+
+**Important**: The `scripts/env.sh` file contains sensitive credentials and is gitignored for security.
+
+1. **Create environment file** (one-time setup):
+```bash
+# Create scripts/env.sh with your credentials
+cat > scripts/env.sh << 'EOF'
+#!/bin/bash
+# Environment variables for development
+# Usage: source scripts/env.sh
+
+# Aquanuri DB connection
+export AQUANURI_BASTION_URL="your-bastion-host"
+export AQUANURI_BASTION_PW="your-password"  
+export AQUANURI_BASTION_PORT="3306"
+export AQUANURI_TARGET_URL="your-target-host"
+export AQUANURI_LOCAL_PORT="3307"
+
+# VPN credentials
+export HAMA_VPN_PW="your-vpn-password"
+EOF
+```
+
+2. **Load environment variables**:
+```bash
+just source-env    # Loads and validates environment variables
+```
+
+3. **Connect to services**:
+```bash
+# SSH tunnel to development database
+just aquanuri-connect
+
+# VPN connection (requires OpenVPN config file)
+just vpn-connect                        # Uses default: lonelynight1026.ovpn
+just vpn-connect custom-config.ovpn     # Uses custom config file
+```
+
+#### Debugging Connection Issues
+
+If automatic password insertion doesn't work:
+
+1. **Verify environment loading**:
+```bash
+just source-env
+echo $AQUANURI_BASTION_PW  # Should show your password
+```
+
+2. **Check debug output** - The aquanuri-dev.sh script includes debugging:
+   - Shows first 3 characters of password + ***
+   - Confirms when password prompt is detected
+   - Reports when password is sent
+
+3. **Common issues**:
+   - Environment variables not loaded: Run `just source-env` first
+   - SSH prompt pattern mismatch: Check expect pattern in script
+   - Network connectivity: Verify target hosts are reachable
+
+#### Security Notes
+
+- `scripts/env.sh` is automatically gitignored to prevent credential exposure
+- Passwords are scrubbed from environment after loading in expect scripts
+- Debug output masks sensitive information (shows only first 3 characters)
+- Use secure methods to distribute credentials across team/machines
+
+### Workflow Integration
+
+The development connection commands integrate with the standard workflow:
+
+```bash
+# Standard development session
+just source-env          # Load credentials
+just aquanuri-connect    # Connect to database
+# ... work in another terminal ...
+just vpn-connect         # Connect to VPN if needed
+```
