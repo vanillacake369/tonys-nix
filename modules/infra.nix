@@ -2,6 +2,7 @@
   pkgs,
   lib,
   isWsl,
+  isLinux,
   ...
 }: {
   home.packages = with pkgs;
@@ -17,8 +18,11 @@
       oxker
     ]
     ++ lib.optionals (!isWsl) [
-      minikube
       dive
+    ]
+    ++ lib.optionals (isLinux && !isWsl) [
+      # Linux container tools (not WSL)
+      minikube
       podman-compose
       podman-tui
     ];

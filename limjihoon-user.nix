@@ -6,7 +6,7 @@
   ...
 }: {
   home.username = "limjihoon";
-  home.homeDirectory = "/home/limjihoon";
+  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/limjihoon" else "/home/limjihoon";
   home.stateVersion = "23.11"; # Don't change after first setup
 
   # Applied keybindings :: https://heywoodlh.io/nixos-gnome-settings-and-keyboard-shortcuts
