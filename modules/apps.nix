@@ -16,12 +16,13 @@
       jetbrains.idea-ultimate
       jetbrains.goland
       jetbrains.datagrip
-      firefox
       drawio
       discord
+      obsidian
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Linux-specific apps
+      firefox
       slack
       ticktick
       ytmdesktop
