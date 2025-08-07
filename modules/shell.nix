@@ -2,6 +2,7 @@
   pkgs,
   lib,
   isWsl,
+  isLinux,
   ...
 }: {
   home.packages = with pkgs;
@@ -18,10 +19,8 @@
       ripgrep
       neofetch
       lsof
-      psmisc
       zellij
       htop
-      xclip
       autossh
       redli
       smartmontools
@@ -29,8 +28,16 @@
     ]
     ++ lib.optionals (!isWsl) [
       openssh
-      wayland-utils
+    ]
+    ++ lib.optionals isLinux [
+      # Linux-specific utilities
+      psmisc
       google-authenticator
+      xclip
+    ]
+    ++ lib.optionals (isLinux && !isWsl) [
+      # Linux desktop utilities (not WSL)
+      wayland-utils
     ];
 
   programs = {
