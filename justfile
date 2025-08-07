@@ -5,10 +5,10 @@ HOSTNAME := `hostname`
 OS_TYPE := `bash -euo pipefail -c '           \
   if [[ -d /etc/nixos ]]; then                \
     echo nixos;                               \
-  elif grep -qiE "(Microsoft|WSL)" /proc/version; then \
-    echo wsl;                                 \
   elif [[ "$(uname -s)" == "Darwin" ]]; then  \
     echo darwin;                              \
+  elif grep -qiE "(Microsoft|WSL)" /proc/version; then \
+    echo wsl;                                 \
   else                                        \
     echo unsupported;                         \
   fi'`
