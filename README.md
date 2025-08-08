@@ -405,9 +405,38 @@ This repository includes scripts for development environment connections that re
 - File issues on the repository for bugs or feature requests
 
 
+## 🤖 Claude Code Integration
+
+This repository includes optimized **Claude Code slash commands** for development workflows:
+
+- **`/solve`** - Universal problem solver for issues, bugs, and requirements
+- **`/enhance`** - Code and system improvements with migration strategies  
+- **`/scaffold`** - Generate skeleton code and architecture from concepts
+- **`/debug`** - Systematic debugging with root cause analysis
+
+### Usage Examples
+
+```bash
+# Problem solving
+/solve "Getting permission denied when running just install-pckgs"
+
+# Code improvements
+/enhance "The justfile install-pckgs command is becoming too complex"
+
+# Implementation from ideas
+/scaffold "Need a backup system for Nix configurations"
+
+# Systematic debugging
+/debug "Home-manager fails with dependency errors on ARM64 Linux"
+```
+
+These commands provide **project-aware solutions** that follow the repository's patterns, consider multi-platform support, and include detailed implementation plans with validation strategies.
+
+> **Note**: Commands are stored in `dotfiles/claude/commands/` and automatically available in Claude Code. See [CLAUDE.md](./CLAUDE.md#claude-code-integration) for detailed usage and best practices.
+
 ## 📚 Additional Resources
 
-- **[CLAUDE.md](./CLAUDE.md)**: Detailed development workflows and architecture
+- **[CLAUDE.md](./CLAUDE.md)**: Detailed development workflows, architecture, and Claude Code integration
 - **[Nix Tutorial](https://velog.io/@vanillacake369/Nix-Tutorial)**: In-depth Nix guide (Korean)
 - **[Justfile Reference](./justfile)**: All available automation commands
 - **[Home Manager Manual](https://nix-community.github.io/home-manager/)**: Official documentation
