@@ -14,24 +14,28 @@
   targets.genericLinux.enable = isLinux;
 
   # Import dotfiles
-  home.file = {
-    ".config/nix".source = ./dotfiles/nix;
-    ".config/nixpkgs".source = ./dotfiles/nixpkgs;
-    ".config/nvim".source = ./dotfiles/lazyvim;
-    ".screenrc".source = ./dotfiles/screen/.screenrc;
+  home.file =
+    {
+      ".config/nix".source = ./dotfiles/nix;
+      ".config/nixpkgs".source = ./dotfiles/nixpkgs;
+      ".config/nvim".source = ./dotfiles/lazyvim;
+      ".screenrc".source = ./dotfiles/screen/.screenrc;
 
-    # Claude configuration - only manage static files
-    ".claude/commands".source = ./dotfiles/claude/commands;
+      # Claude configuration - only manage static files
+      ".claude/commands".source = ./dotfiles/claude/commands;
+      ".claude/settings.json".source = ./dotfiles/claude/settings.json;
 
-    # Zellij configuration - platform-specific
-    ".config/zellij/config.kdl".source = 
-      if isDarwin then ./dotfiles/zellij/config.kdl.darwin
-      else ./dotfiles/zellij/config.kdl.linux;
-  } // lib.optionalAttrs isDarwin {
-    # macOS-specific configurations
-    ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
-    ".skhdrc".source = ./dotfiles/skhd/skhdrc;
-  };
+      # Zellij configuration - platform-specific
+      ".config/zellij/config.kdl".source =
+        if isDarwin
+        then ./dotfiles/zellij/config.kdl.darwin
+        else ./dotfiles/zellij/config.kdl.linux;
+    }
+    // lib.optionalAttrs isDarwin {
+      # macOS-specific configurations
+      ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
+      ".skhdrc".source = ./dotfiles/skhd/skhdrc;
+    };
 
   # Core pkgs
   # Pass isLinux, isDarwin, isWsl
