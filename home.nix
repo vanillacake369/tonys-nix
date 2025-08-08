@@ -24,8 +24,9 @@
       # Claude configuration - only manage static files
       ".claude/commands".source = ./dotfiles/claude/commands;
       ".claude/settings.json".source = ./dotfiles/claude/settings.json;
+      ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
 
-      # Zellij configuration - platform-specific
+      # Zellij configuratioCLAUDE.mdn - platform-specific
       ".config/zellij/config.kdl".source =
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
