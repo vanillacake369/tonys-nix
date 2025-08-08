@@ -457,3 +457,125 @@ just aquanuri-connect    # Connect to database
 # ... work in another terminal ...
 just vpn-connect         # Connect to VPN if needed
 ```
+
+## Claude Code Integration
+
+### Available Slash Commands
+
+This repository includes optimized Claude Code slash commands for development workflows. These commands provide structured, project-aware assistance:
+
+#### `/solve` - Universal Problem Solver
+Analyze and provide optimal solutions for any issue, bug, or requirement.
+
+**Usage Examples:**
+```bash
+/solve "Getting permission denied when running just install-pckgs"
+/solve "Need to add support for a new architecture in the flake"
+/solve "Nix build is consuming too much disk space"
+```
+
+**Output Structure:**
+- Problem analysis with root cause identification
+- 3-5 solution options with trade-offs
+- Recommended solution considering project patterns
+- Detailed implementation plan with validation strategy
+
+#### `/enhance` - Code and System Improvements
+Improve existing code or systems with optimized solutions and safe migration strategies.
+
+**Usage Examples:**
+```bash
+/enhance "The justfile install-pckgs command is becoming complex with platform detection"
+/enhance "Home-manager module organization could be more maintainable"
+/enhance "Performance optimization for Nix store operations"
+```
+
+**Output Structure:**
+- Current state assessment with improvement opportunities
+- Enhancement options with impact/effort analysis
+- Recommended approach with project guidelines compliance
+- Phased implementation strategy with rollback plan
+
+#### `/scaffold` - Skeleton Code Generation
+Generate architecture and skeleton code from concepts or requirements.
+
+**Usage Examples:**
+```bash
+/scaffold "Need a backup system for Nix configurations that can restore previous states"
+/scaffold "Create a new module for development database connections"
+/scaffold "Design a testing framework for Nix flake configurations"
+```
+
+**Output Structure:**
+- Requirement breakdown into components
+- Multiple architectural approaches (MVP, scalable, hybrid)
+- Recommended structure with core skeleton code
+- Development roadmap and integration points
+
+#### `/debug` - Systematic Debugging
+Debug specific issues with systematic root cause analysis and prevention strategies.
+
+**Usage Examples:**
+```bash
+/debug "Home-manager fails with unclear dependency errors only on ARM64 Linux"
+/debug "Podman containers won't start after system update"
+/debug "SSH tunnel connection drops unexpectedly during development work"
+```
+
+**Output Structure:**
+- Issue reproduction steps and investigation process
+- Systematic hypothesis testing with evidence
+- Multiple fix strategies (quick vs proper solutions)
+- Prevention measures and monitoring recommendations
+
+### Command Design Philosophy
+
+#### Project-Aware Solutions
+All commands reference this `CLAUDE.md` file to provide solutions that:
+- Follow existing code patterns and conventions
+- Respect the multi-platform architecture
+- Consider performance implications (SSD optimization, binary caches)
+- Maintain compatibility with the current tooling ecosystem
+
+#### Structured Decision Making
+Every command follows a consistent pattern:
+1. **Analysis**: Understand the problem/requirement in project context
+2. **Options**: Present multiple approaches with clear trade-offs
+3. **Recommendation**: Choose optimal solution with detailed justification
+4. **Implementation**: Provide actionable steps with validation strategies
+
+#### Quality Assurance
+- Solutions include testing and validation approaches
+- Risk assessment for each recommended approach
+- Rollback procedures for system changes
+- Performance impact considerations
+
+### Integration with Development Workflow
+
+These commands integrate seamlessly with the standard development process:
+
+```bash
+# Example workflow using Claude commands
+/solve "Add support for new development tool in language.nix"     # Get implementation plan
+# Apply the recommended solution
+just install-pckgs                                                 # Test the changes
+/debug "New tool causing build failures"                          # If issues arise
+# Fix any problems identified
+/enhance "Optimize the new tool integration for better performance" # Improve implementation
+```
+
+### Best Practices for Command Usage
+
+1. **Be Specific**: Provide detailed context about your issue or requirement
+2. **Include Error Messages**: When debugging, include exact error text and conditions
+3. **Mention Constraints**: Specify any limitations (time, compatibility, resources)
+4. **Reference Context**: Mention relevant files, modules, or system components
+5. **Follow Up**: Use commands in sequence for complex problems (solve → debug → enhance)
+
+### Command Files Location
+
+The slash commands are stored in `dotfiles/claude/commands/` and automatically available when using Claude Code in this repository:
+- `solve.md` - Universal problem solving
+- `enhance.md` - Code and system improvements  
+- `scaffold.md` - Architecture and skeleton generation
+- `debug.md` - Systematic debugging and troubleshooting
