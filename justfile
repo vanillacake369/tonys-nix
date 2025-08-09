@@ -35,7 +35,7 @@ SYSTEM_ARCH := `bash -euo pipefail -c '       \
 ########### *** INSTALLATION *** ##########
 
 # Initiate all configuration
-install-all: install-nix install-home-manager (install-uidmap-conditional) install-pckgs clean
+install-all: install-nix link-nix-conf install-home-manager (install-uidmap-conditional) install-pckgs clean
 
 # Install nix
 install-nix:
@@ -140,6 +140,52 @@ apply-zsh:
     echo "/home/{{USERNAME}}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells
   fi
   chsh -s /home/{{USERNAME}}/.nix-profile/bin/zsh
+
+# Link nix.conf to system configuration
+link-nix-conf:
+  #!/usr/bin/env bash
+  SOURCE_FILE="$(pwd)/dotfiles/nix/nix.conf"
+  TARGET_FILE="/etc/nix/nix.conf"
+  
+  # Check if source exists
+  if [[ ! -f "$SOURCE_FILE" ]]; then
+    echo "[✗] Source file not found: $SOURCE_FILE"
+    exit 1
+  fi
+  
+  # Ensure /etc/nix directory exists
+  if [[ ! -d "/etc/nix" ]]; then
+    echo "[!] Creating /etc/nix directory (requires sudo)"
+    sudo mkdir -p /etc/nix
+  fi
+  
+  # Handle existing nix.conf
+  if [[ -e "$TARGET_FILE" ]]; then
+    if [[ -L "$TARGET_FILE" ]]; then
+      CURRENT_TARGET=$(readlink "$TARGET_FILE")
+      if [[ "$CURRENT_TARGET" == "$SOURCE_FILE" ]]; then
+        echo "[✓] Symlink already correctly configured"
+        exit 0
+      else
+        echo "[!] Removing existing symlink pointing to: $CURRENT_TARGET"
+        sudo rm "$TARGET_FILE"
+      fi
+    else
+      echo "[!] Backing up existing nix.conf to ${TARGET_FILE}.backup"
+      sudo mv "$TARGET_FILE" "${TARGET_FILE}.backup"
+    fi
+  fi
+  
+  # Create symlink
+  echo "[!] Creating symlink: $TARGET_FILE -> $SOURCE_FILE"
+  sudo ln -s "$SOURCE_FILE" "$TARGET_FILE"
+  
+  if [[ -L "$TARGET_FILE" ]]; then
+    echo "[✓] Successfully linked nix.conf"
+  else
+    echo "[✗] Failed to create symlink"
+    exit 1
+  fi
 
 
 
