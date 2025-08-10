@@ -19,6 +19,7 @@
       drawio
       discord
       obsidian
+      wezterm
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Linux-specific apps
