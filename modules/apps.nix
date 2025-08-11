@@ -36,7 +36,6 @@
     ]
     ++ lib.optionals isDarwin [
       # MacOs Apps
-      hidden-bar
       aldente
       bartender
       yabai
