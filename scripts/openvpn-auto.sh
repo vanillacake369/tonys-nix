@@ -22,18 +22,28 @@ unset env(HAMA_VPN_PW)
 
 #---------- spawn & login -------------------------------------------------
 log_user 1
-spawn openvpn --config $ovpn_config
+spawn sudo openvpn --config $ovpn_config
 
+# Handle sudo password first
+expect "Password:"
+send_user "\nEnter your sudo password: "
+stty -echo
+expect_user -re "(.*)\n"
+set sudo_password $expect_out(1,string)
+send "$sudo_password\r"
+stty echo
+
+# Now wait for OpenVPN private key password
 expect {
-    -re "(?i)enter.*private.*key.*password.*:" {
-        # Turn off local echo, send the password, restore echo
-        stty -echo
+    "Enter Private Key Password:" {
         send -- "$vpn_password\r"
-        stty echo
-        exp_continue          ;# keep listening in case the prompt reappears
+        exp_continue
+    }
+    "Initialization Sequence Completed" {
+        send_user "\n✅ VPN Connected Successfully\n"
     }
     timeout {
-        puts stderr "❌ Timed out waiting for the password prompt"
+        puts stderr "❌ Timed out waiting for connection"
         exit 1
     }
     eof {
