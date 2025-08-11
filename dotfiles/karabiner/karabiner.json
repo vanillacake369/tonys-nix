@@ -13,7 +13,7 @@
           "to": [{ "key_code": "left_command" }]
         },
         {
-          "from": { "key_code": "right_option" },
+          "from": { "key_code": "left_option" },
           "to": [{ "key_code": "fn" }]
         },
         {
@@ -378,22 +378,6 @@
               }
             ]
           },
-          {
-            "description": "Special application shortcuts",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "m",
-                  "modifiers": { "mandatory": ["fn", "command"] }
-                },
-                "to": [
-                  { 
-                  }
-                ]
-              }
-            ]
-          }
         ]
       },
       "virtual_hid_keyboard": {
