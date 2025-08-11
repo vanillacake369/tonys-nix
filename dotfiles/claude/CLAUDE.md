@@ -547,6 +547,66 @@ Use this checklist during development and code reviews:
 - [ ] Does the Infrastructure layer handle only technical details?
 - [ ] Are domain events utilized appropriately?
 
+## KISS Principle (Keep It Simple, Stupid)
+
+### Progressive Development Philosophy
+Claude should follow KISS principles to avoid overwhelming complexity and ensure solid, incremental progress:
+
+#### Core KISS Guidelines
+1. **One Thing at a Time**: Focus on a single, well-defined task before moving to the next
+2. **Simple Solutions First**: Always choose the simplest solution that works
+3. **Incremental Progress**: Break complex tasks into small, manageable steps
+4. **Solid Foundation**: Complete each step thoroughly before proceeding
+5. **Clear Communication**: Use simple, direct explanations without unnecessary complexity
+
+#### Implementation Strategy
+```
+❌ Bad Approach:
+- Attempt to solve multiple problems simultaneously
+- Over-engineer solutions with complex patterns
+- Rush through steps without validation
+- Provide overwhelming amounts of information at once
+
+✅ KISS Approach:
+- Identify ONE specific problem to solve
+- Choose the simplest working solution
+- Complete and validate before next step
+- Provide focused, actionable guidance
+```
+
+#### Progressive Task Management
+When given complex requirements:
+
+1. **Analyze & Break Down**: Identify the core problem and break into discrete steps
+2. **Prioritize**: Order steps by dependency and importance
+3. **Execute One Step**: Focus entirely on the current step
+4. **Validate**: Ensure the step works before proceeding
+5. **Iterate**: Move to next step only after current step is solid
+
+#### Example KISS Workflow
+```
+User Request: "Add support for new development tool with configuration, testing, and documentation"
+
+❌ Complex Approach:
+- Modify multiple files simultaneously
+- Create comprehensive documentation
+- Set up complex testing scenarios
+- Configure advanced features immediately
+
+✅ KISS Approach:
+Step 1: Add basic tool installation to language.nix
+Step 2: Test installation works with `just install-pckgs`
+Step 3: Add minimal configuration if needed
+Step 4: Validate tool functions correctly
+Step 5: (Only if requested) Add documentation
+```
+
+#### Communication Guidelines
+- **Be Specific**: "Added Go debugger to language.nix:45" not "Enhanced development environment"
+- **One Action Per Response**: Complete one modification before suggesting the next
+- **Clear Next Steps**: Always state exactly what to do next
+- **Avoid Assumptions**: Ask for clarification rather than guessing requirements
+
 ## Clean Code Principles Summary
 
 ### Core Principles
@@ -554,6 +614,7 @@ Use this checklist during development and code reviews:
 2. **Pursue simplicity**: Prefer simple solutions over complex ones
 3. **Maintain consistency**: Entire team uses the same styles and patterns
 4. **Boy Scout rule**: Leave code cleaner than when you found it
+5. **KISS principle**: Keep it simple, focus on one thing at a time
 
 ### Integration with DDD
 - **Ubiquitous language**: Reflect the common language used by domain experts and developers in code
