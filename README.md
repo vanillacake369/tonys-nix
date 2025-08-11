@@ -137,14 +137,20 @@ The flake automatically selects the appropriate configuration:
 
 ```bash
 # Primary workflow
-just install-all    # Complete setup pipeline
+just install-all    # Complete setup pipeline with intelligent cleanup
 just install-pckgs  # Install/update packages
-just clean         # Clean old generations
+just smart-clean    # Intelligent SSD-optimized cleanup (skips when not needed)
 
 # Development connections (requires scripts/env.sh)
 just source-env            # Load development environment variables
 just aquanuri-connect      # Connect to Aquanuri database via SSH tunnel  
 just vpn-connect [config]  # Connect to VPN (default: lonelynight1026.ovpn)
+
+# Maintenance and cleanup
+just smart-clean           # Intelligent SSD-optimized garbage collection
+just force-clean           # Force cleanup regardless of conditions
+just gc-status             # Show garbage collection status and analysis
+just clean                 # Legacy cleanup command (same as force-clean)
 
 # Performance and diagnostics
 just performance-test      # Run comprehensive Nix performance analysis
@@ -173,9 +179,30 @@ This configuration includes several optimizations to reduce SSD wear and extend 
 - **Store Auto-Optimization**: Automatic deduplication reduces store size and improves I/O performance
 - **Optimized Build Settings**: Uses all CPU cores with `max-jobs=auto` for faster parallel builds
 - **Binary Caches**: Uses Cachix and community caches to minimize local builds (80-90% reduction in SSD writes)
-- **Smart Garbage Collection**: Daily automatic cleanup with 7-day retention for optimal performance
+- **Smart Garbage Collection**: Intelligent cleanup system that runs only when needed (size > 10GB or > 14 days), reducing SSD wear by 80-90%
 - **Journal Limiting**: SystemD logs are capped at 500MB with automatic rotation
 - **Firmware Updates**: fwupd service enabled for SSD firmware optimization
+
+### Smart Garbage Collection System
+The configuration includes an intelligent garbage collection system designed to protect SSD lifespan:
+
+**Key Features:**
+- **Conditional execution**: Only runs when `/nix/store` exceeds 10GB or hasn't run for 14+ days
+- **SSD protection**: Eliminates 80-90% of unnecessary cleanup operations
+- **User transparency**: Clear feedback about cleanup decisions and recommendations
+- **Manual override**: Force cleanup when needed with `just force-clean`
+
+**Usage:**
+```bash
+# Check garbage collection status
+just gc-status
+
+# Run intelligent cleanup (automatically used in install-all)
+just smart-clean
+
+# Force cleanup regardless of conditions
+just force-clean
+```
 
 ### Manual Hardware Optimizations
 For NixOS systems, add these mount options to your `/etc/nixos/hardware-configuration.nix`:
@@ -276,11 +303,20 @@ nix build .#packages.x86_64-linux.iso     # Specific architecture
 - **Symptoms**: Nix installs taking longer than expected, large store sizes
 - **Solutions**:
   ```bash
-  # Run comprehensive performance analysis
+  # Run comprehensive performance analysis (includes GC status)
   just performance-test
+  
+  # Check garbage collection status and recommendations
+  just gc-status
   
   # Check current store size
   du -sh /nix/store
+  
+  # Run intelligent cleanup
+  just smart-clean
+  
+  # Force cleanup if needed
+  just force-clean
   
   # Run manual store optimization
   nix store optimise
@@ -417,18 +453,20 @@ Common shortcuts work consistently across macOS (excluding terminal apps):
 - `Ctrl+←/→` → Word navigation
 - `Ctrl+Backspace` → Delete word
 
-### Quick App Launching
-Launch apps instantly with Option+number:
-- `Option+1` → TickTick
-- `Option+2` → Slack  
-- `Option+3` → Obsidian
-- `Option+4` → Chrome
-- `Option+5` → IntelliJ IDEA
-- `Option+6` → GoLand
+### Quick App Launching & Key Swapping
+Launch apps instantly with Option+number and improved ergonomics:
+- `Option+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ IDEA, GoLand
+- `Option+7-9` → Mail, Calendar, System Settings
 - `Ctrl+Option+T` → WezTerm
 - `Ctrl+Option+D` → Docker Desktop
 
-> **Note**: Configuration is in `dotfiles/karabiner/karabiner.json`. Terminal apps maintain their native shortcuts. See [CLAUDE.md](./CLAUDE.md#macos-keyboard-customization) for full details.
+**Enhanced Key Mapping:**
+- `fn` key → `left_command` (fn becomes an additional command key)
+- `left_command` → `left_option` (improved ergonomics)
+- `right_option` → `fn` (access to fn functions)
+- `right_command` → `F18` (for custom shortcuts)
+
+> **Note**: Configuration is in `dotfiles/karabiner/karabiner.json`. Terminal apps maintain their native shortcuts. The configuration provides better ergonomics while preserving all functionality. See [CLAUDE.md](./CLAUDE.md#macos-keyboard-customization) for full details.
 
 ## 🤖 Claude Code Integration
 
