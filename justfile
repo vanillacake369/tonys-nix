@@ -301,19 +301,9 @@ should-run-gc:
 # Intelligent conditional garbage collection (SSD-optimized)
 smart-clean:
   #!/usr/bin/env bash
-  # Inline the GC check logic to avoid multiple shell invocations
-  store_size=0
+  # Quick days check only - skip expensive size check for speed
   days_since_gc=999
   
-  # Quick size check (optimized)
-  if [[ -d "/nix/store" ]]; then
-    size_human=$(du -sh /nix/store 2>/dev/null | cut -f1 || echo "0G")
-    if [[ "$size_human" =~ ^([0-9]+)G$ ]]; then
-      store_size="${BASH_REMATCH[1]}"
-    fi
-  fi
-  
-  # Quick days check
   if [[ -f "{{GC_STATE_FILE}}" ]]; then
     last_gc=$(cat {{GC_STATE_FILE}} 2>/dev/null || echo "0")
     current=$(date +%s)
@@ -322,10 +312,9 @@ smart-clean:
     fi
   fi
   
-  # Quick decision
-  if (( days_since_gc >= {{GC_MAX_INTERVAL_DAYS}} )) || \
-     (( days_since_gc >= {{GC_MIN_INTERVAL_DAYS}} && store_size >= {{GC_SIZE_THRESHOLD_GB}} )); then
-    echo "[!] Running garbage collection..."
+  # Quick decision based on time only
+  if (( days_since_gc >= {{GC_MAX_INTERVAL_DAYS}} )); then
+    echo "[!] Running GC (${days_since_gc} days since last cleanup)..."
     nix-collect-garbage -d --delete-older-than 14d
     
     if [[ "{{OS_TYPE}}" == "nixos" ]]; then
@@ -334,9 +323,31 @@ smart-clean:
     
     date +%s > {{GC_STATE_FILE}}
     echo "[✓] Garbage collection completed"
-  else
-    echo "[→] GC skipped: ${store_size}GB store, ${days_since_gc} days since last GC"
+  elif (( days_since_gc < {{GC_MIN_INTERVAL_DAYS}} )); then
+    echo "[→] GC skipped (${days_since_gc} days since last cleanup)"
     echo "    Use 'just force-clean' to force cleanup"
+  else
+    # Only check size if within the decision window (3-14 days)
+    # Use df for quick filesystem check instead of du
+    if [[ -d "/nix/store" ]]; then
+      used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
+      if [[ "$used_percent" -gt 80 ]]; then
+        echo "[!] Running GC (disk usage at ${used_percent}%)..."
+        nix-collect-garbage -d --delete-older-than 14d
+        
+        if [[ "{{OS_TYPE}}" == "nixos" ]]; then
+          sudo -H nix-collect-garbage -d --delete-older-than 14d
+        fi
+        
+        date +%s > {{GC_STATE_FILE}}
+        echo "[✓] Garbage collection completed"
+      else
+        echo "[→] GC skipped (${days_since_gc}d since cleanup, ${used_percent}% disk used)"
+        echo "    Use 'just force-clean' to force cleanup"
+      fi
+    else
+      echo "[→] GC skipped (${days_since_gc} days since last cleanup)"
+    fi
   fi
 
 # Force garbage collection regardless of conditions (manual override)
