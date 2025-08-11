@@ -1,0 +1,193 @@
+{
+  "profiles": [
+    {
+      "name": "Change language",
+      "selected": true,
+      "simple_modifications": [
+        {
+          "from": { "key_code": "right_command" },
+          "to": [{ "key_code": "f18" }]
+        },
+        {
+          "from": { "key_code": "fn" },
+          "to": [{ "key_code": "left_command" }]
+        },
+        {
+          "from": { "key_code": "left_command" },
+          "to": [{ "key_code": "left_option" }]
+        },
+        {
+          "from": { "key_code": "left_option" },
+          "to": [{ "key_code": "fn" }]
+        }
+      ],
+      "complex_modifications": {
+        "rules": [
+          {
+            "description": "Fn + Command + D opens Docker Desktop",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "d",
+                  "modifiers": {
+                    "mandatory": ["fn", "command"]
+                  }
+                },
+                "to": [
+                  {
+                    "shell_command": "open -a 'Docker'"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Fn + Command + T opens WezTerm",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "t",
+                  "modifiers": {
+                    "mandatory": ["fn", "command"]
+                  }
+                },
+                "to": [
+                  {
+                    "shell_command": "open -a 'WezTerm'"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Fn + Command + C opens Google Chrome",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "c",
+                  "modifiers": {
+                    "mandatory": ["fn", "command"]
+                  }
+                },
+                "to": [
+                  {
+                    "shell_command": "open -a 'Google Chrome'"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Command + E to Command + L (Chrome address bar)",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "e",
+                  "modifiers": {
+                    "mandatory": ["left_command"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "l",
+                    "modifiers": ["left_command"]
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.google\\.Chrome$"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Fn + Arrow keys for word navigation",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_arrow",
+                  "modifiers": {
+                    "mandatory": ["fn"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": ["left_option"]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "left_arrow",
+                  "modifiers": {
+                    "mandatory": ["fn"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": ["left_option"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Option + Tab to Command + Tab (App Switcher)",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "tab",
+                  "modifiers": {
+                    "mandatory": ["left_option"]
+                  }
+                },
+                "to": [
+                  { "key_code": "left_command", "modifiers": [], "lazy": true },
+                  { "key_code": "tab" }
+                ],
+                "to_after_key_up": [
+                  { "key_code": "left_command", "modifiers": ["left_command"] }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Fn + Tab to Command + Tab (App Switcher)",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "tab",
+                  "modifiers": {
+                    "mandatory": ["fn"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "tab",
+                    "modifiers": ["left_command"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "virtual_hid_keyboard": {
+        "keyboard_type_v2": "ansi"
+      }
+    }
+  ]
+}
+
