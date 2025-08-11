@@ -1,7 +1,8 @@
 {
-  pkgs,
   lib,
+  pkgs,
   isWsl,
+  isDarwin,
   isLinux,
   ...
 }: {
@@ -20,8 +21,8 @@
     ++ lib.optionals (!isWsl) [
       dive
     ]
-    ++ lib.optionals (isLinux && !isWsl) [
-      # Linux container tools (not WSL)
+    ++ lib.optionals (isDarwin || isLinux && !isWsl) [
+      # Containers (not WSL)
       minikube
       podman-compose
       podman-tui
