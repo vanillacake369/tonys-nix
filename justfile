@@ -303,7 +303,7 @@ smart-clean:
   #!/usr/bin/env bash
   echo "[!] Evaluating garbage collection necessity..."
   
-  if just should-run-gc; then
+  if just should-run-gc 2>/dev/null; then
     echo "[!] Running garbage collection (store cleanup needed)..."
     nix-collect-garbage -d --delete-older-than 14d
     
