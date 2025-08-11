@@ -301,24 +301,42 @@ should-run-gc:
 # Intelligent conditional garbage collection (SSD-optimized)
 smart-clean:
   #!/usr/bin/env bash
-  echo "[!] Evaluating garbage collection necessity..."
+  # Inline the GC check logic to avoid multiple shell invocations
+  store_size=0
+  days_since_gc=999
   
-  if just should-run-gc 2>/dev/null; then
-    echo "[!] Running garbage collection (store cleanup needed)..."
+  # Quick size check (optimized)
+  if [[ -d "/nix/store" ]]; then
+    size_human=$(du -sh /nix/store 2>/dev/null | cut -f1 || echo "0G")
+    if [[ "$size_human" =~ ^([0-9]+)G$ ]]; then
+      store_size="${BASH_REMATCH[1]}"
+    fi
+  fi
+  
+  # Quick days check
+  if [[ -f "{{GC_STATE_FILE}}" ]]; then
+    last_gc=$(cat {{GC_STATE_FILE}} 2>/dev/null || echo "0")
+    current=$(date +%s)
+    if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
+      days_since_gc=$(( (current - last_gc) / 86400 ))
+    fi
+  fi
+  
+  # Quick decision
+  if (( days_since_gc >= {{GC_MAX_INTERVAL_DAYS}} )) || \
+     (( days_since_gc >= {{GC_MIN_INTERVAL_DAYS}} && store_size >= {{GC_SIZE_THRESHOLD_GB}} )); then
+    echo "[!] Running garbage collection..."
     nix-collect-garbage -d --delete-older-than 14d
     
-    # Only run system-wide GC on NixOS where it's needed
     if [[ "{{OS_TYPE}}" == "nixos" ]]; then
-      echo "[!] Running system-wide garbage collection..."
       sudo -H nix-collect-garbage -d --delete-older-than 14d
     fi
     
-    just record-gc-execution
-    echo "[✓] Garbage collection completed successfully"
+    date +%s > {{GC_STATE_FILE}}
+    echo "[✓] Garbage collection completed"
   else
-    echo "[→] Garbage collection skipped (not needed at this time)"
-    echo "    Tip: Use 'just force-clean' to run cleanup anyway"
-    echo "    Run 'just gc-status' for detailed analysis"
+    echo "[→] GC skipped: ${store_size}GB store, ${days_since_gc} days since last GC"
+    echo "    Use 'just force-clean' to force cleanup"
   fi
 
 # Force garbage collection regardless of conditions (manual override)
