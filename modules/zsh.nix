@@ -81,7 +81,11 @@
                   fi
                 ''}
 
-                # Smart container compose aliases - use podman if available, fallback to docker
+                # Smart container aliases - use podman if available, fallback to docker
+                if command -v podman >/dev/null 2>&1; then
+                  alias docker='podman'
+                fi
+
                 if command -v podman-compose >/dev/null 2>&1; then
                   alias docker-compose='podman-compose'
                 elif command -v docker-compose >/dev/null 2>&1; then

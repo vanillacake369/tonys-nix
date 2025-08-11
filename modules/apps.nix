@@ -19,6 +19,7 @@
       drawio
       discord
       obsidian
+      wezterm
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Linux-specific apps
@@ -40,6 +41,8 @@
       bartender
       yabai
       skhd
+      # karabiner-elements
+      keycastr
       # Slack has known issues on macOS Sequoia, may need Homebrew fallback
       # slack
     ];
