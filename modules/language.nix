@@ -22,6 +22,8 @@
     alejandra
     # Python
     uv
+    # Formatters
+    nodePackages.prettier
   ];
   home.sessionVariables = {
     JAVA_HOME = "${pkgs.zulu17}";

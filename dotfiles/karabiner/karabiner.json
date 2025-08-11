@@ -6,7 +6,7 @@
       "simple_modifications": [
         {
           "from": { "key_code": "right_command" },
-          "to": [{ "key_code": "f18" }]Why use raycast ?
+          "to": [{ "key_code": "f18" }]
         },
         {
           "from": { "key_code": "fn" },
@@ -35,19 +35,6 @@
                 "to": [
                   { "key_code": "a", "modifiers": ["left_command"] }
                 ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
-                ]
               },
               {
                 "type": "basic",
@@ -57,19 +44,6 @@
                 },
                 "to": [
                   { "key_code": "c", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -80,19 +54,6 @@
                 },
                 "to": [
                   { "key_code": "v", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -103,19 +64,6 @@
                 },
                 "to": [
                   { "key_code": "x", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -126,19 +74,6 @@
                 },
                 "to": [
                   { "key_code": "z", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -149,19 +84,6 @@
                 },
                 "to": [
                   { "key_code": "s", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -172,19 +94,6 @@
                 },
                 "to": [
                   { "key_code": "w", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -195,19 +104,6 @@
                 },
                 "to": [
                   { "key_code": "t", "modifiers": ["left_command"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               }
             ]
@@ -223,19 +119,6 @@
                 },
                 "to": [
                   { "key_code": "right_arrow", "modifiers": ["left_option"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -246,19 +129,6 @@
                 },
                 "to": [
                   { "key_code": "left_arrow", "modifiers": ["left_option"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               }
             ]
@@ -274,19 +144,6 @@
                 },
                 "to": [
                   { "key_code": "delete_or_backspace", "modifiers": ["left_option"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               },
               {
@@ -297,19 +154,6 @@
                 },
                 "to": [
                   { "key_code": "delete_forward", "modifiers": ["left_option"] }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_unless",
-                    "bundle_identifiers": [
-                      "^com\\.apple\\.Terminal$",
-                      "^com\\.googlecode\\.iterm2$", 
-                      "^com\\.github\\.wez\\.wezterm$",
-                      "^io\\.alacritty$",
-                      "^net\\.kovidgoyal\\.kitty$",
-                      "^org\\.gnu\\.Emacs$"
-                    ]
-                  }
                 ]
               }
             ]
@@ -475,7 +319,7 @@
             ]
           },
           {
-            "description": "Legacy Fn + Arrow keys (for compatibility)",
+            "description": "Fn (Left Command) + Arrow keys for word navigation",
             "manipulators": [
               {
                 "type": "basic",
@@ -495,6 +339,31 @@
                 },
                 "to": [
                   { "key_code": "left_arrow", "modifiers": ["left_option"] }
+                ]
+              }
+            ]
+          },
+          {
+            "description": "Caps Lock + Arrow keys for line navigation",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_arrow",
+                  "modifiers": { "mandatory": ["caps_lock"] }
+                },
+                "to": [
+                  { "key_code": "right_arrow", "modifiers": ["left_command"] }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "left_arrow",
+                  "modifiers": { "mandatory": ["caps_lock"] }
+                },
+                "to": [
+                  { "key_code": "left_arrow", "modifiers": ["left_command"] }
                 ]
               }
             ]
