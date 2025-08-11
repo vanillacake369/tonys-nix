@@ -131,18 +131,7 @@ local function setup_plugin_navigation()
     end,
   })
   
-  -- Neo-tree mappings (if using LazyVim default)
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "neo-tree",
-    callback = function(event)
-      local opts = { buffer = event.buf, silent = true }
-      
-      vim.keymap.set("n", "k", "j", opts)  -- k = down
-      vim.keymap.set("n", "l", "k", opts)  -- l = up
-      vim.keymap.set("n", "j", "h", opts)  -- j = collapse
-      vim.keymap.set("n", ";", "l", opts)  -- ; = expand
-    end,
-  })
+  -- Neo-tree mappings handled in plugins/global.lua
   
   -- Quickfix and location list
   vim.api.nvim_create_autocmd("FileType", {
