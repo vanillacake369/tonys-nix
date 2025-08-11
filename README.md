@@ -14,6 +14,7 @@ Supports NixOS, WSL, macOS, and standard Linux distributions with automatic envi
 - **Container support**: Rootless Podman with Docker compatibility and podman-compose
 - **Image generation**: Create ISOs, VM images (VirtualBox, VMware, qcow2), and container images
 - **Dynamic binary support**: nix-ld enabled for running non-Nix executables seamlessly
+- **macOS productivity**: Karabiner-Elements config for Windows/GNOME shortcuts and app launching
 
 ## 📦 Included Packages
 
@@ -404,6 +405,30 @@ This repository includes scripts for development environment connections that re
 - Review individual module files in `modules/` for specific configurations
 - File issues on the repository for bugs or feature requests
 
+
+## 🖥️ macOS Keyboard Customization
+
+This configuration includes a Karabiner-Elements setup for macOS that provides:
+
+### Windows/GNOME-style Shortcuts
+Common shortcuts work consistently across macOS (excluding terminal apps):
+- `Ctrl+C/V/X/A/Z/S` → Standard copy, paste, cut, select all, undo, save
+- `Ctrl+T/W` → New tab, close tab
+- `Ctrl+←/→` → Word navigation
+- `Ctrl+Backspace` → Delete word
+
+### Quick App Launching
+Launch apps instantly with Option+number:
+- `Option+1` → TickTick
+- `Option+2` → Slack  
+- `Option+3` → Obsidian
+- `Option+4` → Chrome
+- `Option+5` → IntelliJ IDEA
+- `Option+6` → GoLand
+- `Ctrl+Option+T` → WezTerm
+- `Ctrl+Option+D` → Docker Desktop
+
+> **Note**: Configuration is in `dotfiles/karabiner/karabiner.json`. Terminal apps maintain their native shortcuts. See [CLAUDE.md](./CLAUDE.md#macos-keyboard-customization) for full details.
 
 ## 🤖 Claude Code Integration
 

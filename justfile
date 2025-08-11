@@ -195,9 +195,9 @@ link-nix-conf:
 clean:
   #!/usr/bin/env bash
   nix-collect-garbage -d --delete-older-than 14d
-  # if not wsl, gc for nixos
-  if ! grep -qi Microsoft /proc/version 2>/dev/null; then
-    sudo nix-collect-garbage -d --delete-older-than 14d
+  # Only run system-wide GC on NixOS where it's needed
+  if [[ "{{OS_TYPE}}" == "nixos" ]]; then
+    sudo -H nix-collect-garbage -d --delete-older-than 14d
   fi
 
 # Clear all dependencies

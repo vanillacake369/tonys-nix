@@ -31,6 +31,9 @@
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
         else ./dotfiles/zellij/config.kdl.linux;
+
+      # Karabiner json
+      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
     }
     // lib.optionalAttrs isDarwin {
       # macOS-specific configurations

@@ -94,6 +94,7 @@ Configuration files are symlinked from dotfiles directory:
 - **nix/** and **nixpkgs/**: Nix-specific configuration files
 - **autohotkey/**: Windows automation scripts (for WSL environments)
 - **screen/**: Screen session configurations
+- **karabiner/**: macOS keyboard remapping with productivity shortcuts
 
 ### Library Functions (`lib/`)
 - **builders.nix**: Custom Nix builders and utility functions
@@ -457,6 +458,61 @@ just aquanuri-connect    # Connect to database
 # ... work in another terminal ...
 just vpn-connect         # Connect to VPN if needed
 ```
+
+## macOS Keyboard Customization
+
+### Karabiner-Elements Configuration
+
+This repository includes a Karabiner-Elements configuration for macOS that provides Windows/GNOME-style keyboard shortcuts and quick app launching via Option+number combinations.
+
+#### Key Mappings
+
+**Windows/GNOME-style shortcuts** (work in all apps except terminals):
+- `Ctrl+A` → `Cmd+A` (Select all)
+- `Ctrl+C` → `Cmd+C` (Copy)
+- `Ctrl+V` → `Cmd+V` (Paste)
+- `Ctrl+X` → `Cmd+X` (Cut)
+- `Ctrl+Z` → `Cmd+Z` (Undo)
+- `Ctrl+S` → `Cmd+S` (Save)
+- `Ctrl+W` → `Cmd+W` (Close tab/window)
+- `Ctrl+T` → `Cmd+T` (New tab)
+
+**Text navigation shortcuts**:
+- `Ctrl+←/→` → `Option+←/→` (Word navigation)
+- `Ctrl+Backspace` → `Option+Backspace` (Delete word)
+- `Ctrl+Delete` → `Option+Delete` (Delete word forward)
+
+**App launcher shortcuts**:
+- `Option+1` → TickTick
+- `Option+2` → Slack
+- `Option+3` → Obsidian
+- `Option+4` → Google Chrome
+- `Option+5` → IntelliJ IDEA
+- `Option+6` → GoLand
+- `Option+7` → Mail
+- `Option+8` → Calendar
+- `Option+9` → System Settings
+- `Ctrl+Option+T` → WezTerm
+- `Ctrl+Option+D` → Docker Desktop
+
+**Other mappings**:
+- Right Command → F18 (for custom shortcuts)
+
+#### Configuration Location
+
+The Karabiner configuration is located at `dotfiles/karabiner/karabiner.json`. When home-manager is applied, this file is symlinked to `~/.config/karabiner/karabiner.json`.
+
+#### Terminal Exclusions
+
+The Windows/GNOME-style shortcuts are automatically disabled in terminal applications to preserve their native behavior:
+- Terminal.app
+- iTerm2
+- WezTerm
+- Alacritty
+- Kitty
+- Emacs
+
+This ensures that terminal applications maintain their expected keyboard shortcuts (e.g., `Ctrl+C` for interrupt).
 
 ## Claude Code Integration
 
