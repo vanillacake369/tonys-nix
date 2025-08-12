@@ -44,7 +44,7 @@
             ]
           },
           {
-            "description": "Map Fn+Arrow keys to tab navigation in Chrome",
+            "description": "Map Option+Arrow keys to tab navigation in Chrome",
             "manipulators": [
               {
                 "type": "basic",
@@ -92,6 +92,17 @@
           }
         ]
       },
+      "devices": [
+        {
+          "identifiers": {
+            "is_keyboard": true
+          },
+          "ignore": false,
+          "manipulate_caps_lock_led": true,
+          "simple_modifications": [],
+          "treat_as_built_in_keyboard": false
+        }
+      ],
       "virtual_hid_keyboard": {
         "keyboard_type_v2": "ansi"
       }
