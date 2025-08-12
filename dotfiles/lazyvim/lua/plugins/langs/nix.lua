@@ -2,13 +2,9 @@ return {
   -- Install alejandra automatically
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
     opts = {
-      ensure_installed = {
-        "alejandra",
-      },
-      run_on_start = true,
-      start_delay = 3000, -- wait 3s so Mason is ready
-      auto_update = false,
+      ensure_installed = { "alejandra" },
     },
   },
 
