@@ -474,7 +474,7 @@ This repository includes optimized **Claude Code slash commands** for developmen
 
 - **`/solve`** - Universal problem solver for issues, bugs, and requirements
 - **`/enhance`** - Code and system improvements with migration strategies  
-- **`/scaffold`** - Generate skeleton code and architecture from concepts
+- **`/scaffold`** - Generate working skeleton code instantly (KISS approach)
 - **`/debug`** - Systematic debugging with root cause analysis
 
 ### Usage Examples
@@ -486,14 +486,14 @@ This repository includes optimized **Claude Code slash commands** for developmen
 # Code improvements
 /enhance "The justfile install-pckgs command is becoming too complex"
 
-# Implementation from ideas
+# Generate working code instantly (KISS approach)
 /scaffold "Need a backup system for Nix configurations"
 
 # Systematic debugging
 /debug "Home-manager fails with dependency errors on ARM64 Linux"
 ```
 
-These commands provide **project-aware solutions** that follow the repository's patterns, consider multi-platform support, and include detailed implementation plans with validation strategies.
+These commands provide **project-aware solutions** that follow the repository's patterns, consider multi-platform support, and include detailed implementation plans with validation strategies. The `/scaffold` command specifically follows the KISS principle - generating the simplest working code without complex architectural analysis.
 
 > **Note**: Commands are stored in `dotfiles/claude/commands/` and automatically available in Claude Code. See [CLAUDE.md](./CLAUDE.md#claude-code-integration) for detailed usage and best practices.
 

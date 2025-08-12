@@ -5,35 +5,15 @@
   isDarwin,
   isLinux,
   ...
-}: let
-  # GUI packages that need Spotlight integration on macOS
-  guiPackages = lib.optionals (!isWsl) [
-    { pkg = pkgs.google-chrome; name = "Google Chrome"; }
-    { pkg = pkgs.jetbrains.idea-ultimate; name = "IntelliJ IDEA"; }
-    { pkg = pkgs.jetbrains.goland; name = "GoLand"; }
-    { pkg = pkgs.jetbrains.datagrip; name = "DataGrip"; }
-    { pkg = pkgs.drawio; name = "draw.io"; }
-    { pkg = pkgs.discord; name = "Discord"; }
-    { pkg = pkgs.obsidian; name = "Obsidian"; }
-    { pkg = pkgs.wezterm; name = "WezTerm"; }
-  ] ++ lib.optionals isDarwin [
-    { pkg = pkgs.hidden-bar; name = "Hidden Bar"; }
-    { pkg = pkgs.aldente; name = "AlDente"; }
-    { pkg = pkgs.bartender; name = "Bartender 4"; }
-    { pkg = pkgs.keycastr; name = "KeyCastr"; }
-  ];
-
-  # Simple function to create app symlinks for Spotlight
-  mkAppLink = app: {
-    "Applications/${app.name}.app".source = "${app.pkg}/Applications/${app.name}.app";
-  };
-in {
+}: {
   home.packages = with pkgs;
     [
+      # General apps
       claude-code
       openvpn
     ]
     ++ lib.optionals (!isWsl) [
+      # Non WSL apps
       google-chrome
       jetbrains.idea-ultimate
       jetbrains.goland
@@ -63,12 +43,22 @@ in {
       bartender
       yabai
       skhd
-      # karabiner-elements
       keycastr
-      # Slack has known issues on macOS Sequoia, may need Homebrew fallback
-      # slack
     ];
 
   # Create app symlinks for macOS Spotlight integration
-  home.file = lib.mkIf isDarwin (lib.mkMerge (map mkAppLink guiPackages));
+  home.file = lib.mkIf isDarwin {
+    "Applications/Google Chrome.app".source = "${pkgs.google-chrome}/Applications/Google Chrome.app";
+    "Applications/IntelliJ IDEA.app".source = "${pkgs.jetbrains.idea-ultimate}/Applications/IntelliJ IDEA.app";
+    "Applications/GoLand.app".source = "${pkgs.jetbrains.goland}/Applications/GoLand.app";
+    "Applications/DataGrip.app".source = "${pkgs.jetbrains.datagrip}/Applications/DataGrip.app";
+    "Applications/draw.io.app".source = "${pkgs.drawio}/Applications/draw.io.app";
+    "Applications/Discord.app".source = "${pkgs.discord}/Applications/Discord.app";
+    "Applications/Obsidian.app".source = "${pkgs.obsidian}/Applications/Obsidian.app";
+    "Applications/WezTerm.app".source = "${pkgs.wezterm}/Applications/WezTerm.app";
+    "Applications/Hidden Bar.app".source = "${pkgs.hidden-bar}/Applications/Hidden Bar.app";
+    "Applications/AlDente.app".source = "${pkgs.aldente}/Applications/AlDente.app";
+    "Applications/Bartender 4.app".source = "${pkgs.bartender}/Applications/Bartender 4.app";
+    "Applications/KeyCastr.app".source = "${pkgs.keycastr}/Applications/KeyCastr.app";
+  };
 }
