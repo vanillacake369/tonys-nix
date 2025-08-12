@@ -33,7 +33,7 @@
         else ./dotfiles/zellij/config.kdl.linux;
 
       # Karabiner json
-      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner-vim-motion-plus.json;
+      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner-windows.json;
     }
     // lib.optionalAttrs isDarwin {
       # macOS-specific configurations
