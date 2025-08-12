@@ -3,9 +3,13 @@
     "allow": [
       "Bash(git commit:*)",
       "Bash(git add:*)",
-      "Bash(gradlew clean:*)",
-      "Bash(gradlew build:*)",
-      "Bash(gradlew test:*)",
+      "Bash(git checkout:*)",
+      "Bash(gradle:*)",
+      "Bash(./gradlew:*)",
+      "Bash(go build:*)",
+      "Bash(go run:*)",
+      "Bash(go test:*)",
+      "Bash(just:*)",
       "Read(*)"
     ],
     "deny": []

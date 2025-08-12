@@ -586,8 +586,8 @@ Improve existing code or systems with optimized solutions and safe migration str
 - Recommended approach with project guidelines compliance
 - Phased implementation strategy with rollback plan
 
-#### `/scaffold` - Skeleton Code Generation
-Generate architecture and skeleton code from concepts or requirements.
+#### `/scaffold` - Skeleton Code Generation (KISS)
+Generate working skeleton code from requirements following the KISS (Keep It Simple, Stupid) principle.
 
 **Usage Examples:**
 ```bash
@@ -597,10 +597,13 @@ Generate architecture and skeleton code from concepts or requirements.
 ```
 
 **Output Structure:**
-- Requirement breakdown into components
-- Multiple architectural approaches (MVP, scalable, hybrid)
-- Recommended structure with core skeleton code
-- Development roadmap and integration points
+- Brief description of what we're building
+- Minimal file structure
+- Working code that can run immediately
+- Simple instructions to get started
+- 2-3 next steps to enhance further
+
+**Note**: This command follows KISS principles - it creates the simplest working implementation without complex architectural analysis or multiple options. Start simple, optimize later.
 
 #### `/debug` - Systematic Debugging
 Debug specific issues with systematic root cause analysis and prevention strategies.
