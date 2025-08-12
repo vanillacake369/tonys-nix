@@ -8,26 +8,23 @@ return {
         -- Base languages
         "bash",
         "json",
-        "lua", 
+        "lua",
         "markdown",
         "markdown_inline",
         "query",
         "regex",
         "vim",
         "yaml",
-        
         -- Development languages
         "nix",
         "go",
         "gomod",
-        "gowork", 
+        "gowork",
         "gosum",
         "java",
         "dockerfile",
-        
         -- Infrastructure
         "helm",
-        
         -- Git-related
         "git_config",
         "gitcommit",
@@ -38,3 +35,4 @@ return {
     },
   },
 }
+
