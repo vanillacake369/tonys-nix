@@ -1,115 +1,57 @@
 {
   "profiles": [
     {
-      "name": "Change language",
+      "name": "Enhanced macOS Productivity",
       "selected": true,
       "simple_modifications": [
         {
-          "from": { "key_code": "right_command" },
-          "to": [{ "key_code": "f18" }]
+          "from": {
+            "key_code": "fn"
+          },
+          "to": [
+            {
+              "key_code": "left_command"
+            }
+          ]
         },
         {
-          "from": { "key_code": "fn" },
-          "to": [{ "key_code": "left_command" }]
+          "from": {
+            "key_code": "left_command"
+          },
+          "to": [
+            {
+              "key_code": "fn"
+            }
+          ]
         },
         {
-          "from": { "key_code": "left_command" },
-          "to": [{ "key_code": "left_option" }]
+          "from": {
+            "key_code": "right_command"
+          },
+          "to": [
+            {
+              "key_code": "f18"
+            }
+          ]
         }
       ],
       "complex_modifications": {
         "rules": [
           {
-            "description": "Fn + Command + D opens Docker Desktop",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "d",
-                  "modifiers": {
-                    "mandatory": ["fn", "command"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Docker'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Fn + Command + T opens WezTerm",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "t",
-                  "modifiers": {
-                    "mandatory": ["fn", "command"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'WezTerm'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Fn + Command + C opens Google Chrome",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "c",
-                  "modifiers": {
-                    "mandatory": ["fn", "command"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Google Chrome'"
-                  }
-                ]
-              }
-            ]
-          }, 
-          {
-            "description": "Fn + Command + M opens Youtube Music PWA",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "m",
-                  "modifiers": {
-                    "mandatory": ["fn", "command"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open ~/Applications/Chrome\ Apps.localized/YouTube.app"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Command + E to Command + L (Chrome address bar)",
+            "description": "Map Cmd+E to Cmd+L in Chrome",
             "manipulators": [
               {
                 "type": "basic",
                 "from": {
                   "key_code": "e",
                   "modifiers": {
-                    "mandatory": ["left_command"]
+                    "mandatory": ["command"]
                   }
                 },
                 "to": [
                   {
                     "key_code": "l",
-                    "modifiers": ["left_command"]
+                    "modifiers": ["command"]
                   }
                 ],
                 "conditions": [
@@ -122,23 +64,8 @@
             ]
           },
           {
-            "description": "Fn + Arrow keys for word navigation",
+            "description": "Map Fn+Arrow keys to tab navigation in Chrome",
             "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "right_arrow",
-                  "modifiers": {
-                    "mandatory": ["fn"]
-                  }
-                },
-                "to": [
-                  {
-                    "key_code": "right_arrow",
-                    "modifiers": ["left_option"]
-                  }
-                ]
-              },
               {
                 "type": "basic",
                 "from": {
@@ -150,142 +77,34 @@
                 "to": [
                   {
                     "key_code": "left_arrow",
-                    "modifiers": ["left_option"]
+                    "modifiers": ["command", "left_option"]
                   }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + Tab to Command + Tab (App Switcher)",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "tab",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
-                  { "key_code": "left_command", "modifiers": [], "lazy": true },
-                  { "key_code": "tab" }
                 ],
-                "to_after_key_up": [
-                  { "key_code": "left_command", "modifiers": [] }
+                "conditions": [
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.google\\.Chrome$"]
+                  }
                 ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 1 opens TickTick",
-            "manipulators": [
+              },
               {
                 "type": "basic",
                 "from": {
-                  "key_code": "1",
+                  "key_code": "right_arrow",
                   "modifiers": {
-                    "mandatory": ["left_option"]
+                    "mandatory": ["fn"]
                   }
                 },
                 "to": [
                   {
-                    "shell_command": "open -a 'TickTick'"
+                    "key_code": "right_arrow",
+                    "modifiers": ["command", "left_option"]
                   }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 2 opens Slack",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "2",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
+                ],
+                "conditions": [
                   {
-                    "shell_command": "open -a 'Slack'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 3 opens Obsidian",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "3",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Obsidian'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 4 opens Google Chrome",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "4",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Google Chrome'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 5 opens IntelliJ IDEA",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "5",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'IntelliJ IDEA'"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Option + 6 opens GoLand",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "6",
-                  "modifiers": {
-                    "mandatory": ["left_option"]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'GoLand'"
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": ["^com\\.google\\.Chrome$"]
                   }
                 ]
               }
@@ -299,4 +118,3 @@
     }
   ]
 }
-
