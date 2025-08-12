@@ -1,56 +1,24 @@
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
 return {
-
-  -- LSP
+  -- Install alejandra automatically
   {
-    "neovim/nvim-lspconfig",
-    ft = { "nix" },
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = {
-      servers = {
-        nixd = {
-          cmd = { "nixd" },
-          settings = {
-            nixd = {
-              nixpkgs = {
-                expr = "import (builtins.getFlake(toString ./.)).inputs.nixpkgs { }",
-              },
-              formatting = {
-                command = { "alejandra" },
-              },
-              options = {
-                nixos = {
-                  expr = "let flake = builtins.getFlake(toString ./.); in flake.nixosConfigurations.limjihoon.options",
-                },
-                home_manager = {
-                  expr = "let flake = builtins.getFlake(toString ./.); in flake.homeConfigurations.limjihoon.options",
-                },
-              },
-            },
-          },
-        },
+      ensure_installed = {
+        "alejandra",
       },
+      run_on_start = true,
+      start_delay = 3000, -- wait 3s so Mason is ready
+      auto_update = false,
     },
   },
 
-  -- Conform.nvim formatter for Nix
+  -- Configure Conform to use alejandra
   {
     "stevearc/conform.nvim",
     opts = function(_, opts)
-      opts.formatters_by_ft = opts.formatters_by_ft or {}
-      opts.formatters_by_ft.nix = { "alejandra" }
-      
-      opts.formatters = opts.formatters or {}
-      opts.formatters.alejandra = {
-        command = "alejandra",
-        args = { "--quiet" },
-        stdin = true,
-      }
+      opts.formatters_by_ft = vim.tbl_deep_extend("force", opts.formatters_by_ft or {}, {
+        nix = { "alejandra" },
+      })
     end,
   },
-
 }
