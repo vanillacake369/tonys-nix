@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixos-24_11.url = "github:nixos/nixpkgs/nixos-24.11";
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -25,6 +26,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixos-24_11,
     nixos-wsl,
     home-manager,
     nix-darwin,
@@ -50,6 +52,11 @@
             wrapProgram $out/bin/slack \
               --add-flags "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3"
           '';
+        };
+        # Make nixos-24.11 packages available
+        nixos-24_11 = import nixos-24_11 {
+          inherit (final) system;
+          config = final.config;
         };
       })
     ];

@@ -24,7 +24,7 @@
       podman
       podman-compose
       podman-desktop
-      vagrant
+      nixos-24_11.vagrant
     ];
 
   # Podman Desktop configuration
