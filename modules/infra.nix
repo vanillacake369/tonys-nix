@@ -24,8 +24,9 @@
     ++ lib.optionals (isDarwin || isLinux && !isWsl) [
       # Containers (not WSL)
       minikube
+      podman
       podman-compose
-      podman-tui
+      podman-desktop
     ];
 
   # TODO : Activate only when isWsl == false
