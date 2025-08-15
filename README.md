@@ -453,18 +453,19 @@ Common shortcuts work consistently across macOS (excluding terminal apps):
 - `Ctrl+←/→` → Word navigation
 - `Ctrl+Backspace` → Delete word
 
-### Quick App Launching & Key Swapping
-Launch apps instantly with Option+number and improved ergonomics:
-- `Option+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ IDEA, GoLand
-- `Option+7-9` → Mail, Calendar, System Settings
-- `Ctrl+Option+T` → WezTerm
-- `Ctrl+Option+D` → Docker Desktop
+### Quick App Launching
+Launch apps instantly with keyboard shortcuts:
+- `Cmd+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ IDEA, GoLand
+- `Cmd+Option+T` → WezTerm
+- `Cmd+Option+D` → Docker Desktop
+- `Cmd+Option+M` → YouTube Music
+- `Cmd+Option+C` → Google Chrome
+- `Cmd+Option+I` → IntelliJ IDEA
+- `Cmd+Option+G` → GoLand
 
-**Enhanced Key Mapping:**
-- `fn` key → `left_command` (fn becomes an additional command key)
-- `left_command` → `left_option` (improved ergonomics)
-- `right_option` → `fn` (access to fn functions)
-- `right_command` → `F18` (for custom shortcuts)
+**Additional Navigation:**
+- `Ctrl+←/→` → `Option+←/→` (Word navigation in text)
+- `Right Command` → `F18` (for custom shortcuts)
 
 > **Note**: Configuration is in `dotfiles/karabiner/karabiner.json`. Terminal apps maintain their native shortcuts. The configuration provides better ergonomics while preserving all functionality. See [CLAUDE.md](./CLAUDE.md#macos-keyboard-customization) for full details.
 
