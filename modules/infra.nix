@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   isWsl,
@@ -28,6 +29,13 @@
       podman-compose
       podman-desktop
     ];
+
+  # Podman Desktop configuration
+  home.file = lib.optionalAttrs (isDarwin || (isLinux && !isWsl)) {
+    ".local/share/containers/podman-desktop/configuration/settings.json".text = builtins.toJSON {
+      "podman.binary.path" = "${config.home.homeDirectory}/.nix-profile/bin/podman";
+    };
+  };
 
   # TODO : Activate only when isWsl == false
   # Initiate podman systemd service
