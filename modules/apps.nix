@@ -44,5 +44,6 @@
       skhd
       keycastr
       raycast
+      jankyborders
     ];
 }
