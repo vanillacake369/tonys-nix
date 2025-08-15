@@ -9,7 +9,6 @@
 }: {
   home.packages = with pkgs;
     [
-      # Container orchestration tools
       k6
       kubectl
       kubectx
@@ -19,15 +18,13 @@
       kubectl-tree
       oxker
     ]
-    ++ lib.optionals (!isWsl) [
+    ++ lib.optionals (isDarwin || (isLinux && !isWsl)) [
       dive
-    ]
-    ++ lib.optionals (isDarwin || isLinux && !isWsl) [
-      # Containers (not WSL)
       minikube
       podman
       podman-compose
       podman-desktop
+      vagrant
     ];
 
   # Podman Desktop configuration
