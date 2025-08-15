@@ -517,17 +517,21 @@ This repository includes a Karabiner-Elements configuration for macOS that provi
 - `Ctrl+Delete` → `Option+Delete` (Delete word forward)
 
 **App launcher shortcuts**:
-- `Option+1` → TickTick
-- `Option+2` → Slack
-- `Option+3` → Obsidian
-- `Option+4` → Google Chrome
-- `Option+5` → IntelliJ IDEA
-- `Option+6` → GoLand
-- `Option+7` → Mail
-- `Option+8` → Calendar
-- `Option+9` → System Settings
-- `Ctrl+Option+T` → WezTerm
-- `Ctrl+Option+D` → Docker Desktop
+- `Cmd+1` → TickTick
+- `Cmd+2` → Slack
+- `Cmd+3` → Obsidian
+- `Cmd+4` → Google Chrome
+- `Cmd+5` → IntelliJ IDEA
+- `Cmd+6` → GoLand
+- `Cmd+Option+T` → WezTerm
+- `Cmd+Option+D` → Docker Desktop
+- `Cmd+Option+M` → YouTube Music
+- `Cmd+Option+C` → Google Chrome
+- `Cmd+Option+I` → IntelliJ IDEA
+- `Cmd+Option+G` → GoLand
+
+**Word navigation shortcuts**:
+- `Ctrl+←/→` → `Option+←/→` (Word navigation in text)
 
 **Other mappings**:
 - Right Command → F18 (for custom shortcuts)
