@@ -189,6 +189,51 @@
             ]
           },
           {
+            "description": "Map Ctrl+Arrow to Option+Arrow for word navigation",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "left_arrow",
+                  "modifiers": { "mandatory": ["control"] }
+                },
+                "to": [
+                  { "key_code": "left_arrow", "modifiers": ["option"] }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_arrow",
+                  "modifiers": { "mandatory": ["control"] }
+                },
+                "to": [
+                  { "key_code": "right_arrow", "modifiers": ["option"] }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "up_arrow",
+                  "modifiers": { "mandatory": ["control"] }
+                },
+                "to": [
+                  { "key_code": "up_arrow", "modifiers": ["option"] }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "down_arrow",
+                  "modifiers": { "mandatory": ["control"] }
+                },
+                "to": [
+                  { "key_code": "down_arrow", "modifiers": ["option"] }
+                ]
+              }
+            ]
+          },
+          {
             "description": "App launcher shortcuts",
             "manipulators": [
               {
