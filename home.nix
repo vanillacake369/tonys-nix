@@ -33,7 +33,7 @@
         else ./dotfiles/zellij/config.kdl.linux;
 
       # Karabiner json
-      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner-windows.json;
+      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
     }
     // lib.optionalAttrs isDarwin {
       # macOS-specific configurations
