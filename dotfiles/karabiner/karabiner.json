@@ -37,15 +37,18 @@
                   "key_code": "caps_lock",
                   "modifiers": { "optional": ["any"] }
                 },
+                "to": [
+                  { "set_variable": { "name": "caps_layer", "value": 1 } }
+                ],
                 "to_if_alone": [
                   { "key_code": "left_shift", "modifiers": ["left_command","left_control","left_option"] }
                 ],
-                "to_if_held_down": [
-                  { "set_variable": { "name": "caps_layer", "value": 1 } }
-                ],
                 "to_after_key_up": [
                   { "set_variable": { "name": "caps_layer", "value": 0 } }
-                ]
+                ],
+                "parameters": {
+                  "basic.to_if_alone_timeout_milliseconds": 250
+                }
               }
             ]
           },
