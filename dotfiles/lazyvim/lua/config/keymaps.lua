@@ -84,6 +84,14 @@ vim.keymap.set("t", "<C-A-;>", "<C-\\><C-n><C-w>l", { desc = "Terminal: Go to ri
 vim.keymap.set("t", "<C-A-[>", "<C-\\><C-n>", { desc = "Terminal: Exit terminal mode" })
 
 -- =============================================
+-- Scrolling (Normal Mode Only)
+-- =============================================
+
+-- Half-page scrolling with Ctrl+j (down) and Ctrl+l (up) in normal mode
+vim.keymap.set("n", "<C-j>", "<C-d>", { desc = "Scroll half-page down" })
+vim.keymap.set("n", "<C-l>", "<C-u>", { desc = "Scroll half-page up" })
+
+-- =============================================
 -- Visual Mode Enhancements
 -- =============================================
 
