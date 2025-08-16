@@ -25,6 +25,7 @@
       ".claude/commands".source = ./dotfiles/claude/commands;
       ".claude/settings.json".source = ./dotfiles/claude/settings.json;
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
+      ".claude/agents".source = ./dotfiles/claude/agents;
 
       # Zellij configuratioCLAUDE.mdn - platform-specific
       ".config/zellij/config.kdl".source =
