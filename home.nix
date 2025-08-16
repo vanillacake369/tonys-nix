@@ -27,7 +27,7 @@
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
       ".claude/agents".source = ./dotfiles/claude/agents;
 
-      # Zellij configuratioCLAUDE.mdn - platform-specific
+      # Zellij configuration
       ".config/zellij/config.kdl".source =
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
