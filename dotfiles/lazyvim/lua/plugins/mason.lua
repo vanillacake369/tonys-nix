@@ -11,45 +11,59 @@ return {
     opts = {
       ensure_installed = {
         -- LSP servers
-        "gopls",              -- Go language server
-        "nil",                -- Nix language server  
-        "css-lsp",            -- CSS/JSON language server
-        "dockerfile-language-server", -- Docker language server
-        "docker-compose-language-service", -- Docker Compose LSP
-        "jdtls",              -- Java language server
-        
+        "gopls",                            -- Go language server
+        "dockerfile-language-server",       -- Docker language server
+        "docker-compose-language-service",  -- Docker Compose language server
+        "jdtls",                            -- Java language server
         -- Formatters
-        "goimports",          -- Go imports formatter
-        "gofumpt",            -- Go strict formatter
-        "prettier",           -- JavaScript/JSON/YAML formatter
-        "alejandra",          -- Nix formatter
-        "stylua",             -- Lua formatter
-        "shfmt",              -- Shell script formatter
-        
-        -- Linters
-        "hadolint",           -- Dockerfile linter
-        
+        "goimports",                        -- Go imports formatter
+        "gofumpt",                          -- Go strict formatter
+        "prettier",                         -- JavaScript/JSON/YAML formatter
+        "stylua",                           -- Lua formatter
+        "shfmt",                            -- Shell script formatter
         -- Debug adapters (Java specific)
         "java-debug-adapter", -- Java debug adapter
-        "java-test",          -- Java test adapter
+        "java-test", -- Java test adapter
       },
     },
   },
-  
+
   -- Mason-LSPConfig integration for automatic server setup
   {
     "williamboman/mason-lspconfig.nvim",
     opts = {
       ensure_installed = {
         "gopls",
-        "nil", 
-        "css-lsp",
-        "dockerfile-language-server",
-        "docker-compose-language-service",
         "jdtls",
       },
       -- Automatic server setup for basic configurations
       automatic_installation = true,
+    },
+  },
+
+  -- LSP configuration for Nix-installed tools
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        -- Configure nixd (installed via Nix)
+        nixd = {
+          cmd = { "nixd" },
+          settings = {
+            nixd = {
+              formatting = {
+                command = { "alejandra" },
+              },
+              options = {
+                enable = true,
+                target = {
+                  installable = ".#homeConfigurations.hm-aarch64-darwin.activationPackage",
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 }
