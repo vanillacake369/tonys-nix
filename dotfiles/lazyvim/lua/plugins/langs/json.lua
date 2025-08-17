@@ -1,16 +1,17 @@
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
-return {
+-- JSON language support configuration
+-- Provides LSP support with schema validation and formatting
 
-  -- LSP
+return {
+  -- SchemaStore plugin for JSON schemas
+  {
+    "b0o/schemastore.nvim",
+    lazy = true,
+  },
+
+  -- LSP Configuration for JSON
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         jsonls = {
           -- lazy-load schemastore when needed

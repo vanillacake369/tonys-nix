@@ -1,16 +1,11 @@
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
-return {
+-- Java language support configuration
+-- Provides LSP support with JDTLS and debug/test adapters
 
-  -- LSP
+return {
+  -- LSP Configuration for Java
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         jdtls = {},
       },
@@ -18,15 +13,6 @@ return {
         jdtls = function()
           return true -- avoid duplicate servers
         end,
-      },
-    },
-  },
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "java-debug-adapter",
-        "java-test",
       },
     },
   },

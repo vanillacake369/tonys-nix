@@ -1,15 +1,17 @@
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
+-- YAML language support configuration
+-- Provides LSP support with schema validation and formatting
+
 return {
-  -- LSP
+  -- SchemaStore plugin for YAML schemas
+  {
+    "b0o/schemastore.nvim",
+    lazy = true,
+  },
+
+  -- LSP Configuration for YAML
   {
     "neovim/nvim-lspconfig",
     opts = {
-      -- make sure mason installs the server
       servers = {
         yamlls = {
           -- Have to add this for yamlls to understand that we support line folding
@@ -56,5 +58,15 @@ return {
         end,
       },
     },
+  },
+
+  -- Formatter configuration for YAML
+  {
+    "stevearc/conform.nvim",
+    opts = function(_, opts)
+      opts.formatters_by_ft = opts.formatters_by_ft or {}
+      opts.formatters_by_ft.yaml = { "prettier" }
+      opts.formatters_by_ft.yml = { "prettier" }
+    end,
   },
 }

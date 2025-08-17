@@ -1,12 +1,8 @@
--- every spec file under the "plugins" directory will be loaded automatically by lazy.nvim
---
--- In your plugin files, you can:
--- * add extra plugins
--- * disable/enabled LazyVim plugins
--- * override the configuration of LazyVim plugins
-return {
+-- Docker language support configuration
+-- Provides LSP support for Dockerfile and docker-compose files
 
-  -- LSP
+return {
+  -- LSP Configuration for Docker
   {
     "neovim/nvim-lspconfig",
     opts = {
@@ -15,9 +11,5 @@ return {
         docker_compose_language_service = {},
       },
     },
-  },
-  {
-    "mason.nvim",
-    opts = { ensure_installed = { "hadolint" } },
   },
 }

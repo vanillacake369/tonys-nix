@@ -10,16 +10,12 @@
     # Go
     go
     gotools
-    gofumpt
     # Lua
     gcc
     lua54Packages.lua
     lua54Packages.luaunit
-    stylua
     # Nix
-    nixd
     nixfmt-rfc-style
-    alejandra
     # Python
     uv
     # Formatters
