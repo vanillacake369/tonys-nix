@@ -1,26 +1,15 @@
-return {
-  -- Mason LSP configuration for automatic server management
-  {
-    "williamboman/mason-lspconfig.nvim",
-    opts = function(_, opts)
-      opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, {
-        "nixd", -- Ensure nixd LSP server is installed via Mason
-      })
-    end,
-  },
+-- Nix language support configuration
+-- Provides LSP support with nixd and alejandra formatting
 
-  -- LSP configuration
+return {
+  -- LSP Configuration for Nix
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
-        nixd = {
+        nil_ls = {
           settings = {
-            nixd = {
-              nixpkgs = {
-                expr = "import <nixpkgs> { }",
-              },
+            ['nil'] = {
               formatting = {
                 command = { "alejandra" },
               },
