@@ -42,8 +42,7 @@
       ".skhdrc".source = ./dotfiles/skhd/skhdrc;
     };
 
-  # Core pkgs
-  # Pass isLinux, isDarwin, isWsl
+  # Packages
   imports =
     [
       ./modules/infra.nix
@@ -52,11 +51,5 @@
       ./modules/zsh.nix
       ./modules/shell.nix
       ./modules/apps.nix
-    ]
-    # NixOs / Darwin pkgs
-    ++ (lib.optionals (!isWsl && isLinux || isDarwin) [
-      ])
-    # WSL pkgs
-    ++ (lib.optionals isWsl [
-      ]);
+    ];
 }
