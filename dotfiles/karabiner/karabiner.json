@@ -75,7 +75,6 @@
                 "to": [ { "key_code": "right_arrow" } ],
                 "conditions": [ { "type": "variable_if", "name": "caps_layer", "value": 1 } ]
               },
-
               { "type": "basic",
                 "from": { "key_code": "j", "modifiers": { "mandatory": ["shift"], "optional": ["any"] } },
                 "to": [ { "key_code": "left_arrow", "modifiers": ["shift"] } ],
@@ -188,96 +187,6 @@
                   }
                 ],
                 "type": "basic"
-              }
-            ]
-          },
-          {
-            "description": "Map Ctrl+Arrow to Option+Arrow for word navigation",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "left_arrow",
-                  "modifiers": { "mandatory": ["control"] }
-                },
-                "to": [
-                  { "key_code": "left_arrow", "modifiers": ["option"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "right_arrow",
-                  "modifiers": { "mandatory": ["control"] }
-                },
-                "to": [
-                  { "key_code": "right_arrow", "modifiers": ["option"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "up_arrow",
-                  "modifiers": { "mandatory": ["control"] }
-                },
-                "to": [
-                  { "key_code": "up_arrow", "modifiers": ["option"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "down_arrow",
-                  "modifiers": { "mandatory": ["control"] }
-                },
-                "to": [
-                  { "key_code": "down_arrow", "modifiers": ["option"] }
-                ]
-              }
-            ]
-          },
-          {
-            "description": "Map Ctrl+Shift+Arrow to Option+Shift+Arrow for word selection",
-            "manipulators": [
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "left_arrow",
-                  "modifiers": { "mandatory": ["control", "shift"] }
-                },
-                "to": [
-                  { "key_code": "left_arrow", "modifiers": ["option", "shift"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "right_arrow",
-                  "modifiers": { "mandatory": ["control", "shift"] }
-                },
-                "to": [
-                  { "key_code": "right_arrow", "modifiers": ["option", "shift"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "up_arrow",
-                  "modifiers": { "mandatory": ["control", "shift"] }
-                },
-                "to": [
-                  { "key_code": "up_arrow", "modifiers": ["option", "shift"] }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "down_arrow",
-                  "modifiers": { "mandatory": ["control", "shift"] }
-                },
-                "to": [
-                  { "key_code": "down_arrow", "modifiers": ["option", "shift"] }
-                ]
               }
             ]
           },
