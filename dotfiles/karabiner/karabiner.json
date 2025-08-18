@@ -191,10 +191,18 @@
             ]
           },
           {
-            "description": "Map Home/End keys to Ctrl+Arrow",
+            "description": "Map Home/End keys to Ctrl+Arrow in Chrome",
             "manipulators": [
               {
                 "type": "basic",
+                "conditions": [
+                  {
+                    "bundle_identifiers": [
+                      "^com\\.google\\.Chrome$"
+                    ],
+                    "type": "frontmost_application_if"
+                  }
+                ],
                 "from": {
                   "key_code": "home"
                 },
@@ -207,6 +215,14 @@
               },
               {
                 "type": "basic",
+                "conditions": [
+                  {
+                    "bundle_identifiers": [
+                      "^com\\.google\\.Chrome$"
+                    ],
+                    "type": "frontmost_application_if"
+                  }
+                ],
                 "from": {
                   "key_code": "end"
                 },
@@ -219,6 +235,14 @@
               },
               {
                 "type": "basic",
+                "conditions": [
+                  {
+                    "bundle_identifiers": [
+                      "^com\\.google\\.Chrome$"
+                    ],
+                    "type": "frontmost_application_if"
+                  }
+                ],
                 "from": {
                   "key_code": "home",
                   "modifiers": {
@@ -234,6 +258,14 @@
               },
               {
                 "type": "basic",
+                "conditions": [
+                  {
+                    "bundle_identifiers": [
+                      "^com\\.google\\.Chrome$"
+                    ],
+                    "type": "frontmost_application_if"
+                  }
+                ],
                 "from": {
                   "key_code": "end",
                   "modifiers": {
