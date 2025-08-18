@@ -191,6 +191,35 @@
             ]
           },
           {
+            "description": "Map Home/End keys to Ctrl+Arrow",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "home"
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": ["control"]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "end"
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": ["control"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "description": "App launcher shortcuts",
             "manipulators": [
               {
