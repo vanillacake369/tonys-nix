@@ -130,7 +130,7 @@
             ]
           },
           {
-            "description": "Map Option+Arrow keys to tab navigation in Chrome",
+            "description": "Map Cmd+Arrow keys to tab navigation in Chrome",
             "manipulators": [
               {
                 "conditions": [
@@ -145,7 +145,7 @@
                   "key_code": "left_arrow",
                   "modifiers": {
                     "mandatory": [
-                      "left_option"
+                      "command"
                     ]
                   }
                 },
@@ -173,7 +173,7 @@
                   "key_code": "right_arrow",
                   "modifiers": {
                     "mandatory": [
-                      "left_option"
+                      "command"
                     ]
                   }
                 },
@@ -214,6 +214,36 @@
                   {
                     "key_code": "right_arrow",
                     "modifiers": ["control"]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "home",
+                  "modifiers": {
+                    "mandatory": ["shift"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": ["control", "shift"]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "end",
+                  "modifiers": {
+                    "mandatory": ["shift"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": ["control", "shift"]
                   }
                 ]
               }
