@@ -25,18 +25,13 @@
       redli
       smartmontools
       expect
-    ]
-    ++ lib.optionals (!isWsl) [
-      openssh
-    ]
-    ++ lib.optionals isLinux [
-      # Linux-specific utilities
       psmisc
-      google-authenticator
       xclip
+      openssh
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Linux desktop utilities (not WSL)
+      google-authenticator
       wayland-utils
     ];
 
