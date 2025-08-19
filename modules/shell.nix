@@ -2,11 +2,13 @@
   pkgs,
   lib,
   isWsl,
+  isDarwin,
   isLinux,
   ...
 }: {
   home.packages = with pkgs;
     [
+      # Common packages for all platforms
       asciinema
       asciinema-agg
       awscli2
@@ -25,19 +27,23 @@
       redli
       smartmontools
       expect
-    ]
-    ++ lib.optionals (!isWsl) [
-      openssh
+      psmisc
     ]
     ++ lib.optionals isLinux [
-      # Linux-specific utilities
-      psmisc
-      google-authenticator
+      # Linux (both native and WSL)
       xclip
+      openssh
     ]
     ++ lib.optionals (isLinux && !isWsl) [
-      # Linux desktop utilities (not WSL)
+      # Native Linux only (not WSL)
+      google-authenticator
       wayland-utils
+    ]
+    ++ lib.optionals isWsl [
+      # WSL-specific packages
+    ]
+    ++ lib.optionals isDarwin [
+      # macOS-specific packages
     ];
 
   programs = {
