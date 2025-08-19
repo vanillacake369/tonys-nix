@@ -51,7 +51,7 @@
       ./modules/zsh.nix
       ./modules/shell.nix
       ./modules/apps.nix
-      ./modules/jetbrains.nix
+      ./dotfiles/jetbrains.nix
     ];
 
 }
