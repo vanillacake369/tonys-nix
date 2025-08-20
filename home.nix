@@ -43,15 +43,13 @@
     };
 
   # Packages
-  imports =
-    [
-      ./modules/infra.nix
-      ./modules/language.nix
-      ./modules/nvim.nix
-      ./modules/zsh.nix
-      ./modules/shell.nix
-      ./modules/apps.nix
-      ./dotfiles/jetbrains.nix
-    ];
-
+  imports = [
+    ./modules/infra.nix
+    ./modules/language.nix
+    ./modules/nvim.nix
+    ./modules/zsh.nix
+    ./modules/shell.nix
+    ./modules/apps.nix
+    ./dotfiles/jetbrain/jetbrains.nix
+  ];
 }
