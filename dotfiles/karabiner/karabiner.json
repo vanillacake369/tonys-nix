@@ -98,7 +98,7 @@
             ]
           },
           {
-            "description": "Map Cmd+E to Cmd+L in Chrome",
+            "description": "Chrome address bar to Cmd + e",
             "manipulators": [
               {
                 "conditions": [
@@ -282,6 +282,24 @@
             ]
           },
           {
+            "description": "Sleep with Cmd+L",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "l",
+                  "modifiers": { "mandatory": ["command"] }
+                },
+                "to": [
+                  {
+                    "key_code": "q",
+                    "modifiers": ["command", "control"]
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "description": "App launcher shortcuts",
             "manipulators": [
               {
@@ -348,7 +366,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "t",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open -a 'WezTerm'" }
@@ -358,7 +376,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "d",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open -a 'Docker Desktop'" }
@@ -368,7 +386,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "m",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open '/Users/limjihoon/Applications/Chrome Apps.localized/YouTube Music.app'" }
@@ -378,7 +396,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "c",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open -a 'Google Chrome'" }
@@ -388,7 +406,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "i",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open -a 'IntelliJ IDEA'" }
@@ -398,7 +416,7 @@
                 "type": "basic",
                 "from": {
                   "key_code": "g",
-                  "modifiers": { "mandatory": ["command", "option"] }
+                  "modifiers": { "mandatory": ["command", "control"] }
                 },
                 "to": [
                   { "shell_command": "open -a 'GoLand'" }

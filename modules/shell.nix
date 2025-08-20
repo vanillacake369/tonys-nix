@@ -27,12 +27,12 @@
       redli
       smartmontools
       expect
-      psmisc
     ]
     ++ lib.optionals isLinux [
       # Linux (both native and WSL)
       xclip
       openssh
+      psmisc
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
