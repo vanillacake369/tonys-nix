@@ -86,6 +86,12 @@
   <action id="MethodUp">
     <keyboard-shortcut first-keystroke="meta up" />
   </action>
+  <action id="NextTab">
+    <keyboard-shortcut first-keystroke="meta right" />
+  </action>
+  <action id="PreviousTab">
+    <keyboard-shortcut first-keystroke="meta left" />
+  </action>
   <action id="QuickChangeScheme" />
   <action id="RecentFiles">
     <keyboard-shortcut first-keystroke="ctrl e" />
