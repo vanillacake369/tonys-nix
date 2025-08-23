@@ -423,6 +423,21 @@
                 ]
               }
             ]
+          },
+          {
+            "description": "Open Raycast with Cmd+Space",
+            "manipulators": [
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "spacebar",
+                  "modifiers": { "mandatory": ["command"] }
+                },
+                "to": [
+                  { "shell_command": "open -a 'Raycast'" }
+                ]
+              }
+            ]
           }
         ]
       },
