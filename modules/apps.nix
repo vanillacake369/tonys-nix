@@ -45,5 +45,6 @@
       keycastr
       raycast
       jankyborders
+      rectangle
     ];
 }
