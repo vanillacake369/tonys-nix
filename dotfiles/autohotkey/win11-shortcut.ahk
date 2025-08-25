@@ -1,6 +1,7 @@
 app := "WindowsTerminal.exe"
 chrome := "chrome.exe"
 docker := "Docker Desktop.exe"
+goland := "goland64.exe"
 
 ^!t:: {
     if WinExist("ahk_exe " app) {
@@ -37,5 +38,17 @@ docker := "Docker Desktop.exe"
         }
     } else {
         Run("Docker Desktop.exe")
+    }
+}
+
+^!g:: {
+    if WinExist("ahk_exe " goland) {
+        if !WinActive("ahk_exe " goland) {
+            WinActivate("ahk_exe " goland)
+        } else {
+            WinMinimize("ahk_exe " goland)
+        }
+    } else {
+        Run("goland64.exe")
     }
 }
