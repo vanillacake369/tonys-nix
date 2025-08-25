@@ -1,7 +1,5 @@
 {
   lib,
-  pkgs,
-  config,
   isLinux,
   isDarwin,
   isWsl,
@@ -12,6 +10,13 @@
 
   # Set env automatically (Linux only)
   targets.genericLinux.enable = isLinux;
+
+  # Copy autohotkey (Wsl only)
+  home.activation = lib.mkIf isWsl {
+    copyAutoHotkeyScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      $DRY_RUN_CMD cp -f ${./dotfiles/autohotkey/win11-shortcut.ahk} "/mnt/c/Users/limjihoon/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/win11-shortcut.ahk"
+    '';
+  };
 
   # Import dotfiles
   home.file =
@@ -37,7 +42,7 @@
       ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
     }
     // lib.optionalAttrs isDarwin {
-      # macOS-specific configurations
+      # Yabai & Skhd (Mac only)
       ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
       ".skhdrc".source = ./dotfiles/skhd/skhdrc;
     };
