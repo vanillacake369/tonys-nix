@@ -46,5 +46,6 @@
       raycast
       jankyborders
       rectangle
+      appcleaner
     ];
 }
