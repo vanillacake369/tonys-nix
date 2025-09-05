@@ -39,13 +39,12 @@
     ++ lib.optionals isDarwin [
       # MacOs Apps
       aldente
-      bartender
       yabai
       skhd
-      keycastr
       raycast
       jankyborders
       rectangle
       appcleaner
+      hidden-bar
     ];
 }
