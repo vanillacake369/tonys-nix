@@ -13,6 +13,10 @@
     <keyboard-shortcut first-keystroke="meta y" />
     <keyboard-shortcut first-keystroke="ctrl y" />
   </action>
+  <action id="$SelectAll">
+    <keyboard-shortcut first-keystroke="ctrl a" />
+    <keyboard-shortcut first-keystroke="meta a" />
+  </action>
   <action id="$Undo">
     <keyboard-shortcut first-keystroke="ctrl z" />
     <keyboard-shortcut first-keystroke="alt back_space" />
@@ -68,6 +72,17 @@
     <keyboard-shortcut first-keystroke="ctrl period" />
     <keyboard-shortcut first-keystroke="meta period" />
   </action>
+  <action id="Console.TableResult.EditValue">
+    <keyboard-shortcut first-keystroke="enter" />
+    <keyboard-shortcut first-keystroke="f2" />
+    <keyboard-shortcut first-keystroke="meta enter" />
+  </action>
+  <action id="Console.TableResult.GotoReferencedResult">
+    <mouse-shortcut keystroke="button1 doubleClick" />
+    <keyboard-shortcut first-keystroke="enter" />
+    <keyboard-shortcut first-keystroke="f2" />
+    <keyboard-shortcut first-keystroke="meta enter" />
+  </action>
   <action id="Editor Copy">
     <keyboard-shortcut first-keystroke="meta c" />
   </action>
@@ -77,6 +92,9 @@
   <action id="Editor Redo">
     <keyboard-shortcut first-keystroke="meta y" />
     <keyboard-shortcut first-keystroke="ctrl y" />
+  </action>
+  <action id="Editor SelectAll">
+    <keyboard-shortcut first-keystroke="meta a" />
   </action>
   <action id="Editor Undo">
     <keyboard-shortcut first-keystroke="meta z" />
@@ -122,6 +140,9 @@
   <action id="PreviousTab">
     <keyboard-shortcut first-keystroke="meta left" />
   </action>
+  <action id="ProblemsView.QuickFixes">
+    <keyboard-shortcut first-keystroke="meta enter" />
+  </action>
   <action id="QuickChangeScheme" />
   <action id="RecentFiles">
     <keyboard-shortcut first-keystroke="ctrl e" />
@@ -136,6 +157,9 @@
   </action>
   <action id="SelectNextOccurrence">
     <keyboard-shortcut first-keystroke="meta n" />
+  </action>
+  <action id="ShowIntentionActions">
+    <keyboard-shortcut first-keystroke="meta enter" />
   </action>
   <action id="SmartSelect" />
   <action id="TableResult.GrowSelection" />
@@ -152,4 +176,7 @@
     <keyboard-shortcut first-keystroke="meta v" />
   </action>
   <action id="UsageFiltering.WriteAccess" />
+  <action id="com.anthropic.code.plugin.actions.SendToClaudeAction">
+    <keyboard-shortcut first-keystroke="ctrl meta k" />
+  </action>
 </keymap>
