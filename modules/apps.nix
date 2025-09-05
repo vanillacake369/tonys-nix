@@ -46,5 +46,6 @@
       rectangle
       appcleaner
       hidden-bar
+      jankyborders
     ];
 }
