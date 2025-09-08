@@ -16,7 +16,6 @@
       stern
       kubernetes-helm
       kubectl-tree
-      oxker
       ngrok
     ]
     ++ lib.optionals (isDarwin || (isLinux && !isWsl)) [
