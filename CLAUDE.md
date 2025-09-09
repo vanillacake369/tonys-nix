@@ -210,7 +210,7 @@ When setting up on a new NixOS machine, optimize the hardware configuration for 
 
 #### Automatic Performance & SSD Optimizations (Already Configured):
 - **Store auto-optimization**: Automatic deduplication reduces store size and improves I/O performance
-- **Optimized build settings**: Uses all 8 CPU cores with `max-jobs=auto` and `cores=0`
+- **Optimized build settings**: Uses all available CPU cores with `max-jobs=auto` and `cores=0`
 - **Smart Garbage Collection**: Intelligent cleanup that runs only when needed (size > 10GB or > 14 days), reducing SSD wear by 80-90%
 - **Binary caches**: Reduces local builds by 80-90% (cache.nixos.org, nix-community, devenv)
 - **Journal limits**: SystemD logs capped at 500MB with monthly rotation
@@ -625,6 +625,15 @@ Debug specific issues with systematic root cause analysis and prevention strateg
 - Multiple fix strategies (quick vs proper solutions)
 - Prevention measures and monitoring recommendations
 
+#### `/commit` - Smart Git Commit
+Generate appropriate commit messages and handle git operations intelligently.
+
+#### `/documentify` - Documentation Generation
+Generate comprehensive documentation from code and configuration files.
+
+#### `/forget-all` - Context Reset
+Clear conversation context while preserving important project information.
+
 ### Command Design Philosophy
 
 #### Project-Aware Solutions
@@ -676,3 +685,6 @@ The slash commands are stored in `dotfiles/claude/commands/` and automatically a
 - `enhance.md` - Code and system improvements  
 - `scaffold.md` - Architecture and skeleton generation
 - `debug.md` - Systematic debugging and troubleshooting
+- `commit.md` - Smart git commit operations
+- `documentify.md` - Documentation generation
+- `forget-all.md` - Context reset functionality
