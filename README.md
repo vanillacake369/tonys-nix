@@ -177,7 +177,7 @@ This configuration includes several optimizations to reduce SSD wear and extend 
 
 ### Automatic Performance & SSD Optimizations
 - **Store Auto-Optimization**: Automatic deduplication reduces store size and improves I/O performance
-- **Optimized Build Settings**: Uses all CPU cores with `max-jobs=auto` for faster parallel builds
+- **Optimized Build Settings**: Uses all available CPU cores with `max-jobs=auto` for faster parallel builds
 - **Binary Caches**: Uses Cachix and community caches to minimize local builds (80-90% reduction in SSD writes)
 - **Smart Garbage Collection**: Intelligent cleanup system that runs only when needed (size > 10GB or > 14 days), reducing SSD wear by 80-90%
 - **Journal Limiting**: SystemD logs are capped at 500MB with automatic rotation
