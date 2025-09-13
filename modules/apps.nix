@@ -43,9 +43,7 @@
       skhd
       raycast
       jankyborders
-      rectangle
       appcleaner
       hidden-bar
-      jankyborders
     ];
 }
