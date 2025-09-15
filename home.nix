@@ -37,11 +37,11 @@
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
         else ./dotfiles/zellij/config.kdl.linux;
-
-      # Karabiner json
-      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
     }
     // lib.optionalAttrs isDarwin {
+      # Karabiner json
+      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
+
       # Yabai & Skhd (Mac only)
       ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
       ".skhdrc".source = ./dotfiles/skhd/skhdrc;

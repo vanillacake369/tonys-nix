@@ -64,6 +64,9 @@
   <action id="BuildProject">
     <keyboard-shortcut first-keystroke="ctrl f9" />
   </action>
+  <action id="ChangesView.Revert">
+    <keyboard-shortcut first-keystroke="ctrl meta z" />
+  </action>
   <action id="CheckinProject">
     <keyboard-shortcut first-keystroke="ctrl k" />
     <keyboard-shortcut first-keystroke="meta k" />
