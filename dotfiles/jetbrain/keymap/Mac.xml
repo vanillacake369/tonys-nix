@@ -115,6 +115,11 @@
     <keyboard-shortcut first-keystroke="f2" />
     <keyboard-shortcut first-keystroke="meta enter" />
   </action>
+  <action id="Console.TableResult.NextPage" />
+  <action id="Console.TableResult.PreviousPage" />
+  <action id="DatabaseView.Tools">
+    <keyboard-shortcut first-keystroke="meta enter" />
+  </action>
   <action id="Debug">
     <keyboard-shortcut first-keystroke="shift f9" />
   </action>
@@ -134,8 +139,17 @@
   <action id="Editor Undo">
     <keyboard-shortcut first-keystroke="meta z" />
   </action>
+  <action id="EditorAddOrRemoveCaret">
+    <mouse-shortcut keystroke="shift control meta button1" />
+  </action>
   <action id="EditorBackSpace">
     <keyboard-shortcut first-keystroke="back_space" />
+  </action>
+  <action id="EditorCloneCaretAbove">
+    <keyboard-shortcut first-keystroke="ctrl alt up" />
+  </action>
+  <action id="EditorCloneCaretBelow">
+    <keyboard-shortcut first-keystroke="ctrl alt down" />
   </action>
   <action id="EditorContextInfo">
     <keyboard-shortcut first-keystroke="alt q" />
@@ -250,7 +264,7 @@
     <keyboard-shortcut first-keystroke="ctrl alt f" />
   </action>
   <action id="ExtractMethod">
-    <keyboard-shortcut first-keystroke="ctrl alt m" />
+    <keyboard-shortcut first-keystroke="ctrl meta m" />
   </action>
   <action id="ExtractVariable">
     <keyboard-shortcut first-keystroke="ctrl alt v" />
@@ -277,6 +291,7 @@
   <action id="GenerateConstructor">
     <keyboard-shortcut first-keystroke="alt insert" />
   </action>
+  <action id="GitHub.Diff.Review.PreviousComment" />
   <action id="GotoClass">
     <keyboard-shortcut first-keystroke="ctrl n" />
   </action>
@@ -290,9 +305,8 @@
     <keyboard-shortcut first-keystroke="shift ctrl n" />
   </action>
   <action id="GotoImplementation">
-    <keyboard-shortcut first-keystroke="ctrl alt b" />
-    <mouse-shortcut keystroke="control alt button1" />
-    <keyboard-shortcut first-keystroke="meta alt b" />
+    <keyboard-shortcut first-keystroke="ctrl meta b" />
+    <mouse-shortcut keystroke="control meta button1" />
   </action>
   <action id="GotoLine">
     <keyboard-shortcut first-keystroke="ctrl g" />
@@ -305,6 +319,7 @@
   </action>
   <action id="GotoSuperMethod">
     <keyboard-shortcut first-keystroke="ctrl u" />
+    <keyboard-shortcut first-keystroke="meta u" />
   </action>
   <action id="GotoSymbol" />
   <action id="HideAllWindows">
@@ -315,6 +330,9 @@
   </action>
   <action id="Inline">
     <keyboard-shortcut first-keystroke="ctrl alt n" />
+  </action>
+  <action id="IntroduceVariable">
+    <keyboard-shortcut first-keystroke="ctrl meta v" />
   </action>
   <action id="MaximizeToolWindow">
     <keyboard-shortcut first-keystroke="shift ctrl quote" />
@@ -331,9 +349,7 @@
   <action id="MoveStatementUp">
     <keyboard-shortcut first-keystroke="shift ctrl up" />
   </action>
-  <action id="NextOccurence">
-    <keyboard-shortcut first-keystroke="ctrl alt down" />
-  </action>
+  <action id="NextOccurence" />
   <action id="NextSplitter">
     <keyboard-shortcut first-keystroke="alt tab" />
   </action>
@@ -353,9 +369,7 @@
   <action id="PrevSplitter">
     <keyboard-shortcut first-keystroke="shift alt tab" />
   </action>
-  <action id="PreviousOccurence">
-    <keyboard-shortcut first-keystroke="ctrl alt up" />
-  </action>
+  <action id="PreviousOccurence" />
   <action id="PreviousTab">
     <keyboard-shortcut first-keystroke="meta left" />
   </action>
@@ -382,6 +396,7 @@
   </action>
   <action id="ReformatCode">
     <keyboard-shortcut first-keystroke="ctrl alt l" />
+    <keyboard-shortcut first-keystroke="ctrl meta l" />
   </action>
   <action id="RenameElement">
     <keyboard-shortcut first-keystroke="shift f6" />
@@ -408,6 +423,9 @@
   <action id="SelectNextOccurrence">
     <keyboard-shortcut first-keystroke="meta n" />
   </action>
+  <action id="SetShortcutAction">
+    <keyboard-shortcut first-keystroke="meta enter" />
+  </action>
   <action id="ShowBookmarks">
     <keyboard-shortcut first-keystroke="shift f11" />
   </action>
@@ -415,7 +433,7 @@
     <keyboard-shortcut first-keystroke="ctrl f1" />
   </action>
   <action id="ShowIntentionActions">
-    <keyboard-shortcut first-keystroke="alt enter" />
+    <keyboard-shortcut first-keystroke="meta enter" />
   </action>
   <action id="ShowProjectStructureSettings">
     <keyboard-shortcut first-keystroke="shift ctrl alt s" />
@@ -455,6 +473,9 @@
     <keyboard-shortcut first-keystroke="shift insert" />
     <keyboard-shortcut first-keystroke="meta v" />
   </action>
+  <action id="TodoViewGroupByShowModules">
+    <keyboard-shortcut first-keystroke="ctrl meta m" />
+  </action>
   <action id="ToggleBookmark">
     <keyboard-shortcut first-keystroke="f11" />
   </action>
@@ -462,6 +483,9 @@
     <keyboard-shortcut first-keystroke="ctrl f8" />
   </action>
   <action id="UsageFiltering.WriteAccess" />
+  <action id="UsageGrouping.Module">
+    <keyboard-shortcut first-keystroke="ctrl meta m" />
+  </action>
   <action id="Vcs.ShowMessageHistory">
     <keyboard-shortcut first-keystroke="ctrl m" />
   </action>
@@ -473,5 +497,8 @@
   </action>
   <action id="com.anthropic.code.plugin.actions.SendToClaudeAction">
     <keyboard-shortcut first-keystroke="ctrl meta k" />
+  </action>
+  <action id="sql.ExtractFunctionAction">
+    <keyboard-shortcut first-keystroke="ctrl meta m" />
   </action>
 </keymap>
