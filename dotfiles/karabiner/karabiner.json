@@ -1958,6 +1958,14 @@
                 },
                 "to": [
                   { "shell_command": "open '/Users/limjihoon/Applications/Chrome Apps.localized/YouTube Music.app'" }
+                ],
+                "conditions": [
+                  {
+                    "type": "frontmost_application_unless",
+                    "bundle_identifiers": [
+                      "^com\\.jetbrains\\..*$"
+                    ]
+                  }
                 ]
               },
               {
