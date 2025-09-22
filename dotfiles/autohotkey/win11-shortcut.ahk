@@ -2,6 +2,7 @@ app := "WindowsTerminal.exe"
 chrome := "chrome.exe"
 docker := "Docker Desktop.exe"
 goland := "goland64.exe"
+intellij := "idea64.exe"
 
 ^!t:: {
     if WinExist("ahk_exe " app) {
@@ -50,5 +51,17 @@ goland := "goland64.exe"
         }
     } else {
         Run("goland64.exe")
+    }
+}
+
+^!i:: {
+    if WinExist("ahk_exe " intellij) {
+        if !WinActive("ahk_exe " intellij) {
+            WinActivate("ahk_exe " intellij)
+        } else {
+            WinMinimize("ahk_exe " intellij)
+        }
+    } else {
+        Run("idea64.exe")
     }
 }
