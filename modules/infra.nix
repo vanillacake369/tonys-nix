@@ -43,36 +43,4 @@
     # Optional: make qemu the default so you don't need --provider=qemu
     VAGRANT_DEFAULT_PROVIDER = "qemu";
   };
-
-  # TODO : Activate only when isWsl == false
-  # Initiate podman systemd service
-  # systemd.user.services.podman = {
-  #   enable = true;
-  #   description = "Init Podman";
-  #   wantedBy = [ "default.target" ];
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
-  #     ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
-  #     ExecStop = "${pkgs.minikube}/bin/minikube stop";
-  #     RemainAfterExit = true;
-  #   };
-  # };
-
-  # TODO : Activate only when isWsl == false
-  # Initiate minikube systemd service
-  # systemd.user.services.minikube = {
-  #   enable = true;
-  #   description = "Init Minikube Cluster";
-  #   wantedBy = [ "default.target" ];
-  #   after = [ "podman.socket" ];
-  #   requires = [ "podman.socket" ];
-  #   serviceConfig = {
-  #     Type = "simple";
-  #     Environment = "PATH=${pkgs.podman}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin";
-  #     ExecStart = "${pkgs.minikube}/bin/minikube start --driver=podman";
-  #     ExecStop = "${pkgs.minikube}/bin/minikube stop";
-  #     RemainAfterExit = true;
-  #   };
-  # };
 }
