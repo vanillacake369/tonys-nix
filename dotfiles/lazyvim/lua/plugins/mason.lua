@@ -4,7 +4,7 @@
 return {
   -- Main Mason plugin for managing external tools
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
     build = ":MasonUpdate",
@@ -30,7 +30,7 @@ return {
 
   -- Mason-LSPConfig integration for automatic server setup
   {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     opts = {
       ensure_installed = {
         "gopls",
