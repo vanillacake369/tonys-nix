@@ -20,6 +20,7 @@
   mkHomeConfig = {
     system,
     isWsl ? false,
+    isNixOs ? false,
   }: let
     systemConfig = mkSystem system;
   in
@@ -28,7 +29,7 @@
       modules = homeManagerModules;
       extraSpecialArgs = {
         inherit (systemConfig) isLinux isDarwin;
-        inherit isWsl;
+        inherit isWsl isNixOs;
       };
     };
 in {

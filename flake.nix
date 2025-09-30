@@ -116,16 +116,17 @@
         )
       );
 
-    # Home-manager configurations - separate WSL and non-WSL configs
+    # Home-manager configurations - separate WSL, NixOS and standard configs
     homeConfigurations = lib.listToAttrs (
       lib.flatten (
         map (system: [
-          # Non-WSL configuration
+          # Standard Linux/macOS configuration
           {
             name = "hm-${system}";
             value = builders.mkHomeConfig {
               inherit system;
               isWsl = false;
+              isNixOs = false;
             };
           }
           # WSL configuration
@@ -134,6 +135,16 @@
             value = builders.mkHomeConfig {
               inherit system;
               isWsl = true;
+              isNixOs = false;
+            };
+          }
+          # NixOS configuration
+          {
+            name = "hm-nixos-${system}";
+            value = builders.mkHomeConfig {
+              inherit system;
+              isWsl = false;
+              isNixOs = true;
             };
           }
         ])
