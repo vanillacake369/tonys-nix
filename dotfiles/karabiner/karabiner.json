@@ -2226,15 +2226,24 @@
         ]
       },
       "devices": [
-        {
-          "identifiers": {
-            "device_address": "fa-9c-60-0b-b1-65",
-            "is_keyboard": true,
-            "is_pointing_device": true
+          {
+              "identifiers": {
+                  "device_address": "fa-9c-60-0b-b1-65",
+                  "is_keyboard": true,
+                  "is_pointing_device": true
+              },
+              "ignore": false,
+              "treat_as_built_in_keyboard": true
           },
-          "ignore": false,
-          "treat_as_built_in_keyboard": true
-        }
+          {
+              "identifiers": {
+                  "device_address": "fa-9c-60-0b-12-79",
+                  "is_keyboard": true,
+                  "is_pointing_device": true
+              },
+              "ignore": false,
+              "treat_as_built_in_keyboard": true
+          }
       ],
       "name": "Switch language",
       "selected": true,
