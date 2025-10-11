@@ -16,6 +16,7 @@
       bat
       jq
       git
+      lazygit
       curl
       tree
       ripgrep
@@ -23,6 +24,7 @@
       lsof
       zellij
       htop
+      btop
       autossh
       redli
       smartmontools
