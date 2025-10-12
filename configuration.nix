@@ -64,6 +64,12 @@ in {
   services = {
     logind = {
       lidSwitch = "ignore";
+      powerKey = "ignore";
+      suspendKey = "ignore";
+      hibernateKey = "ignore";
+      idleAction = "ignore";
+      idleActionSec = "0";
+      powerKeyLongPress = "ignore";
     };
     # SSD optimization: limit systemd journal size and rotation
     journald.extraConfig = ''
@@ -271,6 +277,20 @@ in {
       # Required for containers under podman-compose to be able to talk to each other.
       defaultNetwork.settings.dns_enabled = true;
     };
+  };
+
+  # Disable systemd sleep targets to prevent automatic suspend/hibernate
+  systemd.targets = {
+    sleep.enable = false;
+    suspend.enable = false;
+    hibernate.enable = false;
+    hybrid-sleep.enable = false;
+  };
+
+  # Power management - disable automatic suspend/hibernate
+  powerManagement = {
+    enable = false;
+    powertop.enable = false;
   };
 
   # Firewall of inbound traffic
