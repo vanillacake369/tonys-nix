@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-24_11.url = "github:nixos/nixpkgs/nixos-24.11";
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -17,21 +16,15 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    system-manager = {
-      url = "github:numtide/system-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = {
     self,
     nixpkgs,
     nixos-24_11,
-    nixos-wsl,
     home-manager,
     nix-darwin,
     nixos-generators,
-    system-manager,
     ...
   }: let
     lib = nixpkgs.lib;
@@ -187,11 +180,5 @@
       )
     );
 
-    # Define system manager to cope with linux distro system
-    systemConfigs.default = system-manager.lib.makeSystemConfig {
-      modules = [
-        ./modules
-      ];
-    };
   };
 }
