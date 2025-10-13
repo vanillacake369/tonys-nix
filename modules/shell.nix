@@ -11,7 +11,12 @@
       # Common packages for all platforms
       asciinema
       asciinema-agg
-      awscli2
+      # Substitue with awscli
+      # since awscli2 crashes in wsl
+      # after update with crazy python unit test fail
+      # 2025.10.13
+      # awscli2
+      awscli
       ssm-session-manager-plugin
       bat
       jq
