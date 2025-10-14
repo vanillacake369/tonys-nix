@@ -22,6 +22,7 @@
       jq
       git
       lazygit
+      lazydocker
       curl
       tree
       ripgrep
