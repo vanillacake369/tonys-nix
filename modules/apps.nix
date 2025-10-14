@@ -21,7 +21,6 @@
       jetbrains.datagrip
       drawio
       discord
-      obsidian
       wezterm
     ]
     ++ lib.optionals (isLinux && !isWsl) [
