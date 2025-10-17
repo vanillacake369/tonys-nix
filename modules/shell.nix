@@ -37,12 +37,14 @@
       expect
       inetutils
       netcat
+      gdb
     ]
     ++ lib.optionals isLinux [
       # Linux (both native and WSL)
       xclip
       openssh
       psmisc
+      strace
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
