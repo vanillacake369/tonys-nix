@@ -63,13 +63,17 @@ in {
   # NFS / X-SERVER / PIPEWIRE / OPENSSH
   services = {
     logind = {
-      lidSwitch = "ignore";
-      powerKey = "ignore";
-      suspendKey = "ignore";
-      hibernateKey = "ignore";
-      idleAction = "ignore";
-      idleActionSec = "0";
-      powerKeyLongPress = "ignore";
+      settings = {
+        Login = {
+          HandleLidSwitch = "ignore";
+          HandlePowerKey = "ignore";
+          HandleSuspendKey = "ignore";
+          HandleHibernateKey = "ignore";
+          HandlePowerKeyLongPress = "ignore";
+          IdleAction = "ignore";
+          IdleActionSec = "0";
+        };
+      };
     };
     # SSD optimization: limit systemd journal size and rotation
     journald.extraConfig = ''
@@ -171,7 +175,6 @@ in {
           "networkmanager"
           "wheel"
           "input"
-          "vboxusers"
         ];
         packages = with pkgs; [
         ];
@@ -269,7 +272,9 @@ in {
         block = [];
       };
     };
-    virtualbox.host.enable = true;
+    # VirtualBox disabled due to build failures with VirtualBox 7.2.0 and libcurl compatibility
+    # Using Podman as container runtime instead
+    # virtualbox.host.enable = true;
     podman = {
       enable = true;
       # Create a `docker` alias for podman, to use it as a drop-in replacement
