@@ -1,6 +1,6 @@
 # Multi-Platform Nix Configuration
 
-A comprehensive personal Nix configuration using flakes and home-manager for multi-platform development environments. 
+A comprehensive personal Nix configuration using flakes and home-manager for multi-platform development environments.
 Supports NixOS, WSL, macOS, and standard Linux distributions with automatic environment detection.
 
 ## ✨ Features
