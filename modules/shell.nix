@@ -35,6 +35,8 @@
       redli
       smartmontools
       expect
+      inetutils
+      netcat
     ]
     ++ lib.optionals isLinux [
       # Linux (both native and WSL)
