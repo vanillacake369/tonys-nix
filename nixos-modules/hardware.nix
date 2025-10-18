@@ -1,21 +1,8 @@
 # Hardware-related services: audio, printing, input devices
 {pkgs, ...}: {
-  # Touchpad and input device configuration
-  services.libinput = {
-    enable = true;
-    touchpad = {
-      tapping = true;
-      disableWhileTyping = true;
-      clickMethod = "buttonareas";
-      middleEmulation = true;
-      accelSpeed = "0.3";
-      additionalOptions = ''
-        Option "PalmDetection" "on"
-        Option "TappingButtonMap" "lmr"
-        Option "ScrollPixelDistance" "50"
-      '';
-    };
-  };
+  # Libinput configuration (basic enablement)
+  # Note: Touchpad settings are managed via GNOME dconf (see modules/gnome-settings.nix)
+  services.libinput.enable = true;
 
   # Printing support
   services.printing.enable = true;
