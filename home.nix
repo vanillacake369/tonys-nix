@@ -132,6 +132,7 @@ in {
     ./modules/zsh.nix
     ./modules/shell.nix
     ./modules/apps.nix
+    ./modules/gnome-settings.nix
     ./dotfiles/jetbrain/jetbrains.nix
   ];
 }

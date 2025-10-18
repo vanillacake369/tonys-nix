@@ -67,19 +67,16 @@
     hostnames = ["HAMA" "nixos"];
   in {
     # Define nixos configuration for multiple hostnames
-    # Only create nixosConfigurations if we can access /etc (actual NixOS system)
-    nixosConfigurations = lib.optionalAttrs (builtins.pathExists /etc) (
-      lib.genAttrs hostnames (hostname: let
-        systemConfig = builders.mkSystem "x86_64-linux";
-      in
-        nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          pkgs = systemConfig.pkgs;
-          modules = [
-            ./configuration.nix
-          ];
-        })
-    );
+    nixosConfigurations = lib.genAttrs hostnames (hostname: let
+      systemConfig = builders.mkSystem "x86_64-linux";
+    in
+      nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        pkgs = systemConfig.pkgs;
+        modules = [
+          ./configuration.nix
+        ];
+      });
 
     # Define macos configuration for multiple hostnames and architectures
     darwinConfigurations = let
