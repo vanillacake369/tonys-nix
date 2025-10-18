@@ -1,10 +1,5 @@
 # Hardware-related services: audio, printing, input devices
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   # Touchpad and input device configuration
   services.libinput = {
     enable = true;

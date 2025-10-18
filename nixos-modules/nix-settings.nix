@@ -1,10 +1,5 @@
 # Nix configuration, binary caches, and garbage collection
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
+{...}: {
   # Nix configuration optimized for performance and SSD longevity
   nix.settings = {
     experimental-features = [

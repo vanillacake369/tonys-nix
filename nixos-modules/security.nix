@@ -1,10 +1,5 @@
 # Security configuration: SSH, fail2ban, PAM, Google Authenticator
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   # SSH hardening with Google Authenticator 2FA
   services.openssh = {
     enable = true;
