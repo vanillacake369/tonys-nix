@@ -1,9 +1,5 @@
 # Desktop environment: X Server, GNOME, display manager
-{
-  pkgs,
-  lib,
-  ...
-}: {
+{lib, ...}: {
   # X Server configuration
   services.xserver = {
     enable = true;
@@ -43,36 +39,5 @@
         IdleActionSec = "0";
       };
     };
-  };
-
-  # Programs for desktop environment
-  programs.firefox.enable = true;
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-  };
-  programs.java = {
-    enable = true;
-    package = pkgs.zulu17;
-  };
-
-  # Enable nix-ld for running dynamically linked executables
-  programs.nix-ld = {
-    enable = true;
-    libraries = with pkgs; [
-      # Basic system libraries
-      stdenv.cc.cc
-      zlib
-      openssl
-      curl
-
-      # Python-related libraries (for claude-monitor and other Python tools)
-      libffi
-      glib
-
-      # CLI tool dependencies
-      ncurses
-      readline
-    ];
   };
 }
