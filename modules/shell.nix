@@ -23,6 +23,7 @@
       git
       lazygit
       lazydocker
+      lazyssh
       curl
       tree
       ripgrep
