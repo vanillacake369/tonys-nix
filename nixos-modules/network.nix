@@ -1,7 +1,6 @@
 # Network configuration, firewall, and VPN
 {
   config,
-  pkgs,
   lib,
   ...
 }: let

@@ -1,6 +1,5 @@
 # Desktop environment: X Server, GNOME, display manager
 {
-  config,
   pkgs,
   lib,
   ...

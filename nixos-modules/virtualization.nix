@@ -1,10 +1,5 @@
 # Container and virtualization configuration
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
+{...}: {
   # Enable common container config files in /etc/containers
   virtualisation = {
     containers = {
