@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-{
-
+{pkgs, ...}: {
   programs = {
     neovim = {
       enable = true;
@@ -9,8 +7,7 @@
       vimAlias = true;
       vimdiffAlias = true;
       # All configuration resides in dotfiles/lazyvim
-      plugins = with pkgs.vimPlugins; [ LazyVim ];
+      plugins = with pkgs.vimPlugins; [LazyVim];
     };
   };
-
 }
