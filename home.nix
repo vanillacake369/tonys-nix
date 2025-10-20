@@ -41,10 +41,13 @@
     };
 
   # Packages
-  imports = [
-    ./modules/apps.nix
-    ./modules/language.nix
-    ./modules/settings.nix
-    ./modules/shell.nix
-  ];
+  imports =
+    [
+      ./modules/apps.nix
+      ./modules/language.nix
+      ./modules/shell.nix
+    ]
+    ++ lib.optionals isNixOs [./modules/settings-gnome.nix]
+    ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix]
+    ++ lib.optionals isDarwin [./modules/settings-mac.nix];
 }
