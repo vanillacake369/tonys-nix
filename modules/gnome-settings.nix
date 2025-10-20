@@ -37,7 +37,7 @@
       middle-click-emulation = false;
 
       # Acceleration profile: "default", "flat", "adaptive"
-      accel-profile = "flat"; # Disable acceleration for precision
+      accel-profile = "custom"; # Disable acceleration for precision
     };
 
     # Mouse configuration (for external mouse)
