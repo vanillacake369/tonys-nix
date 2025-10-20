@@ -32,27 +32,8 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
     # Define overlays for package customizations
-    overlays = [
-      (final: prev: {
-        google-chrome = prev.google-chrome.override {
-          commandLineArgs = "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3";
-        };
-        slack = final.symlinkJoin {
-          name = "slack";
-          paths = [prev.slack];
-          buildInputs = [final.makeWrapper];
-          postBuild = ''
-            wrapProgram $out/bin/slack \
-              --add-flags "--ozone-platform-hint=auto --enable-wayland-ime --enable-features=TouchpadOverscrollHistoryNavigation --wayland-text-input-version=3"
-          '';
-        };
-        # Make nixos-24.11 packages available
-        nixos-24_11 = import nixos-24_11 {
-          inherit (final) system;
-          config = final.config;
-        };
-      })
-    ];
+    # All overlays are now managed in the overlays/ directory
+    overlays = import ./overlays {inherit nixos-24_11;};
 
     # Shared home-manager modules
     homeManagerModules = [
