@@ -4,7 +4,6 @@
   isWsl,
   isDarwin,
   isLinux,
-  isNixOs ? false,
   ...
 }: {
   home.packages = with pkgs;
