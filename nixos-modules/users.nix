@@ -12,8 +12,6 @@
           "wheel"
           "input"
         ];
-        packages = with pkgs; [
-        ];
       };
     };
   };
