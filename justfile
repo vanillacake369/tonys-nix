@@ -119,6 +119,9 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
       if [[ "{{OS_TYPE}}" == "wsl" ]]; then
         echo "Running: home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back"
         home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back
+      elif [[ "{{OS_TYPE}}" == "nixos" ]]; then
+        echo "Running: home-manager switch --flake .#hm-nixos-{{HM_CONFIG}} -b back"
+        home-manager switch --flake .#hm-nixos-{{HM_CONFIG}} -b back
       else
         echo "Running: home-manager switch --flake .#hm-{{HM_CONFIG}} -b back"
         home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
@@ -132,6 +135,9 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
       if [[ "{{OS_TYPE}}" == "wsl" ]]; then
         echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying WSL config anyway..."
         home-manager switch --flake .#hm-wsl-{{HM_CONFIG}} -b back
+      elif [[ "{{OS_TYPE}}" == "nixos" ]]; then
+        echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying NixOS config anyway..."
+        home-manager switch --flake .#hm-nixos-{{HM_CONFIG}} -b back
       else
         echo "[!] Unknown system architecture: {{HM_CONFIG}}. Trying anyway..."
         home-manager switch --flake .#hm-{{HM_CONFIG}} -b back
