@@ -1,9 +1,8 @@
 {
   lib,
-  pkgs,
   isLinux,
   isDarwin,
-  isWsl,
+  isNixOs,
   ...
 }: {
   # Enable Home Manager
@@ -42,15 +41,18 @@
     };
 
   # Packages
-  imports = [
-    ./modules/infra.nix
-    ./modules/language.nix
-    ./modules/nvim.nix
-    ./modules/zsh.nix
-    ./modules/shell.nix
-    ./modules/apps.nix
-    ./modules/gnome-settings.nix
-    ./modules/windows.nix
-    ./dotfiles/jetbrain/jetbrains.nix
-  ];
+  imports =
+    [
+      ./modules/infra.nix
+      ./modules/language.nix
+      ./modules/nvim.nix
+      ./modules/zsh.nix
+      ./modules/shell.nix
+      ./modules/apps.nix
+      ./modules/windows.nix
+      ./dotfiles/jetbrain/jetbrains.nix
+    ]
+    ++ lib.optionals isNixOs [
+      ./modules/gnome-settings.nix
+    ];
 }
