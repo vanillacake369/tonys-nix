@@ -44,9 +44,17 @@
     '';
   };
 
-  # Display manager and desktop environment
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  # Display manager for Hyprland
+  # Using greetd with tuigreet for a lightweight TTY greeter
+  services.greetd = {
+    enable = true;
+    settings = {
+      default_session = {
+        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        user = "greeter";
+      };
+    };
+  };
 
   # SystemD journal configuration for SSD optimization
   services.journald.extraConfig = ''
