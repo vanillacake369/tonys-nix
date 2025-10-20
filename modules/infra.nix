@@ -9,6 +9,7 @@
 }: {
   home.packages = with pkgs;
     [
+      # General
       k6
       kubectl
       kubectx
@@ -17,8 +18,13 @@
       kubernetes-helm
       kubectl-tree
       ngrok
+      multipass
+    ]
+    ++ lib.optionals isWsl [
+      # WSL-specific
     ]
     ++ lib.optionals (isDarwin || (isLinux && !isWsl)) [
+      # Mac only
       dive
       minikube
       podman
