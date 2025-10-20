@@ -41,18 +41,10 @@
     };
 
   # Packages
-  imports =
-    [
-      ./modules/infra.nix
-      ./modules/language.nix
-      ./modules/nvim.nix
-      ./modules/zsh.nix
-      ./modules/shell.nix
-      ./modules/apps.nix
-      ./modules/windows.nix
-      ./dotfiles/jetbrain/jetbrains.nix
-    ]
-    ++ lib.optionals isNixOs [
-      ./modules/gnome-settings.nix
-    ];
+  imports = [
+    ./modules/apps.nix
+    ./modules/language.nix
+    ./modules/settings.nix
+    ./modules/shell.nix
+  ];
 }
