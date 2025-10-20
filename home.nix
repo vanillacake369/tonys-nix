@@ -30,6 +30,9 @@
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
         else ./dotfiles/zellij/config.kdl.linux;
+
+      # Hyprland configuration (Linux only)
+      ".config/hypr/hyprland.conf".source = ./dotfiles/hypr/hyprland.conf;
     }
     // lib.optionalAttrs isDarwin {
       # Karabiner json
