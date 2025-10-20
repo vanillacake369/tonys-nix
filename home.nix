@@ -50,7 +50,7 @@
       ./modules/language.nix
       ./modules/shell.nix
     ]
-    ++ lib.optionals isNixOs [./modules/settings-gnome.nix]
+    ++ lib.optionals isNixOs [./modules/settings-hyprland.nix]
     ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix]
     ++ lib.optionals isDarwin [./modules/settings-mac.nix];
 }
