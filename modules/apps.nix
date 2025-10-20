@@ -11,7 +11,6 @@
     [
       # General apps
       claude-code
-      openvpn
     ]
     ++ lib.optionals (!isWsl) [
       # Non WSL apps
@@ -19,9 +18,6 @@
       jetbrains.idea-ultimate
       jetbrains.goland
       jetbrains.datagrip
-      drawio
-      discord
-      wezterm
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Linux-specific apps
@@ -34,11 +30,6 @@
       hunspellDicts.en_US
       hunspellDicts.ko_KR
       hunspellDicts.ko-kr
-      openvpn3
-    ]
-    ++ lib.optionals isNixOs [
-      # NixOS-specific apps
-      ulauncher
     ]
     ++ lib.optionals isDarwin [
       # MacOs Apps
@@ -49,5 +40,7 @@
       jankyborders
       appcleaner
       hidden-bar
+      discord
+      wezterm
     ];
 }
