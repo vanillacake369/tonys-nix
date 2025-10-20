@@ -10,6 +10,91 @@
   ...
 }: {
   # =============================================================================
+  # CLI Tools and Packages
+  # =============================================================================
+  home.packages = with pkgs;
+    [
+      # Core utilities
+      zsh-autoenv
+      zsh-powerlevel10k
+      bat
+      jq
+      ripgrep
+      tree
+      curl
+      htop
+      btop
+
+      # Git tools
+      git
+      lazygit
+
+      # Container tools
+      lazydocker
+
+      # Network tools
+      autossh
+      lazyssh
+      inetutils
+      netcat
+
+      # Monitoring and debugging
+      lsof
+      gdb
+      smartmontools
+
+      # Terminal tools
+      zellij
+      neofetch
+      expect
+
+      # Cloud tools
+      awscli
+      ssm-session-manager-plugin
+
+      # Recording
+      asciinema
+      asciinema-agg
+
+      # Database
+      redli
+
+      # Infrastructure tools
+      k6
+      kubectl
+      kubectx
+      k9s
+      stern
+      kubernetes-helm
+      kubectl-tree
+      ngrok
+      multipass
+      terraform
+    ]
+    ++ lib.optionals isLinux [
+      # Linux-specific tools
+      xclip
+      openssh
+      psmisc
+      strace
+    ]
+    ++ lib.optionals (isLinux && !isWsl) [
+      # Native Linux only (not WSL)
+      google-authenticator
+      wayland-utils
+    ]
+    ++ lib.optionals isDarwin [
+      # macOS-specific tools
+      dive
+      minikube
+      podman
+      podman-compose
+      podman-desktop
+      nixos-24_11.vagrant
+      qemu
+    ];
+
+  # =============================================================================
   # ZSH Configuration
   # =============================================================================
   programs.zsh = {
@@ -69,7 +154,7 @@
     };
 
     # ZSH initialization script
-    initExtra = ''
+    initContent = ''
       # Powerlevel10k instant prompt
       if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
         source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
@@ -251,90 +336,6 @@
       };
     };
   };
-
-  # =============================================================================
-  # CLI Tools and Packages
-  # =============================================================================
-  home.packages = with pkgs;
-    [
-      # Core utilities
-      zsh-autoenv
-      zsh-powerlevel10k
-      bat
-      jq
-      ripgrep
-      tree
-      curl
-      htop
-      btop
-
-      # Git tools
-      git
-      lazygit
-
-      # Container tools
-      lazydocker
-
-      # Network tools
-      autossh
-      lazyssh
-      inetutils
-      netcat
-
-      # Monitoring and debugging
-      lsof
-      gdb
-      smartmontools
-
-      # Terminal tools
-      zellij
-      neofetch
-      expect
-
-      # Cloud tools
-      awscli
-      ssm-session-manager-plugin
-
-      # Recording
-      asciinema
-      asciinema-agg
-
-      # Database
-      redli
-
-      # Infrastructure tools
-      k6
-      kubectl
-      kubectx
-      k9s
-      stern
-      kubernetes-helm
-      kubectl-tree
-      ngrok
-      multipass
-    ]
-    ++ lib.optionals isLinux [
-      # Linux-specific tools
-      xclip
-      openssh
-      psmisc
-      strace
-    ]
-    ++ lib.optionals (isLinux && !isWsl) [
-      # Native Linux only (not WSL)
-      google-authenticator
-      wayland-utils
-    ]
-    ++ lib.optionals isDarwin [
-      # macOS-specific tools
-      dive
-      minikube
-      podman
-      podman-compose
-      podman-desktop
-      nixos-24_11.vagrant
-      qemu
-    ];
 
   # =============================================================================
   # Platform-Specific Configurations
