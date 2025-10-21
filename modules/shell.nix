@@ -68,7 +68,6 @@
       kubernetes-helm
       kubectl-tree
       ngrok
-      multipass
       terraform
     ]
     ++ lib.optionals isLinux [
@@ -77,6 +76,7 @@
       openssh
       psmisc
       strace
+      multipass
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
