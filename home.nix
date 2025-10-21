@@ -30,6 +30,9 @@
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
         else ./dotfiles/zellij/config.kdl.linux;
+
+      # Hyprland configuration (Linux only)
+      ".config/hypr/hyprland.conf".source = ./dotfiles/hypr/hyprland.conf;
     }
     // lib.optionalAttrs isDarwin {
       # Karabiner json
@@ -41,10 +44,13 @@
     };
 
   # Packages
-  imports = [
-    ./modules/apps.nix
-    ./modules/language.nix
-    ./modules/settings.nix
-    ./modules/shell.nix
-  ];
+  imports =
+    [
+      ./modules/apps.nix
+      ./modules/language.nix
+      ./modules/shell.nix
+    ]
+    ++ lib.optionals isNixOs [./modules/settings-hyprland.nix]
+    ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix]
+    ++ lib.optionals isDarwin [./modules/settings-mac.nix];
 }
