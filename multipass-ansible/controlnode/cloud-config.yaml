@@ -1,0 +1,105 @@
+#cloud-config
+# Ansible Control Node Configuration
+# Uses default ubuntu user with automatic SSH key generation
+
+hostname: controlnode
+
+# Package installation
+packages:
+  - ansible
+  - net-tools
+  - vim
+  - git
+  - python3-pip
+  - sshpass
+
+# SSH configuration for passwordless authentication
+ssh_pwauth: true
+
+# Generate SSH key pair for ubuntu user automatically
+runcmd:
+  # Wait for cloud-init to complete
+  - sleep 5
+
+  # Generate SSH key pair for ubuntu user (no passphrase)
+  - sudo -u ubuntu ssh-keygen -t rsa -b 4096 -f /home/ubuntu/.ssh/id_rsa -N ""
+
+  # Set proper permissions
+  - chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+  - chmod 700 /home/ubuntu/.ssh
+  - chmod 600 /home/ubuntu/.ssh/id_rsa
+  - chmod 644 /home/ubuntu/.ssh/id_rsa.pub
+
+  # Create ansible inventory directory
+  - sudo -u ubuntu mkdir -p /home/ubuntu/ansible-lab
+  - sudo -u ubuntu touch /home/ubuntu/ansible-lab/inventory
+
+  # Display the public key for easy copying
+  - echo "========================================" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "Copy this public key to managed nodes:" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "========================================" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - cat /home/ubuntu/.ssh/id_rsa.pub >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "To get this key later, run:" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "  cat ~/.ssh/id_rsa.pub" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - echo "========================================" >> /home/ubuntu/SSH_PUBLIC_KEY.txt
+  - chown ubuntu:ubuntu /home/ubuntu/SSH_PUBLIC_KEY.txt
+
+  # Create a helper script to display connection info
+  - |
+    cat > /home/ubuntu/show-connection-info.sh << 'EOF'
+    #!/bin/bash
+    echo "=========================================="
+    echo "Ansible Control Node Connection Info"
+    echo "=========================================="
+    echo "Hostname: $(hostname)"
+    echo "IP Address: $(hostname -I | awk '{print $1}')"
+    echo ""
+    echo "SSH Public Key:"
+    echo "----------------------------------------"
+    cat ~/.ssh/id_rsa.pub
+    echo "----------------------------------------"
+    echo ""
+    echo "To connect to managed nodes:"
+    echo "  ssh <node-ip>"
+    echo ""
+    echo "Ansible inventory file:"
+    echo "  ~/ansible-lab/inventory"
+    echo "=========================================="
+    EOF
+  - chmod +x /home/ubuntu/show-connection-info.sh
+  - chown ubuntu:ubuntu /home/ubuntu/show-connection-info.sh
+
+  # Create sample ansible.cfg
+  - |
+    cat > /home/ubuntu/ansible-lab/ansible.cfg << 'EOF'
+    [defaults]
+    inventory = inventory
+    remote_user = ubuntu
+    host_key_checking = False
+
+    [privilege_escalation]
+    become = True
+    become_method = sudo
+    become_user = root
+    become_ask_pass = False
+    EOF
+  - chown ubuntu:ubuntu /home/ubuntu/ansible-lab/ansible.cfg
+
+# Welcome message
+final_message: |
+  ========================================
+  Ansible Control Node is ready!
+  ========================================
+
+  Default user: ubuntu
+
+  To get started:
+    1. multipass shell controlnode
+    2. ./show-connection-info.sh
+    3. Copy the SSH public key to managed nodes
+
+  SSH key location: ~/.ssh/id_rsa.pub
+  Ansible workspace: ~/ansible-lab
+
+  ========================================
