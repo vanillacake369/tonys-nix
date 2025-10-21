@@ -15,6 +15,7 @@
       ./nixos-modules/boot.nix
       ./nixos-modules/locale.nix
       ./nixos-modules/desktop.nix
+      ./nixos-modules/remote-desktop.nix
       ./nixos-modules/hardware.nix
       ./nixos-modules/security.nix
       ./nixos-modules/network.nix
