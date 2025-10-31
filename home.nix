@@ -48,7 +48,13 @@
     [
       ./modules/apps.nix
       ./modules/language.nix
-      ./modules/shell.nix
+      ./modules/shell-core.nix
+      ./modules/shell-infra.nix
+      ./modules/shell-utils.nix
+      ./modules/shell-network.nix
+      ./modules/shell-monitor.nix
+      ./modules/shell-functions.nix
+      ./modules/shell-services.nix
     ]
     ++ lib.optionals isNixOs [./modules/settings-hyprland.nix]
     ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix]
