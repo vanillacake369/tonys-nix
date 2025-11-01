@@ -65,3 +65,7 @@ intellij := "idea64.exe"
         Run("idea64.exe")
     }
 }
+
+; Disable PageUp and PageDown keys
+PgUp::Return
+PgDn::Return
