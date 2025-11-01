@@ -19,6 +19,7 @@
     ]
     ++ lib.optionals isLinux [
       # Linux-specific tools
+      google-authenticator
       xclip
     ];
 
