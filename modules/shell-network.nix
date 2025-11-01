@@ -19,6 +19,7 @@
       lazyssh
       inetutils
       netcat
+      dig
     ]
     ++ lib.optionals isLinux [
       # Linux-specific network tools
