@@ -24,6 +24,7 @@
       curl
       htop
       btop
+      gping
 
       # Git tools
       git
@@ -35,6 +36,7 @@
       # Network tools
       autossh
       lazyssh
+      sshpass
       inetutils
       netcat
 
