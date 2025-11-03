@@ -35,13 +35,18 @@ GC_MIN_INTERVAL_DAYS := "3"            # Minimum days between GC runs
 GC_MAX_INTERVAL_DAYS := "14"           # Force GC after 14 days regardless
 GC_STATE_FILE := ".nix-gc-state"       # Track last GC timestamp
 
+# macOS Power Schedule Configuration
+MAC_SLEEP_TIME := "02:00:00"           # Sleep time (HH:MM:SS)
+MAC_WAKE_TIME := "06:30:00"            # Wake time (HH:MM:SS)
+MAC_SCHEDULE_DAYS := "MTWRFSU"         # Days of week (M=Mon, T=Tue, W=Wed, R=Thu, F=Fri, S=Sat, U=Sun)
+
 
 
 
 ########### *** INSTALLATION *** ##########
 
 # Initiate all configuration
-install-all: install-nix link-nix-conf install-home-manager (install-uidmap-conditional) install-pckgs smart-clean
+install-all: install-nix link-nix-conf install-home-manager (install-uidmap-conditional) install-pckgs setup-mac-power-schedule smart-clean
 
 # Install nix
 install-nix:
@@ -152,6 +157,39 @@ apply-zsh:
     echo "/home/{{USERNAME}}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells
   fi
   chsh -s /home/{{USERNAME}}/.nix-profile/bin/zsh
+
+# Setup macOS power schedule (macOS only)
+setup-mac-power-schedule:
+  #!/usr/bin/env bash
+  if [[ "{{OS_TYPE}}" != "darwin" ]]; then
+    echo "[✓] Power schedule setup skipped - not macOS"
+    exit 0
+  fi
+
+  echo "[!] Setting up macOS power schedule (requires sudo)..."
+
+  # Clear any existing power schedules first
+  sudo pmset repeat cancel >/dev/null 2>&1
+
+  # Set both sleep and wake schedules in a single command
+  # Format: pmset repeat sleep DAYS TIME wakeorpoweron DAYS TIME
+  if sudo pmset repeat sleep {{MAC_SCHEDULE_DAYS}} {{MAC_SLEEP_TIME}} wakeorpoweron {{MAC_SCHEDULE_DAYS}} {{MAC_WAKE_TIME}}; then
+    echo "[✓] Sleep schedule set: {{MAC_SLEEP_TIME}} daily"
+    echo "[✓] Wake schedule set: {{MAC_WAKE_TIME}} daily"
+  else
+    echo "[✗] Failed to set power schedules"
+    exit 1
+  fi
+
+  echo ""
+  echo "[✓] Power schedule configured successfully!"
+  echo ""
+  echo "Schedule details:"
+  echo "  • Sleep: {{MAC_SLEEP_TIME}} (every day)"
+  echo "  • Wake:  {{MAC_WAKE_TIME}} (every day)"
+  echo ""
+  echo "To verify: sudo pmset -g sched"
+  echo "To cancel: sudo pmset repeat cancel"
 
 # Link nix.conf to system configuration
 link-nix-conf:
