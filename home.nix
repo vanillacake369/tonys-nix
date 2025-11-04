@@ -16,7 +16,6 @@
     {
       ".config/nix".source = ./dotfiles/nix;
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
-      ".config/nvim".source = ./dotfiles/lazyvim;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
 
       # Claude configuration - only manage static files

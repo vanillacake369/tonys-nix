@@ -93,7 +93,6 @@ just force-clean                                              # Manual garbage c
 ### Dotfiles Management (`dotfiles/`)
 Configuration files are symlinked from dotfiles directory:
 - **lazyvim/**: Complete LazyVim Neovim configuration with language support
-- **learn-nvim/**: Alternative/experimental Neovim setup
 - **zellij/**: Terminal multiplexer configuration and layouts
 - **nix/** and **nixpkgs/**: Nix-specific configuration files
 - **autohotkey/**: Windows automation scripts (for WSL environments)
