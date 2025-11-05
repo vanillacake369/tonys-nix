@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixos-24_11.url = "github:nixos/nixpkgs/nixos-24.11";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,7 +20,6 @@
   outputs = {
     self,
     nixpkgs,
-    nixos-24_11,
     home-manager,
     nix-darwin,
     nixos-generators,
@@ -33,7 +31,7 @@
 
     # Define overlays for package customizations
     # All overlays are now managed in the overlays/ directory
-    overlays = import ./overlays {inherit nixos-24_11;};
+    overlays = import ./overlays {};
 
     # Shared home-manager modules
     homeManagerModules = [
