@@ -166,6 +166,14 @@ setup-mac-power-schedule:
     exit 0
   fi
 
+  echo ""
+  read -p "Do you want to configure automatic sleep schedule for macOS? ( yes(Y/y)/no(N/n) ): " -r confirm
+  if [[ ! "$confirm" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    echo "[→] Power schedule setup skipped"
+    exit 0
+  fi
+  echo ""
+
   echo "[!] Setting up macOS power schedule (requires sudo)..."
 
   # Clear any existing power schedules first
