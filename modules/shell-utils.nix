@@ -1,5 +1,5 @@
 # General CLI utilities and tools
-# Core utilities, terminal tools, recording, database clients
+# Core utilities, terminal tools, recording, database clients, platform-specific services
 {
   config,
   pkgs,
@@ -12,28 +12,37 @@
   # =============================================================================
   # General CLI Utilities
   # =============================================================================
-  home.packages = with pkgs; [
-    # Core utilities
-    bat
-    jq
-    ripgrep
-    tree
-    curl
+  home.packages = with pkgs;
+    [
+      # Core utilities
+      bat
+      jq
+      ripgrep
+      tree
+      curl
 
-    # Git tools
-    git
-    lazygit
+      # Git tools
+      git
+      lazygit
 
-    # Terminal tools
-    zellij
-    neofetch
-    expect
+      # Terminal tools
+      zellij
+      neofetch
+      expect
 
-    # Recording
-    asciinema
-    asciinema-agg
+      # Recording
+      asciinema
+      asciinema-agg
 
-    # Database
-    redli
-  ];
+      # Database
+      redli
+    ]
+    ++ lib.optionals (isLinux && !isWsl) [
+      # Native Linux only (not WSL)
+      google-authenticator
+    ]
+    ++ lib.optionals isLinux [
+      # Linux-specific tools
+      xclip
+    ];
 }
