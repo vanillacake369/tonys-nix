@@ -103,23 +103,6 @@
         fi
       ''}
 
-      # Smart container aliases - prefer podman, fallback to docker
-      if command -v podman >/dev/null 2>&1; then
-        alias docker='podman'
-      fi
-
-      if command -v podman-compose >/dev/null 2>&1; then
-        alias docker-compose='podman-compose'
-      elif command -v docker-compose >/dev/null 2>&1; then
-        alias docker-compose='docker-compose'
-      fi
-
-      if command -v podman >/dev/null 2>&1; then
-        alias docker-compose-new='podman compose'
-      elif command -v docker >/dev/null 2>&1; then
-        alias docker-compose-new='docker compose'
-      fi
-
       # =============================================================================
       # Custom Functions
       # =============================================================================
@@ -235,8 +218,10 @@
 
   programs.git = {
     enable = true;
-    userName = "limjihoon";
-    userEmail = "lonelynight1026@gmail.com";
+    settings.user = {
+	name = "limjihoon";
+	email = "lonelynight1026@gmail.com";
+    };
   };
 
   programs.yazi = {
