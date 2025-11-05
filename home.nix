@@ -52,7 +52,6 @@
       ./modules/shell-utils.nix
       ./modules/shell-network.nix
       ./modules/shell-monitor.nix
-      ./modules/shell-services.nix
     ]
     ++ lib.optionals isNixOs [./modules/settings-hyprland.nix]
     ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix]
