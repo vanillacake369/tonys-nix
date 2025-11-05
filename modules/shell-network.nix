@@ -24,6 +24,5 @@
     ++ lib.optionals isLinux [
       # Linux-specific network tools
       openssh
-      multipass
     ];
 }

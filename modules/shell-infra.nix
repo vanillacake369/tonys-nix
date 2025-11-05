@@ -39,7 +39,6 @@
       podman
       podman-compose
       podman-desktop
-      nixos-24_11.vagrant
       qemu
     ];
 }
