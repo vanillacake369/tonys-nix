@@ -83,9 +83,10 @@ intellij := "idea64.exe"
 ; ==============================================================================
 ; Disable Unwanted Keys
 ; ==============================================================================
-; Disable PageUp and PageDown keys
+; Disable PageUp, PageDown, and NumLock keys
 PgUp::return
 PgDn::return
+NumLock::return
 
 
 ; ==============================================================================
