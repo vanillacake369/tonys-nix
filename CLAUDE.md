@@ -98,6 +98,12 @@ Configuration files are symlinked from dotfiles directory:
 - **autohotkey/**: Windows automation scripts (for WSL environments)
 - **screen/**: Screen session configurations
 - **karabiner/**: macOS keyboard remapping with productivity shortcuts
+- **claude/**: Claude Code configuration with automatic sync
+  - **commands/**: Custom slash commands
+  - **agents/**: Custom AI agents
+  - **settings.json**: Project-level settings
+  - **CLAUDE.md**: Project instructions
+  - **config-overlay.json**: Global permissions and MCP servers (auto-synced)
 
 ### Library Functions (`lib/`)
 - **builders.nix**: Custom Nix builders and utility functions
@@ -180,6 +186,116 @@ home-manager switch --flake .#hm-x86_64-linux --dry-run  # Test Linux config wit
 home-manager switch --flake .#hm-wsl-x86_64-linux --dry-run # Test WSL config without applying
 home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon config without applying
 ```
+
+## Claude Code Configuration Management
+
+### Automatic Configuration Sync
+
+This repository uses a **hybrid approach** to manage Claude Code configuration:
+- **Static files** (commands, agents, CLAUDE.md) are symlinked directly
+- **Dynamic settings** (permissions, mcpServers) are automatically merged into `~/.claude.json` during home-manager activation
+- **Runtime data** (projects, tipsHistory, etc.) remains in `~/.claude.json` and is preserved
+
+### How It Works
+
+When you run `just install-pckgs`, home-manager:
+1. Copies static files to `~/.claude/`
+2. Executes an activation script that:
+   - Reads your existing `~/.claude.json`
+   - Merges `dotfiles/claude/config-overlay.json` into it
+   - Preserves all runtime data (project history, settings, etc.)
+   - Creates a timestamped backup before modification
+
+### Configuration Files
+
+#### `dotfiles/claude/config-overlay.json`
+Contains only the settings you want to version control:
+- **permissions**: Tool access rules (Read, WebFetch, Bash, etc.)
+- **mcpServers**: MCP server configurations (npay, kakaopay, context7, etc.)
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "Bash(git commit:*)",
+      ...
+    ]
+  },
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    ...
+  }
+}
+```
+
+#### `~/.claude.json`
+Your local configuration file that contains:
+- Settings from `config-overlay.json` (auto-synced)
+- Runtime data (numStartups, tipsHistory, projects, etc.)
+- Machine-specific state
+
+### Benefits
+
+✅ **Version Control**: Share permissions and MCP servers across machines
+✅ **Preserve Runtime Data**: Project history and settings stay intact
+✅ **Automatic Sync**: No manual steps needed
+✅ **Safe Updates**: Automatic backups before each sync
+✅ **Multi-Machine**: Same configuration on all your devices
+
+### Modifying Configuration
+
+#### Add/Remove Permissions
+Edit `dotfiles/claude/config-overlay.json`:
+```json
+{
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Glob(*)",
+      "YourNewTool(*)"
+    ]
+  }
+}
+```
+
+Then apply:
+```bash
+just install-pckgs
+```
+
+#### Add/Remove MCP Servers
+Edit `dotfiles/claude/config-overlay.json`:
+```json
+{
+  "mcpServers": {
+    "new-server": {
+      "command": "npx",
+      "args": ["-y", "@example/mcp-server"]
+    }
+  }
+}
+```
+
+Then apply:
+```bash
+just install-pckgs
+```
+
+### Implementation Details
+
+The sync is powered by:
+- **Nix `home.activation`**: Runs after symlinks are created
+- **jq**: Merges JSON files (`.[0] * .[1]` operator)
+- **sponge** (moreutils): Safely writes to files
+- **lib.hm.dag.entryAfter**: Ensures proper execution order
+
+See `home.nix:47-72` for the implementation.
 
 ## Troubleshooting
 
