@@ -2922,7 +2922,7 @@
             ]
           },
           {
-            "description": "Ctrl+Cmd+Arrow to line start/end (Cmd+Arrow)",
+            "description": "Fn+Arrow to line start/end (Cmd+Arrow)",
             "manipulators": [
               {
                 "type": "basic",
@@ -2930,8 +2930,75 @@
                   "key_code": "left_arrow",
                   "modifiers": {
                     "mandatory": [
-                      "control",
-                      "command"
+                      "fn",
+                      "shift"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": [
+                      "command",
+                      "shift"
+                    ]
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "frontmost_application_unless",
+                    "bundle_identifiers": [
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^io\\.alacritty$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.jetbrains\\..*$"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_arrow",
+                  "modifiers": {
+                    "mandatory": [
+                      "fn",
+                      "shift"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": [
+                      "command",
+                      "shift"
+                    ]
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "frontmost_application_unless",
+                    "bundle_identifiers": [
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^io\\.alacritty$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.jetbrains\\..*$"
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "left_arrow",
+                  "modifiers": {
+                    "mandatory": [
+                      "fn"
                     ]
                   }
                 },
@@ -2958,8 +3025,7 @@
                   "key_code": "right_arrow",
                   "modifiers": {
                     "mandatory": [
-                      "control",
-                      "command"
+                      "fn"
                     ]
                   }
                 },
