@@ -17,6 +17,7 @@
       # Core utilities
       bat
       jq
+      moreutils # sponge for safe file writes
       ripgrep
       tree
       curl

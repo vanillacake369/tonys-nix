@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   isLinux,
   isDarwin,
   isNixOs,
@@ -18,7 +19,7 @@
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
 
-      # Claude configuration - only manage static files
+      # Claude configuration - static files only
       ".claude/commands".source = ./dotfiles/claude/commands;
       ".claude/settings.json".source = ./dotfiles/claude/settings.json;
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
@@ -41,6 +42,35 @@
       ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
       ".skhdrc".source = ./dotfiles/skhd/skhdrc;
     };
+
+  # Activation script to merge Claude Code configuration
+  # This syncs permissions and mcpServers from dotfiles while preserving runtime data
+  home.activation.syncClaudeConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    CLAUDE_CONFIG="$HOME/.claude.json"
+    OVERLAY_FILE="${./dotfiles/claude/config-overlay.json}"
+
+    # Only proceed if jq is available
+    if command -v ${lib.getExe' pkgs.jq "jq"} &> /dev/null; then
+      # Create .claude.json if it doesn't exist
+      if [[ ! -f "$CLAUDE_CONFIG" ]]; then
+        echo "Creating new $CLAUDE_CONFIG..."
+        echo '{}' > "$CLAUDE_CONFIG"
+      fi
+
+      # Create backup before modification
+      BACKUP_FILE="''${CLAUDE_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
+      ${lib.getExe' pkgs.coreutils "cp"} "$CLAUDE_CONFIG" "$BACKUP_FILE"
+
+      # Merge overlay into existing config using jq
+      # This preserves all existing fields and only updates permissions and mcpServers
+      ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$CLAUDE_CONFIG" "$OVERLAY_FILE" | \
+        ${lib.getExe' pkgs.moreutils "sponge"} "$CLAUDE_CONFIG"
+
+      echo "✓ Claude Code configuration synced (backup: $BACKUP_FILE)"
+    else
+      echo "⚠ jq not found, skipping Claude config sync"
+    fi
+  '';
 
   # Packages
   imports =
