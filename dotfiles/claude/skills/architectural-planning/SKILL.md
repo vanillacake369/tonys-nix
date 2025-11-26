@@ -33,6 +33,133 @@ Using [codebase-analysis] methodology:
 4. Learn architectural boundaries and conventions
 5. Find similar features as reference examples
 
+### Phase 1.5: Deep Reasoning (If Complex)
+
+After architectural discovery, automatically evaluate if systematic thinking is needed using the MCP Decision Tree from @CLAUDE.md.
+
+#### Complexity Assessment
+
+**Evaluate the planning task**:
+- Count viable architectural approaches (1, 2, 3+?)
+- Identify trade-off dimensions (performance, cost, complexity, maintainability, scalability, etc.)
+- Assess decision impact (low, medium, high, critical?)
+- Determine path clarity (obvious, somewhat clear, unclear?)
+
+**Decision**:
+- 3+ approaches AND 5+ dimensions AND unclear path → **Use Sequential Thinking**
+- Otherwise → **Proceed to Phase 2**
+
+#### Sequential Thinking Activation
+
+When complexity indicators are met, use Sequential Thinking MCP for systematic analysis:
+
+**Process**:
+```
+1. Invoke mcp__sequential-thinking__sequentialthinking
+2. Thought 1: Analyze current system constraints
+3. Thought 2: Evaluate Option A (pros, cons, risks)
+4. Thought 3: Evaluate Option B (pros, cons, risks)
+5. Thought 4: Evaluate Option C (pros, cons, risks)
+6. Thought 5: Compare options across all dimensions
+7. Thought N: Synthesize final recommendation with evidence
+8. nextThoughtNeeded: false → Proceed with recommendation
+```
+
+#### Examples
+
+**Example 1: Complex Decision (Use Sequential Thinking)**
+```
+User: "Should we use microservices or monolith for this feature?"
+
+Complexity Check:
+✅ Approaches: 3 (microservices, monolith, modular monolith)
+✅ Dimensions: 7 (scalability, complexity, cost, team size, deployment, monitoring, debugging)
+✅ Impact: High (affects entire architecture)
+✅ Clarity: Unclear (trade-offs not obvious)
+
+Decision: Use Sequential Thinking
+
+Sequential Process:
+Thought 1: Current system handles 10k req/s, team of 3 developers
+Thought 2: Microservices - Benefits: independent scaling, tech diversity
+                         Drawbacks: complexity, distributed debugging, overhead
+Thought 3: Monolith - Benefits: simplicity, easy debugging, lower ops cost
+                      Drawbacks: scaling limitations, deployment coupling
+Thought 4: Modular Monolith - Benefits: best of both, easier migration path
+                               Drawbacks: requires discipline, eventual split needed
+Thought 5: Compare across dimensions:
+           - Team size (3 devs) → favors simpler approach
+           - Current scale → monolith sufficient
+           - Future growth → need migration path
+Thought 6: Evidence-based conclusion:
+           Start with modular monolith, designed for future microservices split
+           Rationale: Balances current simplicity with future scalability
+
+Result: Detailed implementation plan with modular monolith approach
+```
+
+**Example 2: Simple Decision (Skip Sequential Thinking)**
+```
+User: "Add a new Nix module for VSCode"
+
+Complexity Check:
+❌ Approaches: 1 (add to modules/apps.nix following existing pattern)
+❌ Dimensions: 2 (package selection, configuration)
+❌ Impact: Low (isolated addition)
+✅ Clarity: Clear (pattern exists in apps.nix)
+
+Decision: Skip Sequential Thinking, proceed to Phase 2
+
+Reason: Straightforward addition following existing pattern from modules/apps.nix:15-20
+```
+
+**Example 3: Moderate Complexity (Borderline)**
+```
+User: "Refactor home.nix activation scripts for better maintainability"
+
+Complexity Check:
+⚠️ Approaches: 2-3 (keep inline, extract to functions, move to separate files)
+⚠️ Dimensions: 4 (readability, maintainability, testability, performance)
+❌ Impact: Medium (affects build process but not critical)
+⚠️ Clarity: Somewhat clear (prefer extraction but details vary)
+
+Decision: Skip Sequential Thinking (borderline, but not meeting all criteria)
+
+Reason: While moderate complexity, optimal approach is fairly clear from Clean Code principles
+        Trade-offs are straightforward: inline simplicity vs extracted reusability
+        Can analyze directly without systematic thought chain
+```
+
+#### Memory Integration
+
+After completing deep reasoning and making architectural decisions, consider using Memory MCP to record:
+- **Decision rationale**: Why Option X was chosen over Option Y
+- **Trade-offs considered**: What was sacrificed and why
+- **Future implications**: When to revisit this decision
+- **Constraints**: Factors that influenced the choice
+
+**Example**:
+```
+After choosing modular monolith approach:
+
+mcp__memory__create_entities([{
+  name: "Architecture Decision - Modular Monolith",
+  entityType: "Architectural Decision",
+  observations: [
+    "Chose modular monolith over microservices (2025-01-26)",
+    "Reason: Team size (3 devs) favors simplicity",
+    "Designed for future microservices migration when scale requires it",
+    "Trade-off: Accept scaling limitations for reduced operational complexity"
+  ]
+}])
+
+mcp__memory__create_relations([{
+  from: "Architecture Decision - Modular Monolith",
+  to: "Team Size Constraint",
+  relationType: "influenced by"
+}])
+```
+
 ### Phase 2: Solution Design
 Design within discovered constraints:
 1. Identify which existing components are affected
@@ -49,82 +176,38 @@ Create actionable steps:
 4. Identify potential conflicts or breaking changes
 5. Plan validation and testing approach
 
-## Output Structure
+## Plan Structure Guidelines
 
-### IMPLEMENTATION_PLAN.md Template
+### Essential Elements
 
-```markdown
-# Implementation Plan: [Feature Name]
+**Context Section**:
+- Discovered architecture pattern
+- Technology stack
+- Similar existing features
+- Integration points
 
-## Discovered Architecture
+**Approach Section**:
+- High-level solution
+- Why it fits the architecture
+- New vs existing components
+- Pattern references
 
-**Architecture Pattern**: [Identified pattern - layered, hexagonal, microservices, etc.]
-**Primary Language**: [Detected from analysis]
-**Key Frameworks**: [Found in dependencies]
-**Project Structure**: [How code is organized]
+**Implementation Section**:
+- Atomic, ordered steps
+- File paths (create/modify)
+- Code examples from codebase
+- Rationale for each step
 
-**Similar Features**: [Reference existing similar functionality]
-- `path/to/similar/feature.ext` - [How it relates]
+**Risk Section**:
+- Dependencies (internal/external)
+- Potential issues and mitigations
+- Breaking changes and migrations
+- Performance impact
 
-## Solution Approach
-
-[High-level approach aligned with discovered patterns]
-
-**Integration Points**:
-- [Existing component 1] - [How solution connects]
-- [Existing component 2] - [Why this integration point]
-
-**New Components Needed**:
-- [Component name] - [Responsibility, location, reasoning]
-
-## Implementation Steps
-
-### Step 1: [Specific, atomic task]
-**Files**:
-- `path/to/file` (modify/create)
-
-**Action**: [What to change, following which existing pattern]
-
-**Example**: [Reference to similar existing code]
-```
-[code example from codebase]
-```
-
-**Rationale**: [Why this approach fits the architecture]
-
-### Step 2: [Next task]
-[Continue with same structure]
-
-## Dependencies & Risks
-
-**Dependencies**:
-- [Internal dependency] - [Why it's needed]
-- [External library] - [If new, justify addition]
-
-**Potential Risks**:
-- [Risk] - **Mitigation**: [How to handle]
-
-**Breaking Changes**:
-- [Any breaking change] - **Migration**: [How to update callers]
-
-## Testing Strategy
-
-**Test Location**: [Where tests go based on project structure]
-
-**Test Approach**: [Following existing test patterns]
-- Unit tests: [What to test, using which framework]
-- Integration tests: [If needed, following existing patterns]
-
-**Manual Validation**:
-- [ ] [Specific validation step]
-- [ ] [Another validation step]
-
-## Success Criteria
-- [ ] [Measurable outcome 1]
-- [ ] [Measurable outcome 2]
-- [ ] All existing tests pass
-- [ ] New code follows project conventions
-```
+**Validation Section**:
+- Testing strategy
+- Success criteria
+- Manual verification steps
 
 ## Planning Best Practices
 
@@ -232,6 +315,11 @@ Before finalizing plan:
 - [ ] Is each step atomic and testable?
 - [ ] Have I considered risks and provided mitigations?
 - [ ] Will someone unfamiliar with my thinking understand this plan?
+
+## Plan Templates
+
+For detailed templates and architecture-specific examples, see:
+- **templates.md** - Full plan template and common scenarios
 
 ---
 
