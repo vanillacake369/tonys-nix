@@ -1,91 +1,113 @@
-Debug specific issue with systematic root cause analysis
+Orchestrate skills to systematically debug issues with root cause analysis
 
-# Context
-Issue description, symptoms, and context:
+# Task
 $ARGUMENTS
 
-# Requirements
-1. **Issue Reproduction**: Understand exact conditions and symptoms:
-   - When does the issue occur?
-   - What are the exact error messages or symptoms?
-   - What environment/configuration is involved?
-   - Can the issue be consistently reproduced?
-2. **Root Cause Analysis**: Use systematic debugging approach:
-   - Trace the issue from symptom to source
-   - Identify contributing factors
-   - Rule out false leads
-   - Validate hypotheses with evidence
-3. **Fix Strategies**: Present multiple fix approaches with:
-   - Immediate/temporary solutions
-   - Proper long-term fixes
-   - Risk assessment for each approach
-4. **Optimal Fix**: Choose best solution for current codebase:
-   - Follow patterns from @CLAUDE.md
-   - Consider impact on system stability
-   - Evaluate maintenance burden
-5. **Prevention**: Suggest measures to prevent similar issues:
-   - Code patterns to avoid
-   - Monitoring and alerting
-   - Testing improvements
+# Workflow
 
-# Output Format
+This command orchestrates skills for systematic debugging:
+
+1. **[codebase-analysis]**: Understand the context and reproduce the issue
+2. **Hypothesis testing**: Systematic root cause analysis
+3. **[code-implementation]**: Apply the fix following project patterns
+4. **[test-development]**: Add tests to prevent regression
+
+# Output Guidelines
+
+Provide **adaptive output** based on issue urgency and complexity:
+
+## For Critical Production Issues
+- Immediate reproduction steps
+- Quick fix (temporary workaround)
+- Proper fix (long-term solution)
+- Monitoring to ensure resolution
+
+## For Development Bugs
+- Thorough root cause analysis
+- Single recommended fix
+- Implementation with pattern references
+- Regression prevention strategy
+
+# Key Principles
+
+- **Evidence-based**: Test hypotheses, don't guess
+- **Reproducible**: Provide exact steps to reproduce
+- **Prioritized fixes**: Quick fix vs proper fix when needed
+- **Prevention-focused**: Add tests to catch similar issues
+- **Context-aware**: Reference existing debugging patterns and error handling
+
+# Example Output Structure
+
+For a typical debugging session:
+
+```markdown
 ## Issue Summary
 [Clear description of the problem and its impact]
 
-## Reproduction Steps
-1. [Step-by-step reproduction guide]
-2. [Expected vs actual behavior]
+## Reproduction
+**Steps**:
+1. [Exact step to reproduce]
+2. [Next step]
 
-## Investigation Process
-### Initial Observations
-[What we can observe directly]
+**Expected**: [What should happen]
+**Actual**: [What actually happens]
 
-### Hypotheses
-1. **Hypothesis 1**: [Potential cause]
-   - Evidence: [Supporting data]
-   - Likelihood: [High/Medium/Low]
+## Root Cause Analysis
 
-2. **Hypothesis 2**: [Alternative cause]
-   - Evidence: [Supporting data] 
-   - Likelihood: [High/Medium/Low]
+**Initial Observations**:
+- [What we can see directly]
+- [Error messages, logs, symptoms]
 
-### Root Cause
-[Confirmed underlying cause with evidence]
+**Investigation**:
+Hypothesis 1: [Potential cause]
+- Test: [How to verify]
+- Result: ✅/❌ [Evidence found/not found]
 
-## Fix Options
-### Quick Fix (Temporary)
-- **Solution**: [Immediate workaround]
-- **Pros**: [Benefits]
-- **Cons**: [Limitations and risks]
-- **Timeline**: [Implementation time]
+Hypothesis 2: [Another possible cause]
+- Test: [Verification approach]
+- Result: ✅/❌ [Evidence]
 
-### Proper Fix (Long-term)
-- **Solution**: [Comprehensive solution]
-- **Pros**: [Benefits]
-- **Cons**: [Complexity and effort required]
-- **Timeline**: [Implementation time]
+**Root Cause**: [Confirmed underlying cause with evidence]
+- Location: [file:line]
+- Reason: [Why this causes the issue]
 
-### Alternative Approaches
-[Other viable solutions with trade-offs]
+## Fix Strategy
 
-## Recommended Solution
-[Chosen approach with detailed justification]
+### Option A: Quick Fix (if critical)
+**Solution**: [Immediate workaround]
+**Implementation**: [How to apply]
+**Timeline**: [How fast can be deployed]
+**Trade-offs**: [What's not addressed]
+
+### Option B: Proper Fix (recommended)
+**Solution**: [Comprehensive fix addressing root cause]
+**Pattern**: Following [existing error handling] from [file:line]
+**Timeline**: [Implementation time]
+**Benefits**: [Why this is better long-term]
 
 ## Implementation Steps
-1. **Preparation**: [Pre-fix steps and safety measures]
-2. **Implementation**: [Step-by-step fix process]
-3. **Validation**: [How to verify the fix works]
-4. **Monitoring**: [What to watch for post-fix]
+1. [Specific change referencing existing code patterns]
+2. [Next change]
+3. [Add test to prevent regression]
 
 ## Prevention Strategy
-### Code Improvements
-[Changes to prevent recurrence]
+**Tests to Add**:
+- [Test case for this scenario]
+- [Edge case uncovered]
 
-### Process Improvements
-[Testing, monitoring, or workflow changes]
+**Monitoring**:
+- Watch [metric] for [expected behavior]
+- Alert on [error pattern]
 
-### Documentation
-[Knowledge sharing and runbook updates]
+**Code Improvements** (optional):
+- [Pattern to avoid in future]
+- [Defensive check to add]
 
-## Rollback Plan
-[What to do if the fix causes new issues]
+## Verification
+- [ ] Issue no longer reproduces
+- [ ] Test case added and passes
+- [ ] No regressions in [affected areas]
+- [ ] [Performance/behavior] as expected
+```
+
+Adapt based on urgency - minimal for quick production fixes, comprehensive for development debugging.

@@ -57,239 +57,94 @@ Code quality in project context:
 4. Testing adequacy
 5. Documentation quality
 
-## Universal Security Vulnerabilities
+## OWASP Top 10 Checklist
 
-### Input Validation (Any Language)
+### A01: Broken Access Control
+- [ ] Authorization checks on all protected resources
+- [ ] User can't access other users' data
+- [ ] Admin functions require admin role
+- [ ] No direct object references without validation
 
-```python
-# 🚨 CRITICAL: SQL Injection
-# ❌ Vulnerable
-def get_user(username):
-    query = f"SELECT * FROM users WHERE username = '{username}'"
-    return db.execute(query)
+### A02: Cryptographic Failures
+- [ ] Sensitive data encrypted at rest and in transit
+- [ ] Strong encryption algorithms (AES-256, RSA-2048+)
+- [ ] No hardcoded secrets in source code
+- [ ] Proper key management
 
-# ✅ Fixed: Parameterized query
-def get_user(username):
-    query = "SELECT * FROM users WHERE username = ?"
-    return db.execute(query, (username,))
-```
+### A03: Injection
+- [ ] All SQL queries parameterized
+- [ ] Command execution uses argument arrays
+- [ ] No eval() or similar dynamic execution
+- [ ] Input validation with whitelists
 
-```javascript
-// 🚨 HIGH: Command Injection
-// ❌ Vulnerable
-app.post('/convert', (req, res) => {
-  exec(`convert ${req.body.file} output.pdf`);
-});
+### A04: Insecure Design
+- [ ] Threat modeling performed
+- [ ] Security controls at design level
+- [ ] Rate limiting on sensitive operations
+- [ ] Proper session management
 
-// ✅ Fixed: Whitelist and sanitize
-app.post('/convert', (req, res) => {
-  const file = path.basename(req.body.file);  // Prevent path traversal
-  if (!/^[a-zA-Z0-9_-]+\.txt$/.test(file)) {  // Whitelist pattern
-    return res.status(400).send('Invalid file');
-  }
-  exec(`convert ${file} output.pdf`);
-});
-```
+### A05: Security Misconfiguration
+- [ ] Default credentials changed
+- [ ] Error messages don't leak information
+- [ ] Security headers configured (CSP, HSTS, etc.)
+- [ ] Unnecessary features disabled
 
-### Authentication & Authorization
+### A06: Vulnerable Components
+- [ ] Dependencies up to date
+- [ ] No known vulnerable libraries
+- [ ] Dependency scanning enabled
+- [ ] Unused dependencies removed
 
-```java
-// 🚨 CRITICAL: Missing authorization check
-// ❌ Vulnerable
-@GetMapping("/user/{id}/private-data")
-public PrivateData getPrivateData(@PathVariable Long id) {
-    return privateDataRepository.findByUserId(id);
-    // Anyone can access any user's private data!
-}
+### A07: Authentication Failures
+- [ ] Strong password policies
+- [ ] Multi-factor authentication available
+- [ ] Session timeout configured
+- [ ] Secure password storage (bcrypt, Argon2)
 
-// ✅ Fixed: Authorization check
-@GetMapping("/user/{id}/private-data")
-public PrivateData getPrivateData(@PathVariable Long id) {
-    Long currentUserId = getCurrentUserId();
-    if (!currentUserId.equals(id)) {
-        throw new UnauthorizedException("Access denied");
-    }
-    return privateDataRepository.findByUserId(id);
-}
-```
+### A08: Data Integrity Failures
+- [ ] Digital signatures for critical data
+- [ ] Secure deserialization
+- [ ] CI/CD pipeline security
+- [ ] Input validation on all data sources
 
-### Sensitive Data Exposure
+### A09: Logging & Monitoring Failures
+- [ ] Security events logged
+- [ ] No sensitive data in logs
+- [ ] Log integrity protected
+- [ ] Alerting on suspicious activity
 
-```typescript
-// 🛡️ MEDIUM: Sensitive data in logs
-// ❌ Problematic
-logger.info(`User logged in: ${JSON.stringify(user)}`);
-// Logs: { id: 1, email: "user@example.com", password: "hashed..." }
+### A10: Server-Side Request Forgery
+- [ ] URL validation and whitelisting
+- [ ] Network segmentation
+- [ ] No user-controlled URLs to internal resources
+- [ ] Response validation
 
-// ✅ Fixed: Sanitized logging
-logger.info(`User logged in: ${user.id}`);
-// Or use a sanitization function
-logger.info(`User logged in: ${sanitizeForLog(user)}`);
-```
+## Performance Review Categories
 
-```go
-// 🛡️ MEDIUM: Hardcoded secrets
-// ❌ Vulnerable
-const apiKey = "sk_live_abc123xyz"  // Secret in source code!
+### Algorithm Complexity
+- Identify O(n²) or worse algorithms
+- Suggest more efficient approaches
+- Consider trade-offs (time vs space)
 
-// ✅ Fixed: Environment variable
-apiKey := os.Getenv("API_KEY")
-if apiKey == "" {
-    log.Fatal("API_KEY environment variable required")
-}
-```
+### Database Optimization
+- N+1 query detection
+- Missing indexes
+- Inefficient joins
+- Unbounded result sets
 
-## Technology-Specific Security
+### Resource Management
+- Memory leaks
+- File handle leaks
+- Database connection pools
+- Proper cleanup (defer, finally, using)
 
-### Web Applications
+### Caching Strategy
+- Missing caching opportunities
+- Cache invalidation correctness
+- Over-caching (stale data)
+- Cache key design
 
-```javascript
-// 🚨 HIGH: XSS vulnerability
-// ❌ Vulnerable (React)
-function UserProfile({ user }) {
-  return <div dangerouslySetInnerHTML={{ __html: user.bio }} />;
-}
-
-// ✅ Fixed: Sanitize or avoid HTML
-function UserProfile({ user }) {
-  return <div>{user.bio}</div>;  // React escapes by default
-  // Or use DOMPurify if HTML needed
-}
-```
-
-```python
-# 🛡️ MEDIUM: Missing CSRF protection
-# ❌ Vulnerable (Flask)
-@app.route('/transfer', methods=['POST'])
-def transfer_money():
-    amount = request.form['amount']
-    to_account = request.form['account']
-    transfer(amount, to_account)
-
-# ✅ Fixed: CSRF token
-from flask_wtf.csrf import CSRFProtect
-csrf = CSRFProtect(app)
-
-@app.route('/transfer', methods=['POST'])
-@csrf.csrf_protect
-def transfer_money():
-    amount = request.form['amount']
-    to_account = request.form['account']
-    transfer(amount, to_account)
-```
-
-### API Security
-
-```typescript
-// 🛡️ HIGH: Missing rate limiting
-// ❌ Vulnerable
-app.post('/api/login', async (req, res) => {
-  const user = await authenticate(req.body.username, req.body.password);
-  // Brute force attack possible!
-});
-
-// ✅ Fixed: Rate limiting
-import rateLimit from 'express-rate-limit';
-
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,  // 15 minutes
-  max: 5,  // 5 attempts
-  message: 'Too many login attempts'
-});
-
-app.post('/api/login', loginLimiter, async (req, res) => {
-  const user = await authenticate(req.body.username, req.body.password);
-});
-```
-
-### Database Security
-
-```java
-// 🚨 CRITICAL: Overprivileged database connection
-// ❌ Problematic
-// Application uses 'root' user with full privileges
-
-// ✅ Fixed: Principle of least privilege
-// Create dedicated app user with minimal permissions:
-// GRANT SELECT, INSERT, UPDATE ON app_db.* TO 'app_user'@'localhost';
-// Use 'app_user' in application config
-```
-
-## Performance Review Patterns
-
-### Algorithm Efficiency
-
-```python
-# ⚡ MEDIUM: Inefficient algorithm
-# ❌ O(n²) performance
-def find_duplicates(items):
-    for i in range(len(items)):
-        for j in range(i + 1, len(items)):
-            if items[i] == items[j]:
-                # Performance issue with large lists
-                pass
-
-# ✅ O(n) performance
-def find_duplicates(items):
-    seen = set()
-    duplicates = set()
-    for item in items:
-        if item in seen:
-            duplicates.add(item)
-        seen.add(item)
-    return duplicates
-```
-
-### Database Query Optimization
-
-```javascript
-// ⚡ HIGH: N+1 query problem
-// ❌ Problematic
-const users = await User.findAll();
-for (const user of users) {
-  user.posts = await Post.findAll({ where: { userId: user.id } });
-  // Executes N queries!
-}
-
-// ✅ Fixed: Eager loading
-const users = await User.findAll({
-  include: [{ model: Post }]
-});
-// Executes 1 query with JOIN
-```
-
-### Memory Management
-
-```go
-// ⚡ MEDIUM: Memory leak potential
-// ❌ Problematic
-func loadAllUsers() []*User {
-    rows, _ := db.Query("SELECT * FROM users")
-    // No rows.Close() - connection leak!
-    var users []*User
-    for rows.Next() {
-        // ...
-    }
-    return users
-}
-
-// ✅ Fixed: Proper resource cleanup
-func loadAllUsers() ([]*User, error) {
-    rows, err := db.Query("SELECT * FROM users")
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()  // Ensures cleanup
-
-    var users []*User
-    for rows.Next() {
-        // ...
-    }
-    return users, rows.Err()
-}
-```
-
-## Domain-Specific Security
+## Domain-Specific Considerations
 
 ### Financial Systems
 - Decimal precision in calculations (no floating point!)
@@ -319,51 +174,35 @@ func loadAllUsers() ([]*User, error) {
 
 ### 🚨 Critical Issues (Must Fix)
 **Location**: `file.ext:line`
-**Risk**: SQL Injection
-**Impact**: Attackers can access entire database
-
-**Vulnerable Code**:
-```language
-[code snippet]
-```
-
-**Recommended Fix**:
-```language
-[fixed code]
-```
-
-**Rationale**: [Explanation]
+**Risk**: [Vulnerability type]
+**Impact**: [What can happen]
+**Fix**: [Specific recommendation with code]
 
 ### 🛡️ Security Concerns (High Priority)
 **Location**: `file.ext:line`
 **Severity**: High
-**OWASP Category**: A01:2021 – Broken Access Control
-
-[Details...]
+**OWASP Category**: [Category]
+**Recommendation**: [Fix with code example]
 
 ### ⚡ Performance Issues
 **Location**: `file.ext:line`
-**Impact**: 2.1s → 180ms (91% improvement possible)
-
-[Details...]
+**Impact**: [Performance degradation]
+**Fix**: [Optimization with code]
 
 ### 📈 Quality Improvements (Recommended)
 **Location**: `file.ext:line`
-**Category**: Maintainability
-
-[Details...]
+**Category**: [Maintainability/Readability/etc.]
+**Suggestion**: [Improvement]
 
 ### ✅ Good Practices Found
 **Location**: `file.ext:line`
-**Observation**: Excellent use of parameterized queries throughout codebase
-
-[Why this matters...]
+**Observation**: [What's done well]
+**Why**: [Why this matters]
 ```
 
 ## Review Best Practices
 
 ### Provide Context
-
 ```
 ✅ "This SQL injection vulnerability exists because user input
    from req.body.search is directly concatenated into the query.
@@ -374,7 +213,6 @@ func loadAllUsers() ([]*User, error) {
 ```
 
 ### Prioritize Realistically
-
 ```
 🚨 Critical: Fix immediately (security, data loss)
 🛡️ High: Fix before release (security, major bugs)
@@ -383,7 +221,6 @@ func loadAllUsers() ([]*User, error) {
 ```
 
 ### Reference Project Standards
-
 ```
 ✅ "This violates the project's Clean Code guideline of
    <20 lines per function (see CLAUDE.md). Extract validation
@@ -403,6 +240,11 @@ Before finalizing review:
 - [ ] Explained rationale for each concern
 - [ ] Acknowledged good practices found
 - [ ] Prioritized issues appropriately
+
+## Detailed Examples
+
+For comprehensive vulnerability examples and fixes, see:
+- **vulnerability-examples.md** - Detailed security and performance examples
 
 ---
 

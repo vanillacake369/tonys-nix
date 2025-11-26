@@ -1,67 +1,95 @@
-Improve existing code or system with optimized solutions
+Orchestrate skills to improve code quality, performance, and maintainability
 
-# Context
-Current code, system, or functionality to enhance:
+# Task
 $ARGUMENTS
 
-# Requirements
-1. **Current State Analysis**: Thoroughly assess the existing implementation
-2. **Improvement Areas**: Identify specific areas for enhancement:
-   - Performance bottlenecks
-   - Code readability and maintainability
-   - Security vulnerabilities
-   - Scalability limitations
-   - Technical debt
-3. **Enhancement Options**: Suggest 3-4 improvement approaches with:
-   - Impact assessment (High/Medium/Low)
-   - Implementation effort required
-   - Risk evaluation
-4. **Optimal Solution**: Choose the best enhancement considering:
-   - Project guidelines from @CLAUDE.md
-   - Backward compatibility requirements
-   - Resource constraints
-5. **Migration Strategy**: Safe implementation plan with:
-   - Incremental rollout approach
-   - Rollback procedures
-   - Testing strategy
+# Workflow
 
-# Output Format
+This command orchestrates multiple skills to provide comprehensive improvement strategies:
+
+1. **[security-review]**: Identify security vulnerabilities and quality issues
+2. **[code-quality]**: Suggest refactoring and maintainability improvements
+3. **[architectural-planning]**: Design safe migration strategy if needed
+4. **[code-implementation]**: Provide implementation guidance for improvements
+5. **[test-development]**: Ensure improvements are properly tested
+
+# Output Guidelines
+
+Provide **adaptive output** based on improvement scope:
+
+## For Focused Improvements (single file/function)
+- Specific issues identified
+- Direct improvement recommendation
+- Implementation approach
+- Quick validation
+
+## For Large-Scale Improvements (system-wide)
+- Assessment of current state with metrics
+- Prioritized improvement areas (critical → nice-to-have)
+- Phased enhancement approach
+- Safe migration strategy with rollback plan
+- Impact assessment (performance, compatibility, effort)
+
+# Key Principles
+
+- **Safety first**: Never break existing functionality
+- **Incremental**: Phase improvements to reduce risk
+- **Measurable**: Define success metrics where possible
+- **Backward compatible**: Maintain compatibility unless explicitly required otherwise
+- **Project-aligned**: Follow existing code patterns and standards from @CLAUDE.md
+
+# Example Output Structure
+
+For a moderate improvement task:
+
+```markdown
 ## Current State Assessment
-[Analysis of existing implementation and limitations]
+[Analysis of existing implementation with identified issues]
 
 ## Improvement Opportunities
-### Performance
-[Performance-related improvements]
 
-### Maintainability
-[Code quality and structure improvements]
+**Critical** (Fix before release):
+- [Security/correctness issue] at [file:line]
 
-### Security & Reliability
-[Security and reliability enhancements]
+**High Priority** (Significant value):
+- [Performance bottleneck] at [file:line]
+- [Maintainability issue] at [file:line]
 
-### Scalability
-[Future-proofing improvements]
+**Enhancement** (When convenient):
+- [Code style inconsistency] at [file:line]
 
-## Enhancement Options
-### Option 1: [Enhancement Name]
-- **Impact**: [High/Medium/Low]
-- **Effort**: [High/Medium/Low]
-- **Risk**: [High/Medium/Low]
-- **Benefits**: [Specific improvements]
-- **Drawbacks**: [Potential issues]
+## Recommended Approach
+[Chosen strategy with justification based on project context]
 
-[Repeat for 3-4 options]
+**Why this approach**:
+- Minimizes risk by [phasing strategy]
+- Reuses [existing patterns/utilities]
+- Preserves [backward compatibility]
 
-## Recommended Enhancement
-[Chosen approach with detailed justification]
+## Phased Implementation
 
-## Implementation Strategy
-1. **Phase 1**: [Initial changes with minimal risk]
-2. **Phase 2**: [Core improvements]
-3. **Phase 3**: [Advanced optimizations]
+### Phase 1: Critical Fixes (1-2 hours)
+1. [Immediate safety/security fix]
+2. [Quick validation]
 
-## Migration Plan
-- **Preparation**: [Pre-implementation steps]
-- **Rollout**: [Deployment strategy]
-- **Validation**: [Testing and verification]
-- **Rollback**: [Contingency plan if issues arise]
+### Phase 2: Core Improvements (half-day)
+1. [Performance optimization]
+2. [Refactoring for maintainability]
+3. [Comprehensive testing]
+
+### Phase 3: Polish (optional, 1-2 hours)
+1. [Code style consistency]
+2. [Documentation updates]
+
+## Migration Strategy
+- **Rollout**: [How to deploy safely]
+- **Validation**: [How to verify improvements]
+- **Rollback**: [If issues occur, how to revert]
+
+## Success Metrics
+- [ ] [Measurable improvement - e.g., "Response time < 200ms"]
+- [ ] All existing tests pass
+- [ ] No regressions in [affected areas]
+```
+
+Adapt complexity based on improvement scope - simpler for focused changes, detailed for system-wide enhancements.

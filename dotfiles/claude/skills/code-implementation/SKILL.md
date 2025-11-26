@@ -47,243 +47,37 @@ Ensure seamless integration:
 4. Check that integration points work correctly
 5. Ensure no new dependencies without justification
 
-## Style Matching Strategies
+## Style Matching Categories
 
-### Naming Convention Matching
+### Naming Conventions
+- Match case style (camelCase, snake_case, PascalCase)
+- Follow prefix/suffix patterns (get*, is*, has*, *Service, *Repository)
+- Use domain terminology from existing code
+- Maintain consistency within same module
 
-```javascript
-// ✅ Learn and apply existing pattern
-// Found in codebase:
-function getUserById(id) { ... }
-function getOrderById(id) { ... }
+### Structural Patterns
+- Copy class/function organization from similar files
+- Follow same constructor/initialization patterns
+- Match method ordering (public → private, create → read → update → delete)
+- Replicate abstraction levels
 
-// New code matches:
-function getProductById(id) { ... }
+### Import Organization
+- Group imports same way as existing files
+- Use same libraries and frameworks
+- Follow import ordering conventions
+- Avoid introducing new dependencies
 
-// ❌ Don't impose different pattern:
-function fetchProduct(id) { ... }  // Wrong - breaks convention
-```
+### Error Handling
+- Match exception types and error messages
+- Follow logging patterns and levels
+- Use same error propagation approach
+- Replicate validation patterns
 
-### Structural Pattern Matching
-
-```python
-# ✅ Follow existing structure
-# Found in codebase:
-class UserService:
-    def __init__(self, repository, cache):
-        self.repository = repository
-        self.cache = cache
-
-    def get_user(self, id):
-        # Implementation
-
-# New code matches structure:
-class ProductService:
-    def __init__(self, repository, cache):
-        self.repository = repository
-        self.cache = cache
-
-    def get_product(self, id):
-        # Implementation
-```
-
-### Import Pattern Matching
-
-```typescript
-// ✅ Match existing import organization
-// Found in existing files:
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
-import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dto/create-user.dto';
-
-// New code follows same pattern:
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
-import { Product } from '../entities/product.entity';
-import { CreateProductDto } from '../dto/create-product.dto';
-```
-
-### Error Handling Pattern Matching
-
-```java
-// ✅ Match existing error handling
-// Found in UserService.java:
-public User findById(Long id) {
-    return repository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException(
-            ErrorCode.USER_NOT_FOUND,
-            "User not found with id: " + id
-        ));
-}
-
-// New code in OrderService.java matches:
-public Order findById(Long id) {
-    return repository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException(
-            ErrorCode.ORDER_NOT_FOUND,
-            "Order not found with id: " + id
-        ));
-}
-```
-
-## Library and Framework Integration
-
-### Using Existing Libraries
-
-```python
-# ✅ Study how existing code uses libraries
-# Found in existing services:
-from app.utils.logger import get_logger
-logger = get_logger(__name__)
-
-# New code uses same approach:
-from app.utils.logger import get_logger
-logger = get_logger(__name__)
-
-# ❌ Don't introduce different logging:
-import logging  # Wrong - project has custom logger
-```
-
-### Dependency Consistency
-
-```go
-// ✅ Use existing dependencies
-// Found in existing handlers:
-import (
-    "github.com/gin-gonic/gin"
-    "project/internal/service"
-)
-
-// New handler uses same:
-import (
-    "github.com/gin-gonic/gin"
-    "project/internal/service"
-)
-
-// ❌ Don't add new HTTP framework:
-import "github.com/gorilla/mux"  // Wrong - project uses Gin
-```
-
-## Code Quality Integration
-
-### Comment Style Matching
-
-```rust
-// ✅ Match existing comment patterns
-// Found in existing code:
-/// Validates user credentials and returns auth token.
-///
-/// # Arguments
-/// * `username` - The user's username
-/// * `password` - The user's password
-///
-/// # Returns
-/// * `Result<Token, AuthError>` - Auth token or error
-pub fn authenticate(username: &str, password: &str) -> Result<Token, AuthError>
-
-// New code matches style:
-/// Validates product availability and reserves inventory.
-///
-/// # Arguments
-/// * `product_id` - The product identifier
-/// * `quantity` - Requested quantity
-///
-/// # Returns
-/// * `Result<Reservation, InventoryError>` - Reservation or error
-pub fn reserve_inventory(product_id: &str, quantity: u32) -> Result<Reservation, InventoryError>
-```
-
-### Formatting and Spacing
-
-```javascript
-// ✅ Match exact formatting
-// Found in existing code (2 spaces, no semicolons):
-function processUser(user) {
-  const validated = validateUser(user)
-  const enriched = enrichData(validated)
-  return saveUser(enriched)
-}
-
-// New code matches formatting:
-function processOrder(order) {
-  const validated = validateOrder(order)
-  const enriched = enrichData(validated)
-  return saveOrder(enriched)
-}
-
-// ❌ Don't use different style:
-function processOrder(order) {
-    const validated = validateOrder(order);  // Wrong indentation and semicolons
-    const enriched = enrichData(validated);
-    return saveOrder(enriched);
-}
-```
-
-## Testing Integration
-
-### Test Pattern Matching
-
-```python
-# ✅ Follow existing test structure
-# Found in test_user_service.py:
-class TestUserService:
-    @pytest.fixture
-    def service(self, mock_repository):
-        return UserService(mock_repository)
-
-    def test_get_user_success(self, service):
-        # Arrange
-        user_id = 1
-        expected_user = User(id=user_id, name="Test")
-
-        # Act
-        result = service.get_user(user_id)
-
-        # Assert
-        assert result == expected_user
-
-# New test_product_service.py matches:
-class TestProductService:
-    @pytest.fixture
-    def service(self, mock_repository):
-        return ProductService(mock_repository)
-
-    def test_get_product_success(self, service):
-        # Arrange
-        product_id = 1
-        expected_product = Product(id=product_id, name="Test")
-
-        # Act
-        result = service.get_product(product_id)
-
-        # Assert
-        assert result == expected_product
-```
-
-## Implementation Safety
-
-### Before Implementation
-- [ ] Study at least 3 similar files to understand patterns
-- [ ] Identify exact naming, structure, and style conventions
-- [ ] Locate existing utilities/helpers to reuse
-- [ ] Check what testing patterns to follow
-
-### During Implementation
-- [ ] Make small, atomic changes
-- [ ] Test each change before proceeding
-- [ ] Maintain backward compatibility
-- [ ] Follow plan precisely - don't add scope
-
-### After Implementation
-- [ ] Run all tests - ensure none break
-- [ ] Build project - ensure it compiles/runs
-- [ ] Review code side-by-side with similar existing files
-- [ ] Verify no debug code or TODOs remain
+### Comment and Documentation
+- Match comment style (// vs /* */ vs #)
+- Follow documentation format (JSDoc, Python docstrings, etc.)
+- Use same level of detail as surrounding code
+- Maintain consistent spacing and formatting
 
 ## Common Implementation Patterns
 
@@ -311,40 +105,24 @@ When adding logic, study similar use cases:
 4. Reuse existing validation
 5. Match logging and error handling
 
-## Anti-Patterns to Avoid
+## Integration Best Practices
 
-❌ **Imposing External Style**:
-```javascript
-// Wrong - introducing new style
-const result = await service.execute();  // Project uses promises, not async/await
+### Use Existing Utilities
+```
+✅ Always: Reuse project utilities and helpers
+❌ Never: Reimplement existing functionality
 ```
 
-✅ **Matching Project Style**:
-```javascript
-// Right - following project pattern
-const result = service.execute().then(data => data);
+### Follow Architectural Boundaries
+```
+✅ Always: Respect layer dependencies (API → Service → Repository)
+❌ Never: Skip layers or create circular dependencies
 ```
 
-❌ **Adding Unnecessary Dependencies**:
-```python
-import requests  # Wrong - project uses httpx
+### Match Technology Choices
 ```
-
-✅ **Using Existing Dependencies**:
-```python
-from app.http import client  # Right - project's HTTP client
-```
-
-❌ **Reinventing Existing Utilities**:
-```java
-// Wrong - creating own date formatter
-SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-```
-
-✅ **Reusing Project Utilities**:
-```java
-// Right - using project's date utility
-String formatted = DateUtils.formatDate(date);
+✅ Always: Use same libraries as existing code
+❌ Never: Introduce new frameworks without strong justification
 ```
 
 ## Quality Checklist
@@ -358,6 +136,13 @@ Before considering implementation complete:
 - [ ] Does code structure align with similar features?
 - [ ] All existing tests still pass?
 - [ ] New code follows discovered patterns?
+- [ ] No architectural boundaries violated?
+- [ ] No unnecessary dependencies added?
+
+## Detailed Examples
+
+For comprehensive code examples demonstrating each pattern, see:
+- **examples.md** - Detailed code samples for all matching strategies
 
 ---
 
