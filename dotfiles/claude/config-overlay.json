@@ -1,0 +1,83 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(gradle:*)",
+      "Bash(./gradlew:*)",
+      "Bash(go build:*)",
+      "Bash(go run:*)",
+      "Bash(go test:*)",
+      "Bash(just:*)",
+      "Read(*)",
+      "WebFetch(https://docs.*.com/*)",
+      "WebFetch(https://*.readthedocs.io/*)",
+      "WebFetch(https://github.com/*)",
+      "WebFetch(https://claude.ai/*)",
+      "WebSearch(*)"
+    ],
+    "deny": [
+      "WebFetch(http://*)",
+      "WebFetch(*.internal/*)",
+      "WebFetch(*.local/*)",
+      "WebFetch(localhost:*)",
+      "WebFetch(127.0.0.1:*)"
+    ]
+  },
+  "mcpServers": {
+    "npay-payments": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@naverpay/payments-mcp"
+      ],
+      "_comment": "네이버 페이"
+    },
+    "kakaopay": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@kakaopay-develop/mcp",
+        "--tools=all",
+        "--cid=TC0ONETIME"
+      ],
+      "env": {
+        "KAKAOPAY_SECRET_KEY": "${KAKAOPAY_SECRET_KEY}"
+      },
+      "_comment": "카카오페이"
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "_comment": "최신 오픈소스 조회"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "_comment": "순차적 사고 설계"
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "_comment": "세션 간 단기 기억"
+    },
+    "webresearch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mzxrai/mcp-webresearch@latest"
+      ],
+      "_comment": "웹 검색"
+    }
+  }
+}
