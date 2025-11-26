@@ -21,9 +21,9 @@
 
       # Claude configuration - static files only
       ".claude/commands".source = ./dotfiles/claude/commands;
-      ".claude/settings.json".source = ./dotfiles/claude/settings.json;
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
       ".claude/agents".source = ./dotfiles/claude/agents;
+      ".claude/skills".source = ./dotfiles/claude/skills;
 
       # Zellij configuration
       ".config/zellij/config.kdl".source =
