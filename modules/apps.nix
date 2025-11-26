@@ -14,6 +14,7 @@
     ++ lib.optionals (!isWsl) [
       # Non WSL apps
       google-chrome
+      obsidian
       jetbrains.idea-ultimate
       jetbrains.goland
       jetbrains.datagrip
