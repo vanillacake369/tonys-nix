@@ -25,6 +25,7 @@
       # Git tools
       git
       lazygit
+      bfg-repo-cleaner
 
       # Terminal tools
       zellij
