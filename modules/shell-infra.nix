@@ -14,8 +14,11 @@
   # =============================================================================
   home.packages = with pkgs;
     [
-      # Container tools
+      # Docker TUI
       lazydocker
+
+      # Database TUI
+      lazysql
 
       # Cloud tools
       awscli
