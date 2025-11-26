@@ -607,32 +607,245 @@ Step 5: (Only if requested) Add documentation
 - **Clear Next Steps**: Always state exactly what to do next
 - **Avoid Assumptions**: Ask for clarification rather than guessing requirements
 
-## MCP Usage Guidelines
+## Intelligent Tool Selection with MCP Servers
 
-**IMPORTANT:** Use MCP servers intelligently to balance efficiency and capability. Prefer direct analysis for simple tasks.
+### Progressive Problem-Solving Strategy
 
-### When to Use MCP Servers
+Claude Code should intelligently select the appropriate tools and MCP servers based on task complexity. Follow these guidelines to determine when to leverage advanced capabilities versus direct analysis.
 
-**Direct Analysis (Default for simple tasks):**
-- Single file changes, clear requirements, standard patterns
-- Routine git operations, file management, obvious fixes
+#### Decision Framework
 
-**MCP-Assisted (Use when genuinely needed):**
-- **Context7**: Unfamiliar libraries needing official documentation or API references
-- **Sequential Thinking**: Complex architectural decisions with multiple trade-offs, systematic debugging with unclear root cause
-- **Memory**: Track important component relationships, record architectural decisions, maintain cross-session context
+**When to use MCP Servers:**
+1. **Complex Problems**: Multi-step reasoning, architectural decisions, or unfamiliar domains
+2. **Knowledge Gaps**: Need for library documentation, API references, or technical specifications
+3. **Deep Analysis**: Logical reasoning chains, hypothesis testing, or systematic debugging
+4. **Persistent Knowledge**: Tracking relationships, dependencies, or project-specific insights
 
-### Anti-Patterns to Avoid
+**When to analyze directly:**
+1. **Simple Tasks**: Straightforward code changes, file operations, or clear-cut solutions
+2. **Familiar Patterns**: Standard implementations following existing codebase patterns
+3. **Quick Responses**: Questions with obvious answers based on current context
+4. **Tool Operations**: Git commands, file management, or routine development tasks
 
+### Available MCP Servers
+
+#### Context7 - Library Documentation
+**Purpose**: Fetch up-to-date documentation and code examples for any library or framework
+
+**Use when:**
+- Encountering unfamiliar libraries or frameworks
+- Need for specific API usage patterns or best practices
+- Integration requirements with third-party dependencies
+- Version-specific implementation details needed
+
+**Example triggers:**
 ```
-❌ Sequential Thinking for trivial edits (e.g., "add a comma to JSON")
-❌ Context7 for libraries already used throughout codebase
-❌ Memory for temporary debugging information
+❓ "How do I implement authentication with this library?"
+✅ Use Context7 to get official documentation and examples
+
+❓ "What's the best way to configure Kubernetes deployment?"
+✅ Use Context7 for kubectl/K8s API documentation
+
+❌ "Add a new function to existing Go service"
+⚠️ Direct analysis - follows existing codebase patterns
+```
+
+#### Sequential Thinking - Logical Analysis
+**Purpose**: Break down complex problems into systematic reasoning steps
+
+**Use when:**
+- Multi-step problem requiring hypothesis generation and testing
+- Architectural decisions with trade-offs to evaluate
+- Debugging complex issues with multiple potential root causes
+- Performance optimization requiring systematic analysis
+- Design decisions affecting multiple system components
+
+**Example triggers:**
+```
+❓ "Why is the Nix build failing on ARM64 but working on x86_64?"
+✅ Use Sequential Thinking for systematic hypothesis testing
+
+❓ "Design a caching strategy for this distributed system"
+✅ Use Sequential Thinking to evaluate architecture options
+
+❌ "Fix this typo in configuration file"
+⚠️ Direct fix - obvious solution
+```
+
+#### Memory - Knowledge Graph
+**Purpose**: Store and retrieve project-specific knowledge, relationships, and insights
+
+**Use when:**
+- Tracking complex relationships between components
+- Recording important architectural decisions and rationale
+- Building understanding of unfamiliar codebase structure
+- Maintaining context across multiple related tasks
+- Documenting non-obvious dependencies or constraints
+
+**Example triggers:**
+```
+❓ "What are all the services that depend on this authentication module?"
+✅ Use Memory to query relationship graph
+
+❓ "Remember that this API has rate limiting issues during peak hours"
+✅ Store in Memory for future reference
+
+❌ "What files changed in last commit?"
+⚠️ Direct git command - transient information
+```
+
+### Progressive Analysis Workflow
+
+#### Step 1: Classify the Task
+```
+Simple Task (Direct Analysis):
+→ Single file modification
+→ Clear requirement with obvious solution
+→ Standard pattern application
+→ Routine maintenance operation
+
+Complex Task (MCP-Assisted):
+→ Multiple components affected
+→ Unfamiliar technology or pattern
+→ Trade-offs requiring evaluation
+→ Systematic debugging needed
+```
+
+#### Step 2: Select Appropriate Tools
+```
+Knowledge Gap → Context7
+├─ Need library documentation
+├─ API reference required
+└─ Best practices lookup
+
+Logical Complexity → Sequential Thinking
+├─ Multiple solution paths
+├─ Hypothesis testing needed
+└─ Systematic analysis required
+
+Relationship Tracking → Memory
+├─ Component dependencies
+├─ Architecture decisions
+└─ Project-specific insights
+```
+
+#### Step 3: Execute Efficiently
+```
+✅ Simple → Direct Analysis → Quick Solution
+✅ Complex → MCP Selection → Structured Analysis → Solution
+❌ Don't: Use MCP for trivial tasks (overhead)
+❌ Don't: Skip MCP when truly needed (incomplete solution)
+```
+
+### Integration Examples
+
+#### Example 1: Simple Configuration Change
+```
+User: "Add kubectl to the development tools"
+
+Analysis: ✅ Direct approach
+- Clear requirement: single tool installation
+- Existing pattern: language.nix module
+- No knowledge gap: standard Nix package
+
+Action:
+1. Add kubectl to language.nix
+2. Test with `just install-pckgs`
+3. Confirm availability
+```
+
+#### Example 2: Complex Architectural Decision
+```
+User: "Implement a rollback system for failed deployments"
+
+Analysis: ✅ Sequential Thinking MCP
+- Multiple approaches possible (backup, version control, snapshots)
+- Trade-offs to evaluate (performance, storage, complexity)
+- Integration with existing CI/CD pipeline
+- Safety and recovery considerations
+
+Action:
+1. Use Sequential Thinking to:
+   - Enumerate solution approaches
+   - Evaluate trade-offs systematically
+   - Test hypotheses about integration points
+   - Design failure scenarios and recovery
+2. Present structured recommendation
+3. Implement chosen solution
+```
+
+#### Example 3: Library Integration
+```
+User: "Add Prometheus metrics to our Go service"
+
+Analysis: ✅ Context7 MCP
+- Unfamiliar with Prometheus client library for Go
+- Need best practices for metric collection
+- Integration patterns with existing HTTP server
+
+Action:
+1. Use Context7 to fetch:
+   - Prometheus Go client documentation
+   - Metric type recommendations
+   - Integration examples
+2. Apply patterns to existing codebase
+3. Test metric collection
+```
+
+#### Example 4: Mixed Complexity
+```
+User: "Why is home-manager taking 10 minutes to build?"
+
+Phase 1: Quick checks (Direct)
+- Check Nix store size
+- Review recent changes
+- Verify binary cache connectivity
+
+Phase 2: Deep analysis if needed (Sequential Thinking)
+- If issue persists:
+  - Systematically test hypotheses
+  - Analyze build logs for bottlenecks
+  - Evaluate optimization strategies
+  - Test solutions incrementally
+```
+
+### Best Practices
+
+#### Efficiency Guidelines
+1. **Start Simple**: Always attempt direct analysis first for apparently simple tasks
+2. **Escalate Smart**: Switch to MCP when complexity or knowledge gaps become apparent
+3. **Combine Tools**: Use multiple MCPs for complex, multi-faceted problems
+4. **Learn Patterns**: Build understanding to reduce future MCP dependency
+
+#### Quality Assurance
+1. **Validate MCP Output**: Cross-reference MCP suggestions with project patterns
+2. **Maintain Context**: Ensure MCP-generated solutions align with KISS principles
+3. **Document Decisions**: Use Memory MCP to record important architectural choices
+4. **Iterate Efficiently**: Combine MCP insights with direct implementation
+
+#### Anti-Patterns to Avoid
+```
+❌ Using Sequential Thinking for "add a comma to JSON"
+❌ Using Context7 for libraries already used throughout codebase
+❌ Using Memory for temporary debugging information
+❌ Skipping MCP when genuinely stuck on complex problem
 ❌ Over-relying on MCP without building understanding
-❌ Skipping MCP when genuinely stuck on complex problems
 ```
 
-**Decision Rule:** Start simple (direct analysis) → Escalate to MCP only when complexity or knowledge gaps warrant it.
+### Summary: The Intelligent Balance
+
+**Direct Analysis**:
+- Fast execution for routine tasks
+- Builds familiarity with codebase
+- Maintains simplicity and clarity
+
+**MCP-Assisted Analysis**:
+- Structured approach to complexity
+- Access to specialized knowledge
+- Systematic problem-solving
+- Persistent insight tracking
+
+**The Goal**: Use the simplest effective approach while leveraging advanced capabilities when they provide genuine value. Stay aligned with KISS principles while not hesitating to use powerful tools when complexity genuinely warrants them.
 
 ## Clean Code Principles Summary
 
