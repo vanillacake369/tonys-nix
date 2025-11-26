@@ -1,6 +1,14 @@
 ---
 name: code-quality
-description: Improve code quality, performance, and maintainability through safe, incremental refactoring while preserving functionality and respecting project patterns
+description: Improve code quality, performance, and maintainability through safe, incremental refactoring while preserving functionality and respecting project patterns. Use when refactoring, optimizing performance, improving readability. Triggers: 'refactor', 'optimize', 'improve', 'clean up', 'performance', 'slow', 'duplication', 'complex', 'technical debt', '리팩토링', '최적화', '개선', '정리', '성능', '느림', '중복', '복잡', '기술부채'.
+allowed-tools:
+  - Read
+  - Edit
+  - Grep
+  - Bash(test:*)
+  - Bash(build:*)
+  - Bash(go test:*)
+  - Bash(npm test:*)
 ---
 
 # Code Quality and Refactoring Methodology

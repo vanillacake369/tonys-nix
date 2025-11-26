@@ -1,6 +1,17 @@
 ---
 name: codebase-analysis
-description: Universal methodology for discovering and adapting to any codebase's patterns, conventions, and architectural decisions. Automatically detects technology stack, learns project structure, and identifies coding standards.
+description: Universal methodology for discovering and adapting to any codebase's patterns, conventions, and architectural decisions. Automatically detects technology stack, learns project structure, and identifies coding standards. Use when encountering unfamiliar code, unknown frameworks, need to understand project patterns. Triggers: 'architecture', 'structure', 'conventions', 'tech stack', 'patterns', 'how is organized', '구조', '아키텍처', '패턴', '컨벤션', '기술스택', '어떻게 구성', '분석', analyzing package.json, go.mod, flake.nix, Cargo.toml, .gitignore files.
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - Bash(ls:*)
+  - Bash(find:*)
+  - Bash(cat:*)
+  - Bash(head:*)
+  - Bash(tail:*)
+  - mcp__context7__*
+  - WebSearch
 ---
 
 # Universal Codebase Analysis
@@ -27,93 +38,15 @@ Every analysis must begin with systematic discovery:
 
 ### Phase 0: Knowledge Expansion (If Needed)
 
-Before analyzing the codebase, automatically evaluate if external knowledge is required using the MCP Decision Tree from @CLAUDE.md.
+Before analyzing the codebase, evaluate if external knowledge is required.
 
-#### Knowledge Gap Detection
+**Quick decision**:
+1. Check file extensions and package managers
+2. Unfamiliar library/framework? → **Context7**
+3. Version newer than knowledge cutoff? → **WebSearch**
+4. All familiar? → **Skip to Phase 1**
 
-**Scan for unfamiliar technology**:
-1. Check file extensions (`.rs`, `.go`, `.nix`, etc.)
-2. Read package managers (package.json, Cargo.toml, flake.nix)
-3. Identify unknown frameworks in imports
-
-**Evaluation**:
-- Is this library/framework unfamiliar? → **Use Context7**
-- Is the version potentially newer than knowledge cutoff? → **Use WebSearch**
-- Are all technologies familiar? → **Proceed to Phase 1**
-
-#### Knowledge Expansion Process
-
-**When Context7 needed**:
-```
-1. Detect unfamiliar library (e.g., @upstash/redis)
-2. Resolve library ID: mcp__context7__resolve-library-id("upstash redis")
-3. Fetch docs: mcp__context7__get-library-docs("/upstash/upstash-redis", topic="architecture")
-4. Integrate documentation into analysis
-```
-
-**When WebSearch needed**:
-```
-1. Detect version mismatch (e.g., React 19 vs knowledge cutoff)
-2. Search: WebSearch("React 19 new features breaking changes")
-3. Update understanding with latest information
-4. Proceed with current knowledge
-```
-
-#### Examples
-
-**Example 1: Unfamiliar Library (Use Context7)**
-```
-Scans codebase → Finds `import { Redis } from '@upstash/redis'`
-Question: "Is @upstash/redis familiar?"
-Answer: No → Use Context7
-
-Process:
-1. mcp__context7__resolve-library-id("upstash redis")
-2. mcp__context7__get-library-docs("/upstash/upstash-redis", topic="usage patterns")
-3. Learn: Serverless Redis, REST-based API, specific patterns
-4. Proceed to Phase 1 with enriched knowledge
-```
-
-**Example 2: Version Mismatch (Use WebSearch)**
-```
-Scans package.json → Finds "react": "19.0.0"
-Question: "Is React 19 potentially newer than my knowledge?"
-Answer: Yes (knowledge cutoff is earlier) → Use WebSearch
-
-Process:
-1. WebSearch("React 19 new features")
-2. Learn: New hooks, breaking changes, migration patterns
-3. Proceed to Phase 1 with updated understanding
-```
-
-**Example 3: Familiar Technology (Skip MCP)**
-```
-Scans codebase → Finds justfile, Nix flakes, home-manager
-Question: "Are these technologies familiar?"
-Answer: Yes → Skip MCP, proceed directly to Phase 1
-
-Reason: Standard Nix ecosystem tools, well within knowledge base
-```
-
-#### Decision Criteria
-
-**Use Context7 when**:
-- Unknown library in imports/dependencies
-- Framework mentioned in docs but unfamiliar
-- API patterns unclear from code alone
-- Official documentation would clarify architecture
-
-**Use WebSearch when**:
-- Version number suggests recent release
-- Technology name suggests post-knowledge-cutoff
-- "Latest" or "new" mentioned in task
-- Breaking changes suspected
-
-**Skip MCP when**:
-- All technologies in common use
-- Patterns clear from code inspection
-- Standard libraries/frameworks
-- No version concerns
+**Detailed guidance**: See `../shared/mcp-decision-guide.md` for comprehensive MCP selection criteria, usage examples, and decision flows.
 
 ### Phase 1: Structural Analysis
 ```bash

@@ -1,6 +1,11 @@
 ---
 name: security-review
-description: Identify security vulnerabilities, performance issues, and code quality problems through systematic analysis adapted to project's technology stack and domain
+description: Identify security vulnerabilities, performance issues, and code quality problems through systematic analysis adapted to project's technology stack and domain. Use when reviewing code, assessing security, auditing. Triggers: 'security', 'vulnerability', 'audit', 'review', 'OWASP', 'injection', 'authentication', 'authorization', 'XSS', 'CSRF', 'secure', '보안', '취약점', '검토', '리뷰', '감사', '인증', '인가', '보안검사'.
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
+  - WebSearch
 ---
 
 # Security and Code Review Methodology
