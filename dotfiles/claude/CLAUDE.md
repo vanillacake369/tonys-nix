@@ -191,3 +191,162 @@ Step 5: (Only if requested) Add documentation
 - **Event-driven thinking**: Model important occurrences in the domain as events
 
 Apply these Clean Code principles together with DDD architecture to build maintainable and extensible codebases.
+
+## Claude Code Skills
+
+This project includes custom Skills that provide specialized expertise for software development tasks. Skills are portable, reusable capabilities that Claude automatically activates when relevant.
+
+### Available Skills
+
+#### 1. Codebase Analysis (`codebase-analysis`)
+**Purpose**: Universal methodology for discovering and adapting to any codebase's patterns and conventions.
+
+**When activated**: Automatically when analyzing unfamiliar code, learning project structure, or understanding conventions.
+
+**Key capabilities**:
+- Language and framework detection
+- Pattern recognition and convention learning
+- Technology stack analysis
+- Build system understanding
+
+**Supporting files**:
+- `pattern-recognition.md` - Deep dive into pattern matching strategies
+- `language-detection.md` - Technology identification guides
+
+#### 2. Architectural Planning (`architectural-planning`)
+**Purpose**: Create detailed technical plans that integrate seamlessly with existing architecture.
+
+**When activated**: When planning new features, system changes, or architectural improvements.
+
+**Key capabilities**:
+- Discovers project architecture patterns
+- Designs solutions aligned with existing structure
+- Creates implementation plans with specific steps
+- Identifies integration points and risks
+
+**Output**: `IMPLEMENTATION_PLAN.md` with context-specific guidance
+
+#### 3. Code Implementation (`code-implementation`)
+**Purpose**: Write code that blends naturally with existing codebase as if written by original developers.
+
+**When activated**: When implementing features, fixing bugs, or adding functionality.
+
+**Key capabilities**:
+- Matches naming conventions and code style
+- Uses same libraries and patterns as existing code
+- Follows project error handling patterns
+- Integrates with existing test patterns
+
+#### 4. Code Quality (`code-quality`)
+**Purpose**: Improve code through safe, incremental refactoring while preserving functionality.
+
+**When activated**: When refactoring, optimizing performance, or improving maintainability.
+
+**Key capabilities**:
+- Safe refactoring with behavior preservation
+- Performance optimization
+- Code duplication elimination
+- Complexity reduction
+
+**Approach**: Test-driven validation, incremental improvements
+
+#### 5. Security Review (`security-review`)
+**Purpose**: Identify vulnerabilities and quality issues through technology-specific analysis.
+
+**When activated**: When reviewing code, assessing security, or evaluating quality.
+
+**Key capabilities**:
+- Technology-specific vulnerability detection
+- Performance analysis appropriate to language/framework
+- Domain-specific security considerations (finance, healthcare, IoT)
+- Constructive feedback with actionable fixes
+
+**Coverage**: OWASP Top 10, injection attacks, authentication/authorization, data protection
+
+#### 6. Test Development (`test-development`)
+**Purpose**: Create comprehensive tests by adapting to project's testing framework and patterns.
+
+**When activated**: When writing tests, improving coverage, or validating functionality.
+
+**Key capabilities**:
+- Testing framework auto-detection
+- Test pattern matching
+- Coverage strategy adaptation
+- Integration with existing CI/CD
+
+**Supported frameworks**: Jest, pytest, JUnit, Go test, and many others (universal detection)
+
+### Skills Architecture
+
+Skills use a **layered approach**:
+
+```
+codebase-analysis (Base Skill)
+└── Universal pattern recognition and adaptation methodology
+    │
+    ├── architectural-planning
+    │   └── Uses base skill to understand architecture before planning
+    │
+    ├── code-implementation
+    │   └── Uses base skill to match existing code patterns
+    │
+    ├── code-quality
+    │   └── Uses base skill to identify improvement opportunities
+    │
+    ├── security-review
+    │   └── Uses base skill to detect tech-specific vulnerabilities
+    │
+    └── test-development
+        └── Uses base skill to discover testing frameworks and patterns
+```
+
+### How Skills Work
+
+**Automatic Activation**: Claude loads relevant Skills based on task context. You don't need to explicitly invoke them.
+
+**Portable Expertise**: Skills carry procedural knowledge across all conversations and projects.
+
+**Context-Aware**: Skills adapt to your project's specific patterns, conventions, and technology stack.
+
+**Example workflow**:
+```
+User: "Add user authentication"
+→ [codebase-analysis] activates to discover existing patterns
+→ [architectural-planning] creates integration plan
+→ [code-implementation] writes code matching project style
+→ [test-development] adds tests following project patterns
+→ [security-review] validates security considerations
+```
+
+### Skills vs Commands vs Agents
+
+**Skills** (what this project uses):
+- Portable procedural knowledge
+- Automatically activated when relevant
+- Reusable across conversations
+- Example: `codebase-analysis`, `security-review`
+
+**Slash Commands** (also available):
+- User-invoked workflows
+- Located in `dotfiles/claude/commands/`
+- Example: `/solve`, `/enhance`, `/scaffold`
+
+**Built-in Agents** (system-level):
+- Task-specialized autonomous executors
+- Independent context windows
+- Cannot be customized or overridden
+- Example: architect, implementer, refactorer agents
+
+### Skill Development Guidelines
+
+If extending or modifying Skills:
+
+1. **Keep Skills focused**: Each skill should have a clear, single purpose
+2. **Reference base skill**: Specialized skills should leverage `codebase-analysis`
+3. **Provide examples**: Include concrete code examples in skill documentation
+4. **Support modularity**: Split large skills into SKILL.md + supporting files
+5. **Test activation**: Ensure skill description triggers appropriate activation
+
+### Skills Location
+
+All skills are located in `dotfiles/claude/skills/` and automatically synced to `~/.claude/skills/` via home-manager.
