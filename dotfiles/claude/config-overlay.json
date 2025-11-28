@@ -95,6 +95,15 @@
         "GDRIVE_OAUTH_PATH": "${GDRIVE_OAUTH_PATH}"
       },
       "_comment": "구글 드라이브"
+    },
+    "mcp-atlassian": {
+      "command": "uvx",
+      "args": [
+        "mcp-atlassian",
+        "--jira-url=${JIRA_URL}",
+        "--jira-username=${JIRA_USERNAME}",
+        "--jira-token=${JIRA_TOKEN}"
+      ]
     }
   }
 }
