@@ -90,6 +90,10 @@
         "-y",
         "@modelcontextprotocol/server-gdrive"
       ],
+      "env": {
+        "GDRIVE_CREDENTIALS_PATH": "${GDRIVE_CREDENTIALS_PATH}",
+        "GDRIVE_OAUTH_PATH": "${GDRIVE_OAUTH_PATH}"
+      },
       "_comment": "구글 드라이브"
     }
   }

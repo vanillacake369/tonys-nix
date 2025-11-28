@@ -77,6 +77,7 @@
     [
       ./modules/apps.nix
       ./modules/language.nix
+      ./modules/env.nix
       ./modules/shell-core.nix
       ./modules/shell-infra.nix
       ./modules/shell-utils.nix
