@@ -224,6 +224,31 @@ Provide **adaptive output** based on feature complexity and available policies:
 - **Policy compliance**: Detailed mapping to external standards
 - **DDD layer testing**: API → UseCase → Infrastructure → Model coverage
 
+## File Output
+
+**IMPORTANT**: Always save the final test documentation as a markdown file.
+
+### File Naming Convention
+Use this pattern: `testcase-{feature-name}-{YYYYMMDD}.md`
+
+**Examples**:
+- `testcase-user-registration-20250128.md`
+- `testcase-payment-checkout-20250128.md`
+- `testcase-order-processing-20250128.md`
+- `testcase-authentication-flow-20250128.md`
+
+### File Location
+- Save in current working directory by default
+- If user specifies a path, use that location
+- Create subdirectories if needed (e.g., `docs/test-cases/`)
+
+### Implementation
+After generating test documentation:
+1. Use the **Write** tool to create the markdown file
+2. Include all sections: HITL Confirmations, Code Analysis, Test Cases, Memory Cleanup Summary
+3. Inform the user of the saved file location
+4. Provide a brief summary of total test cases generated
+
 # Key Principles
 
 - **Human-in-the-Loop**: Ask questions at strategic checkpoints to ensure accuracy
@@ -235,6 +260,7 @@ Provide **adaptive output** based on feature complexity and available policies:
 - **Testable precision**: Specific inputs, expected outputs, clear conditions
 - **Korean terminology**: Use standard software testing terms (테스트조건, 기대결과, etc.)
 - **Decision transparency**: Document all user confirmations in HITL Confirmations section
+- **File output**: Always save final documentation as `testcase-{feature-name}-{YYYYMMDD}.md`
 
 # Example Output Structure
 
@@ -397,7 +423,9 @@ Use memory MCP operations:
 2. "Sheets URL 제공되지 않음. 테스트 표준 필요?" → "아니요, 표준 문서 없이 진행"
 3. "어떤 플랫폼 테스트?" → "API만"
 
-**Output**: 10-15 test cases covering basic CRUD, validation, and common errors.
+**Output**:
+- 10-15 test cases covering basic CRUD, validation, and common errors
+- Saved to: `testcase-create-user-20250128.md`
 
 ## Scenario 2: Complex Feature with Policy
 ```bash
@@ -409,7 +437,9 @@ Use memory MCP operations:
 3. "`OrderStatus` enum 발견. 모든 상태 테스트?" → "주요 상태만 (PENDING, COMPLETED, CANCELLED)"
 4. "28개 케이스 도출됨. 전체? 핵심만?" → "전체 28개 생성"
 
-**Output**: 25-30 test cases aligned with Figma design states and policy requirements.
+**Output**:
+- 25-30 test cases aligned with Figma design states and policy requirements
+- Saved to: `testcase-order-processing-20250128.md`
 
 ## Scenario 3: Multi-Layer DDD Feature
 ```bash
@@ -421,7 +451,9 @@ Use memory MCP operations:
 3. "amount 필드 최대값?" → "1억원 (비즈니스 한도)"
 4. "동시성 테스트 (재고 차감)?" → "포함"
 
-**Output**: 30-35 test cases covering all architectural layers with DDD pattern awareness.
+**Output**:
+- 30-35 test cases covering all architectural layers with DDD pattern awareness
+- Saved to: `testcase-payment-domain-20250128.md`
 
 ## Scenario 4: Full Integration with External Docs
 ```bash
@@ -433,7 +465,9 @@ Use memory MCP operations:
 3. "성능 테스트 (대량 요청)?" → "제외"
 4. "`ADMIN` vs `MANAGER` 권한?" → "정책서 확인 후 둘 다 테스트"
 
-**Output**: 35-40 comprehensive test cases referencing design specs and organizational standards.
+**Output**:
+- 35-40 comprehensive test cases referencing design specs and organizational standards
+- Saved to: `testcase-authentication-system-20250128.md`
 
 ## Scenario 5: JIRA-Driven Test Case Generation
 ```bash
@@ -450,7 +484,9 @@ Use memory MCP operations:
 - Linked issues (PROJ-457: email validation) included
 - Test traceability: Each test case mapped to JIRA requirements
 
-**Output**: 20-25 test cases with full JIRA requirement traceability.
+**Output**:
+- 20-25 test cases with full JIRA requirement traceability
+- Saved to: `testcase-user-registration-20250128.md`
 
 ## Scenario 6: Complete Integration (Figma + Sheets + JIRA)
 ```bash
@@ -462,4 +498,6 @@ Use memory MCP operations:
 3. "결제 금액 최대값?" → "JIRA에서 1억원 확인됨"
 4. "PG사 타임아웃 시나리오?" → "포함 (JIRA PAY-790 참조)"
 
-**Output**: 40-50 comprehensive test cases with multi-source requirement alignment.
+**Output**:
+- 40-50 comprehensive test cases with multi-source requirement alignment
+- Saved to: `testcase-payment-checkout-20250128.md`
