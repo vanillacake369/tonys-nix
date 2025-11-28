@@ -177,3 +177,139 @@ This project includes 6 custom Skills that activate automatically based on conte
 - **test-development**: Comprehensive test suite creation
 
 Skills are located in `dotfiles/claude/skills/` and sync to `~/.claude/skills/`. Each skill's SKILL.md contains detailed methodology. Claude loads them automatically when relevant - no manual invocation needed.
+
+## Long-Term Conversation & Memory Management
+
+This project leverages MCP (Model Context Protocol) servers to maintain context across sessions and optimize token usage for sustained, productive conversations.
+
+### Memory MCP Usage Pattern
+
+Claude should proactively use the memory MCP to build and maintain a knowledge graph across sessions:
+
+#### Session Start Protocol
+1. **Retrieve Context**: At the beginning of each session, use `search_nodes` or `open_nodes` to retrieve relevant memories
+2. **Acknowledge Context**: Briefly acknowledge retrieved context when relevant to the current task
+3. **Continuous Learning**: Throughout the conversation, identify and store new insights
+
+#### Information Categories to Track
+
+Store information in these categories using the knowledge graph:
+
+1. **Technical Preferences**
+   - Preferred architectural patterns and design decisions
+   - Tool and library choices with rationale
+   - Code style preferences beyond what's in CLAUDE.md
+   - Example: "User prefers rootless Podman over Docker for security"
+
+2. **Recurring Issues & Solutions**
+   - Common errors and their proven solutions
+   - Debugging patterns that work for this project
+   - Workarounds for known limitations
+   - Example: "webresearch MCP fails with libnspr4.so missing - use WebSearch instead"
+
+3. **Best Practices & Optimizations**
+   - Validated solutions that worked well
+   - Performance optimization strategies
+   - SSD-friendly approaches (this is a Nix project with SSD considerations)
+   - Example: "Use smart-clean instead of force-clean to reduce SSD wear"
+
+4. **Project Context & Constraints**
+   - Key design decisions and their reasoning
+   - Multi-platform support requirements (WSL, NixOS, macOS)
+   - Dependencies and version constraints
+   - Development workflow preferences
+
+#### Memory Graph Operations
+
+Use these patterns for effective knowledge management:
+
+**Entity Types:**
+- `User` - The developer (preferences, workflows, goals)
+- `Project` - This repository (tonys-nix, architecture decisions)
+- `Technology` - Tools and frameworks (Nix, Home-Manager, etc.)
+- `Issue` - Recurring problems or errors
+- `Solution` - Proven fixes and approaches
+- `BestPractice` - Validated patterns and optimizations
+
+**Relation Types (Active Voice):**
+- `User → prefers → Technology`
+- `User → uses → WorkflowPattern`
+- `Issue → solved_by → Solution`
+- `Project → requires → Technology`
+- `BestPractice → applies_to → ProjectArea`
+- `Solution → prevents → Issue`
+
+**Observation Guidelines:**
+- Keep observations concise but specific
+- Include context (when, why, what outcome)
+- Reference file paths or line numbers when relevant
+- Update observations when practices evolve
+
+#### Example Memory Usage
+
+```
+# Creating entities and relations
+CREATE Entity: User (limjihoon)
+  - Observation: "Prefers long-term conversations with context retention"
+  - Observation: "Works on tonys-nix multi-platform Nix configuration"
+
+CREATE Entity: BestPractice (PromptCaching)
+  - Observation: "Claude caches contexts over 1024 tokens automatically"
+  - Observation: "CLAUDE.md is cached, reducing token costs by up to 90%"
+
+CREATE Relation: User → uses → BestPractice
+```
+
+### Token Optimization Strategy
+
+Efficient token usage through smart caching and memory reuse:
+
+#### Automatic Optimizations (Already Active)
+
+1. **Prompt Caching**
+   - CLAUDE.md (1024+ tokens) is automatically cached by Claude
+   - Cache TTL: 5 minutes default, up to 1 hour for frequent use
+   - System prompts and tool schemas are cached
+   - Reduces costs by up to 90% and latency by up to 85%
+
+2. **Structured Memory Storage**
+   - Store recurring questions and answers in memory graph
+   - Reference previous solutions instead of re-explaining
+   - Build up best practices knowledge over time
+
+#### Manual Optimizations (Use When Appropriate)
+
+1. **Error Log Summarization**
+   - Store error patterns and solutions, not full logs
+   - Example: Instead of full stack trace, store "NixOS build fails with 'journald.settings' - use 'journald.extraConfig' instead"
+
+2. **Reference Linking**
+   - Link to previous solutions: "See memory: Solution[NixBuildOptimization]"
+   - Build on past context instead of repeating
+
+3. **Incremental Knowledge Building**
+   - Add observations to existing entities rather than creating duplicates
+   - Use `add_observations` to append new learnings
+
+### Best Practices Summary
+
+**DO:**
+- Use memory to track user preferences and validated solutions
+- Reference past solutions when similar issues arise
+- Build a knowledge graph that grows smarter over time
+- Keep memory observations specific and actionable
+
+**DON'T:**
+- Store sensitive information (credentials, API keys)
+- Duplicate information across multiple entities
+- Store temporary or one-off information
+- Over-rely on memory for information available in codebase
+
+### Integration with Existing Tools
+
+Memory MCP complements other available MCPs:
+- **sequential-thinking**: For complex analysis, then store conclusions in memory
+- **context7**: For up-to-date library docs, then cache patterns in memory
+- **WebSearch**: For current information, then distill insights to memory
+
+This layered approach ensures both immediate problem-solving and long-term knowledge retention.

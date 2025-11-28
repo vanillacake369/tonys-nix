@@ -78,6 +78,19 @@
         "@mzxrai/mcp-webresearch@latest"
       ],
       "_comment": "웹 검색"
+    },
+    "figma": {
+      "type": "http",
+      "url": "https://mcp.figma.com/mcp",
+      "_comment": "피그마"
+    },
+    "gdrive": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-gdrive"
+      ],
+      "_comment": "구글 드라이브"
     }
   }
 }
