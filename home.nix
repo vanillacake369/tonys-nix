@@ -3,6 +3,7 @@
   pkgs,
   isLinux,
   isDarwin,
+  isWsl,
   isNixOs,
   ...
 }: {
