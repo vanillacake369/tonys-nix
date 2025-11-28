@@ -37,8 +37,8 @@
     # TypeScript/JavaScript
     nodejs_22
     nodePackages.typescript-language-server
+
+    # Python
+    uv
   ];
-  home.sessionVariables = {
-    JAVA_HOME = "${pkgs.zulu17}";
-  };
 }
