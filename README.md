@@ -230,273 +230,83 @@ sudo smartctl -a /dev/nvme0n1
 
 ## 🖼️ Image Generation
 
-Create bootable ISOs and VM images from your NixOS configuration using nixos-generators.
+Create bootable ISOs and VM images from your NixOS configuration. Supports multiple formats with automatic multi-architecture generation.
 
-### Quick Start
-
+**Quick Start**:
 ```bash
-# List available formats
-just list-image-formats
-
-# Build bootable ISO
-just build-image iso
-
-# Build VirtualBox image
-just build-image virtualbox
-
-# Build all formats
-just build-all-images
-
-# Check built images
-just show-images
+just build-image iso          # Bootable ISO
+just build-image virtualbox   # VirtualBox OVA
+just build-all-images         # All formats
 ```
 
-### Supported Formats
+**Supported Formats**: ISO, VirtualBox OVA, VMware VMDK, QEMU qcow2
 
-| Format | Description | Architecture Support |
-|--------|-------------|---------------------|
-| `iso` | Bootable installation ISO | x86_64-linux, aarch64-linux |
-| `virtualbox` | VirtualBox OVA image | x86_64-linux, aarch64-linux |
-| `vmware` | VMware VMDK image | x86_64-linux, aarch64-linux |
-| `qcow` | QEMU/KVM qcow image | x86_64-linux, aarch64-linux |
-
-### Use Cases
-
-- **Installation Media**: Create bootable USB drives for NixOS installation
-- **Virtual Machines**: Deploy consistent environments in VirtualBox, VMware, or KVM
-- **Cloud Deployment**: Use qcow images for cloud platforms
-
-> **Note**: For Docker containers, use official NixOS Docker images. This configuration is optimized for VM and installation media generation.
-
-### Advanced Usage
-
-```bash
-# Build for specific architecture
-just build-image-arch iso x86_64-linux
-just build-image-arch qcow aarch64-linux
-
-# Direct nix commands
-nix build .#iso                           # Current architecture
-nix build .#packages.x86_64-linux.iso     # Specific architecture
-```
-
-> **Note**: Image generation requires significant disk space (10GB+) and build time. Use binary caches to speed up the process.
+📖 **[Full Image Generation Guide](docs/guides/image-generation.md)** - Detailed documentation including use cases, troubleshooting, and advanced usage.
 
 ## 🐛 Troubleshooting
 
+### Quick Diagnostics
+
+```bash
+just performance-test  # Comprehensive system analysis
+just gc-status         # Check garbage collection status
+nix flake check        # Validate configuration
+```
+
 ### Common Issues
 
-#### NixOS Configuration Issues
+**NixOS Configuration**
+- Hardware config missing → `sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix`
+- Slow builds → `just smart-clean` then `just performance-test`
 
-**Hardware Configuration Missing**
-- **Symptom**: "path does not exist" or "fileSystems option does not specify root" errors
-- **Solution**: Generate hardware config in the correct location:
-  ```bash
-  sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
-  ```
+**Containers (Podman/Minikube)**
+- Permission denied → `just enable-shared-mount`
+- cgroup errors → Enable cgroup v2 in WSL config
 
-**services.journald.settings Error**
-- **Symptom**: "The option 'services.journald.settings' does not exist"
-- **Solution**: Already fixed in current configuration (uses `extraConfig` instead)
+**Development Environment**
+- Missing env vars → Create `scripts/env.sh` and run `just source-env`
+- Connection issues → Verify credentials and network connectivity
 
-**Slow Nix Builds/Installations**
-- **Symptoms**: Nix installs taking longer than expected, large store sizes
-- **Solutions**:
-  ```bash
-  # Run comprehensive performance analysis (includes GC status)
-  just performance-test
-  
-  # Check garbage collection status and recommendations
-  just gc-status
-  
-  # Check current store size
-  du -sh /nix/store
-  
-  # Run intelligent cleanup
-  just smart-clean
-  
-  # Force cleanup if needed
-  just force-clean
-  
-  # Run manual store optimization
-  nix store optimise
-  
-  # Check if auto-optimization is enabled
-  nix show-config | grep auto-optimise
-  ```
-
-#### Minikube + Podman Issues
-
-If you encounter container creation failures:
-
-**Symptoms**: Container creation failures with permission denied errors
-
-```
-Failed to create /init.scope control group: Permission denied
-Failed to allocate manager object: Permission denied
-container exited unexpectedly
-```
-
-**Solutions**:
-
-1. **Install Required Dependencies**
-   
-   ```bash
-   # These packages are included in the infra.nix module
-   # but ensure they're properly installed:
-   # - cni plugins
-   # - dbus (must be running via systemd)
-   # - qemu, virtiofsd (for podman machine)
-   # - crun, runc (container runtimes)
-   ```
-
-2. **Enable cgroup v2**
-   
-   ```bash
-   # Check current cgroup version
-   grep cgroup /proc/filesystems
-   ```
-   
-   For WSL2, add to `.wslconfig`:
-   ```ini
-   [wsl2]
-   kernelCommandLine = cgroup_no_v1=all
-   ```
-
-3. **Configure Shared Mount**
-   
-   ```bash
-   just enable-shared-mount  # Automated via justfile
-   # Or manually: sudo mount --make-rshared /
-   ```
-
-4. **Debug with Logs**
-   
-   ```bash
-   # Generate detailed logs for troubleshooting
-   minikube logs --file=logs.txt
-   
-   # Check podman status
-   podman system info
-   systemctl --user status podman
-   ```
-
-### Other Common Issues
-
-- **Build failures**: Run `nix flake check` to validate syntax
-- **Package conflicts**: Run `just clean` to remove old generations
-- **Shell not updating**: Restart terminal or run `exec zsh`
-- **Permission issues**: Ensure user is in required groups (docker, wheel)
-- **Performance issues**: Check store optimization status and consider manual `nix store optimise`
-
-#### Development Environment Connections
-
-This repository includes scripts for development environment connections that require credentials:
-
-**Environment Variables Missing**:
-- **Symptom**: "Required environment variable not set" errors when running connection scripts
-- **Solution**: Create and load environment variables:
-  ```bash
-  # Create scripts/env.sh with your credentials (gitignored)
-  cat > scripts/env.sh << 'EOF'
-  #!/bin/bash
-  # Environment variables for development connections
-  
-  # Aquanuri database connection (SSH tunnel)
-  export AQUANURI_BASTION_URL="your-bastion-host-ip"       # e.g. "10.0.13.122"
-  export AQUANURI_BASTION_PW="your-ssh-password"           # SSH password
-  export AQUANURI_BASTION_PORT="3306"                      # Remote MySQL port
-  export AQUANURI_TARGET_URL="your-target-server-ip"       # e.g. "146.56.44.51"
-  export AQUANURI_LOCAL_PORT="3307"                        # Local port for tunnel
-  
-  # VPN connection
-  export HAMA_VPN_PW="your-vpn-password"                   # OpenVPN private key password
-  EOF
-  
-  # Then load and use them:
-  just source-env        # Load environment variables
-  just aquanuri-connect  # SSH tunnel to database
-  just vpn-connect       # VPN connection
-  ```
-
-**SSH/VPN Connection Issues**:
-- **Symptom**: Password prompts not being handled automatically
-- **Solutions**:
-  - Ensure environment variables are loaded: `just source-env`
-  - Check debug output in the connection scripts
-  - Verify network connectivity to target hosts
-
-#### Running Dynamically Linked Executables
-
-**nix-ld Support**: This configuration includes nix-ld, which allows running non-Nix dynamically linked executables. If you encounter "No such file or directory" errors when running downloaded binaries:
-
-- The system is already configured with essential libraries for most CLI tools
-- For specific missing libraries, check error messages and add them to `programs.nix-ld.libraries` in configuration.nix
-- Common use case: Running Python tools installed outside Nix (e.g., via pip in virtual environments)
-
-### Getting Help
-
-- Run `just performance-test` for comprehensive system analysis
-- Check `CLAUDE.md` for detailed development workflows
-- Review individual module files in `modules/` for specific configurations
-- File issues on the repository for bugs or feature requests
+📖 **[Full Troubleshooting Guide](docs/guides/troubleshooting.md)** - Comprehensive solutions for all common issues, including NixOS configuration, performance, containers, development environment, and build problems.
 
 
 ## 🖥️ macOS Keyboard Customization
 
-This configuration includes a Karabiner-Elements setup for macOS that provides:
+Karabiner-Elements configuration for macOS providing Windows/GNOME-style shortcuts and quick app launching.
 
-### Windows/GNOME-style Shortcuts
-Common shortcuts work consistently across macOS (excluding terminal apps):
-- `Ctrl+C/V/X/A/Z/S` → Standard copy, paste, cut, select all, undo, save
-- `Ctrl+T/W` → New tab, close tab
+**Windows/GNOME Shortcuts** (all apps except terminals):
+- `Ctrl+C/V/X/A/Z/S` → Copy, paste, cut, select all, undo, save
+- `Ctrl+T/W` → New/close tab
 - `Ctrl+←/→` → Word navigation
-- `Ctrl+Backspace` → Delete word
 
-### Quick App Launching
-Launch apps instantly with keyboard shortcuts:
-- `Cmd+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ IDEA, GoLand
-- `Cmd+Option+T` → WezTerm
-- `Cmd+Option+D` → Docker Desktop
-- `Cmd+Option+M` → YouTube Music
-- `Cmd+Option+C` → Google Chrome
-- `Cmd+Option+I` → IntelliJ IDEA
-- `Cmd+Option+G` → GoLand
+**Quick App Launching**:
+- `Cmd+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ, GoLand
+- `Cmd+Option+T/D/M/C/I/G` → WezTerm, Docker, Music, Chrome, IntelliJ, GoLand
 
-**Additional Navigation:**
-- `Ctrl+←/→` → `Option+←/→` (Word navigation in text)
-- `Right Command` → `F18` (for custom shortcuts)
-
-> **Note**: Configuration is in `dotfiles/karabiner/karabiner.json`. Terminal apps maintain their native shortcuts. The configuration provides better ergonomics while preserving all functionality. See [CLAUDE.md](./CLAUDE.md#macos-keyboard-customization) for full details.
+📖 **[Full macOS Keyboard Guide](docs/platform/macos/keyboard.md)** - Complete key mappings, customization, and troubleshooting.
 
 ## 🤖 Claude Code Integration
 
-This repository includes optimized **Claude Code slash commands** for development workflows:
+Optimized **Claude Code slash commands** for Nix development workflows with automatic configuration sync.
 
-- **`/solve`** - Universal problem solver for issues, bugs, and requirements
-- **`/enhance`** - Code and system improvements with migration strategies  
-- **`/scaffold`** - Generate working skeleton code instantly (KISS approach)
-- **`/debug`** - Systematic debugging with root cause analysis
+**Available Commands**:
+- `/solve` - Universal problem solver
+- `/enhance` - Code and system improvements
+- `/scaffold` - Generate working skeleton code (KISS approach)
+- `/debug` - Systematic debugging
 
-### Usage Examples
-
+**Example**:
 ```bash
-# Problem solving
 /solve "Getting permission denied when running just install-pckgs"
-
-# Code improvements
-/enhance "The justfile install-pckgs command is becoming too complex"
-
-# Generate working code instantly (KISS approach)
-/scaffold "Need a backup system for Nix configurations"
-
-# Systematic debugging
-/debug "Home-manager fails with dependency errors on ARM64 Linux"
+/enhance "Optimize justfile GC system to reduce SSD wear"
 ```
 
-These commands provide **project-aware solutions** that follow the repository's patterns, consider multi-platform support, and include detailed implementation plans with validation strategies. The `/scaffold` command specifically follows the KISS principle - generating the simplest working code without complex architectural analysis.
+**Features**:
+- Project-aware solutions following repository patterns
+- Automatic config sync across machines (permissions, MCP servers)
+- Detailed implementation plans with validation strategies
 
-> **Note**: Commands are stored in `dotfiles/claude/commands/` and automatically available in Claude Code. See [CLAUDE.md](./CLAUDE.md#claude-code-integration) for detailed usage and best practices.
+📖 **[Full Claude Code Integration Guide](docs/integrations/claude-code/overview.md)** - Complete command reference, configuration management, and best practices.
 
 ## 📚 Additional Resources
 
