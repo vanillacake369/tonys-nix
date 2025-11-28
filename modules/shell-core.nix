@@ -71,11 +71,6 @@
     # ZSH initialization script
     # `programs.zsh.initContent`
     initContent = ''
-      # Set display for windows xserver (WSL only)
-      ${lib.optionalString isWsl ''
-        export DISPLAY=:0.0
-        export LIBGL_ALWAYS_INDIRECT=1
-      ''}
 
       # Nix daemon initialization (prevents removal via macOS updates)
       if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
