@@ -83,11 +83,19 @@ intellij := "idea64.exe"
 ; ==============================================================================
 ; Disable Unwanted Keys
 ; ==============================================================================
-; Disable PageUp, PageDown, NumLock, and F23 keys
+; Disable PageUp, PageDown, NumLock, Copilot
 PgUp::return
 PgDn::return
 NumLock::return
+; Copilot 키 강력 차단
 F23::return
+SC06E::return
+; 수식키 조합까지 모두 차단
+*F23::return
+*SC06E::return
+; Win+F23 조합도 차단
+#F23::return
+#SC06E::return
 
 
 ; ==============================================================================
