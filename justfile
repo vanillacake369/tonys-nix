@@ -249,104 +249,11 @@ link-nix-conf:
 
 ########### *** SMART GARBAGE COLLECTION *** ##########
 
-# Get current Nix store size in GB
-get-store-size:
-  #!/usr/bin/env bash
-  if [[ -d "/nix/store" ]]; then
-    # Use du with human-readable output and extract GB value
-    size_human=$(du -sh /nix/store 2>/dev/null | cut -f1 || echo "0G")
-    
-    # Parse the size and convert to GB
-    if [[ "$size_human" =~ ^([0-9]+\.?[0-9]*)([KMGT])$ ]]; then
-      value="${BASH_REMATCH[1]}"
-      unit="${BASH_REMATCH[2]}"
-      case "$unit" in
-        "K") echo "0" ;;  # Less than 1GB
-        "M") echo "0" ;;  # Less than 1GB 
-        "G") echo "$value" ;;
-        "T") 
-          if command -v bc >/dev/null 2>&1; then
-            echo "scale=1; $value * 1024" | bc
-          else
-            echo $(( ${value%.*} * 1024 ))
-          fi
-        ;;
-        *) echo "0" ;;
-      esac
-    else
-      # Fallback: use byte calculation
-      size_bytes=$(du -sb /nix/store 2>/dev/null | cut -f1 2>/dev/null || echo "0")
-      if [[ "$size_bytes" =~ ^[0-9]+$ ]] && [[ "$size_bytes" -gt 0 ]]; then
-        echo $(( size_bytes / 1024 / 1024 / 1024 ))
-      else
-        echo "0"
-      fi
-    fi
-  else
-    echo "0"
-  fi
-
-# Get days since last GC execution
-get-days-since-gc:
-  #!/usr/bin/env bash
-  if [[ -f "{{GC_STATE_FILE}}" ]]; then
-    last_gc=$(cat {{GC_STATE_FILE}} 2>/dev/null || echo "0")
-    current=$(date +%s)
-    if [[ "$last_gc" =~ ^[0-9]+$ ]] && [[ "$current" =~ ^[0-9]+$ ]]; then
-      echo $(( (current - last_gc) / 86400 ))
-    else
-      echo "999"  # Force GC if timestamp is corrupted
-    fi
-  else
-    echo "999"  # Force GC on first run
-  fi
-
 # Record GC execution timestamp
 record-gc-execution:
   #!/usr/bin/env bash
   date +%s > {{GC_STATE_FILE}}
   echo "[✓] GC execution recorded at $(date)"
-
-# Determine if GC should run based on thresholds
-should-run-gc:
-  #!/usr/bin/env bash
-  store_size=$(just get-store-size)
-  days_since_gc=$(just get-days-since-gc)
-  
-  echo "[i] Store analysis: ${store_size}GB size, ${days_since_gc} days since last GC"
-  
-  # Force GC after maximum interval
-  if (( days_since_gc >= {{GC_MAX_INTERVAL_DAYS}} )); then
-    echo "[!] GC REQUIRED: Maximum interval (${days_since_gc} >= {{GC_MAX_INTERVAL_DAYS}} days) reached"
-    exit 0
-  fi
-  
-  # Skip GC if within minimum interval
-  if (( days_since_gc < {{GC_MIN_INTERVAL_DAYS}} )); then
-    echo "[→] GC SKIPPED: Minimum interval (${days_since_gc} < {{GC_MIN_INTERVAL_DAYS}} days) not met"
-    exit 1
-  fi
-  
-  # Check size threshold (use bc for decimal comparison if available)
-  if command -v bc >/dev/null 2>&1; then
-    if (( $(echo "$store_size > {{GC_SIZE_THRESHOLD_GB}}" | bc -l) )); then
-      echo "[!] GC REQUIRED: Store size (${store_size}GB > {{GC_SIZE_THRESHOLD_GB}}GB) exceeds threshold"
-      exit 0
-    else
-      echo "[→] GC SKIPPED: Store size (${store_size}GB <= {{GC_SIZE_THRESHOLD_GB}}GB) within limits"
-      exit 1
-    fi
-  else
-    # Fallback integer comparison
-    store_size_int=${store_size%.*}  # Remove decimal part
-    if (( store_size_int >= {{GC_SIZE_THRESHOLD_GB}} )); then
-      echo "[!] GC REQUIRED: Store size (~${store_size_int}GB >= {{GC_SIZE_THRESHOLD_GB}}GB) exceeds threshold"
-      exit 0
-    else
-      echo "[→] GC SKIPPED: Store size (~${store_size_int}GB < {{GC_SIZE_THRESHOLD_GB}}GB) within limits"
-      exit 1
-    fi
-  fi
 
 ########### *** CLEANER *** ##########
 
@@ -420,29 +327,37 @@ force-clean:
 gc-status:
   #!/usr/bin/env bash
   echo "=== GARBAGE COLLECTION STATUS ==="
-  echo "Current store size: $(just get-store-size)GB"
-  echo "Days since last GC: $(just get-days-since-gc) days"
+  echo "Current store size: $(du -sh /nix/store 2>/dev/null | cut -f1 || echo "N/A")"
+
+  # Calculate days since last GC
+  if [[ -f "{{GC_STATE_FILE}}" ]]; then
+    last_gc=$(cat {{GC_STATE_FILE}} 2>/dev/null || echo "0")
+    current=$(date +%s)
+    if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
+      days_since_gc=$(( (current - last_gc) / 86400 ))
+      echo "Days since last GC: $days_since_gc days"
+    else
+      echo "Days since last GC: Unknown (corrupted timestamp)"
+    fi
+  else
+    echo "Days since last GC: Never"
+  fi
+
+  if [[ -d "/nix/store" ]]; then
+    used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
+    echo "Disk usage: ${used_percent}%"
+  fi
+
   echo ""
   echo "=== CONFIGURATION ==="
-  echo "Size threshold: {{GC_SIZE_THRESHOLD_GB}}GB"
+  echo "Size threshold: {{GC_SIZE_THRESHOLD_GB}}GB (legacy - using disk % now)"
   echo "Min interval: {{GC_MIN_INTERVAL_DAYS}} days"
   echo "Max interval: {{GC_MAX_INTERVAL_DAYS}} days"
   echo "State file: {{GC_STATE_FILE}}"
   echo ""
-  echo "=== DECISION ANALYSIS ==="
-  if just should-run-gc 2>/dev/null; then
-    echo "Status: ✓ GC would run with 'just smart-clean'"
-  else
-    echo "Status: → GC would be skipped with 'just smart-clean'"
-    echo "Advice: Store is clean, no action needed"
-  fi
-  echo ""
   echo "Commands:"
   echo "  just smart-clean   # Run intelligent cleanup"
   echo "  just force-clean   # Force cleanup regardless of conditions"
-
-# Legacy clean command (now points to force-clean for compatibility)
-clean: force-clean
 
 # Clear all dependencies
 clear-all:
@@ -522,21 +437,38 @@ performance-test:
   store_links=$(find /nix/store -type l | wc -l 2>/dev/null || echo "0")
   echo "   Symlinks in store: $store_links"
   echo ""
-  
+
   echo "7. SMART GARBAGE COLLECTION:"
-  gc_size=$(just get-store-size 2>/dev/null || echo "N/A")
-  gc_days=$(just get-days-since-gc 2>/dev/null || echo "N/A")
-  echo "   Current store size: ${gc_size}GB"
-  echo "   Days since last GC: $gc_days"
-  echo "   GC size threshold: {{GC_SIZE_THRESHOLD_GB}}GB"
-  echo "   GC interval: {{GC_MIN_INTERVAL_DAYS}}-{{GC_MAX_INTERVAL_DAYS}} days"
-  if just should-run-gc >/dev/null 2>&1; then
-    echo "   GC recommendation: ✓ Cleanup needed"
+  gc_size=$(du -sh /nix/store 2>/dev/null | cut -f1 || echo "N/A")
+
+  # Calculate days since last GC
+  if [[ -f "{{GC_STATE_FILE}}" ]]; then
+    last_gc=$(cat {{GC_STATE_FILE}} 2>/dev/null || echo "0")
+    current=$(date +%s)
+    if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
+      gc_days=$(( (current - last_gc) / 86400 ))
+    else
+      gc_days="N/A"
+    fi
   else
-    echo "   GC recommendation: → Store is clean"
+    gc_days="Never"
+  fi
+
+  echo "   Current store size: $gc_size"
+  echo "   Days since last GC: $gc_days"
+  echo "   GC interval: {{GC_MIN_INTERVAL_DAYS}}-{{GC_MAX_INTERVAL_DAYS}} days"
+
+  if [[ -d "/nix/store" ]]; then
+    used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
+    echo "   Disk usage: ${used_percent}%"
+    if [[ "$used_percent" -gt 80 ]] || [[ "$gc_days" =~ ^[0-9]+$ && "$gc_days" -ge {{GC_MAX_INTERVAL_DAYS}} ]]; then
+      echo "   GC recommendation: ✓ Cleanup needed"
+    else
+      echo "   GC recommendation: → Store is clean"
+    fi
   fi
   echo ""
-  
+
   echo "=== END PERFORMANCE TEST ==="
 
 
