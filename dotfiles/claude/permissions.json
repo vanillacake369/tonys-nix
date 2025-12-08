@@ -1,30 +1,4 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(git commit:*)",
-      "Bash(git add:*)",
-      "Bash(git checkout:*)",
-      "Bash(gradle:*)",
-      "Bash(./gradlew:*)",
-      "Bash(go build:*)",
-      "Bash(go run:*)",
-      "Bash(go test:*)",
-      "Bash(just:*)",
-      "Read(*)",
-      "WebFetch(https://docs.*.com/*)",
-      "WebFetch(https://*.readthedocs.io/*)",
-      "WebFetch(https://github.com/*)",
-      "WebFetch(https://claude.ai/*)",
-      "WebSearch(*)"
-    ],
-    "deny": [
-      "WebFetch(http://*)",
-      "WebFetch(*.internal/*)",
-      "WebFetch(*.local/*)",
-      "WebFetch(localhost:*)",
-      "WebFetch(127.0.0.1:*)"
-    ]
-  },
   "mcpServers": {
     "npay-payments": {
       "command": "npx",
@@ -103,6 +77,20 @@
         "--jira-url=${JIRA_URL}",
         "--jira-username=${JIRA_USERNAME}",
         "--jira-token=${JIRA_TOKEN}"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${POSTGRES_URL}"
+      ]
+    },
+    "apple-docs": {
+      "command": "npx",
+      "args": [
+        "apple-doc-mcp-server@latest"
       ]
     }
   }

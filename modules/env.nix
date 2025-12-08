@@ -32,5 +32,17 @@
     if [ -f "$JIRA_TOKEN_FILE" ]; then
       export JIRA_TOKEN=$(cat "$JIRA_TOKEN_FILE" | tr -d '[:space:]')
     fi
+
+    # Load POSTGRES_URL from markdown file
+    POSTGRES_FILE="${config.home.homeDirectory}/dev/tonys-postgresql.md"
+    if [ -f "$POSTGRES_FILE" ]; then
+      export POSTGRES_URL=$(cat "$POSTGRES_FILE" | tr -d '[:space:]')
+    fi
+
+    # Load KAKAOPAY from markdown file
+    KAKAOPAY_FILE="${config.home.homeDirectory}/dev/tonys-kakaopay.md"
+    if [ -f "$KAKAOPAY_FILE" ]; then
+      export KAKAOPAY_SECRET_KEY=$(cat "$KAKAOPAY_FILE" | tr -d '[:space:]')
+    fi
   '';
 }

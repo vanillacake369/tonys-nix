@@ -17,9 +17,6 @@
       # Docker TUI
       lazydocker
 
-      # Database TUI
-      lazysql
-
       # Cloud tools
       awscli
       ssm-session-manager-plugin
