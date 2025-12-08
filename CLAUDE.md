@@ -74,9 +74,9 @@ Configuration files are symlinked from dotfiles directory:
 - **claude/**: Claude Code configuration with automatic sync
   - **commands/**: Custom slash commands
   - **agents/**: Custom AI agents
-  - **settings.json**: Project-level settings
+  - **settings.json**: Project-level settings (auto-synced to `~/.claude/settings.json`)
   - **CLAUDE.md**: Project instructions
-  - **config-overlay.json**: Global permissions and MCP servers (auto-synced)
+  - **permissions.json**: Global permissions and MCP servers (auto-synced to `~/.claude.json`)
 
 ### Library Functions (`lib/`)
 - **builders.nix**: Custom Nix builders and utility functions
@@ -165,24 +165,26 @@ home-manager switch --flake .#hm-aarch64-darwin --dry-run # Test Apple Silicon c
 ### Automatic Configuration Sync
 
 This repository uses a **hybrid approach** to manage Claude Code configuration:
-- **Static files** (commands, agents, CLAUDE.md) are symlinked directly
-- **Dynamic settings** (permissions, mcpServers) are automatically merged into `~/.claude.json` during home-manager activation
-- **Runtime data** (projects, tipsHistory, etc.) remains in `~/.claude.json` and is preserved
+- **Static files** (commands, agents, skills, CLAUDE.md) are symlinked directly
+- **Dynamic files** are automatically synced during home-manager activation:
+  - `permissions.json` → `~/.claude.json` (merged)
+  - `settings.json` → `~/.claude/settings.json` (merged)
+- **Runtime data** in `~/.claude.json` (projects, tipsHistory, etc.) is preserved
 
 ### How It Works
 
 When you run `just install-pckgs`, home-manager:
-1. Copies static files to `~/.claude/`
-2. Executes an activation script that:
-   - Reads your existing `~/.claude.json`
-   - Merges `dotfiles/claude/config-overlay.json` into it
-   - Preserves all runtime data (project history, settings, etc.)
-   - Creates a timestamped backup before modification
+1. **Symlinks static files** to `~/.claude/`:
+   - `commands/`, `agents/`, `skills/`, `CLAUDE.md`
+2. **Executes activation scripts** that:
+   - Merge `permissions.json` into `~/.claude.json` (preserves runtime data)
+   - Merge/copy `settings.json` to `~/.claude/settings.json` (creates writable copy)
+   - Create timestamped backups before modification
 
 ### Configuration Files
 
-#### `dotfiles/claude/config-overlay.json`
-Contains only the settings you want to version control:
+#### `dotfiles/claude/permissions.json`
+Contains only permissions and MCP servers you want to version control:
 - **permissions**: Tool access rules (Read, WebFetch, Bash, etc.)
 - **mcpServers**: MCP server configurations (npay, kakaopay, context7, etc.)
 
@@ -207,11 +209,21 @@ Contains only the settings you want to version control:
 }
 ```
 
+#### `dotfiles/claude/settings.json`
+Contains Claude Code project-level settings:
+- Editor preferences, UI settings, feature flags, etc.
+- Synced to `~/.claude/settings.json` as a writable copy
+
 #### `~/.claude.json`
 Your local configuration file that contains:
-- Settings from `config-overlay.json` (auto-synced)
+- Settings from `permissions.json` (auto-synced)
 - Runtime data (numStartups, tipsHistory, projects, etc.)
 - Machine-specific state
+
+#### `~/.claude/settings.json`
+Your local settings file that contains:
+- Settings from `dotfiles/claude/settings.json` (auto-synced)
+- User modifications (preserved during sync)
 
 ### Benefits
 
@@ -224,7 +236,7 @@ Your local configuration file that contains:
 ### Modifying Configuration
 
 #### Add/Remove Permissions
-Edit `dotfiles/claude/config-overlay.json`:
+Edit `dotfiles/claude/permissions.json`:
 ```json
 {
   "permissions": {
@@ -243,7 +255,7 @@ just install-pckgs
 ```
 
 #### Add/Remove MCP Servers
-Edit `dotfiles/claude/config-overlay.json`:
+Edit `dotfiles/claude/permissions.json`:
 ```json
 {
   "mcpServers": {
@@ -260,15 +272,33 @@ Then apply:
 just install-pckgs
 ```
 
+#### Modify Settings
+Edit `dotfiles/claude/settings.json`:
+```json
+{
+  "editor.fontSize": 14,
+  "ui.theme": "dark"
+}
+```
+
+Then apply:
+```bash
+just install-pckgs
+```
+
 ### Implementation Details
 
 The sync is powered by:
-- **Nix `home.activation`**: Runs after symlinks are created
+- **Nix `home.activation`**: Runs activation scripts after symlinks are created
 - **jq**: Merges JSON files (`.[0] * .[1]` operator)
 - **sponge** (moreutils): Safely writes to files
 - **lib.hm.dag.entryAfter**: Ensures proper execution order
 
-See `home.nix:47-72` for the implementation.
+Two separate activation scripts:
+- `syncClaudePermissions`: Merges `permissions.json` → `~/.claude.json`
+- `syncClaudeSettings`: Merges/copies `settings.json` → `~/.claude/settings.json`
+
+See `home.nix:55-112` for the implementation.
 
 ## Troubleshooting
 

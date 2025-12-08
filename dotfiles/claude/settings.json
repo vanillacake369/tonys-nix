@@ -1,0 +1,27 @@
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(cp:*)"
+    ],
+    "deny": [
+      "WebFetch(domain:127.0.0.1)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:*.local)",
+      "WebFetch(domain:*.internal)",
+      "Bash(ssh:*)",
+      "Bash(wget:*)",
+      "Bash(curl:*)",
+      "Bash(su:*)",
+      "Bash(sudo:*)",
+      "Read(**/.env)"
+    ],
+    "ask": [],
+    "disableBypassPermissionsMode": "disable"
+  },
+  "alwaysThinkingEnabled": false
+}
