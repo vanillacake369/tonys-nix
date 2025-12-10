@@ -26,7 +26,7 @@
 
   # ZSH initialization for dynamic environment variables
   # Load JIRA token from .md file at shell startup
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     # Load JIRA token from markdown file
     JIRA_TOKEN_FILE="${config.home.homeDirectory}/dev/tonys-jira-mcp-token.md"
     if [ -f "$JIRA_TOKEN_FILE" ]; then
