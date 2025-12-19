@@ -40,7 +40,8 @@
       jankyborders
       appcleaner
       hidden-bar
-      discord
       wezterm
+      # sketchybar
+      aerospace
     ];
 }

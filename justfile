@@ -166,8 +166,66 @@ setup-mac-power-schedule:
     exit 0
   fi
 
+  # Check if schedule is already configured as desired
+  current_schedule=$(pmset -g sched 2>/dev/null)
+
+  # Extract current settings (if any)
+  # pmset -g sched output format:
+  #   wakepoweron at 6:30AM every day
+  #   sleep at 2:00AM every day
+
+  # Parse time from "at 6:30AM" or "at 2:00AM" format
+  parse_pmset_time() {
+    local line="$1"
+    local time_part=$(echo "$line" | grep -oE "[0-9]{1,2}:[0-9]{2}(AM|PM)" | head -1)
+    if [[ -z "$time_part" ]]; then
+      echo ""
+      return
+    fi
+
+    local hour=$(echo "$time_part" | cut -d: -f1)
+    local min=$(echo "$time_part" | cut -d: -f2 | grep -oE "[0-9]+")
+    local ampm=$(echo "$time_part" | grep -oE "(AM|PM)")
+
+    # Convert to 24-hour format
+    if [[ "$ampm" == "PM" && "$hour" -ne 12 ]]; then
+      hour=$((hour + 12))
+    elif [[ "$ampm" == "AM" && "$hour" -eq 12 ]]; then
+      hour=0
+    fi
+
+    printf "%02d:%02d:00" "$hour" "$min"
+  }
+
+  sleep_line=$(echo "$current_schedule" | grep -i "sleep at")
+  wake_line=$(echo "$current_schedule" | grep -i "wake.*at")
+
+  has_sleep=$(parse_pmset_time "$sleep_line")
+  has_wake=$(parse_pmset_time "$wake_line")
+
+  # Check if already configured correctly
+  if [[ -n "$has_sleep" && -n "$has_wake" ]]; then
+    if [[ "$has_sleep" == "{{MAC_SLEEP_TIME}}" && "$has_wake" == "{{MAC_WAKE_TIME}}" ]]; then
+      echo "[✓] Power schedule already configured correctly"
+      echo "    Sleep: {{MAC_SLEEP_TIME}} | Wake: {{MAC_WAKE_TIME}}"
+      exit 0
+    fi
+  fi
+
   echo ""
-  read -p "Do you want to configure automatic sleep schedule for macOS? ( yes(Y/y)/no(N/n) ): " -r confirm
+  if [[ -n "$has_sleep" || -n "$has_wake" ]]; then
+    echo "[!] Current schedule detected:"
+    [[ -n "$has_sleep" ]] && echo "    Sleep: $has_sleep"
+    [[ -n "$has_wake" ]] && echo "    Wake: $has_wake"
+    echo ""
+    echo "[!] New schedule:"
+    echo "    Sleep: {{MAC_SLEEP_TIME}} | Wake: {{MAC_WAKE_TIME}}"
+    echo ""
+    read -p "Do you want to update the power schedule? ( yes(Y/y)/no(N/n) ): " -r confirm
+  else
+    read -p "Do you want to configure automatic sleep schedule for macOS? ( yes(Y/y)/no(N/n) ): " -r confirm
+  fi
+
   if [[ ! "$confirm" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     echo "[→] Power schedule setup skipped"
     exit 0

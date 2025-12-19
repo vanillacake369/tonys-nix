@@ -33,7 +33,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -65,7 +66,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -97,7 +99,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -129,7 +132,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -161,7 +165,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -193,7 +198,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -225,7 +231,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -257,7 +264,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -289,7 +297,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -321,7 +330,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -353,7 +363,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -385,7 +396,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -417,7 +429,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -449,7 +462,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -481,7 +495,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -513,7 +528,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -550,7 +566,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -582,7 +599,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -616,7 +634,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -650,7 +669,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -682,7 +702,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -714,7 +735,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2399,102 +2421,6 @@
               {
                 "type": "basic",
                 "from": {
-                  "key_code": "1",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'TickTick'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "2",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Slack'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "3",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Obsidian'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "4",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'Google Chrome'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "5",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'IntelliJ IDEA'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
-                  "key_code": "6",
-                  "modifiers": {
-                    "mandatory": [
-                      "option"
-                    ]
-                  }
-                },
-                "to": [
-                  {
-                    "shell_command": "open -a 'GoLand'"
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "from": {
                   "key_code": "t",
                   "modifiers": {
                     "mandatory": [
@@ -2546,7 +2472,8 @@
                   {
                     "type": "frontmost_application_unless",
                     "bundle_identifiers": [
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2650,7 +2577,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2677,7 +2605,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2710,7 +2639,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2743,7 +2673,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2780,7 +2711,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2812,7 +2744,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2846,7 +2779,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2880,7 +2814,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2953,7 +2888,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
@@ -2987,7 +2923,8 @@
                       "^com\\.github\\.wez\\.wezterm$",
                       "^io\\.alacritty$",
                       "^net\\.kovidgoyal\\.kitty$",
-                      "^com\\.jetbrains\\..*$"
+                      "^com\\.jetbrains\\..*$",
+                      "^com\\.knollsoft\\.Rectangle$"
                     ]
                   }
                 ]
