@@ -168,6 +168,13 @@ on-mode-changed = []
     ctrl-alt-shift-3 = 'focus-monitor 3'
 
     # =========================================
+    # 창을 모니터로 이동: Capslock + Cmd + 1/2/3
+    # =========================================
+    cmd-ctrl-alt-shift-1 = ['move-node-to-monitor 1', 'focus-monitor 1']
+    cmd-ctrl-alt-shift-2 = ['move-node-to-monitor 2', 'focus-monitor 2']
+    cmd-ctrl-alt-shift-3 = ['move-node-to-monitor 3', 'focus-monitor 3']
+
+    # =========================================
     # 기타
     # =========================================
     ctrl-alt-shift-tab = 'workspace-back-and-forth'
