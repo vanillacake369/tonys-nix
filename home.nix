@@ -59,16 +59,15 @@
         echo '{}' > "$CLAUDE_CONFIG"
       fi
 
-      # Create backup before modification
-      BACKUP_FILE="''${CLAUDE_CONFIG}.backup.$(date +%Y%m%d_%H%M%S)"
-      ${lib.getExe' pkgs.coreutils "cp"} "$CLAUDE_CONFIG" "$BACKUP_FILE"
+      # Create backup before modification (single file, overwrite)
+      ${lib.getExe' pkgs.coreutils "cp"} "$CLAUDE_CONFIG" "''${CLAUDE_CONFIG}.backup"
 
       # Merge permissions into existing config using jq
       # This preserves all existing fields and only updates permissions and mcpServers
       ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$CLAUDE_CONFIG" "$PERMISSIONS_FILE" | \
         ${lib.getExe' pkgs.moreutils "sponge"} "$CLAUDE_CONFIG"
 
-      echo "✓ Claude Code permissions synced to ~/.claude.json (backup: $BACKUP_FILE)"
+      echo "✓ Claude Code permissions synced to ~/.claude.json"
     else
       echo "⚠ jq not found, skipping Claude permissions sync"
     fi
@@ -84,15 +83,14 @@
     # Only proceed if jq is available
     if command -v ${lib.getExe' pkgs.jq "jq"} &> /dev/null; then
       if [[ -f "$SETTINGS_FILE" ]]; then
-        # Create backup before modification
-        BACKUP_FILE="''${SETTINGS_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
-        ${lib.getExe' pkgs.coreutils "cp"} "$SETTINGS_FILE" "$BACKUP_FILE"
+        # Create backup before modification (single file, overwrite)
+        ${lib.getExe' pkgs.coreutils "cp"} "$SETTINGS_FILE" "''${SETTINGS_FILE}.backup"
 
         # Merge settings (existing user settings take precedence)
         ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$SETTINGS_FILE" "$SOURCE_FILE" | \
           ${lib.getExe' pkgs.moreutils "sponge"} "$SETTINGS_FILE"
 
-        echo "✓ Claude Code settings merged to ~/.claude/settings.json (backup: $BACKUP_FILE)"
+        echo "✓ Claude Code settings merged to ~/.claude/settings.json"
       else
         # No existing file, copy fresh
         ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$SETTINGS_FILE"
