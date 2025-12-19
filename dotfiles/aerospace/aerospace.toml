@@ -54,13 +54,20 @@ persistent-workspaces = ["C", "D", "K", "M", "P", "T", "W"]
 # Workspace to monitor assignment
 # See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [workspace-to-monitor-force-assignment]
-D = 'monitor.1'
-C = 'monitor.2'
-P = 'monitor.2'
-W = 'monitor.2'
-T = 'monitor.3'
-K = 'monitor.3'
-M = 'monitor.3'
+D = 1
+C = 2
+P = 2
+W = 2
+T = 3
+K = 3
+M = 3
+# D = 'monitor.1'
+# C = 'monitor.2'
+# P = 'monitor.2'
+# W = 'monitor.2'
+# T = 'monitor.3'
+# K = 'monitor.3'
+# M = 'monitor.3'
 # C = 'BenQ GW2780 (2)'  # Code - middle monitor
 # P = 'BenQ GW2780 (2)'  # Podcast - middle monitor
 # W = 'BenQ GW2780 (2)'  # Web - middle monitor
@@ -220,17 +227,16 @@ run = 'move-node-to-workspace C'
 
 # K = K8s/Containers (Docker, Podman) - Monitor 3 (bottom)
 [[on-window-detected]]
-if.app-id = 'com.docker.docker'
+if.app-name-regex-substring = 'Docker Desktop'
 run = 'move-node-to-workspace K'
 
 [[on-window-detected]]
-if.app-id = 'io.podman_desktop.PodmanDesktop'
+if.app-name-regex-substring = 'Podman Desktop'
 run = 'move-node-to-workspace K'
 
 # M = Music (YouTube Music) - Monitor 3 (bottom)
 [[on-window-detected]]
 if.app-name-regex-substring = 'YouTube Music'
-# if.app-id = 'app.ytmdesktop.ytmdesktop'
 run = 'move-node-to-workspace M'
 
 # T = Terminal (WezTerm) - Monitor 3 (bottom)
