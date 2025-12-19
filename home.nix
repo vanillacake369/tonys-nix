@@ -36,12 +36,11 @@
       ".config/hypr/hyprland.conf".source = ./dotfiles/hypr/hyprland.conf;
     }
     // lib.optionalAttrs isDarwin {
-      # Karabiner json
+      # Keymapper :: karabiner
       ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
 
-      # Yabai & Skhd (Mac only)
-      ".config/yabai/yabairc".source = ./dotfiles/yabai/yabairc;
-      ".skhdrc".source = ./dotfiles/skhd/skhdrc;
+      # Window manager :: Aerospace
+      ".config/aerospace".source = ./dotfiles/aerospace;
     };
 
   # Activation scripts to sync Claude Code configuration
