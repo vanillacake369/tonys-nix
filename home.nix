@@ -20,7 +20,7 @@
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
 
-      # Claude configuration - static files only (settings.json and permissions.json handled by activation scripts)
+      # Claude configuration - static files only (settings.json and mcp-servers.json handled by activation scripts)
       ".claude/commands".source = ./dotfiles/claude/commands;
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
       ".claude/agents".source = ./dotfiles/claude/agents;
@@ -44,12 +44,12 @@
     };
 
   # Activation scripts to sync Claude Code configuration
-  # Syncs permissions.json → ~/.claude.json and settings.json → ~/.claude/settings.json
+  # Syncs mcp-servers.json → ~/.claude.json and settings.json → ~/.claude/settings.json
 
-  # Sync permissions and mcpServers to ~/.claude.json
+  # Sync mcp-servers and mcpServers to ~/.claude.json
   home.activation.syncClaudePermissions = lib.hm.dag.entryAfter ["writeBoundary"] ''
     CLAUDE_CONFIG="$HOME/.claude.json"
-    PERMISSIONS_FILE="${./dotfiles/claude/permissions.json}"
+    PERMISSIONS_FILE="${./dotfiles/claude/mcp-servers.json}"
 
     # Only proceed if jq is available
     if command -v ${lib.getExe' pkgs.jq "jq"} &> /dev/null; then
@@ -62,14 +62,14 @@
       # Create backup before modification (single file, overwrite)
       ${lib.getExe' pkgs.coreutils "cp"} "$CLAUDE_CONFIG" "''${CLAUDE_CONFIG}.backup"
 
-      # Merge permissions into existing config using jq
-      # This preserves all existing fields and only updates permissions and mcpServers
-      ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$CLAUDE_CONFIG" "$PERMISSIONS_FILE" | \
+      # Replace mcpServers with source file (delete existing, then merge)
+      # This ensures removed servers are actually deleted
+      ${lib.getExe' pkgs.jq "jq"} -s '(.[0] | del(.mcpServers)) * .[1]' "$CLAUDE_CONFIG" "$PERMISSIONS_FILE" | \
         ${lib.getExe' pkgs.moreutils "sponge"} "$CLAUDE_CONFIG"
 
-      echo "✓ Claude Code permissions synced to ~/.claude.json"
+      echo "✓ Claude Code mcp-servers synced to ~/.claude.json"
     else
-      echo "⚠ jq not found, skipping Claude permissions sync"
+      echo "⚠ jq not found, skipping Claude mcp-servers sync"
     fi
   '';
 
@@ -83,8 +83,8 @@
     # Only proceed if jq is available
     if command -v ${lib.getExe' pkgs.jq "jq"} &> /dev/null; then
       if [[ -f "$SETTINGS_FILE" ]]; then
-        # Create backup before modification (single file, overwrite)
-        ${lib.getExe' pkgs.coreutils "cp"} "$SETTINGS_FILE" "''${SETTINGS_FILE}.backup"
+        # Ensure file is writable before modification
+        ${lib.getExe' pkgs.coreutils "chmod"} u+w "$SETTINGS_FILE"
 
         # Merge settings (existing user settings take precedence)
         ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$SETTINGS_FILE" "$SOURCE_FILE" | \
@@ -97,6 +97,8 @@
         echo "✓ Claude Code settings.json created"
       fi
     else
+      # Ensure file is writable if it exists
+      [[ -f "$SETTINGS_FILE" ]] && ${lib.getExe' pkgs.coreutils "chmod"} u+w "$SETTINGS_FILE"
       # Fallback: simple copy without merge
       ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$SETTINGS_FILE"
       echo "✓ Claude Code settings.json copied (jq not available for merge)"
@@ -108,7 +110,6 @@
     [
       ./modules/apps.nix
       ./modules/language.nix
-      ./modules/env.nix
       ./modules/shell-core.nix
       ./modules/shell-infra.nix
       ./modules/shell-utils.nix
