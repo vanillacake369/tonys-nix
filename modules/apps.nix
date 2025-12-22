@@ -41,7 +41,7 @@
       appcleaner
       hidden-bar
       wezterm
-      # sketchybar
       aerospace
+      # shottr
     ];
 }
