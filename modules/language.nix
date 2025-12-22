@@ -1,4 +1,9 @@
 {pkgs, ...}: {
+  # Java environment
+  home.sessionVariables = {
+    JAVA_HOME = "${pkgs.zulu17}";
+  };
+
   home.packages = with pkgs; [
     # Java
     zulu17
