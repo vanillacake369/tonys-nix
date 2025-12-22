@@ -15,7 +15,7 @@
       # Non WSL apps
       google-chrome
       obsidian
-      jetbrains.idea-ultimate
+      jetbrains.idea
       jetbrains.goland
       jetbrains.datagrip
     ]
