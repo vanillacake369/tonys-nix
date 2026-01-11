@@ -197,9 +197,7 @@ on-mode-changed = []
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.service.binding]
     esc = ['reload-config', 'mode main']
-    r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
-    backspace = ['close-all-windows-but-current', 'mode main']
 
     # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
     #s = ['layout sticky tiling', 'mode main']
@@ -287,4 +285,20 @@ run = 'layout floating'
 
 [[on-window-detected]]
 if.app-name-regex-substring = 'Horo'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Notes'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'FaceTime'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Karabiner'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Shottr'
 run = 'layout floating'
