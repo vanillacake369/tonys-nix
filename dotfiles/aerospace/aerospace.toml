@@ -50,16 +50,16 @@ automatically-unhide-macos-hidden-apps = false
 # =============================================================================
 # Code  - JetBrains                  - Monitor 2 (middle)
 # Docs  - Chrome                     - Monitor 1 (top)
-# Web   - Chrome                     - Monitor 2 (middle)
+# Browser   - Chrome                     - Monitor 2 (middle)
 # Terminal  - WezTerminal, Docker, Podman    - Monitor 3 (bottom)
 # Music - YouTube Music              - Monitor 3 (bottom)
 # Schedule  - TickTick               - Monitor 3 (bottom)
-persistent-workspaces = ["Code", "Docs", "Web", "Terminal", "Music", "Schedule"]
+persistent-workspaces = ["Code", "Docs", "Browser", "Terminal", "Music", "Schedule"]
 
 [workspace-to-monitor-force-assignment]
 Docs = 1
 Code = 2
-Web = 2
+Browser = 2
 Terminal = 3
 Music = 3
 Schedule = 3
@@ -136,7 +136,7 @@ on-mode-changed = []
     ctrl-alt-shift-m = 'workspace Music'
     ctrl-alt-shift-s = 'workspace Schedule'
     ctrl-alt-shift-t = 'workspace Terminal'
-    ctrl-alt-shift-w = 'workspace Web'
+    ctrl-alt-shift-b = 'workspace Browser'
 
     # =========================================
     # 창 이동: Capslock + Cmd + key
@@ -146,7 +146,7 @@ on-mode-changed = []
     cmd-ctrl-alt-shift-m = ['move-node-to-workspace Music', 'workspace Music']
     cmd-ctrl-alt-shift-s = ['move-node-to-workspace Schedule', 'workspace Schedule']
     cmd-ctrl-alt-shift-t = ['move-node-to-workspace Terminal', 'workspace Terminal']
-    cmd-ctrl-alt-shift-w = ['move-node-to-workspace Web', 'workspace Web']
+    cmd-ctrl-alt-shift-b = ['move-node-to-workspace Browser', 'workspace Browser']
 
     # =========================================
     # 포커스 이동: Capslock + arrow
