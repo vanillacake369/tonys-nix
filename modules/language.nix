@@ -1,49 +1,65 @@
 {pkgs, ...}: {
-  # Java environment
-  home.sessionVariables = {
-    JAVA_HOME = "${pkgs.zulu17}";
-  };
+    # Java environment
+    home.sessionVariables = {
+        JAVA_HOME = "${pkgs.zulu17}";
+    };
 
-  home.packages = with pkgs; [
-    # Java
-    zulu17
-    gradle
-    jdt-language-server
+    home.packages = with pkgs; [
+        # Bash
+        bash-language-server
 
-    # Just
-    just
+        # Java
+        zulu17
+        gradle
+        jdt-language-server
 
-    # Make
-    gnumake
+        # Just
+        just
+        just-lsp
 
-    # Go
-    go
-    gotools
-    gopls
+        # Make
+        gnumake
 
-    # Lua
-    gcc
-    lua54Packages.lua
-    lua54Packages.luaunit
-    lua-language-server
+        # Go
+        go
+        gotools
+        gopls
 
-    # Rust (for cargo-based tools)
-    cargo
-    rustc
+        # Lua
+        gcc
+        lua54Packages.lua
+        lua54Packages.luaunit
+        lua-language-server
 
-    # Nix development tools
-    nixd
-    alejandra
+        # Rust (for cargo-based tools)
+        cargo
+        rustc
 
-    # YAML
-    yamllint
-    yaml-language-server
+        # Nix development tools
+        nil
+        nixd
+        alejandra
 
-    # TypeScript/JavaScript
-    nodejs_22
-    nodePackages.typescript-language-server
+        # YAML
+        yamllint
+        yaml-language-server
 
-    # Python
-    uv
-  ];
+        # TypeScript/JavaScript
+        nodejs_22
+        nodePackages.typescript-language-server
+
+        # Terraform
+        terraform
+        terraform-ls
+
+        # Python
+        uv
+        python313Packages.python-lsp-server
+
+        # Docker
+        docker-compose-language-service
+
+        # HTML
+        vscode-langservers-extracted
+    ];
 }

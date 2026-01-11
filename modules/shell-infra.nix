@@ -1,44 +1,44 @@
 # Infrastructure and DevOps tools
-# Kubernetes, Docker, Cloud CLI, IaC tools
 {
-  config,
-  pkgs,
-  lib,
-  isWsl,
-  isDarwin,
-  isLinux,
-  ...
+config,
+pkgs,
+lib,
+isWsl,
+isDarwin,
+isLinux,
+...
 }: {
-  # =============================================================================
-  # Infrastructure and DevOps Packages
-  # =============================================================================
-  home.packages = with pkgs;
-    [
-      # Docker TUI
-      lazydocker
+    # =============================================================================
+    # Infrastructure and DevOps Packages
+    # =============================================================================
+    home.packages = with pkgs;
+        lib.optionals isDarwin [
+            /* Docker TUI */
+            # lazydocker
 
-      # Cloud tools
-      awscli
-      ssm-session-manager-plugin
+            /* Cloud tools */
+            # awscli
+            # ssm-session-manager-plugin
 
-      # Infrastructure tools
-      k6
-      kubectl
-      kubectx
-      k9s
-      stern
-      kubernetes-helm
-      kubectl-tree
-      ngrok
-      terraform
-    ]
-    ++ lib.optionals isDarwin [
-      # macOS-specific container tools
-      dive
-      minikube
-      podman
-      podman-compose
-      podman-desktop
-      qemu
-    ];
+            /* Testing tools */
+            # k6
+
+            /* Infrastructure tools */
+            # kubectl
+            # kubectx
+            # k9s
+            # kubernetes-helm
+            # kubectl-tree
+            # ngrok
+            # terraform
+
+        ]
+        ++ lib.optionals isDarwin [
+            /* MacOS-specific tools */
+            # minikube
+            # podman
+            # podman-compose
+            # podman-desktop
+            # qemu
+        ];
 }
