@@ -1,65 +1,82 @@
 {pkgs, ...}: {
-    # Java environment
-    home.sessionVariables = {
-        JAVA_HOME = "${pkgs.zulu17}";
-    };
+  # Java environment
+  home.sessionVariables = {
+    JAVA_HOME = "${pkgs.zulu17}";
+  };
 
-    home.packages = with pkgs; [
-        # Bash
-        bash-language-server
+  home.packages = with pkgs; [
+    # Bash
+    bash-language-server
+    shfmt
+    shellcheck
 
-        # Java
-        zulu17
-        gradle
-        jdt-language-server
+    # Java
+    zulu17
+    gradle
+    jdt-language-server
+    google-java-format
 
-        # Just
-        just
-        just-lsp
+    # Just
+    just
+    just-lsp
 
-        # Make
-        gnumake
+    # Make
+    gnumake
 
-        # Go
-        go
-        gotools
-        gopls
+    # Go
+    go
+    gotools
+    gopls
+    golangci-lint
 
-        # Lua
-        gcc
-        lua54Packages.lua
-        lua54Packages.luaunit
-        lua-language-server
+    # C
+    gcc
+    clang-tools
 
-        # Rust (for cargo-based tools)
-        cargo
-        rustc
+    # Lua
+    lua54Packages.lua
+    lua54Packages.luaunit
+    lua-language-server
+    stylua
+    selene
 
-        # Nix development tools
-        nil
-        nixd
-        alejandra
+    # Rust
+    cargo
+    rustc
 
-        # YAML
-        yamllint
-        yaml-language-server
+    # Nix
+    nixd
+    alejandra
+    statix
+    deadnix
 
-        # TypeScript/JavaScript
-        nodejs_22
-        nodePackages.typescript-language-server
+    # YAML
+    yamllint
+    yaml-language-server
+    yamlfmt
 
-        # Terraform
-        terraform
-        terraform-ls
+    # TypeScript/JavaScript
+    nodejs_22
+    nodePackages.typescript-language-server
+    nodePackages.prettier
+    biome
 
-        # Python
-        uv
-        python313Packages.python-lsp-server
+    # Terraform
+    terraform
+    terraform-ls
+    tflint
 
-        # Docker
-        docker-compose-language-service
+    # Python
+    uv
+    python313Packages.python-lsp-server
+    black
+    ruff
 
-        # HTML
-        vscode-langservers-extracted
-    ];
+    # Docker
+    docker-compose-language-service
+    hadolint
+
+    # HTML
+    vscode-langservers-extracted
+  ];
 }
