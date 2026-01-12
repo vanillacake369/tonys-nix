@@ -2225,7 +2225,7 @@
                 },
                 "to": [
                   {
-                    "shell_command": "open '/Users/limjihoon/Applications/Chrome Apps.localized/YouTube Music.app'"
+                    "shell_command": "open '/Users/limjihoon/Applications/Brave Browser Apps.localized/YouTube Music.app'"
                   }
                 ],
                 "conditions": [

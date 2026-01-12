@@ -300,5 +300,9 @@ if.app-name-regex-substring = 'Karabiner'
 run = 'layout floating'
 
 [[on-window-detected]]
+if.app-name-regex-substring = 'AppCleaner'
+run = 'layout floating'
+
+[[on-window-detected]]
 if.app-name-regex-substring = 'Shottr'
 run = 'layout floating'
