@@ -354,7 +354,7 @@ mouse_mode true
 // Valid values: positive integers
 // Default value: 10000
 // 
-// scroll_buffer_size 10000
+// scroll_buffer_size 3000
 
 // ** COPY/PASTE COMMAND :: X11 (USING WL-COPY WON'T WORK)**
 // Provide a command to execute when copying text. The text will be piped to
