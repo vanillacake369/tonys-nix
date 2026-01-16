@@ -219,9 +219,12 @@
 
   programs.git = {
     enable = true;
-    settings.user = {
-      name = "limjihoon";
-      email = "lonelynight1026@gmail.com";
+    settings = {
+      user = {
+        name = "limjihoon";
+        email = "lonelynight1026@gmail.com";
+      };
+      credential.helper = "store";
     };
   };
 
