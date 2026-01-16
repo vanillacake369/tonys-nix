@@ -43,7 +43,7 @@
     builders = import ./lib/builders.nix {inherit nixpkgs home-manager homeManagerModules overlays;};
 
     # Support multiple hostname configurations
-    hostnames = ["HAMA" "nixos"];
+    hostnames = ["tony"];
   in {
     # Define nixos configuration for multiple hostnames
     nixosConfigurations = lib.genAttrs hostnames (hostname: let

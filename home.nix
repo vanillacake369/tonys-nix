@@ -37,7 +37,10 @@
     }
     // lib.optionalAttrs isDarwin {
       # Keymapper :: karabiner
-      ".config/karabiner/karabiner.json".source = ./dotfiles/karabiner/karabiner.json;
+      ".config/karabiner/karabiner.json" = {
+        source = ./dotfiles/karabiner/karabiner.json;
+        force = true;
+      };
 
       # Window manager :: Aerospace
       ".config/aerospace".source = ./dotfiles/aerospace;
