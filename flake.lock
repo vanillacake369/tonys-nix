@@ -93,12 +93,29 @@
         "type": "github"
       }
     },
+    "nvim-config": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1768579914,
+        "narHash": "sha256-uHbbtEP9CDRiEw3E38W8WJaRwSPhw0JUj+BdsjYyHUA=",
+        "owner": "vanillacake369",
+        "repo": "tonys-nvim",
+        "rev": "b07f56850fc047412dd77773e71677e735bd1d93",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vanillacake369",
+        "repo": "tonys-nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixos-generators": "nixos-generators",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nvim-config": "nvim-config"
       }
     }
   },

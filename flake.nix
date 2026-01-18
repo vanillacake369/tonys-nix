@@ -15,6 +15,10 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nvim-config = {
+      url = "github:vanillacake369/tonys-nvim";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -23,6 +27,7 @@
     home-manager,
     nix-darwin,
     nixos-generators,
+    nvim-config,
     ...
   }: let
     lib = nixpkgs.lib;
@@ -37,6 +42,7 @@
     homeManagerModules = [
       ./home.nix
       ./limjihoon-user.nix
+      {_module.args = {inherit nvim-config;};}
     ];
 
     # Import builders from lib directory
@@ -122,39 +128,40 @@
     );
 
     # Image generation using nixos-generators with multiple formats
-    packages = forAllSystems (system: let
-      # Define available formats with metadata
-      formats = {
-        iso = { 
-          format = "iso"; 
-          description = "Bootable ISO image for installation/live boot"; 
+    packages = forAllSystems (
+      system: let
+        # Define available formats with metadata
+        formats = {
+          iso = {
+            format = "iso";
+            description = "Bootable ISO image for installation/live boot";
+          };
+          virtualbox = {
+            format = "virtualbox";
+            description = "VirtualBox OVA image";
+          };
+          vmware = {
+            format = "vmware";
+            description = "VMware VMDK image";
+          };
+          qcow = {
+            format = "qcow";
+            description = "QEMU qcow image for KVM/libvirt";
+          };
         };
-        virtualbox = { 
-          format = "virtualbox"; 
-          description = "VirtualBox OVA image"; 
-        };
-        vmware = { 
-          format = "vmware"; 
-          description = "VMware VMDK image"; 
-        };
-        qcow = { 
-          format = "qcow"; 
-          description = "QEMU qcow image for KVM/libvirt"; 
-        };
-      };
-      
-      # Generate image packages for each format
-      mkImage = name: config: nixos-generators.nixosGenerate {
-        inherit system;
-        modules = [ ./configuration.nix ];
-        format = config.format;
-      };
-    in
-      # Only generate Linux images (nixos-generators doesn't support Darwin)
-      lib.optionalAttrs (lib.hasSuffix "-linux" system) (
-        lib.mapAttrs mkImage formats
-      )
-    );
 
+        # Generate image packages for each format
+        mkImage = name: config:
+          nixos-generators.nixosGenerate {
+            inherit system;
+            modules = [./configuration.nix];
+            format = config.format;
+          };
+      in
+        # Only generate Linux images (nixos-generators doesn't support Darwin)
+        lib.optionalAttrs (lib.hasSuffix "-linux" system) (
+          lib.mapAttrs mkImage formats
+        )
+    );
   };
 }
