@@ -5,6 +5,7 @@
   isDarwin,
   isWsl,
   isNixOs,
+  nvim-config,
   ...
 }: {
   # Enable Home Manager
@@ -19,8 +20,7 @@
       ".config/nix".source = ./dotfiles/nix;
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
-
-      # Claude configuration - static files only (settings.json and mcp-servers.json handled by activation scripts)
+      # ".config/nvim".source = nvim-config;
       ".claude/commands".source = ./dotfiles/claude/commands;
       ".claude/CLAUDE.md".source = ./dotfiles/claude/CLAUDE.md;
       ".claude/agents".source = ./dotfiles/claude/agents;
