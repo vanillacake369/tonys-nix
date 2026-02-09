@@ -20,11 +20,11 @@
 
       # Monitoring and debugging
       lsof
-      gdb
       smartmontools
     ]
     ++ lib.optionals isLinux [
       # Linux-specific debugging tools
+      gdb # GDB has build issues on macOS and lldb is preferred there anyway
       psmisc
       strace
     ]
