@@ -20,6 +20,9 @@
       inetutils
       netcat
       dig
+
+      # Wireguard
+      wireguard-go
     ]
     ++ lib.optionals isLinux [
       # Linux-specific network tools

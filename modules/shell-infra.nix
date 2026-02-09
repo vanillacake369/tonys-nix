@@ -37,7 +37,7 @@
       # k9s
       # kubernetes-helm
       # kubectl-tree
-      # ngrok
+      ngrok
       # terraform
     ]
     ++ lib.optionals isDarwin [

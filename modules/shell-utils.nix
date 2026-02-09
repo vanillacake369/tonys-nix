@@ -44,6 +44,9 @@
       sops
       age
       ssh-to-age
+      git-crypt
+      git-filter-repo
+      gh
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)

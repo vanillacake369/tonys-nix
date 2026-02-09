@@ -5,6 +5,9 @@
   };
 
   home.packages = with pkgs; [
+    # Tree-sitter CLI (for nvim-treesitter to build parsers)
+    tree-sitter
+
     # Bash
     bash-language-server
     shfmt
