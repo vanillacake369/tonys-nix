@@ -21,7 +21,7 @@
       /*
       Cloud tools
       */
-      # awscli
+      awscli
       # ssm-session-manager-plugin
 
       /*
