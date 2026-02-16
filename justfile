@@ -62,17 +62,15 @@ install-nix:
 # Install Home Manager
 install-home-manager:
     #!/usr/bin/env bash
-    homeManager=$(command -v home-manager 2>/dev/null)
-
-    if [ -z "$homeManager" ]; then
-      echo "[!] Installing Home Manager"
-      nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-      nix-channel --update
-      nix-shell '<home-manager>' -A install
-      # Command below has already inside of ~/.zshrc, so no worries :-)
-      # . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-    else
+    if command -v home-manager &>/dev/null; then
       echo "[✓] Home Manager installed already"
+    else
+      echo "[!] Home Manager not found - will bootstrap via flake in install-pckgs"
+      # Clean up legacy channel if it exists
+      if nix-channel --list 2>/dev/null | grep -q home-manager; then
+        echo "[!] Removing legacy home-manager channel..."
+        nix-channel --remove home-manager
+      fi
     fi
 
 # Enable uidmap (Linux only)
@@ -106,6 +104,14 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
     #!/usr/bin/env bash
     echo "OS_TYPE={{ OS_TYPE }}, HM_CONFIG={{ HM_CONFIG }}, HOSTNAME={{ HOSTNAME }}"
 
+    # Determine home-manager command (bootstrap if not installed)
+    if command -v home-manager &>/dev/null; then
+      HM_CMD="home-manager"
+    else
+      echo "[!] Bootstrapping home-manager via flake..."
+      HM_CMD="nix run home-manager/master --"
+    fi
+
     # Installation : NixOS
     if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
       # Validate hardware configuration for NixOS (stored in /etc/nixos/)
@@ -123,14 +129,14 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
     case "{{ HM_CONFIG }}" in
       "x86_64-linux"|"aarch64-linux"|"x86_64-darwin"|"aarch64-darwin")
         if [[ "{{ OS_TYPE }}" == "wsl" ]]; then
-          echo "Running: home-manager switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back"
-          home-manager switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
+          echo "Running: $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back"
+          $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
         elif [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-          echo "Running: home-manager switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back"
-          home-manager switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
+          echo "Running: $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back"
+          $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
         else
-          echo "Running: home-manager switch --flake .#hm-{{ HM_CONFIG }} -b back"
-          home-manager switch --flake .#hm-{{ HM_CONFIG }} -b back
+          echo "Running: $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back"
+          $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back
         fi
         ;;
       "unsupported")
@@ -140,13 +146,13 @@ install-pckgs *HM_CONFIG=SYSTEM_ARCH:
       *)
         if [[ "{{ OS_TYPE }}" == "wsl" ]]; then
           echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying WSL config anyway..."
-          home-manager switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
+          $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
         elif [[ "{{ OS_TYPE }}" == "nixos" ]]; then
           echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying NixOS config anyway..."
-          home-manager switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
+          $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
         else
           echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying anyway..."
-          home-manager switch --flake .#hm-{{ HM_CONFIG }} -b back
+          $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back
         fi
         ;;
     esac
