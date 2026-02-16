@@ -63,6 +63,7 @@
     nodePackages.typescript-language-server
     nodePackages.prettier
     biome
+    pnpm
 
     # Terraform
     terraform
@@ -72,6 +73,9 @@
     # Python
     uv
     python313Packages.python-lsp-server
+    python313Packages.python
+    python313Packages.pytest
+    python313Packages.pip
     black
     ruff
 

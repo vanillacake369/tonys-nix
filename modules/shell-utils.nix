@@ -47,6 +47,7 @@
       git-crypt
       git-filter-repo
       gh
+      gnupg
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
