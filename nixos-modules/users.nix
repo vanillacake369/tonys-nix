@@ -4,7 +4,7 @@
   users = {
     users = {
       limjihoon = {
-        shell = pkgs.zsh;
+        shell = pkgs.fish;
         isNormalUser = true;
         description = "Limjihoon";
         extraGroups = [
@@ -17,6 +17,6 @@
   };
 
   # Shell configuration
-  programs.zsh.enable = true;
-  environment.shells = with pkgs; [zsh];
+  programs.fish.enable = true;
+  environment.shells = with pkgs; [fish];
 }

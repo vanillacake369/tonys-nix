@@ -9,8 +9,10 @@
   home.packages = with pkgs;
     [
       # General apps
-      claude-code
-      opencode
+      # claude-code
+      gemini-cli
+      codex
+      # opencode
       tailscale
     ]
     ++ lib.optionals (!isWsl) [
@@ -37,7 +39,6 @@
       raycast
       jankyborders
       appcleaner
-      hidden-bar
       wezterm
       aerospace
       # shottr

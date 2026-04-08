@@ -21,6 +21,7 @@
       ripgrep
       tree
       curl
+      openssl
 
       # Git tools
       # INFO : git 에 대해서는 ./shell-core.nix 를 확인할 것
@@ -30,7 +31,7 @@
 
       # Terminal tools
       zellij
-      neofetch
+      fastfetch
       expect
 
       # Recording

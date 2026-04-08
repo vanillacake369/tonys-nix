@@ -9,7 +9,7 @@ Supports NixOS, WSL, macOS, and standard Linux distributions with automatic envi
 - **Automated setup**: One-command installation with environment detection
 - **Development tools**: Go, Java, Kubernetes, Podman with compose support, modern CLI utilities
 - **Desktop environment**: GNOME with Wayland optimizations (NixOS)
-- **Shell configuration**: Zsh with oh-my-zsh and powerlevel10k
+- **Shell configuration**: fish with modern shell integrations
 - **Editor setup**: Neovim with LazyVim configuration
 - **Container support**: Rootless Podman with Docker compatibility and podman-compose
 - **Image generation**: Create ISOs, VM images (VirtualBox, VMware, qcow2), and container images
@@ -23,7 +23,7 @@ Packages are automatically managed through home-manager modules. Key categories 
 - **Development**: Go, Java (Zulu), Node.js, Python
 - **DevOps**: kubectl, helm, k9s, minikube, podman-compose, AWS CLI
 - **Editors**: Neovim (LazyVim), VS Code, JetBrains IDEs
-- **Shell**: Zsh, oh-my-zsh, powerlevel10k, modern CLI tools (bat, fzf, ripgrep)
+- **Shell**: fish, direnv, modern CLI tools (bat, fzf, ripgrep)
 - **Applications**: Firefox, Chrome, Slack, Obsidian, LibreOffice
 
 > **Note**: Package versions are automatically managed. Run `home-manager packages` to see current versions.
@@ -164,7 +164,7 @@ just show-images           # Show built images and sizes
 # Specific installations
 just install-nix           # Install Nix package manager
 just install-home-manager  # Install home-manager
-just apply-zsh            # Configure zsh shell
+just apply-fish           # Configure fish shell
 ```
 
 > **Tip**: See `CLAUDE.md` for detailed development workflows and troubleshooting.

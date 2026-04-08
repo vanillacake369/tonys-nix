@@ -344,10 +344,10 @@ programs.nix-ld = {
 **Solution**:
 ```bash
 # Restart terminal or reload shell
-exec zsh
+exec fish
 
 # Or source the new profile
-source ~/.zshrc
+source ~/.config/fish/config.fish
 ```
 
 ### Permission Issues
