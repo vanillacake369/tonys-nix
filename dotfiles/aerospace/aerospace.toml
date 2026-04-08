@@ -155,6 +155,11 @@ on-mode-changed = []
     ctrl-alt-shift-down = 'focus down'
     ctrl-alt-shift-up = 'focus up'
     ctrl-alt-shift-right = 'focus right'
+    # hjkl 추가
+    ctrl-alt-shift-h = 'focus left'
+    ctrl-alt-shift-j = 'focus down'
+    ctrl-alt-shift-k = 'focus up'
+    ctrl-alt-shift-l = 'focus right'
 
     # =========================================
     # 창 위치 이동: Capslock + Cmd + arrow
@@ -163,6 +168,11 @@ on-mode-changed = []
     cmd-ctrl-alt-shift-down = 'move down'
     cmd-ctrl-alt-shift-up = 'move up'
     cmd-ctrl-alt-shift-right = 'move right'
+    # hjkl 추가
+    cmd-ctrl-alt-shift-h = 'move left'
+    cmd-ctrl-alt-shift-j = 'move down'
+    cmd-ctrl-alt-shift-k = 'move up'
+    cmd-ctrl-alt-shift-l = 'move right'
 
     # =========================================
     # 모니터 포커스: Capslock + 1/2/3
@@ -208,12 +218,6 @@ on-mode-changed = []
     k = ['join-with up', 'mode main']
     l = ['join-with right', 'mode main']
 
-# =============================================================================
-# Auto Split - Alternate split direction for new windows
-# =============================================================================
-[[on-window-detected]]
-check-further-callbacks = true
-run = 'split opposite'
 
 # =============================================================================
 # Window Detection Rules - Auto move apps to workspaces
@@ -306,3 +310,18 @@ run = 'layout floating'
 [[on-window-detected]]
 if.app-name-regex-substring = 'Shottr'
 run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Discord'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = 'Opal'
+run = 'layout floating'
+
+# =============================================================================
+# Auto Split - Alternate split direction for new windows
+# =============================================================================
+[[on-window-detected]]
+check-further-callbacks = true
+run = 'split opposite'
