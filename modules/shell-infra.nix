@@ -28,6 +28,7 @@
       Testing tools
       */
       # k6
+      nuclei
 
       /*
       Infrastructure tools

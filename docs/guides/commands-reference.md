@@ -157,20 +157,20 @@ just install-uidmap
 
 ---
 
-### `just apply-zsh`
+### `just apply-fish`
 
-**Description**: Configure zsh as default shell
+**Description**: Configure fish as default shell
 
 **What it does**:
-- Adds Nix zsh to /etc/shells
-- Changes default shell to zsh
+- Adds Nix fish to /etc/shells
+- Changes default shell to fish
 
 **Usage**:
 ```bash
-just apply-zsh
+just apply-fish
 ```
 
-**Requirements**: zsh must be installed via home-manager first
+**Requirements**: fish must be installed via home-manager first
 
 ---
 

@@ -31,6 +31,7 @@
     gotools
     gopls
     golangci-lint
+    delve
 
     # C
     gcc
@@ -75,6 +76,8 @@
     python313Packages.python-lsp-server
     python313Packages.python
     python313Packages.pytest
+    python313Packages.ruff
+    python313Packages.uvicorn
     python313Packages.pip
     black
     ruff

@@ -1,171 +1,289 @@
-########### *** GLOBAL VARIABLE *** ##########
-# Env of user, host, os
+set shell := ["bash", "-euo", "pipefail", "-c"]
 
-USERNAME := `whoami`
+########### Global Settings ##########
+
 HOSTNAME := `hostname`
-OS_TYPE := `bash -euo pipefail -c '           \
-  if [[ -d /etc/nixos ]]; then                \
-    echo nixos;                               \
-  elif [[ "$(uname -s)" == "Darwin" ]]; then  \
-    echo darwin;                              \
-  elif grep -qiE "(Microsoft|WSL)" /proc/version; then \
-    echo wsl;                                 \
-  else                                        \
-    echo unsupported;                         \
-  fi'`
-SYSTEM_ARCH := `bash -euo pipefail -c '       \
-  if [[ "$(uname -s)" == "Darwin" ]]; then    \
-    if [[ "$(uname -m)" == "arm64" ]]; then   \
-      echo aarch64-darwin;                    \
-    else                                      \
-      echo x86_64-darwin;                     \
-    fi                                        \
-  elif [[ "$(uname -s)" == "Linux" ]]; then  \
-    if [[ "$(uname -m)" == "aarch64" ]]; then \
-      echo aarch64-linux;                     \
-    else                                      \
-      echo x86_64-linux;                      \
-    fi                                        \
-  else                                        \
-    echo unsupported;                         \
-  fi'`
-
-# Smart Garbage Collection Configuration
-
-GC_SIZE_THRESHOLD_GB := "10"
+OS_TYPE := `case "$(uname -s)" in
+  Darwin) echo darwin ;;
+  Linux)
+    if [[ -d /etc/nixos ]]; then
+      echo nixos
+    elif grep -qiE '(Microsoft|WSL)' /proc/version 2>/dev/null; then
+      echo wsl
+    else
+      echo linux
+    fi
+    ;;
+  *) echo unsupported ;;
+esac`
+SYSTEM_ARCH := `case "$(uname -s):$(uname -m)" in
+  Darwin:arm64) echo aarch64-darwin ;;
+  Darwin:*) echo x86_64-darwin ;;
+  Linux:aarch64) echo aarch64-linux ;;
+  Linux:x86_64) echo x86_64-linux ;;
+  Linux:amd64) echo x86_64-linux ;;
+  *) echo unsupported ;;
+esac`
 GC_MIN_INTERVAL_DAYS := "3"
 GC_MAX_INTERVAL_DAYS := "14"
+GC_DELETE_OLDER_THAN := "14d"
 GC_STATE_FILE := ".nix-gc-state"
-
-# macOS Power Schedule Configuration
-
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
+NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
+NIX_CONF_TARGET := "/etc/nix/nix.conf"
+AEROSPACE_CONFIG_PATH := "dotfiles/aerospace/aerospace.toml"
 
-########### *** INSTALLATION *** ##########
+########### Backward-Compatible Aliases ##########
 
-# Initiate all configuration
-install-all: install-nix link-nix-conf install-home-manager install-uidmap-conditional install-pckgs setup-mac-power-schedule smart-clean
+alias install-all := bootstrap
+alias install-pckgs := apply
+alias install-uidmap-conditional := bootstrap-uidmap
+alias link-nix-conf := system-link-nix-conf
+alias record-gc-execution := gc-record
+alias smart-clean := gc
+alias force-clean := gc-force
+alias gc-status := gc-info
+alias clear-all := uninstall-home-manager
+alias remove-configs := purge-local-configs
+alias build-all-images := build-images
+alias apply-zsh := apply-fish
 
-# Install nix
+########### Bootstrap ##########
+
+# Full first-time setup for the current machine.
+bootstrap:
+    #!/usr/bin/env bash
+    just install-nix
+    just system-link-nix-conf
+    just install-home-manager
+    just bootstrap-uidmap
+    just apply
+    just setup-mac-power-schedule
+    just gc
+
+# Install Nix if it is not available.
 install-nix:
     #!/usr/bin/env bash
-    nix=$(which nix)
-    if [[ -z "$nix" ]]; then
-      echo "[!] Installing Nix"
-      sh <(curl -L https://nixos.org/nix/install) --daemon
-    else
-      echo "[✓] Nix installed already"
-    fi
-
-# Install Home Manager
-install-home-manager:
-    #!/usr/bin/env bash
-    if command -v home-manager &>/dev/null; then
-      echo "[✓] Home Manager installed already"
-    else
-      echo "[!] Home Manager not found - will bootstrap via flake in install-pckgs"
-      # Clean up legacy channel if it exists
-      if nix-channel --list 2>/dev/null | grep -q home-manager; then
-        echo "[!] Removing legacy home-manager channel..."
-        nix-channel --remove home-manager
-      fi
-    fi
-
-# Enable uidmap (Linux only)
-install-uidmap:
-    #!/usr/bin/env bash
-    if [[ "$(uname -s)" != "Linux" ]]; then
-      echo "[!] uidmap installation skipped - not supported on $(uname -s)"
+    if command -v nix >/dev/null 2>&1; then
+      echo "[✓] Nix is already installed"
       exit 0
     fi
 
-    if ! command -v newuidmap >/dev/null || ! command -v newgidmap >/dev/null; then
-      echo "[!] installing uidmap via apt (requires sudo)"
-      sudo apt update && sudo apt install -y uidmap
-    else
-      echo "[✓] newuidmap and newgidmap already exist"
-    fi
+    echo "[!] Installing Nix"
+    sh <(curl -L https://nixos.org/nix/install) --daemon
 
-# Conditional uidmap install - only run on Linux
-install-uidmap-conditional:
+# Prepare Home Manager. On fresh systems the real install happens via flake commands.
+install-home-manager:
     #!/usr/bin/env bash
-    if [[ "{{ OS_TYPE }}" == "darwin" ]]; then
-      echo "[✓] uidmap installation skipped on macOS"
-    else
-      just install-uidmap
+    if command -v home-manager >/dev/null 2>&1; then
+      echo "[✓] Home Manager is already installed"
+      exit 0
     fi
 
-# Install packages by nix home-manager
+    echo "[!] Home Manager not found - it will be bootstrapped via flake on apply"
+    if nix-channel --list 2>/dev/null | grep -q '^home-manager'; then
+      echo "[!] Removing legacy home-manager channel"
+      nix-channel --remove home-manager
+    fi
 
-# If nixos, it'll run nixos-rebuild & home-manager
-install-pckgs *HM_CONFIG=SYSTEM_ARCH:
+# Install uidmap only where it is relevant.
+bootstrap-uidmap:
     #!/usr/bin/env bash
-    echo "OS_TYPE={{ OS_TYPE }}, HM_CONFIG={{ HM_CONFIG }}, HOSTNAME={{ HOSTNAME }}"
-
-    # Determine home-manager command (bootstrap if not installed)
-    if command -v home-manager &>/dev/null; then
-      HM_CMD="home-manager"
-    else
-      echo "[!] Bootstrapping home-manager via flake..."
-      HM_CMD="nix run home-manager/master --"
-    fi
-
-    # Installation : NixOS
-    if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-      # Validate hardware configuration for NixOS (stored in /etc/nixos/)
-      echo "[!] Checking hardware configuration..."
-      if [[ ! -f "/etc/nixos/hardware-configuration.nix" ]]; then
-        echo "[!] /etc/nixos/hardware-configuration.nix not found. Generating for this machine..."
-        sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
-        echo "[✓] Generated /etc/nixos/hardware-configuration.nix"
-      fi
-
-      sudo nixos-rebuild switch --flake .#{{ HOSTNAME }} --impure
-    fi
-
-    # Installation : Other distros
-    case "{{ HM_CONFIG }}" in
-      "x86_64-linux"|"aarch64-linux"|"x86_64-darwin"|"aarch64-darwin")
-        if [[ "{{ OS_TYPE }}" == "wsl" ]]; then
-          echo "Running: $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back"
-          $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
-        elif [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-          echo "Running: $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back"
-          $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
-        else
-          echo "Running: $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back"
-          $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back
-        fi
-        ;;
-      "unsupported")
-        echo "[!] Unsupported system architecture. Please manually specify config"
-        exit 1
-        ;;
+    case "{{ OS_TYPE }}" in
+      darwin)
+    echo "[✓] uidmap install skipped on macOS"
+    ;;
+      linux|wsl)
+    just install-uidmap
+    ;;
+      nixos)
+    echo "[✓] uidmap install skipped on NixOS"
+    ;;
       *)
-        if [[ "{{ OS_TYPE }}" == "wsl" ]]; then
-          echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying WSL config anyway..."
-          $HM_CMD switch --flake .#hm-wsl-{{ HM_CONFIG }} -b back
-        elif [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-          echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying NixOS config anyway..."
-          $HM_CMD switch --flake .#hm-nixos-{{ HM_CONFIG }} -b back
-        else
-          echo "[!] Unknown system architecture: {{ HM_CONFIG }}. Trying anyway..."
-          $HM_CMD switch --flake .#hm-{{ HM_CONFIG }} -b back
-        fi
-        ;;
+    echo "[→] uidmap install skipped on unsupported platform: {{ OS_TYPE }}"
+    ;;
     esac
 
-# Apply zsh
-apply-zsh:
+# Install uidmap on Debian/Ubuntu style Linux hosts.
+install-uidmap:
     #!/usr/bin/env bash
-    if ! grep -qx "/home/{{ USERNAME }}/.nix-profile/bin/zsh" /etc/shells; then
-      echo "/home/{{ USERNAME }}/.nix-profile/bin/zsh" | sudo tee -a /etc/shells
+    if [[ "$(uname -s)" != "Linux" ]]; then
+      echo "[→] uidmap install skipped on $(uname -s)"
+      exit 0
     fi
-    chsh -s /home/{{ USERNAME }}/.nix-profile/bin/zsh
 
-# Setup macOS power schedule (macOS only)
+    if command -v newuidmap >/dev/null 2>&1 && command -v newgidmap >/dev/null 2>&1; then
+      echo "[✓] newuidmap and newgidmap already exist"
+      exit 0
+    fi
+
+    echo "[!] Installing uidmap via apt (requires sudo)"
+    sudo apt update
+    sudo apt install -y uidmap
+
+# Apply the flake for the current platform.
+apply target=SYSTEM_ARCH:
+    #!/usr/bin/env bash
+    echo "OS_TYPE={{ OS_TYPE }}, TARGET={{ target }}, HOSTNAME={{ HOSTNAME }}"
+    just apply-validate "{{ target }}"
+    just apply-system "{{ target }}"
+    just apply-home "{{ target }}"
+    just apply-fish
+    just sync-local-integrations
+
+# Validate platform and target before applying any configuration.
+apply-validate target:
+    #!/usr/bin/env bash
+    case "{{ OS_TYPE }}" in
+      nixos|wsl|darwin|linux)
+    ;;
+      *)
+    echo "[✗] Unsupported platform: {{ OS_TYPE }}"
+    exit 1
+    ;;
+    esac
+
+    case "{{ target }}" in
+      x86_64-linux|aarch64-linux|x86_64-darwin|aarch64-darwin)
+    echo "[✓] Apply target validated: {{ target }}"
+    ;;
+      unsupported)
+    echo "[✗] Unsupported system architecture"
+    exit 1
+    ;;
+      *)
+    echo "[!] Non-standard target requested: {{ target }}"
+    ;;
+    esac
+
+# Apply system-level configuration for hosts that require it.
+apply-system target:
+    #!/usr/bin/env bash
+    if [[ "{{ OS_TYPE }}" != "nixos" ]]; then
+      echo "[→] System apply skipped - not NixOS"
+      exit 0
+    fi
+
+    echo "[!] Checking NixOS hardware configuration"
+    if [[ ! -f /etc/nixos/hardware-configuration.nix ]]; then
+      echo "[!] Generating /etc/nixos/hardware-configuration.nix"
+      sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
+      echo "[✓] Generated /etc/nixos/hardware-configuration.nix"
+    fi
+
+    echo "[!] Applying NixOS system configuration"
+    sudo nixos-rebuild switch --flake .#"{{ HOSTNAME }}" --impure
+
+# Apply the Home Manager profile for the requested target.
+apply-home target:
+    #!/usr/bin/env bash
+    if command -v home-manager >/dev/null 2>&1; then
+      hm_cmd=(home-manager)
+    else
+      echo "[!] Bootstrapping Home Manager via flake"
+      hm_cmd=(nix run home-manager/master --)
+    fi
+
+    case "{{ OS_TYPE }}" in
+      nixos)
+    flake_target="hm-nixos-{{ target }}"
+    ;;
+      wsl)
+    flake_target="hm-wsl-{{ target }}"
+    ;;
+      darwin|linux)
+    flake_target="hm-{{ target }}"
+    ;;
+      *)
+    echo "[✗] Unsupported platform for Home Manager apply: {{ OS_TYPE }}"
+    exit 1
+    ;;
+    esac
+
+    echo "[!] Applying Home Manager target: ${flake_target}"
+    echo "Running: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
+    "${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back
+
+# Sync local desktop integrations after configuration changes are applied.
+sync-local-integrations:
+    #!/usr/bin/env bash
+    just reload-aerospace-if-needed
+
+# Reload AeroSpace when its config changed in git and the local environment supports it.
+reload-aerospace-if-needed:
+    #!/usr/bin/env bash
+    if [[ "{{ OS_TYPE }}" != "darwin" ]]; then
+      echo "[→] AeroSpace reload skipped - not macOS"
+      exit 0
+    fi
+
+    if ! command -v aerospace >/dev/null 2>&1; then
+      echo "[→] AeroSpace reload skipped - aerospace is not installed"
+      exit 0
+    fi
+
+    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      echo "[→] AeroSpace reload skipped - not in a git worktree"
+      exit 0
+    fi
+
+    if [[ -z "$(git status --porcelain -- "{{ AEROSPACE_CONFIG_PATH }}")" ]]; then
+      echo "[→] AeroSpace reload skipped - no git changes in {{ AEROSPACE_CONFIG_PATH }}"
+      exit 0
+    fi
+
+    echo "[!] Reloading AeroSpace config"
+    aerospace reload-config
+    echo "[✓] AeroSpace config reloaded"
+
+# Ensure the Nix-provided fish is registered as a login shell.
+apply-fish:
+    #!/usr/bin/env bash
+    fish_path="$HOME/.nix-profile/bin/fish"
+    if ! grep -qx "$fish_path" /etc/shells; then
+      echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+    fi
+    chsh -s "$fish_path"
+
+########### System Configuration ##########
+
+# Link the repository nix.conf into /etc/nix/nix.conf.
+system-link-nix-conf:
+    #!/usr/bin/env bash
+    source_file="{{ NIX_CONF_SOURCE }}"
+    target_file="{{ NIX_CONF_TARGET }}"
+
+    if [[ ! -f "$source_file" ]]; then
+      echo "[✗] Source file not found: $source_file"
+      exit 1
+    fi
+
+    if [[ ! -d /etc/nix ]]; then
+      echo "[!] Creating /etc/nix (requires sudo)"
+      sudo mkdir -p /etc/nix
+    fi
+
+    if [[ -L "$target_file" ]]; then
+      current_target=$(readlink "$target_file")
+      if [[ "$current_target" == "$source_file" ]]; then
+    echo "[✓] nix.conf symlink already configured"
+    exit 0
+      fi
+
+      echo "[!] Removing existing nix.conf symlink: $current_target"
+      sudo rm "$target_file"
+    elif [[ -e "$target_file" ]]; then
+      echo "[!] Backing up existing nix.conf to ${target_file}.backup"
+      sudo mv "$target_file" "${target_file}.backup"
+    fi
+
+    echo "[!] Linking $target_file -> $source_file"
+    sudo ln -s "$source_file" "$target_file"
+    echo "[✓] nix.conf linked successfully"
+
+# Configure daily sleep and wake scheduling on macOS.
 setup-mac-power-schedule:
     #!/usr/bin/env bash
     if [[ "{{ OS_TYPE }}" != "darwin" ]]; then
@@ -173,437 +291,315 @@ setup-mac-power-schedule:
       exit 0
     fi
 
-    # Check if schedule is already configured as desired
-    current_schedule=$(pmset -g sched 2>/dev/null)
-
-    # Extract current settings (if any)
-    # pmset -g sched output format:
-    #   wakepoweron at 6:30AM every day
-    #   sleep at 2:00AM every day
-
-    # Parse time from "at 6:30AM" or "at 2:00AM" format
     parse_pmset_time() {
       local line="$1"
-      local time_part=$(echo "$line" | grep -oE "[0-9]{1,2}:[0-9]{2}(AM|PM)" | head -1)
+      local time_part
+      local hour
+      local min
+      local ampm
+
+      time_part="$(grep -oE '[0-9]{1,2}:[0-9]{2}(AM|PM)' <<<"$line" | head -1 || true)"
       if [[ -z "$time_part" ]]; then
-        echo ""
-        return
+    return 0
       fi
 
-      local hour=$(echo "$time_part" | cut -d: -f1)
-      local min=$(echo "$time_part" | cut -d: -f2 | grep -oE "[0-9]+")
-      local ampm=$(echo "$time_part" | grep -oE "(AM|PM)")
+      hour="$(cut -d: -f1 <<<"$time_part")"
+      min="$(grep -oE '[0-9]+' <<<"$(cut -d: -f2 <<<"$time_part")")"
+      ampm="$(grep -oE '(AM|PM)' <<<"$time_part")"
 
-      # Convert to 24-hour format
       if [[ "$ampm" == "PM" && "$hour" -ne 12 ]]; then
-        hour=$((hour + 12))
+    hour=$((hour + 12))
       elif [[ "$ampm" == "AM" && "$hour" -eq 12 ]]; then
-        hour=0
+    hour=0
       fi
 
       printf "%02d:%02d:00" "$hour" "$min"
     }
 
-    sleep_line=$(echo "$current_schedule" | grep -i "sleep at")
-    wake_line=$(echo "$current_schedule" | grep -i "wake.*at")
+    current_schedule="$(pmset -g sched 2>/dev/null || true)"
+    sleep_line="$(grep -i 'sleep at' <<<"$current_schedule" || true)"
+    wake_line="$(grep -i 'wake.*at' <<<"$current_schedule" || true)"
+    has_sleep="$(parse_pmset_time "$sleep_line")"
+    has_wake="$(parse_pmset_time "$wake_line")"
 
-    has_sleep=$(parse_pmset_time "$sleep_line")
-    has_wake=$(parse_pmset_time "$wake_line")
-
-    # Check if already configured correctly
-    if [[ -n "$has_sleep" && -n "$has_wake" ]]; then
-      if [[ "$has_sleep" == "{{ MAC_SLEEP_TIME }}" && "$has_wake" == "{{ MAC_WAKE_TIME }}" ]]; then
-        echo "[✓] Power schedule already configured correctly"
-        echo "    Sleep: {{ MAC_SLEEP_TIME }} | Wake: {{ MAC_WAKE_TIME }}"
-        exit 0
-      fi
+    if [[ -n "$has_sleep" && -n "$has_wake" ]] && [[ "$has_sleep" == "{{ MAC_SLEEP_TIME }}" ]] && [[ "$has_wake" == "{{ MAC_WAKE_TIME }}" ]]; then
+      echo "[✓] Power schedule already configured"
+      echo "    Sleep: {{ MAC_SLEEP_TIME }} | Wake: {{ MAC_WAKE_TIME }}"
+      exit 0
     fi
 
-    echo ""
     if [[ -n "$has_sleep" || -n "$has_wake" ]]; then
-      echo "[!] Current schedule detected:"
+      echo "[!] Current schedule detected"
       [[ -n "$has_sleep" ]] && echo "    Sleep: $has_sleep"
       [[ -n "$has_wake" ]] && echo "    Wake: $has_wake"
-      echo ""
-      echo "[!] New schedule:"
-      echo "    Sleep: {{ MAC_SLEEP_TIME }} | Wake: {{ MAC_WAKE_TIME }}"
-      echo ""
-      read -p "Do you want to update the power schedule? ( yes(Y/y)/no(N/n) ): " -r confirm
+      echo "    New: sleep {{ MAC_SLEEP_TIME }} / wake {{ MAC_WAKE_TIME }}"
     else
-      read -p "Do you want to configure automatic sleep schedule for macOS? ( yes(Y/y)/no(N/n) ): " -r confirm
+      echo "[!] No existing macOS power schedule detected"
+      echo "    New: sleep {{ MAC_SLEEP_TIME }} / wake {{ MAC_WAKE_TIME }}"
     fi
 
+    read -r -p "Apply macOS power schedule? [y/N]: " confirm
     if [[ ! "$confirm" =~ ^[Yy]([Ee][Ss])?$ ]]; then
       echo "[→] Power schedule setup skipped"
       exit 0
     fi
-    echo ""
 
-    echo "[!] Setting up macOS power schedule (requires sudo)..."
+    sudo pmset repeat cancel >/dev/null 2>&1 || true
+    sudo pmset repeat sleep {{ MAC_SCHEDULE_DAYS }} {{ MAC_SLEEP_TIME }} wakeorpoweron {{ MAC_SCHEDULE_DAYS }} {{ MAC_WAKE_TIME }}
 
-    # Clear any existing power schedules first
-    sudo pmset repeat cancel >/dev/null 2>&1
+    echo "[✓] Power schedule configured"
+    echo "    Verify: sudo pmset -g sched"
+    echo "    Cancel: sudo pmset repeat cancel"
 
-    # Set both sleep and wake schedules in a single command
-    # Format: pmset repeat sleep DAYS TIME wakeorpoweron DAYS TIME
-    if sudo pmset repeat sleep {{ MAC_SCHEDULE_DAYS }} {{ MAC_SLEEP_TIME }} wakeorpoweron {{ MAC_SCHEDULE_DAYS }} {{ MAC_WAKE_TIME }}; then
-      echo "[✓] Sleep schedule set: {{ MAC_SLEEP_TIME }} daily"
-      echo "[✓] Wake schedule set: {{ MAC_WAKE_TIME }} daily"
-    else
-      echo "[✗] Failed to set power schedules"
-      exit 1
-    fi
-
-    echo ""
-    echo "[✓] Power schedule configured successfully!"
-    echo ""
-    echo "Schedule details:"
-    echo "  • Sleep: {{ MAC_SLEEP_TIME }} (every day)"
-    echo "  • Wake:  {{ MAC_WAKE_TIME }} (every day)"
-    echo ""
-    echo "To verify: sudo pmset -g sched"
-    echo "To cancel: sudo pmset repeat cancel"
-
-# Link nix.conf to system configuration
-link-nix-conf:
+# Enable shared mount propagation for rootless Podman.
+enable-shared-mount:
     #!/usr/bin/env bash
-    SOURCE_FILE="$(pwd)/dotfiles/nix/nix.conf"
-    TARGET_FILE="/etc/nix/nix.conf"
-
-    # Check if source exists
-    if [[ ! -f "$SOURCE_FILE" ]]; then
-      echo "[✗] Source file not found: $SOURCE_FILE"
-      exit 1
+    propagation="$(findmnt -no PROPAGATION /)"
+    if [[ "$propagation" == *shared* ]]; then
+      echo "[✓] Shared mount propagation is already configured"
+      exit 0
     fi
 
-    # Ensure /etc/nix directory exists
-    if [[ ! -d "/etc/nix" ]]; then
-      echo "[!] Creating /etc/nix directory (requires sudo)"
-      sudo mkdir -p /etc/nix
-    fi
+    echo "[!] Configuring shared mount propagation for Podman"
+    sudo mount --make-rshared /
+    echo "[✓] Shared mount propagation configured"
 
-    # Handle existing nix.conf
-    if [[ -e "$TARGET_FILE" ]]; then
-      if [[ -L "$TARGET_FILE" ]]; then
-        CURRENT_TARGET=$(readlink "$TARGET_FILE")
-        if [[ "$CURRENT_TARGET" == "$SOURCE_FILE" ]]; then
-          echo "[✓] Symlink already correctly configured"
-          exit 0
-        else
-          echo "[!] Removing existing symlink pointing to: $CURRENT_TARGET"
-          sudo rm "$TARGET_FILE"
-        fi
-      else
-        echo "[!] Backing up existing nix.conf to ${TARGET_FILE}.backup"
-        sudo mv "$TARGET_FILE" "${TARGET_FILE}.backup"
-      fi
-    fi
+########### Maintenance ##########
 
-    # Create symlink
-    echo "[!] Creating symlink: $TARGET_FILE -> $SOURCE_FILE"
-    sudo ln -s "$SOURCE_FILE" "$TARGET_FILE"
-
-    if [[ -L "$TARGET_FILE" ]]; then
-      echo "[✓] Successfully linked nix.conf"
-    else
-      echo "[✗] Failed to create symlink"
-      exit 1
-    fi
-
-########### *** SMART GARBAGE COLLECTION *** ##########
-
-# Record GC execution timestamp
-record-gc-execution:
+# Persist a GC run timestamp.
+gc-record:
     #!/usr/bin/env bash
     date +%s > {{ GC_STATE_FILE }}
     echo "[✓] GC execution recorded at $(date)"
 
-########### *** CLEANER *** ##########
-
-# Intelligent conditional garbage collection (SSD-optimized)
-smart-clean:
+# Run conditional garbage collection using age and disk pressure.
+gc:
     #!/usr/bin/env bash
-    # Quick days check only - skip expensive size check for speed
     days_since_gc=999
 
     if [[ -f "{{ GC_STATE_FILE }}" ]]; then
-      last_gc=$(cat {{ GC_STATE_FILE }} 2>/dev/null || echo "0")
-      current=$(date +%s)
+      last_gc="$(cat {{ GC_STATE_FILE }} 2>/dev/null || echo 0)"
+      current="$(date +%s)"
       if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
-        days_since_gc=$(( (current - last_gc) / 86400 ))
+    days_since_gc=$(((current - last_gc) / 86400))
       fi
     fi
 
-    # Quick decision based on time only
-    if (( days_since_gc >= {{ GC_MAX_INTERVAL_DAYS }} )); then
-      echo "[!] Running GC (${days_since_gc} days since last cleanup)..."
-      nix-collect-garbage -d --delete-older-than 14d
-
+    run_gc() {
+      nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
       if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-        sudo -H nix-collect-garbage -d --delete-older-than 14d
+    sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
       fi
+      just gc-record
+    }
 
-      date +%s > {{ GC_STATE_FILE }}
-      echo "[✓] Garbage collection completed"
-    elif (( days_since_gc < {{ GC_MIN_INTERVAL_DAYS }} )); then
-      echo "[→] GC skipped (${days_since_gc} days since last cleanup)"
-      echo "    Use 'just force-clean' to force cleanup"
-    else
-      # Only check size if within the decision window (3-14 days)
-      # Use df for quick filesystem check instead of du
-      if [[ -d "/nix/store" ]]; then
-        used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
-        if [[ "$used_percent" -gt 80 ]]; then
-          echo "[!] Running GC (disk usage at ${used_percent}%)..."
-          nix-collect-garbage -d --delete-older-than 14d
-
-          if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-            sudo -H nix-collect-garbage -d --delete-older-than 14d
-          fi
-
-          date +%s > {{ GC_STATE_FILE }}
-          echo "[✓] Garbage collection completed"
-        else
-          echo "[→] GC skipped (${days_since_gc}d since cleanup, ${used_percent}% disk used)"
-          echo "    Use 'just force-clean' to force cleanup"
-        fi
-      else
-        echo "[→] GC skipped (${days_since_gc} days since last cleanup)"
-      fi
+    if (( days_since_gc >= {{ GC_MAX_INTERVAL_DAYS }} )); then
+      echo "[!] Running GC (${days_since_gc} days since last cleanup)"
+      run_gc
+      exit 0
     fi
 
-# Force garbage collection regardless of conditions (manual override)
-force-clean:
+    if (( days_since_gc < {{ GC_MIN_INTERVAL_DAYS }} )); then
+      echo "[→] GC skipped (${days_since_gc} days since last cleanup)"
+      echo "    Use 'just gc-force' to force cleanup"
+      exit 0
+    fi
+
+    if [[ ! -d /nix/store ]]; then
+      echo "[→] GC skipped (/nix/store not found)"
+      exit 0
+    fi
+
+    used_percent="$(df /nix/store 2>/dev/null | awk 'END {gsub(/%/, "", $5); print $5}')"
+    if [[ -n "$used_percent" && "$used_percent" -gt 80 ]]; then
+      echo "[!] Running GC (disk usage ${used_percent}%)"
+      run_gc
+    else
+      echo "[→] GC skipped (${days_since_gc} days since cleanup, ${used_percent:-unknown}% disk used)"
+      echo "    Use 'just gc-force' to force cleanup"
+    fi
+
+# Run garbage collection immediately.
+gc-force:
     #!/usr/bin/env bash
-    echo "[!] Force running garbage collection (manual override)..."
-    nix-collect-garbage -d --delete-older-than 14d
+    echo "[!] Force running garbage collection"
+    nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
 
     if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-      echo "[!] Force running system-wide garbage collection..."
-      sudo -H nix-collect-garbage -d --delete-older-than 14d
+      echo "[!] Running system-wide garbage collection"
+      sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
     fi
 
-    just record-gc-execution
+    just gc-record
     echo "[✓] Forced garbage collection completed"
 
-# Show comprehensive GC status and metrics
-gc-status:
+# Show GC-related status for this machine.
+gc-info:
     #!/usr/bin/env bash
-    echo "=== GARBAGE COLLECTION STATUS ==="
-    echo "Current store size: $(du -sh /nix/store 2>/dev/null | cut -f1 || echo "N/A")"
+    echo "=== Garbage Collection Status ==="
+    echo "Store size: $(du -sh /nix/store 2>/dev/null | cut -f1 || echo N/A)"
 
-    # Calculate days since last GC
     if [[ -f "{{ GC_STATE_FILE }}" ]]; then
-      last_gc=$(cat {{ GC_STATE_FILE }} 2>/dev/null || echo "0")
-      current=$(date +%s)
+      last_gc="$(cat {{ GC_STATE_FILE }} 2>/dev/null || echo 0)"
+      current="$(date +%s)"
       if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
-        days_since_gc=$(( (current - last_gc) / 86400 ))
-        echo "Days since last GC: $days_since_gc days"
+    echo "Days since last GC: $(((current - last_gc) / 86400))"
       else
-        echo "Days since last GC: Unknown (corrupted timestamp)"
+    echo "Days since last GC: Unknown (corrupted state)"
       fi
     else
       echo "Days since last GC: Never"
     fi
 
-    if [[ -d "/nix/store" ]]; then
-      used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
-      echo "Disk usage: ${used_percent}%"
+    if [[ -d /nix/store ]]; then
+      used_percent="$(df /nix/store 2>/dev/null | awk 'END {print $5}')"
+      echo "Disk usage: ${used_percent:-N/A}"
     fi
 
-    echo ""
-    echo "=== CONFIGURATION ==="
-    echo "Size threshold: {{ GC_SIZE_THRESHOLD_GB }}GB (legacy - using disk % now)"
+    echo
     echo "Min interval: {{ GC_MIN_INTERVAL_DAYS }} days"
     echo "Max interval: {{ GC_MAX_INTERVAL_DAYS }} days"
+    echo "Delete older than: {{ GC_DELETE_OLDER_THAN }}"
     echo "State file: {{ GC_STATE_FILE }}"
-    echo ""
-    echo "Commands:"
-    echo "  just smart-clean   # Run intelligent cleanup"
-    echo "  just force-clean   # Force cleanup regardless of conditions"
 
-# Clear all dependencies
-clear-all:
+########### Diagnostics ##########
+
+# Run a practical health check for this Nix setup.
+performance-test:
+    #!/usr/bin/env bash
+    echo "=== Nix Performance Test ==="
+    echo "Timestamp: $(date)"
+    echo
+
+    echo "1. Store metrics"
+    echo "   Store size: $(du -sh /nix/store 2>/dev/null | cut -f1 || echo N/A)"
+    echo "   Store paths: $(find /nix/store -maxdepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
+    echo "   Disk usage: $(df -h /nix/store 2>/dev/null | awk 'END {print $3 \"/\" $2 \" (\" $5 \" full)\"}' || echo N/A)"
+    echo
+
+    echo "2. Nix configuration"
+    echo "   Auto-optimise: $(grep 'auto-optimise-store' /etc/nix/nix.conf 2>/dev/null | cut -d= -f2 | xargs || echo N/A)"
+    echo "   Max jobs: $(grep 'max-jobs' /etc/nix/nix.conf 2>/dev/null | cut -d= -f2 | xargs || echo N/A)"
+    echo "   Cores: $(grep 'cores' /etc/nix/nix.conf 2>/dev/null | cut -d= -f2 | xargs || echo N/A)"
+    echo "   CPU cores available: $(command -v nproc >/dev/null 2>&1 && nproc || sysctl -n hw.ncpu 2>/dev/null || echo N/A)"
+    echo
+
+    echo "3. Binary cache"
+    echo "   Substituters:"
+    grep 'substituters' /etc/nix/nix.conf 2>/dev/null | cut -d= -f2 | tr ' ' '\n' | sed 's/^/     - /' || true
+    echo
+
+    echo "4. Garbage collection"
+    if command -v systemctl >/dev/null 2>&1 && systemctl is-enabled nix-gc.timer >/dev/null 2>&1; then
+      echo "   GC Timer: $(systemctl is-enabled nix-gc.timer) ($(systemctl is-active nix-gc.timer))"
+      echo "   GC Schedule: $(systemctl show nix-gc.timer | grep OnCalendar | cut -d= -f2)"
+    else
+      echo "   GC Timer: Not available via systemctl"
+    fi
+    echo
+
+    echo "5. Quick shell test"
+    start_time="$(date +%s.%N 2>/dev/null || date +%s)"
+    nix shell nixpkgs#hello --command hello >/dev/null 2>&1 || true
+    end_time="$(date +%s.%N 2>/dev/null || date +%s)"
+    duration="$(echo "$end_time - $start_time" | bc 2>/dev/null || echo N/A)"
+    echo "   hello test: ${duration}s"
+    echo
+
+    echo "6. Store optimization"
+    echo "   Symlinks in store: $(find /nix/store -type l 2>/dev/null | wc -l | tr -d ' ')"
+    echo
+
+    echo "7. Smart GC summary"
+    echo "   GC interval: {{ GC_MIN_INTERVAL_DAYS }}-{{ GC_MAX_INTERVAL_DAYS }} days"
+    if [[ -d /nix/store ]]; then
+      used_percent="$(df /nix/store 2>/dev/null | awk 'END {gsub(/%/, "", $5); print $5}')"
+      echo "   Disk usage: ${used_percent}%"
+      if [[ "$used_percent" -gt 80 ]]; then
+    echo "   Recommendation: cleanup needed"
+      else
+    echo "   Recommendation: store is clean"
+      fi
+    fi
+
+########### Images ##########
+
+# List supported image outputs.
+list-image-formats:
+    #!/usr/bin/env bash
+    echo "Available image formats for {{ SYSTEM_ARCH }}:"
+    echo
+    echo "Format        Description"
+    echo "----------    -----------"
+    echo "iso           Bootable ISO image"
+    echo "virtualbox    VirtualBox OVA image"
+    echo "vmware        VMware VMDK image"
+    echo "qcow          QEMU qcow image"
+    echo
+    echo "Usage: just build-image <format>"
+    echo "Note: For containers, use official NixOS Docker images instead."
+
+# Build one image format for the current architecture.
+build-image format:
+    #!/usr/bin/env bash
+    echo "[!] Building {{ format }} image for {{ SYSTEM_ARCH }}"
+    nix build .#"{{ format }}"
+    echo "[✓] Build complete: $(readlink result)"
+
+# Build one image format for a specific architecture.
+build-image-arch format arch:
+    echo "[!] Building {{ format }} image for {{ arch }}"
+    nix build .#packages."{{ arch }}"."{{ format }}"
+    echo "[✓] Build complete: $(readlink result)"
+
+# Build all supported image formats for the current architecture.
+build-images:
+    #!/usr/bin/env bash
+    failed=()
+    for format in iso virtualbox vmware qcow; do
+      echo "[!] Building $format"
+      if nix build ".#$format"; then
+    echo "[✓] $format built successfully"
+      else
+    echo "[✗] $format build failed"
+    failed+=("$format")
+      fi
+      echo
+    done
+
+    if [[ "${#failed[@]}" -gt 0 ]]; then
+      echo "[✗] Failed formats: ${failed[*]}"
+      exit 1
+    fi
+
+    echo "[✓] All image formats built successfully"
+
+# Show local build artifacts produced by image builds.
+show-images:
+    #!/usr/bin/env bash
+    echo "Built images in ./result*:"
+    ls -lh result* 2>/dev/null | awk '{print $9, $5}' | column -t || echo "No images found. Run 'just build-image <format>' first."
+
+########### Destructive / Legacy Cleanup ##########
+
+# Uninstall Home Manager from the current profile.
+uninstall-home-manager:
+    #!/usr/bin/env bash
     echo y | home-manager uninstall
 
-# Remove all previous configs
-remove-configs:
+# Remove local editor and shell configs created by previous setups.
+purge-local-configs:
+    #!/usr/bin/env bash
+    read -r -p "This removes local config directories and purges apt zsh. Continue? [y/N]: " confirm
+    if [[ ! "$confirm" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+      echo "[→] Purge cancelled"
+      exit 0
+    fi
+
     rm -rf ~/.config/nvim
     rm -rf ~/.local/share/nvim
     rm -rf ~/.cache/nvim
     rm -rf ~/.nix-profile/bin/spacevim
     rm -rf ~/.SpaceVim*
     rm -rf ~/.zshrc
-    sudo apt-get --purge remove zsh
-
-########### *** APPLICATION *** ##########
-
-# Enable shared mount for rootless podman
-enable-shared-mount:
-    #!/usr/bin/env bash
-    PROPAGATION=$(findmnt -no PROPAGATION /)
-
-    if [[ "$PROPAGATION" != *"shared"* ]]; then
-      echo "[!] configuring shared mount for podman"
-      sudo mount --make-rshared /
-      echo "[✓] shared mount configured for podman"
-    else
-      echo "[✓] shared mount already configured for podman"
-    fi
-
-# Run comprehensive Nix performance analysis
-performance-test:
-    #!/usr/bin/env bash
-    echo "=== NIX PERFORMANCE TEST RESULTS ==="
-    echo "Timestamp: $(date)"
-    echo ""
-
-    echo "1. STORE METRICS:"
-    echo "   Store size: $(du -sh /nix/store | cut -f1)"
-    echo "   Store paths: $(find /nix/store -maxdepth 1 -type d | wc -l)"
-    echo "   Disk usage: $(df -h /nix/store | tail -1 | awk '{print $3 "/" $2 " (" $5 " full)"}')"
-    echo ""
-
-    echo "2. CONFIGURATION STATUS:"
-    echo "   Auto-optimise: $(grep "auto-optimise-store" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
-    echo "   Max jobs: $(grep "max-jobs" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
-    echo "   Cores: $(grep "cores" /etc/nix/nix.conf | cut -d= -f2 | xargs)"
-    echo "   CPU cores available: $(nproc)"
-    echo ""
-
-    echo "3. BINARY CACHE STATUS:"
-    echo "   Substituters:"
-    grep "substituters" /etc/nix/nix.conf | cut -d= -f2 | tr ' ' '\n' | sed 's/^/     - /'
-    echo ""
-
-    echo "4. GARBAGE COLLECTION:"
-    if systemctl is-enabled nix-gc.timer >/dev/null 2>&1; then
-      echo "   GC Timer: $(systemctl is-enabled nix-gc.timer) ($(systemctl is-active nix-gc.timer))"
-      echo "   GC Schedule: $(systemctl show nix-gc.timer | grep OnCalendar | cut -d= -f2)"
-    else
-      echo "   GC Timer: Not available via systemctl"
-    fi
-    echo ""
-
-    echo "5. QUICK PERFORMANCE TEST:"
-    echo "   Testing small package installation speed..."
-    start_time=$(date +%s.%N)
-    nix shell nixpkgs#hello --command hello >/dev/null 2>&1
-    end_time=$(date +%s.%N)
-    duration=$(echo "$end_time - $start_time" | bc 2>/dev/null || echo "N/A")
-    echo "   Hello world test: ${duration}s"
-    echo ""
-
-    echo "6. STORE OPTIMIZATION POTENTIAL:"
-    echo "   Checking for duplicate store paths..."
-    store_links=$(find /nix/store -type l | wc -l 2>/dev/null || echo "0")
-    echo "   Symlinks in store: $store_links"
-    echo ""
-
-    echo "7. SMART GARBAGE COLLECTION:"
-    gc_size=$(du -sh /nix/store 2>/dev/null | cut -f1 || echo "N/A")
-
-    # Calculate days since last GC
-    if [[ -f "{{ GC_STATE_FILE }}" ]]; then
-      last_gc=$(cat {{ GC_STATE_FILE }} 2>/dev/null || echo "0")
-      current=$(date +%s)
-      if [[ "$last_gc" =~ ^[0-9]+$ ]]; then
-        gc_days=$(( (current - last_gc) / 86400 ))
-      else
-        gc_days="N/A"
-      fi
-    else
-      gc_days="Never"
-    fi
-
-    echo "   Current store size: $gc_size"
-    echo "   Days since last GC: $gc_days"
-    echo "   GC interval: {{ GC_MIN_INTERVAL_DAYS }}-{{ GC_MAX_INTERVAL_DAYS }} days"
-
-    if [[ -d "/nix/store" ]]; then
-      used_percent=$(df /nix/store 2>/dev/null | tail -1 | awk '{print $5}' | tr -d '%')
-      echo "   Disk usage: ${used_percent}%"
-      if [[ "$used_percent" -gt 80 ]] || [[ "$gc_days" =~ ^[0-9]+$ && "$gc_days" -ge {{ GC_MAX_INTERVAL_DAYS }} ]]; then
-        echo "   GC recommendation: ✓ Cleanup needed"
-      else
-        echo "   GC recommendation: → Store is clean"
-      fi
-    fi
-    echo ""
-
-    echo "=== END PERFORMANCE TEST ==="
-
-########### *** IMAGE GENERATION *** ##########
-
-# List available image formats with descriptions
-list-image-formats:
-    #!/usr/bin/env bash
-    echo "Available image formats for {{ SYSTEM_ARCH }}:"
-    echo ""
-    echo "Format        Description"
-    echo "----------    -----------"
-    echo "iso           Bootable ISO image for installation/live boot"
-    echo "virtualbox    VirtualBox OVA image"
-    echo "vmware        VMware VMDK image"
-    echo "qcow          QEMU qcow image for KVM/libvirt"
-    echo ""
-    echo "Usage: just build-image <format>"
-    echo ""
-    echo "Note: For Docker containers, use official NixOS Docker images instead."
-
-# Build specific image format for current architecture
-build-image FORMAT:
-    #!/usr/bin/env bash
-    echo "[!] Building {{ FORMAT }} image for {{ SYSTEM_ARCH }}..."
-    if ! nix build .#{{ FORMAT }}; then
-      echo "[✗] Failed to build {{ FORMAT }} image"
-      echo "    Run 'just list-image-formats' to see available formats"
-      exit 1
-    fi
-    echo "[✓] Successfully built {{ FORMAT }} image"
-    echo "    Output: $(readlink result)"
-
-# Build specific image format for specific architecture
-build-image-arch FORMAT ARCH:
-    #!/usr/bin/env bash
-    echo "[!] Building {{ FORMAT }} image for {{ ARCH }}..."
-    if ! nix build .#packages.{{ ARCH }}.{{ FORMAT }}; then
-      echo "[✗] Failed to build {{ FORMAT }} image for {{ ARCH }}"
-      echo "    Supported architectures: x86_64-linux, aarch64-linux"
-      echo "    Run 'just list-image-formats' to see available formats"
-      exit 1
-    fi
-    echo "[✓] Successfully built {{ FORMAT }} image for {{ ARCH }}"
-    echo "    Output: $(readlink result)"
-
-# Build all image formats for current architecture
-build-all-images:
-    #!/usr/bin/env bash
-    echo "[!] Building all image formats for {{ SYSTEM_ARCH }}..."
-    formats=("iso" "virtualbox" "vmware" "qcow")
-    failed=()
-
-    for format in "${formats[@]}"; do
-      echo "Building $format..."
-      if nix build .#$format; then
-        echo "[✓] $format built successfully"
-      else
-        echo "[✗] $format build failed"
-        failed+=("$format")
-      fi
-      echo ""
-    done
-
-    if [ ${#failed[@]} -eq 0 ]; then
-      echo "[✓] All image formats built successfully"
-    else
-      echo "[!] Some formats failed: ${failed[*]}"
-      exit 1
-    fi
-
-# Show built images and their sizes
-show-images:
-    #!/usr/bin/env bash
-    echo "Built images in ./result*:"
-    echo ""
-    ls -lh result* 2>/dev/null | awk '{print $9, $5}' | column -t || echo "No images found. Run 'just build-image <format>' first."
+    sudo apt-get --purge remove -y zsh
