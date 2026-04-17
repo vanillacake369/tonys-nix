@@ -27,8 +27,6 @@
         ka = "kubectl get all -o wide";
         ks = "kubectl get services -o wide";
         kap = "kubectl apply -f ";
-        # Tools
-        claude-monitor = "uv tool run claude-monitor";
       };
 
       shellAbbrs = {
@@ -144,7 +142,14 @@
           end
         ''}
 
-        # 6. 테마 초기화 (Tide는 activation에서 1회 설정)
+        # 6. 테마 초기화
+        # 구문 강조 색상 설정 (zsh-syntax-highlighting 스타일)
+        set -g fish_color_command green          # 유효한 명령어: 초록색
+        set -g fish_color_error red --bold       # 유효하지 않은 명령어: 빨간색 + 굵게
+        set -g fish_color_param blue             # 매개변수: 파란색
+        set -g fish_color_quote yellow           # 문자열: 노란색
+        set -g fish_color_redirection cyan       # 리다이렉션: 하늘색
+        set -g fish_color_end white              # 세미콜론 등: 흰색
       '';
 
       # 4. 필수 플러그인
@@ -175,6 +180,9 @@
       ];
     };
     neovim = {
+      withRuby = false;
+      withNodeJs = true;
+      withPython3 = true;
       enable = true;
       defaultEditor = true;
       viAlias = true;
@@ -223,10 +231,9 @@
         };
       };
     };
-
   };
 
-  home.activation.tideBootstrap = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  home.activation.tideBootstrap = lib.hm.dag.entryAfter ["writeBoundary"] ''
     if ! ${lib.getExe pkgs.fish} -lc 'set -q tide_left_prompt_items' >/dev/null 2>&1; then
       ${lib.getExe pkgs.fish} -lc 'tide configure --auto --style=Lean --prompt_colors="True color" --prompt_connection=Disconnected --prompt_spacing=Compact --show_time=No --icons="Few icons" --transient=No --lean_prompt_height="One line" --finish="Overwrite your current tide config"'
     fi

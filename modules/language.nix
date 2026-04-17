@@ -18,6 +18,7 @@
     gradle
     jdt-language-server
     google-java-format
+    lombok
 
     # Just
     just
@@ -54,17 +55,21 @@
     statix
     deadnix
 
-    # YAML
+    # YAML/TOML
     yamllint
     yaml-language-server
     yamlfmt
+    taplo
 
     # TypeScript/JavaScript
     nodejs_22
-    nodePackages.typescript-language-server
-    nodePackages.prettier
+    typescript-language-server
+    prettier
     biome
     pnpm
+
+    # Ansible
+    ansible
 
     # Terraform
     terraform

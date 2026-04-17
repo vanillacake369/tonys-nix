@@ -36,7 +36,6 @@
     ++ lib.optionals isDarwin [
       # MacOs Apps
       aldente
-      raycast
       jankyborders
       appcleaner
       wezterm
