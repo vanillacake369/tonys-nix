@@ -19,6 +19,7 @@
       jq
       moreutils # sponge for safe file writes
       ripgrep
+      fd
       tree
       curl
       openssl
@@ -49,6 +50,10 @@
       git-filter-repo
       gh
       gnupg
+    ]
+    ++ lib.optionals isDarwin [
+      # Mac-specific tools
+      pngpaste
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
