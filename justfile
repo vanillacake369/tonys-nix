@@ -35,21 +35,6 @@ NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
 NIX_CONF_TARGET := "/etc/nix/nix.conf"
 AEROSPACE_CONFIG_PATH := "dotfiles/aerospace/aerospace.toml"
 
-########### Backward-Compatible Aliases ##########
-
-alias install-all := bootstrap
-alias install-pckgs := apply
-alias install-uidmap-conditional := bootstrap-uidmap
-alias link-nix-conf := system-link-nix-conf
-alias record-gc-execution := gc-record
-alias smart-clean := gc
-alias force-clean := gc-force
-alias gc-status := gc-info
-alias clear-all := uninstall-home-manager
-alias remove-configs := purge-local-configs
-alias build-all-images := build-images
-alias apply-zsh := apply-fish
-
 ########### Bootstrap ##########
 
 # Full first-time setup for the current machine.
@@ -60,7 +45,6 @@ bootstrap:
     just install-home-manager
     just bootstrap-uidmap
     just apply
-    just setup-mac-power-schedule
     just gc
 
 # Install Nix if it is not available.
@@ -130,7 +114,6 @@ apply target=SYSTEM_ARCH:
     just apply-validate "{{ target }}"
     just apply-system "{{ target }}"
     just apply-home "{{ target }}"
-    just apply-fish
     just sync-local-integrations
 
 # Validate platform and target before applying any configuration.
@@ -209,7 +192,9 @@ apply-home target:
 # Sync local desktop integrations after configuration changes are applied.
 sync-local-integrations:
     #!/usr/bin/env bash
+    just apply-fish
     just reload-aerospace-if-needed
+    just setup-mac-power-schedule
 
 # Reload AeroSpace when its config changed in git and the local environment supports it.
 reload-aerospace-if-needed:
@@ -243,9 +228,29 @@ apply-fish:
     #!/usr/bin/env bash
     fish_path="$HOME/.nix-profile/bin/fish"
     if ! grep -qx "$fish_path" /etc/shells; then
+      echo "[!] Adding $fish_path to /etc/shells (requires sudo)"
       echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
     fi
-    chsh -s "$fish_path"
+
+    current_shell=""
+    case "{{ OS_TYPE }}" in
+      darwin)
+        current_shell=$(dscl . -read "$HOME" UserShell | awk '{print $2}')
+        ;;
+      linux|wsl|nixos)
+        current_shell=$(getent passwd "$USER" | cut -d: -f7)
+        ;;
+      *)
+        current_shell="$SHELL"
+        ;;
+    esac
+
+    if [[ "$current_shell" != "$fish_path" ]]; then
+      echo "[!] Changing default shell to $fish_path (may ask for password)"
+      chsh -s "$fish_path"
+    else
+      echo "[✓] fish is already the default shell"
+    fi
 
 ########### System Configuration ##########
 
@@ -317,8 +322,10 @@ setup-mac-power-schedule:
     }
 
     current_schedule="$(pmset -g sched 2>/dev/null || true)"
-    sleep_line="$(grep -i 'sleep at' <<<"$current_schedule" || true)"
-    wake_line="$(grep -i 'wake.*at' <<<"$current_schedule" || true)"
+    repeating_section="$(sed -n '/Repeating power events:/,/Scheduled power events:/p' <<<"$current_schedule" || echo "$current_schedule")"
+
+    sleep_line="$(grep -i 'sleep at' <<<"$repeating_section" || true)"
+    wake_line="$(grep -iE '(wake|wakepoweron|wakeorpoweron).*at' <<<"$repeating_section" || true)"
     has_sleep="$(parse_pmset_time "$sleep_line")"
     has_wake="$(parse_pmset_time "$wake_line")"
 
