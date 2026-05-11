@@ -45,7 +45,32 @@ bootstrap:
     just install-home-manager
     just bootstrap-uidmap
     just apply
+    just agent-login
     just gc
+
+# Authenticate missing AI providers via cli-proxy-api OAuth.
+agent-login:
+    #!/usr/bin/env bash
+    AUTH_DIR="$HOME/.cli-proxy-api"
+    CONFIG="-config $AUTH_DIR/config.yaml"
+    has_auth() { ls "$AUTH_DIR"/$1-*.json 2>/dev/null | head -1 | grep -q .; }
+    MISSING=()
+    has_auth gemini || MISSING+=(gemini)
+    has_auth claude || MISSING+=(claude)
+    has_auth codex  || MISSING+=(codex)
+    if [[ ${#MISSING[@]} -eq 0 ]]; then
+        echo "[✓] All AI providers authenticated"
+        exit 0
+    fi
+    echo "[!] Missing auth: ${MISSING[*]}"
+    for p in "${MISSING[@]}"; do
+        case $p in
+            gemini) echo "[→] Logging in to Gemini (Google)..." && cli-proxy-api -login $CONFIG ;;
+            claude) echo "[→] Logging in to Claude (Anthropic)..." && cli-proxy-api -claude-login $CONFIG ;;
+            codex)  echo "[→] Logging in to Codex (OpenAI)..." && cli-proxy-api -codex-login $CONFIG ;;
+        esac
+    done
+    echo "[✓] Agent login complete"
 
 # Install Nix if it is not available.
 install-nix:
