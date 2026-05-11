@@ -437,8 +437,11 @@ gc-force:
       sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
     fi
 
+    echo "[!] Running nix store optimization"
+    nix store optimise
+
     just gc-record
-    echo "[✓] Forced garbage collection completed"
+    echo "[✓] Forced garbage collection & store optimization completed"
 
 # Show GC-related status for this machine.
 gc-info:

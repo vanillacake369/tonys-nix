@@ -223,7 +223,12 @@ on-mode-changed = []
 # Window Detection Rules - Auto move apps to workspaces
 # =============================================================================
 
-# Code (JetBrains IDEs)
+# Docs : Where you maintiain your thinking DAG mindmap and organize things
+[[on-window-detected]]
+if.app-name-regex-substring = 'Obsidian'
+run = 'move-node-to-workspace Docs'
+
+# Code : Where you type in
 [[on-window-detected]]
 if.app-id = 'com.jetbrains.intellij'
 run = 'move-node-to-workspace Code'
@@ -236,7 +241,11 @@ run = 'move-node-to-workspace Code'
 if.app-id = 'com.jetbrains.datagrip'
 run = 'move-node-to-workspace Code'
 
-# Terminal (WezTerminal, Docker, Podman)
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+run = 'move-node-to-workspace Terminal'
+
+# Terminal : Where you see whole struture
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
 run = 'move-node-to-workspace Terminal'
@@ -249,12 +258,12 @@ run = 'move-node-to-workspace Terminal'
 if.app-name-regex-substring = 'Podman Desktop'
 run = 'move-node-to-workspace Terminal'
 
-# Music (YouTube Music)
+# Music
 [[on-window-detected]]
 if.app-name-regex-substring = 'YouTube Music'
 run = 'move-node-to-workspace Music'
 
-# Schedule (TickTick)
+# Schedule
 [[on-window-detected]]
 if.app-name-regex-substring = 'TickTick'
 run = 'move-node-to-workspace Schedule'

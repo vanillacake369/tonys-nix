@@ -20,6 +20,7 @@
       inetutils
       netcat
       dig
+      iproute2mac
 
       # Wireguard
       wireguard-go
