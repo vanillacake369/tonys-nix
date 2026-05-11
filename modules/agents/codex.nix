@@ -5,7 +5,6 @@
 {pkgs, ...}: {
   programs.codex = {
     enable = true;
-    package = pkgs.llm-agents.codex;
     enableMcpIntegration = true;
     custom-instructions = builtins.readFile ../../dotfiles/shared/AGENTS.md;
   };

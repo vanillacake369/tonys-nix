@@ -22,28 +22,45 @@ A file for [guiding coding agents](https://agents.md/).
 ### Deduplication
 Once an agent is launched, do not read the same files from main. Wait for the agent result and use only that result.
 
-### Multi-Provider Routing (Claude as orchestrator)
+### Multi-Provider Delegation (Claude as orchestrator)
 
-Claude Code is the orchestrator. All external provider calls go through cli-proxy-api (localhost:4001).
+Claude Code is the orchestrator. Delegate to other providers via cli-proxy-api when it makes the task better — not just bigger.
 
-**Pattern B — Explicit delegation via proxy:**
+**When to delegate (do this automatically, no user prompt needed):**
 
-| Condition | Provider | Command |
-|-----------|----------|---------|
-| Large context analysis (100K+ tokens, 10+ files) | Gemini | `curl -s $CLI_PROXY_URL/v1/chat/completions -d '{"model":"gemini","messages":[...]}'` |
-| Sandboxed code execution / validation | Codex | `codex -q "..."` |
-| Quick second opinion | Any | `curl -s $CLI_PROXY_URL/v1/chat/completions -d '{"messages":[...]}'` (proxy routes) |
-| Everything else | Claude | direct or subagent |
+- Cross-validation: before finalizing security reviews, architecture decisions, or destructive changes, get a second opinion from a different model
+- Large input: when the context you need to analyze exceeds what fits comfortably (5+ files, long logs, big diffs)
+- Different strength: Gemini for breadth (large context, web knowledge), GPT for code generation, Claude for reasoning and judgment
+- Parallel speedup: when 2+ independent analyses can run at the same time
 
-**Pattern A — Automatic hook logging:**
-PostToolUse hook automatically logs Bash calls to the proxy for cost tracking. No action needed.
+**When NOT to delegate:**
 
-Rules:
-- Default is always Claude (direct or subagent). Only delegate when the advantage is clear
-- Capture the other provider's stdout and use the result — do not blindly trust
-- Never delegate security-sensitive operations (credentials, destructive git) to external providers
-- When delegating, pass only the minimum required context
-- If proxy is down ($CLI_PROXY_URL unreachable), fall back to direct CLI calls (codex/gemini)
+- Simple file reads, edits, git operations — just do it
+- Security-sensitive operations (credentials, destructive git, secrets)
+- When the overhead of delegation exceeds the benefit (trivial questions)
+
+**How to delegate:**
+
+```bash
+# Send to a specific model
+curl -s http://127.0.0.1:4001/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  --data @- <<EOJSON | jq -r '.choices[0].message.content'
+{
+  "model": "gemini-2.5-flash-lite",
+  "messages": [{"role": "user", "content": "YOUR PROMPT HERE"}],
+  "stream": false
+}
+EOJSON
+
+# Available models: gemini-2.5-pro, gemini-2.5-flash-lite, gpt-5.4-mini, gpt-5.4
+# Check all: curl -s http://127.0.0.1:4001/v1/models | jq '.data[].id'
+```
+
+**After receiving a delegation result:**
+- Verify it against your own judgment — do not blindly trust
+- Synthesize multiple opinions into a final recommendation
+- If proxy is unreachable, fall back to direct CLI (codex/gemini) or skip delegation
 
 ## Commit Convention
 

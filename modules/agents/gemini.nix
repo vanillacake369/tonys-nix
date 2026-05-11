@@ -10,7 +10,6 @@
 }: {
   programs.gemini-cli = {
     enable = true;
-    package = pkgs.llm-agents.gemini-cli;
     settings = {
       mcpServers = lib.mapAttrs (_: srv: {
         command = srv.command;

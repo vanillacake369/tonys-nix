@@ -19,6 +19,10 @@
       url = "github:vanillacake369/tonys-nvim";
       flake = false;
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -28,6 +32,7 @@
     nix-darwin,
     nixos-generators,
     nvim-config,
+    llm-agents,
     ...
   }: let
     lib = nixpkgs.lib;
@@ -35,8 +40,7 @@
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
     # Define overlays for package customizations
-    # All overlays are now managed in the overlays/ directory
-    overlays = import ./overlays {};
+    overlays = import ./overlays {} ++ [llm-agents.overlays.default];
 
     # Shared home-manager modules
     homeManagerModules = [
