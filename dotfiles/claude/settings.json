@@ -17,8 +17,6 @@
       "Task(*)",
       "Bash(*)",
       "mcp__context7",
-      "mcp__sequential-thinking",
-      "mcp__memory",
       "mcp__playwright"
     ],
     "deny": [],

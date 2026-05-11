@@ -3,22 +3,12 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"],
-      "_comment": "최신 오픈소스 조회"
-    },
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "_comment": "순차적 사고 설계"
-    },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
-      "_comment": "세션 간 단기 기억"
+      "_comment": "최신 오픈소스 문서 조회"
     },
     "playwright": {
       "command": "npx",
       "args": ["-y", "@executeautomation/playwright-mcp-server"],
-      "_comment": "브라우저 제어"
+      "_comment": "브라우저 제어 및 시각 검증"
     }
   }
 }
