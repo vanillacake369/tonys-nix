@@ -27,6 +27,8 @@
         ka = "kubectl get all -o wide";
         ks = "kubectl get services -o wide";
         kap = "kubectl apply -f ";
+        # Some cli tools
+        zj = "zellij";
       };
 
       shellAbbrs = {
