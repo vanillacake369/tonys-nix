@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+# Unified agent completion notification script
+# Shared by Claude Code (Stop), Codex (Stop), Gemini (AfterAgent)
+#
+# Usage:  echo '<hook-json>' | agent-notify.sh <provider>
+# Env:    AGENT_NOTIFY_BACKEND  - force backend (terminal-notifier|noti|osascript|notify-send|bell)
+#         AGENT_NOTIFY_DRY_RUN  - if set, print what would happen instead of sending
+#
+# This script NEVER exits non-zero — hooks must not block the agent.
+set -uo pipefail
+
+MAX_MSG_LEN=60
+
+# Global state (populated by _parse_input)
+_PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY=""
+# Global state (populated by _build_notify_args)
+_TITLE="" _SUBTITLE="" _MESSAGE="" _GROUP="" _EXECUTE=""
+
+# ===========================================================================
+# Parse stdin JSON → globals
+# Fields vary by provider:
+#   Claude:  session_id, cwd, transcript_path
+#   Codex:   session_id, cwd, transcript_path, last_assistant_message
+#   Gemini:  session_id, cwd, transcript_path, prompt, prompt_response
+# ===========================================================================
+_parse_input() {
+  _PROVIDER="${1:-agent}"
+  local input
+  input=$(cat 2>/dev/null || true)
+
+  _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY=""
+
+  if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
+    _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
+    _CWD=$(echo "$input" | jq -r '.cwd // "unknown"')
+    _PROMPT=$(echo "$input" | jq -r '.prompt // ""')
+    _SUMMARY=$(echo "$input" | jq -r '(.prompt_response // .last_assistant_message) // ""')
+  fi
+}
+
+_print_parsed() {
+  echo "provider=$_PROVIDER"
+  echo "session_id=$_SESSION_ID"
+  echo "cwd=$_CWD"
+  echo "prompt=$_PROMPT"
+  echo "summary=$_SUMMARY"
+}
+
+# ===========================================================================
+# Truncate string to max length, append ... if truncated
+# ===========================================================================
+_truncate() {
+  local str="$1" max="${2:-$MAX_MSG_LEN}"
+  if [[ ${#str} -le $max ]]; then
+    echo "$str"
+  else
+    echo "${str:0:$((max - 3))}..."
+  fi
+}
+
+# ===========================================================================
+# Build notification args → globals
+# ===========================================================================
+_build_notify_args() {
+  _TITLE="$(echo "${_PROVIDER:0:1}" | tr '[:lower:]' '[:upper:]')${_PROVIDER:1}"
+  _SUBTITLE="$(basename "$_CWD")"
+  _GROUP="${_PROVIDER}-${_SESSION_ID}"
+
+  if [[ -n "$_PROMPT" ]]; then
+    _MESSAGE=$(_truncate "$_PROMPT")
+  elif [[ -n "$_SUMMARY" ]]; then
+    _MESSAGE=$(_truncate "$_SUMMARY")
+  else
+    _MESSAGE="Session ${_SESSION_ID:0:8} completed"
+  fi
+
+  _EXECUTE=""
+  local script_dir
+  script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  if [[ "$(uname)" == "Darwin" ]]; then
+    local zj_session="${ZELLIJ_SESSION_NAME:-}"
+    if [[ -n "$zj_session" ]]; then
+      _EXECUTE="${script_dir}/agent-notify-open.sh ${zj_session}"
+    else
+      _EXECUTE="${script_dir}/agent-notify-open.sh"
+    fi
+  fi
+}
+
+_print_notify_args() {
+  echo "title=$_TITLE"
+  echo "subtitle=$_SUBTITLE"
+  echo "group=$_GROUP"
+  echo "message=$_MESSAGE"
+  echo "execute=$_EXECUTE"
+}
+
+# ===========================================================================
+# Select notification backend
+# macOS: terminal-notifier (own app) > noti > osascript > bell
+# Linux: noti > notify-send > bell
+# Note: osascript/noti on macOS inherit parent app's notification permission.
+#       WezTerm is not in macOS notification settings, so they fail silently.
+#       terminal-notifier registers as its own app and bypasses this.
+# ===========================================================================
+_select_backend() {
+  if [[ -n "${AGENT_NOTIFY_BACKEND:-}" ]]; then
+    echo "${AGENT_NOTIFY_BACKEND}"
+    return
+  fi
+
+  if [[ "$(uname)" == "Darwin" ]]; then
+    if command -v terminal-notifier &>/dev/null; then
+      echo "terminal-notifier"
+    elif command -v noti &>/dev/null; then
+      echo "noti"
+    elif command -v osascript &>/dev/null; then
+      echo "osascript"
+    else
+      echo "bell"
+    fi
+  else
+    if command -v noti &>/dev/null; then
+      echo "noti"
+    elif command -v notify-send &>/dev/null; then
+      echo "notify-send"
+    else
+      echo "bell"
+    fi
+  fi
+}
+
+# ===========================================================================
+# Check if the current zellij session is being viewed by the user.
+# Uses `zellij action list-clients`: if any client is attached, the user
+# is looking at this session → skip notification.
+# OS-independent — relies only on zellij's own API.
+# _TEST_CLIENT_COUNT env var allows test injection.
+# ===========================================================================
+_is_session_focused() {
+  # Not in zellij → can't detect, always notify
+  [[ -n "${ZELLIJ_SESSION_NAME:-}" ]] || return 1
+
+  local count="${_TEST_CLIENT_COUNT:-}"
+  if [[ -z "$count" ]]; then
+    count=$(zellij action list-clients 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
+  fi
+  [[ "$count" -gt 0 ]]
+}
+
+# ===========================================================================
+# Send notification
+# ===========================================================================
+_send() {
+  local backend="$1"
+
+  case "$backend" in
+    terminal-notifier)
+      local cmd=(terminal-notifier
+        -title "$_TITLE" -subtitle "$_SUBTITLE"
+        -message "$_MESSAGE" -group "$_GROUP" -sound default)
+      [[ -n "$_EXECUTE" ]] && cmd+=(-execute "$_EXECUTE")
+      "${cmd[@]}" 2>/dev/null || true
+      ;;
+    noti)
+      noti -t "$_TITLE" -m "${_SUBTITLE}: ${_MESSAGE}" 2>/dev/null || true
+      ;;
+    osascript)
+      osascript -e "display notification \"${_MESSAGE}\" with title \"${_TITLE}\" subtitle \"${_SUBTITLE}\" sound name \"Glass\"" 2>/dev/null || true
+      ;;
+    notify-send)
+      notify-send "$_TITLE" "${_SUBTITLE}: ${_MESSAGE}" 2>/dev/null || true
+      ;;
+    bell)
+      printf '\a' 2>/dev/null || true
+      ;;
+  esac
+}
+
+# ===========================================================================
+# Test modes (invoked by test harness)
+# ===========================================================================
+case "${1:-}" in
+  --parse-test)
+    _parse_input "${2:-agent}"; _print_parsed; exit 0 ;;
+  --notify-args-test)
+    _parse_input "${2:-agent}"; _build_notify_args; _print_notify_args; exit 0 ;;
+  --backend-test)
+    echo "backend=$(_select_backend)"; exit 0 ;;
+esac
+
+# ===========================================================================
+# Main
+# ===========================================================================
+main() {
+  _parse_input "${1:-agent}"
+  _build_notify_args
+
+  local backend
+  backend=$(_select_backend)
+
+  if [[ -n "${AGENT_NOTIFY_DRY_RUN:-}" ]]; then
+    if _is_session_focused; then
+      echo "skipped (terminal focused)"
+    else
+      _print_notify_args
+      echo "backend=$backend"
+    fi
+    exit 0
+  fi
+
+  _is_session_focused && exit 0
+  _send "$backend"
+}
+
+main "$@" || exit 0
