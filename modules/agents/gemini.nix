@@ -15,6 +15,17 @@
         command = srv.command;
         args = srv.args or [];
       }) config.programs.mcp.servers;
+      hooks.AfterAgent = [
+        {
+          hooks = [
+            {
+              type = "command";
+              command = "~/.claude/hooks/agent-notify.sh gemini";
+              timeout = 5000;
+            }
+          ];
+        }
+      ];
     };
     context = {
       "GEMINI" = ../../dotfiles/shared/AGENTS.md;

@@ -7,5 +7,18 @@
     enable = true;
     enableMcpIntegration = true;
     custom-instructions = builtins.readFile ../../dotfiles/shared/AGENTS.md;
+    settings = {
+      hooks.Stop = [
+        {
+          hooks = [
+            {
+              type = "command";
+              command = "~/.claude/hooks/agent-notify.sh codex";
+              timeout = 5;
+            }
+          ];
+        }
+      ];
+    };
   };
 }
