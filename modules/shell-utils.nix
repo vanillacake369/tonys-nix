@@ -54,6 +54,7 @@
     ++ lib.optionals isDarwin [
       # Mac-specific tools
       pngpaste
+      terminal-notifier
     ]
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)

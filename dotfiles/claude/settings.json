@@ -36,6 +36,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/agent-notify.sh claude",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }
