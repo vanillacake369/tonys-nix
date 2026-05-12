@@ -12,7 +12,7 @@ set -uo pipefail
 MAX_MSG_LEN=60
 
 # Global state (populated by _parse_input)
-_PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY=""
+_PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
 # Global state (populated by _build_notify_args)
 _TITLE="" _SUBTITLE="" _MESSAGE="" _GROUP="" _EXECUTE=""
 
@@ -28,13 +28,14 @@ _parse_input() {
   local input
   input=$(cat 2>/dev/null || true)
 
-  _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY=""
+  _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
 
   if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
     _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
     _CWD=$(echo "$input" | jq -r '.cwd // "unknown"')
     _PROMPT=$(echo "$input" | jq -r '.prompt // ""')
     _SUMMARY=$(echo "$input" | jq -r '(.prompt_response // .last_assistant_message) // ""')
+    _TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""')
   fi
 }
 
@@ -44,6 +45,7 @@ _print_parsed() {
   echo "cwd=$_CWD"
   echo "prompt=$_PROMPT"
   echo "summary=$_SUMMARY"
+  echo "transcript_path=$_TRANSCRIPT_PATH"
 }
 
 # ===========================================================================
@@ -66,7 +68,11 @@ _build_notify_args() {
   _SUBTITLE="$(basename "$_CWD")"
   _GROUP="${_PROVIDER}-${_SESSION_ID}"
 
-  if [[ -n "$_PROMPT" ]]; then
+  if [[ -n "$_PROMPT" && -n "$_SUMMARY" ]]; then
+    # Both available: subtitle=prompt (what was asked), message=summary (what was done)
+    _SUBTITLE=$(_truncate "$_PROMPT")
+    _MESSAGE=$(_truncate "$_SUMMARY")
+  elif [[ -n "$_PROMPT" ]]; then
     _MESSAGE=$(_truncate "$_PROMPT")
   elif [[ -n "$_SUMMARY" ]]; then
     _MESSAGE=$(_truncate "$_SUMMARY")
@@ -78,12 +84,11 @@ _build_notify_args() {
   local script_dir
   script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
   if [[ "$(uname)" == "Darwin" ]]; then
+    local args=()
     local zj_session="${ZELLIJ_SESSION_NAME:-}"
-    if [[ -n "$zj_session" ]]; then
-      _EXECUTE="${script_dir}/agent-notify-open.sh ${zj_session}"
-    else
-      _EXECUTE="${script_dir}/agent-notify-open.sh"
-    fi
+    [[ -n "$zj_session" ]] && args+=("$zj_session")
+    [[ -n "$_TRANSCRIPT_PATH" ]] && args+=("$_TRANSCRIPT_PATH")
+    _EXECUTE="${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
   fi
 }
 
@@ -190,6 +195,19 @@ case "${1:-}" in
 esac
 
 # ===========================================================================
+# Log notification to file
+# Env: AGENT_NOTIFY_LOG - path to log file (default: ~/.agent-notify.log)
+# ===========================================================================
+_log_notification() {
+  local log_file="${AGENT_NOTIFY_LOG:-$HOME/.agent-notify.log}"
+  local ts
+  ts=$(date '+%Y-%m-%d %H:%M:%S')
+  printf '%s\t%s\t%s\t%s\t%s\n' \
+    "$ts" "$_PROVIDER" "$(basename "$_CWD")" "$_PROMPT" "$_SUMMARY" \
+    >> "$log_file" 2>/dev/null || true
+}
+
+# ===========================================================================
 # Main
 # ===========================================================================
 main() {
@@ -203,6 +221,7 @@ main() {
     if _is_session_focused; then
       echo "skipped (terminal focused)"
     else
+      _log_notification
       _print_notify_args
       echo "backend=$backend"
     fi
@@ -210,6 +229,7 @@ main() {
   fi
 
   _is_session_focused && exit 0
+  _log_notification
   _send "$backend"
 }
 
