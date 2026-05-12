@@ -204,7 +204,7 @@ echo "=== 4. Integration (dry-run) ==="
 
 # 4-1. Claude full flow
 result=$(echo '{"session_id":"int-001","cwd":"/home/user/my-project"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT" claude)
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" claude)
 assert_contains "integration claude: title" "title=Claude" "$result"
 assert_contains "integration claude: subtitle" "subtitle=my-project" "$result"
 assert_contains "integration claude: group" "group=claude-int-001" "$result"
@@ -212,19 +212,19 @@ assert_contains "integration claude: backend" "backend=" "$result"
 
 # 4-2. Gemini with prompt
 result=$(echo '{"session_id":"int-002","cwd":"/dev/frontend","prompt":"Fix CSS layout bug"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT" gemini)
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" gemini)
 assert_contains "integration gemini: title" "title=Gemini" "$result"
 assert_contains "integration gemini: prompt in message" "Fix CSS layout bug" "$result"
 
 # 4-3. Codex with last_assistant_message
 result=$(echo '{"session_id":"int-003","cwd":"/workspace/api","last_assistant_message":"Added 3 endpoints"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT" codex)
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" codex)
 assert_contains "integration codex: title" "title=Codex" "$result"
 assert_contains "integration codex: summary in message" "Added 3 endpoints" "$result"
 
 # 4-4. No provider
 result=$(echo '{"session_id":"no-prov","cwd":"/tmp/test"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT")
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT")
 assert_contains "no provider: defaults to Agent" "title=Agent" "$result"
 
 echo ""
@@ -254,10 +254,168 @@ assert_not_contains "no zellij: not skipped" "skipped" "$result"
 echo ""
 
 # ===========================================================================
-# 6. Exit Code
+# 6. Strategy B: Prompt+Summary Combo Notification
 # ===========================================================================
 
-echo "=== 6. Exit Code ==="
+echo "=== 6. Strategy B: Prompt+Summary Combo ==="
+
+# 6-1. Both prompt and summary → subtitle=prompt, message=summary
+result=$(echo '{"session_id":"b-1","cwd":"/dev/app","prompt":"Fix auth bug","prompt_response":"Fixed login flow by adding token refresh"}' \
+  | bash "$NOTIFY_SCRIPT" --notify-args-test gemini)
+assert_contains "both: subtitle shows prompt" "subtitle=Fix auth bug" "$result"
+assert_contains "both: message shows summary" "message=Fixed login flow" "$result"
+
+# 6-2. Only prompt (no summary) → subtitle=project dir, message=prompt
+result=$(echo '{"session_id":"b-2","cwd":"/dev/my-project","prompt":"Add retry logic"}' \
+  | bash "$NOTIFY_SCRIPT" --notify-args-test gemini)
+assert_contains "prompt only: subtitle is project dir" "subtitle=my-project" "$result"
+assert_contains "prompt only: message shows prompt" "message=Add retry logic" "$result"
+
+# 6-3. Only summary (no prompt) → subtitle=project dir, message=summary
+result=$(echo '{"session_id":"b-3","cwd":"/workspace/api","last_assistant_message":"Refactored into 3 modules"}' \
+  | bash "$NOTIFY_SCRIPT" --notify-args-test codex)
+assert_contains "summary only: subtitle is project dir" "subtitle=api" "$result"
+assert_contains "summary only: message shows summary" "message=Refactored into 3 modules" "$result"
+
+# 6-4. Neither prompt nor summary → subtitle=project dir, message=Session completed
+result=$(echo '{"session_id":"b-4","cwd":"/dev/app"}' \
+  | bash "$NOTIFY_SCRIPT" --notify-args-test claude)
+assert_contains "neither: subtitle is project dir" "subtitle=app" "$result"
+assert_contains "neither: message shows session completed" "Session b-4" "$result"
+
+# 6-5. Long prompt+summary both truncated
+result=$(echo '{"session_id":"b-5","cwd":"/tmp","prompt":"Implement comprehensive error handling for all API endpoints including retry logic","prompt_response":"Done. I have implemented comprehensive error handling across all API endpoints with retry logic and circuit breaker patterns"}' \
+  | bash "$NOTIFY_SCRIPT" --notify-args-test gemini)
+sub_line=$(echo "$result" | grep '^subtitle=')
+msg_line=$(echo "$result" | grep '^message=')
+sub_len=${#sub_line}
+msg_len=${#msg_line}
+# subtitle= is 10 chars, so content <= 70; message= is 8 chars, so content <= 68
+TOTAL=$((TOTAL + 1))
+if [[ $sub_len -le 74 ]]; then
+  echo "  PASS: long prompt in subtitle is truncated"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: long prompt in subtitle is truncated (len=$sub_len)"
+  FAIL=$((FAIL + 1))
+fi
+TOTAL=$((TOTAL + 1))
+if [[ $msg_len -le 72 ]]; then
+  echo "  PASS: long summary in message is truncated"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: long summary in message is truncated (len=$msg_len)"
+  FAIL=$((FAIL + 1))
+fi
+
+echo ""
+
+# ===========================================================================
+# 7. Strategy D: Click Opens Transcript
+# ===========================================================================
+
+echo "=== 7. Strategy D: Click Opens Transcript ==="
+
+# 7-1. transcript_path is parsed from input
+result=$(echo '{"session_id":"d-1","cwd":"/tmp","transcript_path":"/var/log/transcript.jsonl"}' \
+  | bash "$NOTIFY_SCRIPT" --parse-test claude)
+assert_contains "parses transcript_path" "transcript_path=/var/log/transcript.jsonl" "$result"
+
+# 7-2. transcript_path missing defaults to empty
+result=$(echo '{"session_id":"d-2","cwd":"/tmp"}' \
+  | bash "$NOTIFY_SCRIPT" --parse-test claude)
+assert_contains "missing transcript_path is empty" "transcript_path=" "$result"
+
+# 7-3. execute passes transcript_path to open script
+if [[ "$(uname)" == "Darwin" ]]; then
+  result=$(echo '{"session_id":"d-3","cwd":"/tmp","transcript_path":"/tmp/t.jsonl"}' \
+    | ZELLIJ_SESSION_NAME=sess bash "$NOTIFY_SCRIPT" --notify-args-test claude)
+  assert_contains "execute includes transcript path" "/tmp/t.jsonl" "$result"
+fi
+
+echo ""
+
+# ===========================================================================
+# 8. Strategy F: Notification Log File
+# ===========================================================================
+
+echo "=== 8. Strategy F: Notification Log File ==="
+
+LOG_DIR=$(mktemp -d)
+LOG_FILE="$LOG_DIR/agent-notify.log"
+
+# 8-1. Log entry is created on notification
+echo '{"session_id":"f-1","cwd":"/dev/app","prompt":"Fix bug","prompt_response":"Fixed it"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 AGENT_NOTIFY_LOG="$LOG_FILE" _TEST_CLIENT_COUNT=0 \
+    bash "$NOTIFY_SCRIPT" gemini >/dev/null
+TOTAL=$((TOTAL + 1))
+if [[ -f "$LOG_FILE" ]]; then
+  echo "  PASS: log file created"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: log file not created at $LOG_FILE"
+  FAIL=$((FAIL + 1))
+fi
+
+# 8-2. Log contains provider, prompt, summary, timestamp
+if [[ -f "$LOG_FILE" ]]; then
+  log_content=$(cat "$LOG_FILE")
+  assert_contains "log has provider" "gemini" "$log_content"
+  assert_contains "log has prompt" "Fix bug" "$log_content"
+  assert_contains "log has summary" "Fixed it" "$log_content"
+  # Timestamp format: YYYY-MM-DD
+  TOTAL=$((TOTAL + 1))
+  if echo "$log_content" | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2}'; then
+    echo "  PASS: log has timestamp"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL: log missing timestamp"
+    FAIL=$((FAIL + 1))
+  fi
+else
+  # Skip if log file doesn't exist (already failed above)
+  TOTAL=$((TOTAL + 4))
+  FAIL=$((FAIL + 4))
+fi
+
+# 8-3. Multiple notifications append (not overwrite)
+echo '{"session_id":"f-2","cwd":"/tmp","prompt":"Second task"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 AGENT_NOTIFY_LOG="$LOG_FILE" _TEST_CLIENT_COUNT=0 \
+    bash "$NOTIFY_SCRIPT" claude >/dev/null
+TOTAL=$((TOTAL + 1))
+if [[ -f "$LOG_FILE" ]]; then
+  line_count=$(wc -l < "$LOG_FILE" | tr -d ' ')
+  if [[ $line_count -ge 2 ]]; then
+    echo "  PASS: log appends (${line_count} lines)"
+    PASS=$((PASS + 1))
+  else
+    echo "  FAIL: log did not append (${line_count} lines)"
+    FAIL=$((FAIL + 1))
+  fi
+else
+  echo "  FAIL: log file missing for append test"
+  FAIL=$((FAIL + 1))
+fi
+
+# 8-4. Skipped notifications are NOT logged
+echo '{"session_id":"f-3","cwd":"/tmp","prompt":"Skipped task"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 AGENT_NOTIFY_LOG="$LOG_FILE" _TEST_CLIENT_COUNT=1 \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude >/dev/null
+if [[ -f "$LOG_FILE" ]]; then
+  log_content=$(cat "$LOG_FILE")
+  assert_not_contains "skipped notification not logged" "Skipped task" "$log_content"
+fi
+
+# Cleanup
+rm -rf "$LOG_DIR"
+
+echo ""
+
+# ===========================================================================
+# 9. Exit Code
+# ===========================================================================
+
+echo "=== 9. Exit Code ==="
 
 echo '{}' | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT" claude >/dev/null
 assert_eq "exit code is 0" "0" "$?"
