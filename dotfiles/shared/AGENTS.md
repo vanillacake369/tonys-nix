@@ -24,25 +24,38 @@ Once an agent is launched, do not read the same files from main. Wait for the ag
 
 ### Multi-Provider Delegation (Claude as orchestrator)
 
-Claude Code is the orchestrator. Delegate to other providers via cli-proxy-api when it makes the task better — not just bigger.
+Claude Code is the orchestrator. `Agent(general-purpose)` is **denied** — use the specialized agents below instead.
 
-**When to delegate (do this automatically, no user prompt needed):**
+**Routing table:**
 
-- Cross-validation: before finalizing security reviews, architecture decisions, or destructive changes, get a second opinion from a different model
-- Large input: when the context you need to analyze exceeds what fits comfortably (5+ files, long logs, big diffs)
-- Different strength: Gemini for breadth (large context, web knowledge), GPT for code generation, Claude for reasoning and judgment
-- Parallel speedup: when 2+ independent analyses can run at the same time
+| Task | Agent | Why |
+|------|-------|-----|
+| Research, docs, large-context analysis | `researcher` | Routes to Gemini (1M context, fast) |
+| Cross-validation, second opinion | `cross-validator` | Routes to GPT (independent perspective) |
+| Quick code search (1-3 files) | `Explore` (builtin) | Fastest for targeted lookups |
+| Architecture planning | `architect` / `Plan` (builtin) | Claude reasoning strength |
+| Implementation | `implementer` | Claude code generation |
+| Code review | `reviewer` | Claude quality analysis |
+| Refactoring | `refactorer` | Claude pattern recognition |
+| Testing | `tester` | Claude test design |
+| Direct proxy call | `Bash(curl)` | When no agent fits |
+
+**Auto-delegation rules (no user prompt needed):**
+
+- Research / web knowledge / docs → `researcher`
+- Cross-validation of security, architecture, destructive changes → `cross-validator`
+- 3+ independent explorations → parallel background agents
+- 5+ files to analyze → `researcher` (Gemini large context)
 
 **When NOT to delegate:**
 
-- Simple file reads, edits, git operations — just do it
-- Security-sensitive operations (credentials, destructive git, secrets)
-- When the overhead of delegation exceeds the benefit (trivial questions)
+- Simple file reads, edits, git operations — just do it directly
+- Security-sensitive operations (credentials, destructive git)
+- Trivial questions where delegation overhead > benefit
 
-**How to delegate:**
+**Direct proxy call (when no agent fits):**
 
 ```bash
-# Send to a specific model
 curl -s http://127.0.0.1:4001/v1/chat/completions \
   -H "Content-Type: application/json" \
   --data @- <<EOJSON | jq -r '.choices[0].message.content'
@@ -52,15 +65,12 @@ curl -s http://127.0.0.1:4001/v1/chat/completions \
   "stream": false
 }
 EOJSON
-
-# Available models: gemini-2.5-pro, gemini-2.5-flash-lite, gpt-5.4-mini, gpt-5.4
-# Check all: curl -s http://127.0.0.1:4001/v1/models | jq '.data[].id'
 ```
 
 **After receiving a delegation result:**
 - Verify it against your own judgment — do not blindly trust
 - Synthesize multiple opinions into a final recommendation
-- If proxy is unreachable, fall back to direct CLI (codex/gemini) or skip delegation
+- If proxy is unreachable, fall back to local tools or skip delegation
 
 ## Commit Convention
 
