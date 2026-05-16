@@ -26,9 +26,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Phase 1: 문제 정의 → 애매한 부분 질의 → 사용자 승인
 Phase 2: 연구 & 분석 → 관련 지식 수집 → 핵심 원인 + 원리 정리 → 공유
 Phase 3: 전략 제시 → 선택지 + 트레이드오프 나열 → 사용자 선택 대기
-Phase 4: 설계 & 테스트 케이스 → TDD 케이스 + 엣지케이스 정의 → 사용자 승인
-Phase 5: 구현 → lint/format 확인 포함 → 테스트 통과 확인
-Phase 6: 통합 검증 → 실제 동작 확인 → 보고
+Phase 4: Spec 작성 & 테스트 설계 → 명시적 spec(입출력/제약/불변식) + TDD 케이스 + 엣지케이스 → 사용자 승인
+Phase 5: 구현 → spec 준수 확인 + lint/format + 테스트 통과
+Phase 6: 통합 검증 → 실제 동작 확인 + 보안 점검 → 보고
 ```
 
 단순 작업(파일 수정 1-2개, 명확한 지시)은 Phase 5-6만 수행.
@@ -54,6 +54,96 @@ Phase 6: 통합 검증 → 실제 동작 확인 → 보고
 - 출처를 찾을 수 없는 주장은 "출처 미확인 — 검증 필요"로 표기
 - hedging 표현("~일 수 있습니다", "아마도", "대체로") 대신 확인 상태를 명시
 - 톤: 간결하고 사실 중심. 불필요한 수식어 배제.
+
+### Code Principles (모든 구현에 적용)
+
+TDD를 기본으로 하되, 다음 원칙을 지향:
+
+- **TDD**: 테스트 먼저 작성 → 구현 → 리팩토링. 테스트 없는 구현은 미완성.
+- **SSoT (Single Source of Truth)**: 동일 정보의 중복 정의 금지. 하나의 원천에서 파생.
+- **DRY (Don't Repeat Yourself)**: 3회 이상 반복되는 패턴은 추상화 검토.
+- **SRP (Single Responsibility Principle)**: 하나의 모듈/함수/클래스는 하나의 책임만.
+- **DDD (Domain-Driven Design)**: 도메인 용어를 코드에 반영. 경계 컨텍스트 존중.
+- **Functional 지향**: 불변성 우선, 부수효과 격리, 순수 함수 선호.
+
+적용 강도: 프로젝트 기존 패턴이 우선. 원칙을 위해 기존 코드 스타일을 깨지 않음.
+
+### Spec-Driven Development (Phase 4 상세)
+
+구현 전 명시적 spec을 작성하여 "무엇을 만들 것인지"를 코드보다 먼저 확정:
+
+```
+## Spec: [기능명]
+- Input: [타입, 범위, 제약]
+- Output: [타입, 예상 값]
+- Invariants: [절대 깨지면 안 되는 조건]
+- Edge cases: [경계값, 빈 값, 동시성 등]
+- Not in scope: [명시적으로 하지 않는 것]
+```
+
+Spec이 승인되면 TDD 테스트로 변환 → 구현. Spec은 코드 주석이나 테스트 파일 상단에 보존.
+
+### Security Harness (Phase 6 보안 점검)
+
+통합 검증 시 자동 수행:
+
+1. **의존성 취약점**: 새 패키지 추가 시 알려진 CVE 확인 (go: `govulncheck`, npm: `npm audit`, nix: `vulnix`)
+2. **시크릿 노출**: `.env`, API key, credential 패턴 탐지. git add 전 경고.
+3. **입력 검증**: 외부 입력(HTTP, CLI args, 환경변수) 경계에서 validation 존재 확인
+4. **권한 최소화**: 파일/네트워크/프로세스 접근 범위가 필요 최소인지 확인
+5. **라이센스**: 새 의존성의 라이센스가 프로젝트 정책과 호환되는지 확인
+
+발견 시 즉시 보고 (Hard Rule #7 적용). 자동 수정하지 않고 사용자에게 선택지 제시.
+
+### Mutation Testing (선택적 강화)
+
+Phase 6 통합 검증 시 mutation testing 도구를 감지하고 활용:
+
+**감지 순서:**
+1. 프로젝트 내 설정 파일 확인:
+   - `stryker.conf.{js,json,mjs}` → Stryker (TS/JS)
+   - `build.gradle` pitest 블록 → PIT (Java)
+   - `pyproject.toml [tool.mutmut]` → mutmut (Python)
+   - `Cargo.toml` + `which cargo-mutants` → cargo-mutants (Rust)
+   - `go.mod` + `which go-mutesting` → go-mutesting (Go)
+2. CLI 존재 확인: `which stryker` / `which mutmut` / `which cargo-mutants` 등
+
+**도구 있음 → 사용:**
+- 변경된 파일 대상으로 mutation test 실행
+- 목표 mutation score: 80%+
+- 실패한 mutant → 테스트 보강 후 재실행
+
+**도구 없음 → 설치 가이드 제시:**
+```
+[SUGGESTION] Mutation testing 도구 미감지. 설치 권장:
+- Go:     go install github.com/zimmski/go-mutesting/cmd/go-mutesting@latest
+- Java:   build.gradle에 id 'info.solidsoft.pitest' 플러그인 추가
+- TS/JS:  pnpm add -D @stryker-mutator/core
+- Python: uv add --dev mutmut
+- Rust:   cargo install cargo-mutants
+```
+
+강제하지 않음 — 사용자가 skip 하면 진행.
+
+### Integration Verification (통합 검증)
+
+각 작업 단위(task/subtask) 완료 시 반드시 수행:
+
+1. **빌드 확인**: 전체 프로젝트 빌드 성공 여부
+2. **테스트 실행**: 기존 테스트 + 새 테스트 전체 통과
+3. **lint/format**: 프로젝트 lint/formatter 통과 (nvim LSP 포함)
+4. **통합 동작**: 변경된 기능이 실제로 동작하는지 확인 (서버 실행, CLI 실행 등)
+5. **회귀 확인**: 기존 기능이 깨지지 않았는지 확인
+
+모든 task 완료 후 최종 보고:
+```
+[COMPLETE]
+- Tasks: {완료된 작업 목록}
+- Tests: {통과/실패 수}
+- Build: {성공/실패}
+- Integration: {확인 방법 및 결과}
+- Issues: {발견된 문제 또는 "없음"}
+```
 
 ### Token Efficiency
 
