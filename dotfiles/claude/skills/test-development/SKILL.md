@@ -513,3 +513,30 @@ void test2_updateUser() {  // Depends on test1
 ---
 
 **Remember**: Great tests are readable, maintainable, and follow project patterns. Use [codebase-analysis] to discover testing conventions, then create tests that feel native to the project's testing culture.
+
+## Mandatory: Tone & Reference Policy
+
+- 모든 기술적 주장/판단에 출처 명시 (공식 문서 URL, GitHub issue, RFC 등)
+- 출처 없는 주장은 "출처 미확인 — 검증 필요"로 표기
+- "~일 수 있습니다", "아마도", "대체로" 등 hedging 표현 금지. 확인 상태를 명시.
+- 톤: 간결, 사실 중심. 불필요한 수식어 배제.
+
+## Mandatory: Code Principles (테스트 작성 시 적용)
+
+- TDD 사이클 엄수: Red → Green → Refactor
+- SSoT: 테스트 데이터 원천 하나로 관리 (fixture/factory)
+- SRP: 하나의 테스트는 하나의 동작만 검증
+- DDD: 도메인 용어로 테스트 네이밍
+- 엣지케이스 필수: happy path + error cases + boundary conditions
+
+## Mandatory: Integration Verification
+
+테스트 작성 완료 후:
+1. 전체 테스트 스위트 실행 — 신규 + 기존 모두 통과
+2. 커버리지 확인 (프로젝트 기준 충족)
+3. CI 파이프라인 호환 확인
+
+완료 보고 형식:
+```
+[COMPLETE] Tests: {pass}/{total}, Coverage: {%}, New tests: {count}
+```

@@ -218,3 +218,19 @@ For detailed templates and architecture-specific examples, see:
 ---
 
 **Remember**: A great plan reads like it was written by someone deeply familiar with the codebase. Use the [codebase-analysis] skill to become that familiar before planning.
+
+## Mandatory: Tone & Reference Policy
+
+- 모든 기술적 주장/판단에 출처 명시 (공식 문서 URL, GitHub issue, RFC 등)
+- 출처 없는 주장은 "출처 미확인 — 검증 필요"로 표기
+- "~일 수 있습니다", "아마도", "대체로" 등 hedging 표현 금지. 확인 상태를 명시.
+- 톤: 간결, 사실 중심. 불필요한 수식어 배제.
+- 추론이 아닌 실제 확인된 사실만으로 분석/설계 진행.
+
+## Mandatory: Code Principles (설계 시 반영)
+
+- TDD: 테스트 전략을 설계 단계에서 함께 수립
+- SSoT/DRY: 중복 제거 관점에서 설계
+- SRP: 모듈/서비스 책임 분리 명확화
+- DDD: 도메인 모델 중심 설계, Bounded Context 명시
+- Functional: 상태 관리 최소화, 순수 함수 우선 설계

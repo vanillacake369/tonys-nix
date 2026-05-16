@@ -218,6 +218,13 @@ argument-hint: <파일 경로> (예: src/content/posts/Nix 및 Libvirt 기반 Ia
 
 ---
 
+# Mandatory: Reference Integrity
+
+- 추가하는 footnote URL은 반드시 실제 접근 가능한 출처 (추론으로 URL 생성 금지)
+- WebSearch로 확인 불가한 출처는 "출처 미확인 — 검증 필요" 표기
+- 기술적 주장에 출처 없으면 footnote 추가 대상으로 분류
+- 톤 규칙의 hedging 금지를 진단/수정 양쪽에 적용
+
 # 시작
 
 대상 파일을 읽고 **1단계 진단**부터 시작한다.

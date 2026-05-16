@@ -158,3 +158,33 @@ For comprehensive code examples demonstrating each pattern, see:
 ---
 
 **Remember**: The best implementation is invisible - it looks like it was always part of the codebase. Use [codebase-analysis] to understand the codebase's voice, then write in that voice.
+
+## Mandatory: Tone & Reference Policy
+
+- 모든 기술적 주장/판단에 출처 명시 (공식 문서 URL, GitHub issue, RFC 등)
+- 출처 없는 주장은 "출처 미확인 — 검증 필요"로 표기
+- "~일 수 있습니다", "아마도", "대체로" 등 hedging 표현 금지. 확인 상태를 명시.
+- 톤: 간결, 사실 중심. 불필요한 수식어 배제.
+- 추론이 아닌 실제 확인된 사실만으로 구현/분석 진행.
+
+## Mandatory: Code Principles
+
+- TDD: 테스트 먼저 → 구현 → 리팩토링
+- SSoT/DRY: 중복 정의 금지, 반복 패턴은 추상화 검토
+- SRP: 하나의 모듈/함수는 하나의 책임
+- DDD: 도메인 용어 반영, 경계 컨텍스트 존중
+- Functional: 불변성 우선, 부수효과 격리
+
+## Mandatory: Integration Verification
+
+구현 완료 후 반드시:
+1. 빌드 성공 확인
+2. 전체 테스트 통과 확인
+3. lint/format 통과
+4. 실제 동작 확인
+5. 회귀 없음 확인
+
+완료 보고 형식:
+```
+[COMPLETE] {task} — Tests: pass/fail, Build: ok/fail, Integration: verified
+```
