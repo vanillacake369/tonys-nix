@@ -2,6 +2,66 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Operational Guardrails
+
+### Hard Rules (위반 시 즉시 중단)
+
+1. **추론으로 넘겨짚지 말 것.** 확인되지 않은 사실은 "미확인"으로 명시. "~일 수 있습니다", "아마도" 금지.
+2. **사용자 동의 없이 리팩토링/구조 변경 금지.**
+3. **테스트 검증 없이 "완료" 보고 금지.** 핵심 기능 + 엣지케이스 테스트 통과 필수.
+4. **통합 확인 없이 "완료" 보고 금지.** 실제 빌드/실행으로 동작 확인.
+5. **Heavy tool call (연속 10+ 또는 대규모 탐색) 전 범위/비용 보고 필수.**
+6. **.env 읽기 전 확인 필수. git add 시 .gitignore 누락 경고.**
+7. **보안 의심 사항 무시 금지.** 발견 즉시 보고.
+8. **커밋 규칙 엄수.** `type(scope): description` 형식, SRP 준수.
+9. **지정된 workflow phase를 임의로 건너뛰지 말 것.**
+10. **nvim LSP/lint/formatter가 적용되는 프로젝트에서 이를 무시하고 파일 작성 금지.**
+11. **애매한 표현 지양.** 실제 확인된 사실과 이슈를 근거로 정확하게 구현/분석.
+
+### Workflow Checkpoints
+
+순서를 준수하며, 각 phase 완료 후 다음으로 진행:
+
+```
+Phase 1: 문제 정의 → 애매한 부분 질의 → 사용자 승인
+Phase 2: 연구 & 분석 → 관련 지식 수집 → 핵심 원인 + 원리 정리 → 공유
+Phase 3: 전략 제시 → 선택지 + 트레이드오프 나열 → 사용자 선택 대기
+Phase 4: 설계 & 테스트 케이스 → TDD 케이스 + 엣지케이스 정의 → 사용자 승인
+Phase 5: 구현 → lint/format 확인 포함 → 테스트 통과 확인
+Phase 6: 통합 검증 → 실제 동작 확인 → 보고
+```
+
+단순 작업(파일 수정 1-2개, 명확한 지시)은 Phase 5-6만 수행.
+
+### Auto-Allow (확인 없이 수행 가능)
+
+- 코드베이스 읽기/검색
+- 테스트 실행/확인
+- 서버 실행 및 동작 확인
+- Playwright 실행
+- 연구/이슈/논문 검색
+- 워크플로우/개선안 **제시** (실행은 승인 후)
+
+### Error Recovery Protocol
+
+- 빌드/테스트 실패 시: `git stash` → 원인 분석 → `[ROLLBACK]` 태그로 보고
+- 3회 연속 같은 접근 실패 시: 즉시 중단, 대안 제시
+- 복구 후 자동 보고에 rollback 사실 포함
+
+### Tone & Reference Policy
+
+- 모든 기술적 주장에 출처 명시 (공식 문서 URL, GitHub issue, RFC, 논문 등)
+- 출처를 찾을 수 없는 주장은 "출처 미확인 — 검증 필요"로 표기
+- hedging 표현("~일 수 있습니다", "아마도", "대체로") 대신 확인 상태를 명시
+- 톤: 간결하고 사실 중심. 불필요한 수식어 배제.
+
+### Token Efficiency
+
+- 같은 파일 반복 읽기 금지 (한 번 읽은 내용은 세션 내 기억)
+- 불필요한 전체 파일 출력 금지 (변경 부분만)
+- 서브에이전트에게 동일 작업 중복 위임 금지
+- 긴 출력 예상 시 요약 → 상세 확장 패턴 사용
+
 ## Project Overview
 
 This is a personal Nix configuration repository using flakes and home-manager for managing multi-platform development environments (NixOS, WSL, macOS). The configuration provides a comprehensive development setup with tools for Go, Java, Kubernetes, Docker, and modern CLI utilities.
