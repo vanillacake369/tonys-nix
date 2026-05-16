@@ -322,6 +322,13 @@ Task(subagent_type="general-purpose", prompt="[편 4 작성 지시]")
 
 문제가 있으면 _해당 편을 다시 서브에이전트에 의뢰_ 하여 수정한다.
 
+## Mandatory: Reference Integrity
+
+- 모든 footnote URL은 실제 접근 가능한 출처여야 함 (추론으로 URL 생성 금지)
+- 출처를 찾을 수 없는 주장은 "출처 미확인 — 검증 필요"로 표기
+- hedging 표현 금지 (위 톤 규칙에 따름)
+- 기술적 주장에는 반드시 출처 footnote 연결
+
 ## 최종 파일 제시
 
 모든 편이 검증 완료되면 _모든 파일을 한 번에 제시_ 한다.

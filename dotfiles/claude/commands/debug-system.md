@@ -36,6 +36,23 @@ Provide **adaptive output** based on issue urgency and complexity:
 - **Prevention-focused**: Add tests to catch similar issues
 - **Context-aware**: Reference existing debugging patterns and error handling
 
+# Mandatory Rules
+
+## Tone & Reference
+- 모든 진단/원인 분석에 근거 명시 (에러 로그, 스택트레이스, 공식 문서)
+- 추론 기반 가설은 "가설 — 검증 필요" 명시, 확인 후 "확인됨"으로 갱신
+- hedging 금지. "아마 이것 때문일 수 있습니다" → "미확인. 검증 방법: X"
+
+## Code Principles
+- TDD: 버그 수정 전 실패 테스트 먼저 작성 (regression prevention)
+- SRP: 수정 범위를 최소화, 관련 없는 코드 건드리지 않음
+
+## Integration Verification
+디버깅 완료 후: 원인 테스트 통과 → 전체 테스트 통과 → 재현 불가 확인
+```
+[COMPLETE] Bug fixed — Root cause: {X}, Tests: pass, Regression: prevented
+```
+
 # Example Output Structure
 
 For a typical debugging session:
