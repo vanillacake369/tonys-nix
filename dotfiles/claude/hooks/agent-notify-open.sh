@@ -7,8 +7,10 @@
 # Nix binaries are not available, so we prepend ~/.nix-profile/bin.
 set -uo pipefail
 
-export PATH="$HOME/.nix-profile/bin:$PATH"
+export PATH="$HOME/.nix-profile/bin:/run/current-system/sw/bin:$PATH"
 
+TERMINAL_APP="${AGENT_NOTIFY_TERMINAL:-WezTerm}"
+PROVIDER="${AGENT_NOTIFY_PROVIDER:-}"
 TARGET="" TRANSCRIPT=""
 
 # Parse args: first non-file arg is zellij session, file arg is transcript
@@ -20,8 +22,8 @@ for arg in "$@"; do
   fi
 done
 
-# Focus WezTerm and wait for it to become foreground
-open -a WezTerm 2>/dev/null || true
+# Focus terminal app and wait for it to become foreground
+open -a "$TERMINAL_APP" 2>/dev/null || true
 sleep 0.3
 
 # Switch zellij sessions if target is specified
@@ -37,7 +39,7 @@ if [[ -n "$TARGET" ]] && command -v zellij &>/dev/null; then
       done
 fi
 
-# Open transcript in default editor if available
-if [[ -n "$TRANSCRIPT" ]]; then
+# Open transcript only for Claude (other providers' JSON files cause focus issues)
+if [[ -n "$TRANSCRIPT" && "$PROVIDER" != "gemini" && "$PROVIDER" != "codex" ]]; then
   open "$TRANSCRIPT" 2>/dev/null || true
 fi
