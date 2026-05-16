@@ -235,9 +235,10 @@ echo ""
 
 echo "=== 5. Focus Suppression ==="
 
-# 5-1. Skips when session has clients (user is viewing this session)
+# 5-1. Skips when session has clients AND terminal is focused
 result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 bash "$NOTIFY_SCRIPT" claude)
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=WezTerm \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
 assert_contains "has clients: skipped" "skipped" "$result"
 
 # 5-2. Sends when session has no clients (user is in different session)
@@ -400,7 +401,7 @@ fi
 # 8-4. Skipped notifications are NOT logged
 echo '{"session_id":"f-3","cwd":"/tmp","prompt":"Skipped task"}' \
   | AGENT_NOTIFY_DRY_RUN=1 AGENT_NOTIFY_LOG="$LOG_FILE" _TEST_CLIENT_COUNT=1 \
-    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude >/dev/null
+    _TEST_FOCUSED_APP=WezTerm ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude >/dev/null
 if [[ -f "$LOG_FILE" ]]; then
   log_content=$(cat "$LOG_FILE")
   assert_not_contains "skipped notification not logged" "Skipped task" "$log_content"
@@ -412,10 +413,88 @@ rm -rf "$LOG_DIR"
 echo ""
 
 # ===========================================================================
-# 9. Exit Code
+# 9. Hybrid Focus Detection
 # ===========================================================================
 
-echo "=== 9. Exit Code ==="
+echo "=== 9. Hybrid Focus Detection ==="
+
+# 9-1. Terminal NOT focused → always notify (even if zellij has clients)
+result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=Finder \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_not_contains "terminal not focused: not skipped" "skipped" "$result"
+
+# 9-2. Terminal focused + zellij has clients → skip
+result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=WezTerm \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_contains "terminal focused + clients: skipped" "skipped" "$result"
+
+# 9-3. Terminal focused + no clients → notify
+result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 _TEST_FOCUSED_APP=WezTerm \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_not_contains "terminal focused + no clients: not skipped" "skipped" "$result"
+
+# 9-4. Custom terminal app name via AGENT_NOTIFY_TERMINAL
+result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=Ghostty \
+    AGENT_NOTIFY_TERMINAL=Ghostty ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_contains "custom terminal focused + clients: skipped" "skipped" "$result"
+
+# 9-5. Custom terminal NOT focused → notify
+result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=WezTerm \
+    AGENT_NOTIFY_TERMINAL=Ghostty ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_not_contains "custom terminal not focused: not skipped" "skipped" "$result"
+
+echo ""
+
+# ===========================================================================
+# 10. Provider-based Execute Command
+# ===========================================================================
+
+echo "=== 10. Provider-based Execute Command ==="
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  # 10-1. Claude: execute includes AGENT_NOTIFY_PROVIDER=claude
+  result=$(echo '{"session_id":"x","cwd":"/tmp","transcript_path":"/tmp/t.jsonl"}' \
+    | ZELLIJ_SESSION_NAME=sess bash "$NOTIFY_SCRIPT" --notify-args-test claude)
+  assert_contains "claude execute has provider env" "AGENT_NOTIFY_PROVIDER=claude" "$result"
+
+  # 10-2. Gemini: execute includes AGENT_NOTIFY_PROVIDER=gemini
+  result=$(echo '{"session_id":"x","cwd":"/tmp","transcript_path":"/tmp/t.json"}' \
+    | ZELLIJ_SESSION_NAME=sess bash "$NOTIFY_SCRIPT" --notify-args-test gemini)
+  assert_contains "gemini execute has provider env" "AGENT_NOTIFY_PROVIDER=gemini" "$result"
+
+  # 10-3. Custom terminal passed through execute
+  result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
+    | ZELLIJ_SESSION_NAME=sess AGENT_NOTIFY_TERMINAL=Ghostty bash "$NOTIFY_SCRIPT" --notify-args-test claude)
+  assert_contains "execute has custom terminal" "AGENT_NOTIFY_TERMINAL=Ghostty" "$result"
+fi
+
+echo ""
+
+# ===========================================================================
+# 11. jq Graceful Degradation
+# ===========================================================================
+
+echo "=== 11. jq Graceful Degradation ==="
+
+# 11-1. Simulate missing jq via _TEST_NO_JQ injection
+result=$(echo '{"session_id":"abc","cwd":"/tmp"}' \
+  | _TEST_NO_JQ=1 bash "$NOTIFY_SCRIPT" --parse-test claude)
+# Should still get provider and fallback cwd (pwd), session=unknown
+assert_contains "no jq: provider still set" "provider=claude" "$result"
+assert_contains "no jq: session_id falls back to unknown" "session_id=unknown" "$result"
+
+echo ""
+
+# ===========================================================================
+# 12. Exit Code
+# ===========================================================================
+
+echo "=== 12. Exit Code ==="
 
 echo '{}' | AGENT_NOTIFY_DRY_RUN=1 bash "$NOTIFY_SCRIPT" claude >/dev/null
 assert_eq "exit code is 0" "0" "$?"
