@@ -26,6 +26,15 @@
     "ask": [],
     "disableBypassPermissionsMode": "disable"
   },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/statusline.sh",
+    "padding": 1
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "~/.claude/hooks/subagent-statusline.sh"
+  },
   "hooks": {
     "PostToolUse": [
       {
