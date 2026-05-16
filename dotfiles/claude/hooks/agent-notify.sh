@@ -30,6 +30,13 @@ _parse_input() {
 
   _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
 
+  # Graceful degradation: if jq is not available, use fallback values
+  # _TEST_NO_JQ env var allows test injection
+  if [[ -n "${_TEST_NO_JQ:-}" ]] || ! command -v jq &>/dev/null; then
+    _CWD="$(pwd)"
+    return
+  fi
+
   if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
     _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
     _CWD=$(echo "$input" | jq -r '.cwd // "unknown"')
@@ -88,7 +95,9 @@ _build_notify_args() {
     local zj_session="${ZELLIJ_SESSION_NAME:-}"
     [[ -n "$zj_session" ]] && args+=("$zj_session")
     [[ -n "$_TRANSCRIPT_PATH" ]] && args+=("$_TRANSCRIPT_PATH")
-    _EXECUTE="${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
+    # Pass provider and terminal via env so open script can decide behavior
+    local env_prefix="AGENT_NOTIFY_PROVIDER=${_PROVIDER} AGENT_NOTIFY_TERMINAL=${AGENT_NOTIFY_TERMINAL:-WezTerm}"
+    _EXECUTE="${env_prefix} ${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
   fi
 }
 
@@ -136,16 +145,31 @@ _select_backend() {
 }
 
 # ===========================================================================
-# Check if the current zellij session is being viewed by the user.
-# Uses `zellij action list-clients`: if any client is attached, the user
-# is looking at this session → skip notification.
-# OS-independent — relies only on zellij's own API.
-# _TEST_CLIENT_COUNT env var allows test injection.
+# Check if the current session is being viewed by the user.
+# Hybrid approach:
+#   1. macOS: check if terminal app is the frontmost process (OS-level focus)
+#   2. Zellij: check if session has attached clients (pane-level)
+#   Both must be true to suppress notification.
+# Env: _TEST_CLIENT_COUNT - inject zellij client count for testing
+#      _TEST_FOCUSED_APP  - inject frontmost app name for testing
+#      AGENT_NOTIFY_TERMINAL - terminal app name (default: WezTerm)
 # ===========================================================================
 _is_session_focused() {
-  # Not in zellij → can't detect, always notify
+  # Not in zellij → can't detect pane, always notify
   [[ -n "${ZELLIJ_SESSION_NAME:-}" ]] || return 1
 
+  # Step 1: OS-level focus check (macOS only)
+  if [[ "$(uname)" == "Darwin" ]]; then
+    local terminal_app="${AGENT_NOTIFY_TERMINAL:-WezTerm}"
+    local focused_app="${_TEST_FOCUSED_APP:-}"
+    if [[ -z "$focused_app" ]]; then
+      focused_app=$(osascript -e 'tell application "System Events" to get name of first process whose frontmost is true' 2>/dev/null || true)
+    fi
+    # Terminal not focused → user is elsewhere → always notify
+    [[ "$focused_app" == "$terminal_app" ]] || return 1
+  fi
+
+  # Step 2: Zellij client check
   local count="${_TEST_CLIENT_COUNT:-}"
   if [[ -z "$count" ]]; then
     count=$(zellij action list-clients 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
