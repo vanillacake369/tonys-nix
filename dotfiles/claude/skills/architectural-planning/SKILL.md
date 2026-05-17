@@ -53,16 +53,21 @@ After architectural discovery, evaluate if systematic thinking is needed for com
 - Sequential Thinking decision criteria and usage
 - Memory MCP usage patterns
 - Decision flow examples
-
-### Phase 2: Solution Design
+### Phase 2: Solution Design & Strategy
 Design within discovered constraints:
-1. Identify which existing components are affected
-2. Determine if new components are needed
-3. Choose integration points that match existing patterns
-4. Plan data flows following project conventions
-5. Design APIs consistent with current style
+1. **Systems Thinking**: 로컬 수정이 전체 시스템 및 미래 유지보수에 미칠 영향(Ripple Effect)을 분석한다.
+2. **Multidimensional Trade-off**: [성능 / 가독성 / 테스트 용이성 / 미래 확장성]의 3축으로 대안을 평가한다.
+3. **Pre-mortem**: 설계가 확정되기 전, "이 설계가 실패할 이유 3가지"를 스스로 나열하고 보완책을 마련한다. (Reflexion Loop)
+
+### Phase 2.5: Risk Mitigation (One-shot PoC)
+불확실성이 높은 영역(처음 쓰는 라이브러리, 파괴적 설정 변경 등)이 발견되면:
+1. **Trigger based PoC**: 10줄 내외의 독립적인 스크립트로 핵심 동작만 검증한다.
+2. **Review Points**: 사용자에게 PoC 결과와 함께 "이 동작이 의도하신 바와 일치하는지" 확인을 요청하는 리뷰 포인트를 제시한다.
+3. **Decision Gate**: PoC 결과와 전략에 대해 사용자 승인을 받은 후 구현(Phase 3)으로 넘어간다.
 
 ### Phase 3: Implementation Planning
+... (기존 내용) ...
+
 Create actionable steps:
 1. Order tasks by dependency and logical progression
 2. Specify exact files to modify or create
