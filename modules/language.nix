@@ -37,6 +37,7 @@
     # C
     gcc
     clang-tools
+    bear
 
     # Lua
     lua54Packages.lua
