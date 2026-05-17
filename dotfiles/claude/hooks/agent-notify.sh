@@ -95,9 +95,10 @@ _build_notify_args() {
     local zj_session="${ZELLIJ_SESSION_NAME:-}"
     [[ -n "$zj_session" ]] && args+=("$zj_session")
     [[ -n "$_TRANSCRIPT_PATH" ]] && args+=("$_TRANSCRIPT_PATH")
-    # Pass provider and terminal via env so open script can decide behavior
-    local env_prefix="AGENT_NOTIFY_PROVIDER=${_PROVIDER} AGENT_NOTIFY_TERMINAL=${AGENT_NOTIFY_TERMINAL:-WezTerm}"
-    _EXECUTE="${env_prefix} ${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
+    # Pass provider and terminal via env so open script can decide behavior.
+    # We use 'env' to ensure variables are set correctly even if not run in a full shell.
+    local term="${AGENT_NOTIFY_TERMINAL:-WezTerm}"
+    _EXECUTE="env AGENT_NOTIFY_PROVIDER=$_PROVIDER AGENT_NOTIFY_TERMINAL=\"$term\" ${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
   fi
 }
 
@@ -165,11 +166,37 @@ _is_session_focused() {
     if [[ -z "$focused_app" ]]; then
       focused_app=$(osascript -e 'tell application "System Events" to get name of first process whose frontmost is true' 2>/dev/null || true)
     fi
-    # Terminal not focused → user is elsewhere → always notify
-    [[ "$focused_app" == "$terminal_app" ]] || return 1
+
+    # If we couldn't get the focused app, assume not focused to be safe
+    [[ -n "$focused_app" ]] || return 1
+
+    # Check if the focused app is a terminal.
+    # We include common terminal names to be more robust.
+    case "$focused_app" in
+      "$terminal_app" | "WezTerm" | "wezterm-gui" | "iTerm2" | "Alacritty" | "Terminal" | "Ghostty" | "warp")
+        ;;
+      *)
+        return 1 # Not focused on terminal → notify
+        ;;
+    esac
   fi
 
-  # Step 2: Zellij client check
+  # Step 2: Zellij client check (is any client focusing the current pane?)
+  local current_pane="${ZELLIJ_PANE_ID:-}"
+  if [[ -n "$current_pane" ]]; then
+    local clients_output
+    clients_output=$(zellij action list-clients 2>/dev/null || true)
+    if [[ -n "$clients_output" ]]; then
+      # Check if any client is looking at our pane.
+      # list-clients output columns: CLIENT_ID ZELLIJ_PANE_ID RUNNING_COMMAND
+      if echo "$clients_output" | tail -n +2 | awk '{print $2}' | grep -qE "^(terminal_)?${current_pane}$"; then
+        return 0 # Focused
+      fi
+      return 1 # Current pane is not focused by any client
+    fi
+  fi
+
+  # Fallback for Step 2 if zellij command fails or PANE_ID is missing
   local count="${_TEST_CLIENT_COUNT:-}"
   if [[ -z "$count" ]]; then
     count=$(zellij action list-clients 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
@@ -189,10 +216,13 @@ _send() {
         -title "$_TITLE" -subtitle "$_SUBTITLE"
         -message "$_MESSAGE" -group "$_GROUP" -sound default)
       [[ -n "$_EXECUTE" ]] && cmd+=(-execute "$_EXECUTE")
-      "${cmd[@]}" 2>/dev/null || true
+      if ! "${cmd[@]}" 2>/dev/null; then
+        # Fallback to osascript if terminal-notifier fails
+        _send "osascript"
+      fi
       ;;
     noti)
-      noti -t "$_TITLE" -m "${_SUBTITLE}: ${_MESSAGE}" 2>/dev/null || true
+      noti -t "$_TITLE" -m "${_SUBTITLE}: ${_MESSAGE}" 2>/dev/null || _send "osascript"
       ;;
     osascript)
       osascript -e "display notification \"${_MESSAGE}\" with title \"${_TITLE}\" subtitle \"${_SUBTITLE}\" sound name \"Glass\"" 2>/dev/null || true
