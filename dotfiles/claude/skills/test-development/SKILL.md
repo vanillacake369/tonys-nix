@@ -33,26 +33,30 @@ This skill enables creation of comprehensive, project-appropriate tests by learn
 - Follow project's testing pyramid (unit/integration/e2e ratio)
 - Match existing coverage standards
 - Ensure tests are maintainable and readable
-
 ## Testing Workflow
 
 ### Phase 1: Test Environment Discovery
-Using [codebase-analysis]:
-1. **Find tests**: Locate all test files and directories
-2. **Identify framework**: Detect testing framework and runners
-3. **Analyze structure**: Learn test organization patterns
-4. **Discover execution**: Find test commands and scripts
-5. **Understand coverage**: Learn coverage tools and standards
+... (기존 내용) ...
 
-### Phase 2: Test Pattern Analysis
-Study existing tests:
-1. **Naming conventions**: Test file and function naming
-2. **Structure patterns**: Setup/teardown, fixtures, helpers
-3. **Assertion style**: expect(), assert(), should(), etc.
-4. **Test data**: How fixtures and test data are managed
-5. **Integration patterns**: How tests interact with services
+### Phase 2: Test Planning (Mandatory)
+구현 전, 다음 절차를 수행하여 편향되지 않은 테스트를 설계한다:
+1. **Requirement-Test Mapping**: 요구사항 명세에서 비즈니스 크리티컬 패스를 추출하고, 이를 검증할 테스트 케이스 테이블을 작성한다.
+2. **Adversarial Test Design**: 구현을 파괴하려는 시각에서 테스트를 설계한다. 스스로에게 질문하라: "이 테스트를 통과하면서도 버그가 있는 교묘한 코드를 짤 수 있는가?"
+3. **5대 엣지 케이스 (Checklist)**:
+   - **Null/Empty**: 빈 값, null, undefined 처리
+   - **Boundary**: 최대/최소값, 루프의 시작/끝
+   - **Type/Format**: 잘못된 형식의 입력
+   - **Concurrency/State**: 재진입성, 상태 변화 시 동작
+   - **Failure Path**: 외부 API 실패, 권한 없음 등 의도된 실패
+
+### Phase 2.5: Cross-Model Audit (For Core Features)
+핵심 기능의 경우:
+1. **Auditor Model (Gemini)**에게 전체 명세를 제공한다.
+2. "이 명세를 기반으로 설계자가 놓쳤을 법한 엣지 케이스와 보안 취약점 3가지를 제시하라"고 요청하여 보완한다.
 
 ### Phase 3: Test Implementation
+... (기존 내용) ...
+
 Create tests matching patterns:
 1. Follow discovered test structure exactly
 2. Use same testing libraries and utilities
