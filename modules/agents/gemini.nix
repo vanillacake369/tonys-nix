@@ -53,9 +53,18 @@ in {
 
     if [[ -f "$SETTINGS_FILE" ]]; then
       ${lib.getExe' pkgs.coreutils "cp"} "$SETTINGS_FILE" "''${SETTINGS_FILE}.backup"
+      
+      # Merge existing settings with new source using jq
+      if command -v ${lib.getExe' pkgs.jq "jq"} &> /dev/null; then
+        ${lib.getExe' pkgs.jq "jq"} -s '.[0] * .[1]' "$SETTINGS_FILE" "$SOURCE_FILE" | \
+          ${lib.getExe' pkgs.moreutils "sponge"} "$SETTINGS_FILE"
+      else
+        ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$SETTINGS_FILE"
+      fi
+    else
+      ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$SETTINGS_FILE"
     fi
 
-    ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$SETTINGS_FILE"
     ${lib.getExe' pkgs.coreutils "chmod"} u+w "$SETTINGS_FILE"
   '';
 }
