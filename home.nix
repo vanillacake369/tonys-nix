@@ -1,13 +1,16 @@
 {
   lib,
-  pkgs,
   isLinux,
   isDarwin,
-  isWsl,
   isNixOs,
-  nvim-config,
   ...
-}: {
+}: let
+  spec = import ./lib/keymaps/spec.nix {inherit lib;};
+  rawKeybinds = import ./lib/keymaps/keybinds.nix;
+  keybinds = rawKeybinds // {keymaps = spec.validate rawKeybinds.keymaps;};
+  toKarabiner = import ./lib/keymaps/to-karabiner.nix {inherit lib keybinds;};
+  toAeroSpace = import ./lib/keymaps/to-aerospace.nix {inherit lib keybinds;};
+in {
   # Enable Home Manager
   programs.home-manager.enable = true;
 
@@ -15,31 +18,34 @@
   targets.genericLinux.enable = isLinux;
 
   # Import dotfiles (agent configs moved to modules/agents.nix)
+  # Zellij configuration
+  # Hyprland configuration (Linux only)
   home.file =
     {
       ".config/nix".source = ./dotfiles/nix;
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
       # ".config/nvim".source = nvim-config;
-
-      # Zellij configuration
       ".config/zellij/config.kdl".source =
         if isDarwin
         then ./dotfiles/zellij/config.kdl.darwin
         else ./dotfiles/zellij/config.kdl.linux;
-
-      # Hyprland configuration (Linux only)
       ".config/hypr/hyprland.conf".source = ./dotfiles/hypr/hyprland.conf;
     }
     // lib.optionalAttrs isDarwin {
-      # Keymapper :: karabiner
       ".config/karabiner/karabiner.json" = {
-        source = ./dotfiles/karabiner/karabiner.json;
+        text = toKarabiner;
         force = true;
       };
-
-      # Window manager :: Aerospace
-      ".config/aerospace".source = ./dotfiles/aerospace;
+      ".config/aerospace/aerospace.toml" = {
+        text = toAeroSpace;
+        force = true;
+      };
+      # ".config/karabiner/karabiner.json" = {
+      #   source = ./dotfiles/karabiner/karabiner.json;
+      #   force = true;
+      # };
+      # ".config/aerospace".source = ./dotfiles/aerospace;
     };
 
   # Packages
