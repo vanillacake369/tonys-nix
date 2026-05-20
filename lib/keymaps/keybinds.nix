@@ -62,6 +62,20 @@ in {
   };
 
   keymaps = [
+    # --- Korean input: ₩ → backtick ---
+    {
+      bind = "grave_accent_and_tilde";
+      to = "grave_accent_and_tilde";
+      tags = ["karabiner"];
+      description = "Force backtick even in Korean input mode";
+    }
+    {
+      bind = "shift+grave_accent_and_tilde";
+      to = "shift+grave_accent_and_tilde";
+      tags = ["karabiner"];
+      description = "Force tilde even in Korean input mode";
+    }
+
     # --- System core ---
     {
       bind = "caps_lock";
