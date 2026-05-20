@@ -33,7 +33,7 @@ MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
 NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
 NIX_CONF_TARGET := "/etc/nix/nix.conf"
-AEROSPACE_CONFIG_PATH := "dotfiles/aerospace/aerospace.toml"
+AEROSPACE_CONFIG_PATH := "lib/keymaps/keybinds.nix"
 
 ########### Bootstrap ##########
 

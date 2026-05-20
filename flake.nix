@@ -15,10 +15,6 @@
       url = "github:nix-community/nixos-generators";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nvim-config = {
-      url = "github:vanillacake369/tonys-nvim";
-      flake = false;
-    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,7 +27,6 @@
     home-manager,
     nix-darwin,
     nixos-generators,
-    nvim-config,
     llm-agents,
     ...
   }: let
@@ -49,7 +44,6 @@
     # Shared home-manager modules (user config injected via mkHomeConfig)
     homeManagerModules = [
       ./home.nix
-      {_module.args = {inherit nvim-config;};}
     ];
 
     # Import builders from lib directory
