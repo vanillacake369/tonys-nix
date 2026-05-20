@@ -11,6 +11,7 @@
   keybinds = rawKeybinds // {keymaps = spec.validate rawKeybinds.keymaps;};
   toKarabiner = import ./lib/keymaps/to-karabiner.nix {inherit lib keybinds;};
   toAeroSpace = import ./lib/keymaps/to-aerospace.nix {inherit lib keybinds;};
+  zellijConfig = import ./lib/dotfiles/zellij.nix {inherit lib isDarwin;};
 in {
   # Enable Home Manager
   programs.home-manager.enable = true;
@@ -27,10 +28,7 @@ in {
       ".config/nixpkgs".source = ./dotfiles/nixpkgs;
       ".screenrc".source = ./dotfiles/screen/.screenrc;
       # ".config/nvim".source = nvim-config;
-      ".config/zellij/config.kdl".source =
-        if isDarwin
-        then ./dotfiles/zellij/config.kdl.darwin
-        else ./dotfiles/zellij/config.kdl.linux;
+      ".config/zellij/config.kdl".text = zellijConfig;
       ".config/hypr/hyprland.conf".source = ./dotfiles/hypr/hyprland.conf;
     }
     // lib.optionalAttrs isDarwin {
