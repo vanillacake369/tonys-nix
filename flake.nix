@@ -169,5 +169,8 @@
           lib.mapAttrs mkImage formats
         )
     );
+
+    # Guard tests: nix eval .#tests --json
+    tests = import ./tests {inherit lib;};
   };
 }
