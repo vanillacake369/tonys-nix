@@ -3,15 +3,17 @@
   config,
   lib,
   pkgs,
+  userProfile,
   ...
 }: let
   # =============================================================================
   # WSL Configuration Variables
   # =============================================================================
-  winUserDir = "/mnt/c/Users/limjihoon";
+  winUserDir = userProfile.windowsHome;
+  ideGlob = lib.concatStringsSep "," userProfile.jetbrains.ides;
   taskXmlName = "SystemIdleShutdown.xml";
   taskName = "SystemIdleShutdown";
-  winXmlPath = "C:\\Users\\limjihoon\\${taskXmlName}";
+  winXmlPath = "C:\\Users\\${userProfile.username}\\${taskXmlName}";
   wslXmlPath = "${winUserDir}/${taskXmlName}";
 
   # Check Windows admin privileges
@@ -50,7 +52,7 @@ in {
     # Copy AutoHotkey startup script
     copyAutoHotkeyScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
       run cp -f ${../dotfiles/autohotkey/win11-shortcut.ahk} \
-        "/mnt/c/Users/limjihoon/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/win11-shortcut.ahk"
+        "${winUserDir}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/win11-shortcut.ahk"
     '';
 
     # Copy Windows shutdown script (requires admin)
@@ -83,11 +85,11 @@ in {
     # WSL JetBrains keymap linking
     linkJetBrainsKeymapsWSL = lib.hm.dag.entryAfter ["writeBoundary"] ''
       SOURCE_KEYMAP="${config.home.homeDirectory}/dev/tonys-nix/dotfiles/jetbrain/keymap/Windows.xml"
-      JETBRAINS_DIR="/mnt/c/Users/limjihoon/AppData/Roaming/JetBrains"
+      JETBRAINS_DIR="${winUserDir}/AppData/Roaming/JetBrains"
 
       if [[ -d "$JETBRAINS_DIR" && -f "$SOURCE_KEYMAP" ]]; then
         echo "Setting up JetBrains keymaps for WSL..."
-        for ide_dir in "$JETBRAINS_DIR"/{IntelliJIdea,GoLand,DataGrip,WebStorm,PhpStorm,PyCharm,RubyMine,CLion,Rider,AndroidStudio}*; do
+        for ide_dir in "$JETBRAINS_DIR"/{${ideGlob}}*; do
           if [[ -d "$ide_dir" ]]; then
             KEYMAP_DIR="$ide_dir/keymaps"
             mkdir -p "$KEYMAP_DIR"

@@ -42,10 +42,13 @@
     # Define overlays for package customizations
     overlays = import ./overlays {} ++ [llm-agents.overlays.default];
 
-    # Shared home-manager modules
+    # Auto-discover user profiles from user/ directory
+    discoverModules = import ./lib/discover-modules.nix {inherit lib;};
+    userProfiles = discoverModules ./user;
+
+    # Shared home-manager modules (user config injected via mkHomeConfig)
     homeManagerModules = [
       ./home.nix
-      ./limjihoon-user.nix
       {_module.args = {inherit nvim-config;};}
     ];
 
@@ -104,8 +107,7 @@
             name = "hm-${system}";
             value = builders.mkHomeConfig {
               inherit system;
-              isWsl = false;
-              isNixOs = false;
+              userProfile = userProfiles.limjihoon;
             };
           }
           # WSL configuration
@@ -113,8 +115,8 @@
             name = "hm-wsl-${system}";
             value = builders.mkHomeConfig {
               inherit system;
+              userProfile = userProfiles.limjihoon;
               isWsl = true;
-              isNixOs = false;
             };
           }
           # NixOS configuration
@@ -122,7 +124,7 @@
             name = "hm-nixos-${system}";
             value = builders.mkHomeConfig {
               inherit system;
-              isWsl = false;
+              userProfile = userProfiles.limjihoon;
               isNixOs = true;
             };
           }

@@ -16,20 +16,35 @@
     inherit pkgs isLinux isDarwin;
   };
 
-  # Reusable home-manager configuration builder
   mkHomeConfig = {
     system,
+    userProfile,
     isWsl ? false,
     isNixOs ? false,
   }: let
     systemConfig = mkSystem system;
+    platform = import ./platform.nix {
+      inherit (systemConfig) isDarwin isLinux;
+      inherit isWsl isNixOs;
+    };
   in
     home-manager.lib.homeManagerConfiguration {
       pkgs = systemConfig.pkgs;
-      modules = homeManagerModules;
+      modules =
+        homeManagerModules
+        ++ [
+          {
+            home.username = userProfile.username;
+            home.homeDirectory =
+              if systemConfig.isDarwin
+              then "/Users/${userProfile.username}"
+              else "/home/${userProfile.username}";
+            home.stateVersion = userProfile.stateVersion;
+          }
+        ];
       extraSpecialArgs = {
         inherit (systemConfig) isLinux isDarwin;
-        inherit isWsl isNixOs;
+        inherit isWsl isNixOs userProfile platform;
       };
     };
 in {

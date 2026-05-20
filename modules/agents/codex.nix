@@ -9,8 +9,8 @@
   ...
 }: let
   tomlFormat = pkgs.formats.toml {};
+  sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
 
-  # Build MCP servers from shared programs.mcp config
   mcpServers = lib.mapAttrs (
     _: srv:
       (lib.removeAttrs srv ["disabled" "headers"])
@@ -20,7 +20,6 @@
       // {enabled = !(srv.disabled or false);}
   ) config.programs.mcp.servers;
 
-  # Full settings (hooks + MCP)
   codexSettings = {
     hooks.Stop = [
       {
@@ -40,27 +39,13 @@
 in {
   programs.codex = {
     enable = true;
-    # Empty settings — we handle config via activation script for writability
     settings = {};
     custom-instructions = builtins.readFile ../../dotfiles/shared/AGENTS.md;
   };
 
-  home.activation.syncCodexConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    CONFIG_FILE="$HOME/.codex/config.toml"
-    SOURCE_FILE="${configFile}"
-
-    mkdir -p "$HOME/.codex"
-
-    # Remove symlink if home-manager left one
-    if [[ -L "$CONFIG_FILE" ]]; then
-      rm "$CONFIG_FILE"
-    fi
-
-    if [[ -f "$CONFIG_FILE" ]]; then
-      ${lib.getExe' pkgs.coreutils "cp"} "$CONFIG_FILE" "''${CONFIG_FILE}.backup"
-    fi
-
-    ${lib.getExe' pkgs.coreutils "cp"} "$SOURCE_FILE" "$CONFIG_FILE"
-    ${lib.getExe' pkgs.coreutils "chmod"} u+w "$CONFIG_FILE"
-  '';
+  home.activation.syncCodexConfig = sync.mkFileCopy {
+    name = "codex-config";
+    target = "$HOME/.codex/config.toml";
+    source = "${configFile}";
+  };
 }

@@ -5,6 +5,7 @@
   lib,
   isDarwin,
   isLinux,
+  userProfile,
   ...
 }: {
   # =============================================================================
@@ -200,8 +201,8 @@
       enable = true;
       settings = {
         user = {
-          name = "limjihoon";
-          email = "lonelynight1026@gmail.com";
+          name = userProfile.gitUser;
+          email = userProfile.email;
         };
         credential.helper = "store";
       };
