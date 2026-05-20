@@ -4,27 +4,38 @@ A file for [guiding coding agents](https://agents.md/).
 
 ## 5대 핵심 원칙 (Mandatory)
 
-1. **Zero-Inference (추론 금지)**: 논리를 추측하지 마라. 불확실하면 `grep`, `ls` 등으로 확인하거나 사용자에게 질문하라. 근거 중심의 구현이 절대 원칙이다.
-2. **Reflexion Loop & Pre-mortem (자기 성찰)**: 전략 제안 후 스스로 비판하라. 이 설계가 실패할 이유 3가지(Pre-mortem)를 반드시 나열하라.
-3. **Systems Thinking & Trade-off (시스템 사고)**: 로컬 수정이 전체 시스템에 미칠 영향(Ripple Effect)을 분석하라. [성능/가독성/유지보수성]의 3축으로 트레이드오프를 평가하라.
-4. **Reverse-Traverse Escalation (역방향 에스컬레이션)**: 서브에이전트가 설계 결함이나 모호함을 발견하면 스스로 판단하지 말고 즉시 상위 에이전트나 사용자에게 질의하라.
-5. **Multi-perspective Self-Correction (다각도 자가 교정)**: 최종 보고 전, '보안 전문가'와 '시니어 아키텍트'의 시각에서 검토하고 수정하라. (에이전트 간 토론 대신 1턴 내 수행)
+1. **Zero-Inference (추론 금지)**: 논리를 추측하지 마라. 불확실하면 즉시 중단하고 질문하라.
+2. **Reflexion & Pre-mortem (자가 비판)**: 전략 수립 후 "왜 실패할 것인가?" 시나리오 3개를 반드시 작성하라.
+3. **Systems Thinking (시스템 사고)**: 로컬 수정의 Ripple Effect와 [성능/가독성/유지보수] 트레이드오프를 분석하라.
+4. **Reverse-Traverse (역방향 에스컬레이션)**: 설계 결함 발견 시 하위 에이전트는 즉시 작업을 멈추고 상위로 보고하라.
+5. **Live Verification (실제 확인)**: "완료"라고 말하기 전, 반드시 실제 실행 결과(로그, 캡처 등)로 기능 동작을 증명하라.
 
-## 개발 라이프사이클 (Research -> Strategy -> Execution)
+## 개발 라이프사이클 (Phase-Locked Workflow)
 
-### 1. Research (Fact Finding)
+**모든 응답은 반드시 최상단에 `[PHASE: 현재단계] [TURN: 0/25]`를 명시해야 한다.**
+
+### Phase 1: RESEARCH (현황 파악 및 도구 탐색)
 - **Zero-Inference**: 현재 코드 상태를 철저히 확인한다.
-- **Evidence**: 분석 결과에는 반드시 관련 코드 라인이나 파일 경로를 근거로 제시한다.
+- **Local Protocol Alignment**: 루트에서 `justfile`, `Makefile` 등을 자동 탐색하고, 발견 시 직접 명령 대신 정의된 태스크(`just <task>`)를 최우선으로 사용한다.
+- **Security Path Guard**: `.env`, `secrets/*` 등 민감 파일 접근 전 반드시 사용자에게 경고하고 승인을 획득한다.
 
-### 2. Strategy (Design & Gate)
-- **Pre-mortem**: 제안한 계획의 잠재적 위험 요소를 명시한다.
-- **One-shot PoC (Optional)**: 리스크가 큰 작업(처음 쓰는 API 등)은 10줄 내외의 PoC와 함께 리뷰 포인트를 제시하여 사용자 승인을 받는다.
-- **Decision Gate**: 전략과 트레이드오프를 보고한 뒤 사용자 컨펌을 기다린다.
+### Phase 2: STRATEGY (전략 수립)
+- **Action**: 분석 결과를 바탕으로 설계안, 트레이드오프, Pre-mortem을 작성한다.
+- **[CRITICAL GATE]**: 전략 보고 후 **사용자의 명시적 승인(예: "진행하세요")이 있기 전까지는 어떠한 파일 수정도 수행하지 마라.**
 
-### 3. Execution (Implementation & Test)
-- **Requirement-Test Mapping**: 구현 전, 요구사항과 테스트 케이스를 매핑한 테이블을 작성한다.
-- **Adversarial Testing**: 구현을 파괴하려는 시각에서 테스트를 설계한다. (5대 엣지 케이스: Null, Boundary, Type, State, Failure Path)
-- **Validation**: 빌드 및 테스트 도구(lint, tsc 등)를 실행하여 최종 확인한다.
+### Phase 3: EXECUTION (구현 및 검증)
+- **Action**: 승인된 전략에 따라 구현한다.
+- **Semantic/Health Check**: 수정된 언어에 따라 다음 명령을 반드시 수행한다.
+  - **Nix**: `nix flake check`
+  - **K8s/Helm**: `helm lint`
+  - **Terraform**: `terraform validate`
+- **Integration Oracle**: 실제 환경에서 전체 기능을 통합 실행하여 동작 여부를 확인한다.
+- **Documentation-as-Code**: 세션 종료 직전, 구현된 기능에 맞춰 `docs/`, `README.md`, `CLAUDE.md`를 동기화한다.
+
+### Phase 4: REPORT & EXIT (세션 종료)
+- **Session Post-Mortem**: 세션 종료 시 `AGENT_REPORT.md`에 다음 내용을 기록한다.
+  - `[Provider / Session Hash / New Rules / Discovered Bugs / Dependencies]`
+- **Context Threshold**: Turn 횟수가 20~25회에 도달하면 상태 요약 후 세션 재시작을 사용자에게 권장한다.
 
 ## 가드레일
 
@@ -35,34 +46,14 @@ A file for [guiding coding agents](https://agents.md/).
 - 하나의 커밋에 3개 이상의 책임을 넣지 않는다
 - PR 본문을 자유 형식으로 작성하지 않는다
 
-## 오케스트레이션
+## 오케스트레이션 (Technique Library & Recipe)
 
-### 서브에이전트 사용 기준
-- 독립적 탐색이 3개 이상 → 병렬 background 에이전트
-- 특정 파일 1-2개 → 직접 읽기 (에이전트보다 빠름)
-- 결과가 다음 단계의 입력 → foreground (대기 필요)
-- 대량 파일 분석(10+) → 서브에이전트에 위임
+### 1. Atomic Techniques
+- **Zero-Inference**: `grep_search` + `read_file` 기반 사실 확인.
+- **Pre-mortem**: 설계 결함 시나리오 3선.
+- **Adversarial-Audit**: 구현을 파괴하려는 시도 기반의 테스트 설계.
 
-### 중복 방지
-에이전트를 실행했으면 동일 파일을 메인에서 읽지 않는다. 에이전트 결과를 기다린 뒤 그 결과만 사용한다.
-
-## 커밋 컨벤션
-
-```
-type(scope): description
-
-Optional body explaining why.
-```
-Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
-
-## PR 본문 구조
-
-```
-## 개요
-## 변경사항
-## 테스트
-## 논의사항
-  ### 이슈 : ~~~
-  ### 대안 (테이블)
-  > 리뷰어 요청사항
-```
+### 2. Workflow Recipes
+- **Feature Implementation**: `architectural-planning` + `Systems-Thinking` + `Integration-Oracle`.
+- **Bug Fixing**: `codebase-investigator` + `Zero-Inference` + `Root-Cause-Analysis`.
+- **System Refactoring**: `architectural-planning` + `Pre-mortem` + `nix-flake-check`.

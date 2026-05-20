@@ -35,27 +35,19 @@ This skill enables creation of comprehensive, project-appropriate tests by learn
 - Ensure tests are maintainable and readable
 ## Testing Workflow
 
+**중요: 본 스킬을 사용할 때 모든 응답의 최상단에 `[PHASE: EXECUTION]`을 명시하라.**
+
 ### Phase 1: Test Environment Discovery
 ... (기존 내용) ...
 
 ### Phase 2: Test Planning (Mandatory)
-구현 전, 다음 절차를 수행하여 편향되지 않은 테스트를 설계한다:
-1. **Requirement-Test Mapping**: 요구사항 명세에서 비즈니스 크리티컬 패스를 추출하고, 이를 검증할 테스트 케이스 테이블을 작성한다.
-2. **Adversarial Test Design**: 구현을 파괴하려는 시각에서 테스트를 설계한다. 스스로에게 질문하라: "이 테스트를 통과하면서도 버그가 있는 교묘한 코드를 짤 수 있는가?"
-3. **5대 엣지 케이스 (Checklist)**:
-   - **Null/Empty**: 빈 값, null, undefined 처리
-   - **Boundary**: 최대/최소값, 루프의 시작/끝
-   - **Type/Format**: 잘못된 형식의 입력
-   - **Concurrency/State**: 재진입성, 상태 변화 시 동작
-   - **Failure Path**: 외부 API 실패, 권한 없음 등 의도된 실패
-
-### Phase 2.5: Cross-Model Audit (For Core Features)
-핵심 기능의 경우:
-1. **Auditor Model (Gemini)**에게 전체 명세를 제공한다.
-2. "이 명세를 기반으로 설계자가 놓쳤을 법한 엣지 케이스와 보안 취약점 3가지를 제시하라"고 요청하여 보완한다.
-
-### Phase 3: Test Implementation
 ... (기존 내용) ...
+
+### Phase 3: Integration Oracle (통합 실행 증명)
+구현이 완료된 후, 단순히 단위 테스트 통과에 만족하지 마라:
+1. **Live Execution**: `run_shell_command`를 사용하여 실제 환경에서 전체 기능을 통합 실행한다.
+2. **Evidence Collection**: 실행 결과 로그, 터미널 출력, 혹은 생성된 파일의 내용을 직접 확인하고 보고서에 포함한다.
+3. **Exit Condition**: 실제 실행 결과가 포함된 통합 검증 리포트를 사용자에게 제출해야만 "작업 완료"로 간주한다.
 
 Create tests matching patterns:
 1. Follow discovered test structure exactly
