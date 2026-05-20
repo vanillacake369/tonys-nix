@@ -497,6 +497,27 @@ gc-info:
     echo "Delete older than: {{ GC_DELETE_OLDER_THAN }}"
     echo "State file: {{ GC_STATE_FILE }}"
 
+########### Quality Gate ##########
+
+# Run guard tests (nix eval).
+test:
+    #!/usr/bin/env bash
+    result=$(nix eval .#tests.summary --json)
+    total=$(echo "$result" | jq -r .total)
+    passed=$(echo "$result" | jq -r .passed)
+    echo "[✓] $passed/$total guard tests passed"
+    if [[ "$total" != "$passed" ]]; then exit 1; fi
+
+# Run linters (deadnix, statix, alejandra).
+lint:
+    #!/usr/bin/env bash
+    echo "[!] deadnix (unused code)..."
+    deadnix --fail . 2>&1 || true
+    echo "[!] statix (anti-patterns)..."
+    statix check . 2>&1 || true
+    echo "[!] alejandra (formatting)..."
+    alejandra --check . 2>&1 | head -20 || true
+
 ########### Diagnostics ##########
 
 # Run a practical health check for this Nix setup.

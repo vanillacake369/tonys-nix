@@ -30,9 +30,9 @@ in
   [
     ''copy_command "pbcopy"''
     "support_kitty_keyboard_protocol true"
-    ''unbind "Ctrl /"
-        unbind "Ctrl space"
-        unbind "Ctrl s"''
+    ''      unbind "Ctrl /"
+              unbind "Ctrl space"
+              unbind "Ctrl s"''
   ]
   [
     copyCommand

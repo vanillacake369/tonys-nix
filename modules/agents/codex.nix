@@ -11,14 +11,16 @@
   tomlFormat = pkgs.formats.toml {};
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
 
-  mcpServers = lib.mapAttrs (
-    _: srv:
-      (lib.removeAttrs srv ["disabled" "headers"])
-      // (lib.optionalAttrs (srv ? headers && !(srv ? http_headers)) {
-        http_headers = srv.headers;
-      })
-      // {enabled = !(srv.disabled or false);}
-  ) config.programs.mcp.servers;
+  mcpServers =
+    lib.mapAttrs (
+      _: srv:
+        (lib.removeAttrs srv ["disabled" "headers"])
+        // (lib.optionalAttrs (srv ? headers && !(srv ? http_headers)) {
+          http_headers = srv.headers;
+        })
+        // {enabled = !(srv.disabled or false);}
+    )
+    config.programs.mcp.servers;
 
   codexSettings = {
     hooks.Stop = [
