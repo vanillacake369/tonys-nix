@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[pre-commit] Running guard tests..."
+result=$(nix eval .#tests.summary --json 2>&1)
+total=$(echo "$result" | jq -r .total)
+passed=$(echo "$result" | jq -r .passed)
+
+if [ "$total" != "$passed" ]; then
+  echo "[FAIL] $passed/$total tests passed"
+  exit 1
+fi
+echo "[OK] $passed/$total guard tests passed"
+
+echo "[pre-commit] Checking nix formatting..."
+if command -v alejandra &>/dev/null; then
+  alejandra --check . 2>&1 | head -20 || {
+    echo "[FAIL] Run 'alejandra .' to fix formatting"
+    exit 1
+  }
+fi
+
+echo "[pre-commit] All checks passed"

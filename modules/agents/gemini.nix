@@ -12,10 +12,12 @@
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
 
   geminiSettings = {
-    mcpServers = lib.mapAttrs (_: srv: {
-      command = srv.command;
-      args = srv.args or [];
-    }) config.programs.mcp.servers;
+    mcpServers =
+      lib.mapAttrs (_: srv: {
+        command = srv.command;
+        args = srv.args or [];
+      })
+      config.programs.mcp.servers;
     hooks.AfterAgent = [
       {
         hooks = [
