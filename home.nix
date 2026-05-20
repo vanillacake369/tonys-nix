@@ -54,6 +54,7 @@ in {
     [
       ./modules/agents
       ./modules/apps.nix
+      ./modules/packages/jetbrains.nix
       ./modules/language.nix
       ./modules/shell
       ./modules/shell-infra.nix
