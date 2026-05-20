@@ -37,31 +37,8 @@ in {
       ${chmod} u+w "$TARGET"
     '';
 
-  # Merge MCP server definitions into an existing JSON config.
-  # Used by Claude: merges { mcpServers: ... } into ~/.claude.json while
-  # preserving non-MCP keys (permissions, project settings).
-  mkMcpSync = {
-    name,
-    target,
-    mcpServers,
-  }:
-    lib.hm.dag.entryAfter ["writeBoundary"] ''
-      TARGET="${target}"
-      MCP_JSON='${builtins.toJSON {mcpServers = mcpServers;}}'
-
-      if command -v ${jq} &> /dev/null; then
-        if [[ ! -f "$TARGET" ]]; then
-          echo '{}' > "$TARGET"
-        fi
-
-        ${cp} "$TARGET" "''${TARGET}.backup"
-        echo "$MCP_JSON" | ${jq} -s '(.[0] | del(.mcpServers)) * .[1]' "$TARGET" - | \
-          ${sponge} "$TARGET"
-      fi
-    '';
-
   # Copy a Nix-generated file to a mutable target, removing symlinks if present.
-  # Used by Codex: home-manager may leave a symlink that needs replacing with a writable copy.
+  # Used when merge is unnecessary — just overwrite with a writable copy.
   mkFileCopy = {
     name,
     target,
