@@ -19,7 +19,7 @@ in {
   home.file.".cli-proxy-api/config.yaml".text = ''
     host: "127.0.0.1"
     port: 4001
-    auth-dir: "~/.cli-proxy-api"
+    auth-dir: "${config.home.homeDirectory}/.cli-proxy-api"
     debug: false
     request-retry: 3
     routing:
