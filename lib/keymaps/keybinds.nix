@@ -62,18 +62,17 @@ in {
   };
 
   keymaps = [
-    # --- Korean input: ₩ → backtick ---
+    # --- Korean input: ₩ → backtick (only when Korean input active) ---
     {
       bind = "grave_accent_and_tilde";
-      to = "grave_accent_and_tilde";
+      to = "option+grave_accent_and_tilde";
+      optional = ["any"];
       tags = ["karabiner"];
-      description = "Force backtick even in Korean input mode";
-    }
-    {
-      bind = "shift+grave_accent_and_tilde";
-      to = "shift+grave_accent_and_tilde";
-      tags = ["karabiner"];
-      description = "Force tilde even in Korean input mode";
+      condition = {
+        type = "input_source_if";
+        input_sources = [{language = "ko";}];
+      };
+      description = "Force backtick when Korean input active";
     }
 
     # --- System core ---
@@ -549,6 +548,58 @@ in {
     {
       bind = "ctrl+end";
       to = "cmd+down_arrow";
+      tags = ["karabiner"];
+      unless = browsers;
+    }
+
+    # --- Karabiner: Insert key copy/paste ---
+    {
+      bind = "ctrl+insert";
+      to = "cmd+c";
+      optional = ["any"];
+      tags = ["karabiner"];
+    }
+    {
+      bind = "shift+insert";
+      to = "cmd+v";
+      optional = ["any"];
+      tags = ["karabiner"];
+    }
+
+    # --- Karabiner: Fn+Arrow → line start/end ---
+    {
+      bind = "fn+left_arrow";
+      to = "cmd+left_arrow";
+      tags = ["karabiner"];
+      only = browsers;
+    }
+    {
+      bind = "fn+right_arrow";
+      to = "cmd+right_arrow";
+      tags = ["karabiner"];
+      only = browsers;
+    }
+    {
+      bind = "fn+shift+left_arrow";
+      to = "cmd+shift+left_arrow";
+      tags = ["karabiner"];
+      unless = standardUnless;
+    }
+    {
+      bind = "fn+shift+right_arrow";
+      to = "cmd+shift+right_arrow";
+      tags = ["karabiner"];
+      unless = standardUnless;
+    }
+    {
+      bind = "cmd+ctrl+left_arrow";
+      to = "cmd+left_arrow";
+      tags = ["karabiner"];
+      unless = browsers;
+    }
+    {
+      bind = "cmd+ctrl+right_arrow";
+      to = "cmd+right_arrow";
       tags = ["karabiner"];
       unless = browsers;
     }
