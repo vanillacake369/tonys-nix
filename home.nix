@@ -55,7 +55,7 @@ in {
       ./modules/agents
       ./modules/apps.nix
       ./modules/language.nix
-      ./modules/shell-core.nix
+      ./modules/shell
       ./modules/shell-infra.nix
       ./modules/shell-utils.nix
       ./modules/shell-network.nix
