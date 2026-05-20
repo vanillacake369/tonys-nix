@@ -26,7 +26,7 @@ SYSTEM_ARCH := `case "$(uname -s):$(uname -m)" in
 esac`
 GC_MIN_INTERVAL_DAYS := "3"
 GC_MAX_INTERVAL_DAYS := "14"
-GC_DELETE_OLDER_THAN := "14d"
+GC_DELETE_OLDER_THAN := "3d"
 GC_STATE_FILE := ".nix-gc-state"
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
