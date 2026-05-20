@@ -24,6 +24,17 @@ case "$TOOL_NAME" in
   *) exit 0 ;;
 esac
 
+# Skip read-only Bash commands (grep, ls, cat, head, tail, find, echo, pwd, which, type, file)
+if [[ "$TOOL_NAME" == "Bash" ]]; then
+  READ_ONLY_CMD=$(echo "$TOOL_INPUT" | jq -r '.command // ""' 2>/dev/null \
+    | sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g" \
+    | awk '{print $1}')
+  case "$READ_ONLY_CMD" in
+    grep|rg|ls|cat|head|tail|find|echo|pwd|which|type|file|wc|sort|uniq|diff|tree|stat|du|df|date|env|printenv|uname)
+      exit 0 ;;
+  esac
+fi
+
 # State tracking
 STATE_DIR="/tmp/claude-escalation"
 mkdir -p "$STATE_DIR"
@@ -36,9 +47,15 @@ if [ ! -f "$STATE_FILE" ]; then
   echo '{}' > "$STATE_FILE"
 fi
 
-# Detect failure from tool output
+# Detect failure: prefer exit code, fallback to output grep
 IS_FAILURE=false
-if echo "$TOOL_OUTPUT" | grep -qiE '(error|fail|exception|panic|FAIL|Error:|fatal)' 2>/dev/null; then
+TOOL_EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_exit_code // "0"' 2>/dev/null)
+
+if [[ "$TOOL_EXIT_CODE" != "0" && "$TOOL_EXIT_CODE" != "null" && -n "$TOOL_EXIT_CODE" ]]; then
+  # Non-zero exit code is the most reliable failure signal
+  IS_FAILURE=true
+elif echo "$TOOL_OUTPUT" | grep -qiE '(^error:|^FAIL\b|^fatal:|panic:|exception:)' 2>/dev/null; then
+  # Fallback: only match error patterns at line start to reduce false positives
   IS_FAILURE=true
 fi
 
@@ -50,7 +67,8 @@ fi
 
 # Auto-rollback: stash uncommitted changes on escalation
 _auto_rollback() {
-  local stash_msg="[ESCALATION-ROLLBACK] $TASK_KEY $(date '+%Y%m%d-%H%M%S')"
+  local stash_msg
+  stash_msg="[ESCALATION-ROLLBACK] $TASK_KEY $(date '+%Y%m%d-%H%M%S')"
   if git -C "$(pwd)" diff --quiet 2>/dev/null && git -C "$(pwd)" diff --cached --quiet 2>/dev/null; then
     echo "[ROLLBACK] No uncommitted changes to stash."
   else
