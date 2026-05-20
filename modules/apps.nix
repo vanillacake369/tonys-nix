@@ -27,7 +27,6 @@
       hunspellDicts.en_US
       hunspellDicts.ko_KR
       hunspellDicts.ko-kr
-      # JetBrains IDEs managed in packages/jetbrains.nix
     ]
     ++ lib.optionals isDarwin [
       # MacOs Apps
