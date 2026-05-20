@@ -38,11 +38,7 @@ in {
       ./modules/packages/jetbrains.nix
       ./modules/language.nix
       ./modules/shell
-      ./modules/shell-infra.nix
-      ./modules/shell-utils.nix
-      ./modules/shell-network.nix
-      ./modules/shell-monitor.nix
     ]
-    ++ lib.optionals isNixOs [./modules/settings-hyprland.nix]
-    ++ lib.optionals (isLinux && !isNixOs) [./modules/settings-wsl.nix];
+    ++ lib.optionals isNixOs [./modules/platform/hyprland.nix]
+    ++ lib.optionals (isLinux && !isNixOs) [./modules/platform/wsl.nix];
 }
