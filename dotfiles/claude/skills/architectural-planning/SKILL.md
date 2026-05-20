@@ -31,33 +31,19 @@ This skill enables creating comprehensive technical plans for features and chang
 
 ## Planning Workflow
 
+**중요: 본 스킬을 사용할 때 모든 응답의 최상단에 `[PHASE: STRATEGY]`를 명시하라.**
+
 ### Phase 1: Architectural Discovery
-Using [codebase-analysis] methodology:
-1. Understand overall architecture (layered, microservices, modular, etc.)
-2. Identify existing components and their responsibilities
-3. Map dependencies and integration points
-4. Learn architectural boundaries and conventions
-5. Find similar features as reference examples
+... (기존 내용) ...
 
-### Phase 1.5: Deep Reasoning (If Complex)
-
-After architectural discovery, evaluate if systematic thinking is needed for complex decisions.
-
-**Quick assessment**:
-- 3+ approaches AND 5+ dimensions AND unclear path → **Sequential Thinking**
-- Otherwise → **Direct analysis, proceed to Phase 2**
-
-**After decision**: Consider using **Memory MCP** to record architectural decisions and rationale for future reference.
-
-**Detailed guidance**: See `../shared/mcp-decision-guide.md` for:
-- Sequential Thinking decision criteria and usage
-- Memory MCP usage patterns
-- Decision flow examples
 ### Phase 2: Solution Design & Strategy
 Design within discovered constraints:
 1. **Systems Thinking**: 로컬 수정이 전체 시스템 및 미래 유지보수에 미칠 영향(Ripple Effect)을 분석한다.
 2. **Multidimensional Trade-off**: [성능 / 가독성 / 테스트 용이성 / 미래 확장성]의 3축으로 대안을 평가한다.
-3. **Pre-mortem**: 설계가 확정되기 전, "이 설계가 실패할 이유 3가지"를 스스로 나열하고 보완책을 마련한다. (Reflexion Loop)
+3. **Pre-mortem**: 설계가 확정되기 전, "이 설계가 실패할 이유 3가지"를 스스로 나열하고 보완책을 마련한다.
+
+**[CRITICAL GATE]**: 전략 수립 완료 후 사용자에게 보고하고 **"진행 승인"**을 기다려라. 승인 전까지 `write_file`, `replace` 등 파일을 변경하는 어떠한 도구도 호출하지 마라.
+
 
 ### Phase 2.5: Risk Mitigation (One-shot PoC)
 불확실성이 높은 영역(처음 쓰는 라이브러리, 파괴적 설정 변경 등)이 발견되면:

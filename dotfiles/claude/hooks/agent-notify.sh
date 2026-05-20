@@ -17,11 +17,7 @@ _PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
 _TITLE="" _SUBTITLE="" _MESSAGE="" _GROUP="" _EXECUTE=""
 
 # ===========================================================================
-# Parse stdin JSON → globals
-# Fields vary by provider:
-#   Claude:  session_id, cwd, transcript_path
-#   Codex:   session_id, cwd, transcript_path, last_assistant_message
-#   Gemini:  session_id, cwd, transcript_path, prompt, prompt_response
+# Parse input (JSON via stdin or positional arguments)
 # ===========================================================================
 _parse_input() {
   _PROVIDER="${1:-agent}"
@@ -30,19 +26,18 @@ _parse_input() {
 
   _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
 
-  # Graceful degradation: if jq is not available, use fallback values
-  # _TEST_NO_JQ env var allows test injection
-  if [[ -n "${_TEST_NO_JQ:-}" ]] || ! command -v jq &>/dev/null; then
-    _CWD="$(pwd)"
-    return
-  fi
-
   if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
     _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
     _CWD=$(echo "$input" | jq -r '.cwd // "unknown"')
     _PROMPT=$(echo "$input" | jq -r '.prompt // ""')
     _SUMMARY=$(echo "$input" | jq -r '(.prompt_response // .last_assistant_message) // ""')
     _TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""')
+  else
+    # Fallback to positional arguments if stdin is empty or not JSON
+    _PROMPT="${2:-}"
+    _SUMMARY="${3:-}"
+    _CWD="$(pwd)"
+    _SESSION_ID="${ZELLIJ_SESSION_NAME:-unknown}"
   fi
 }
 
@@ -71,7 +66,15 @@ _truncate() {
 # Build notification args → globals
 # ===========================================================================
 _build_notify_args() {
-  _TITLE="$(echo "${_PROVIDER:0:1}" | tr '[:lower:]' '[:upper:]')${_PROVIDER:1}"
+  local icon="" sound="default"
+  if [[ "$_PROVIDER" == "human" ]]; then
+    icon="🔴 "
+    sound="Basso"
+    _TITLE="${icon}[HUMAN REQUIRED]"
+  else
+    _TITLE="$(echo "${_PROVIDER:0:1}" | tr '[:lower:]' '[:upper:]')${_PROVIDER:1}"
+  fi
+
   _SUBTITLE="$(basename "$_CWD")"
   _GROUP="${_PROVIDER}-${_SESSION_ID}"
 
@@ -100,6 +103,8 @@ _build_notify_args() {
     local term="${AGENT_NOTIFY_TERMINAL:-WezTerm}"
     _EXECUTE="env AGENT_NOTIFY_PROVIDER=$_PROVIDER AGENT_NOTIFY_TERMINAL=\"$term\" ${script_dir}/agent-notify-open.sh${args:+ ${args[*]}}"
   fi
+
+  _NOTIFY_SOUND="$sound"
 }
 
 _print_notify_args() {
@@ -214,7 +219,7 @@ _send() {
     terminal-notifier)
       local cmd=(terminal-notifier
         -title "$_TITLE" -subtitle "$_SUBTITLE"
-        -message "$_MESSAGE" -group "$_GROUP" -sound default)
+        -message "$_MESSAGE" -group "$_GROUP" -sound "$_NOTIFY_SOUND")
       [[ -n "$_EXECUTE" ]] && cmd+=(-execute "$_EXECUTE")
       if ! "${cmd[@]}" 2>/dev/null; then
         # Fallback to osascript if terminal-notifier fails
