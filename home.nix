@@ -3,10 +3,11 @@
   isLinux,
   isDarwin,
   isNixOs,
+  userProfile,
   ...
 }: let
   spec = import ./lib/keymaps/spec.nix {inherit lib;};
-  rawKeybinds = import ./lib/keymaps/keybinds.nix;
+  rawKeybinds = import ./lib/keymaps/keybinds.nix {inherit userProfile;};
   keybinds = rawKeybinds // {keymaps = spec.validate rawKeybinds.keymaps;};
   toKarabiner = import ./lib/keymaps/to-karabiner.nix {inherit lib keybinds;};
   toAeroSpace = import ./lib/keymaps/to-aerospace.nix {inherit lib keybinds;};

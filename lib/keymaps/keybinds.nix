@@ -1,4 +1,4 @@
-let
+{userProfile}: let
   standardUnless = [
     "^com\\.apple\\.Terminal$"
     "^com\\.googlecode\\.iterm2$"
@@ -8,7 +8,8 @@ let
     "^com\\.jetbrains\\..*$"
     "^com\\.knollsoft\\.Rectangle$"
   ];
-  browsers = ["^com\\.google\\.Chrome$" "^com\\.brave\\.Browser$"];
+  browsers = userProfile.browsers.bundleIds;
+  darwinHome = "/Users/${userProfile.username}";
 in {
   workspaces = {
     Docs = {
@@ -17,7 +18,7 @@ in {
     };
     Code = {
       monitor = 2;
-      apps = ["com.jetbrains.intellij" "com.jetbrains.goland" "com.jetbrains.datagrip"];
+      apps = userProfile.jetbrains.bundleIds;
     };
     Browser = {
       monitor = 2;
@@ -772,7 +773,7 @@ in {
     }
     {
       bind = "ctrl+cmd+m";
-      shell = "open '/Users/limjihoon/Applications/Brave Browser Apps.localized/YouTube Music.app'";
+      shell = "open '${darwinHome}/Applications/Brave Browser Apps.localized/YouTube Music.app'";
       tags = ["karabiner"];
       unless = ["^com\\.jetbrains\\..*$" "^com\\.knollsoft\\.Rectangle$"];
     }
