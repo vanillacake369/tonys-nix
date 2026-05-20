@@ -29,6 +29,7 @@
         kap = "kubectl apply -f ";
         # Some cli tools
         zj = "zellij";
+        hm = "home-manager";
       };
 
       shellAbbrs = {
