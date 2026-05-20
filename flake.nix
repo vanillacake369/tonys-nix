@@ -34,8 +34,9 @@
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
 
-    # Define overlays for package customizations
-    overlays = import ./overlays {} ++ [llm-agents.overlays.default];
+    # Auto-collect overlays from modules (*.overlay.nix convention)
+    collectOverlays = import ./lib/collect-overlays.nix {inherit lib;};
+    overlays = collectOverlays ./modules ++ [llm-agents.overlays.default];
 
     # Auto-discover user profiles from user/ directory
     discoverModules = import ./lib/discover-modules.nix {inherit lib;};

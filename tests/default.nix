@@ -97,12 +97,22 @@
     (assert' "discovered profile has username" (profiles.limjihoon.username == "limjihoon"))
   ];
 
+  overlayTests = let
+    collectOverlays = import ../lib/collect-overlays.nix {inherit lib;};
+    collected = collectOverlays ../modules;
+  in [
+    (assert' "collect-overlays finds overlay files" (builtins.length collected > 0))
+    (assert' "collected overlays are functions" (builtins.all builtins.isFunction collected))
+    (assert' "expected overlay count" (builtins.length collected == 2))
+  ];
+
   allTests =
     userProfileTests
     ++ platformTests
     ++ keymapTests
     ++ specTests
-    ++ discoveryTests;
+    ++ discoveryTests
+    ++ overlayTests;
 in {
   results = allTests;
   summary = {
