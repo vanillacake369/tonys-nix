@@ -4,7 +4,7 @@
   lib,
   isDarwin,
 }: let
-  base = builtins.readFile ../../dotfiles/zellij/config.kdl.base;
+  base = builtins.readFile ../dotfiles/zellij/config.kdl.base;
 
   copyCommand =
     if isDarwin
@@ -16,8 +16,6 @@
     then "support_kitty_keyboard_protocol true"
     else "// support_kitty_keyboard_protocol false";
 
-  # Darwin keeps Ctrl unbinds to avoid Karabiner/AeroSpace conflicts.
-  # Linux doesn't need them.
   ctrlUnbinds =
     if isDarwin
     then ''
