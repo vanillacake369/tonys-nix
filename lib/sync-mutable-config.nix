@@ -1,6 +1,5 @@
-# Shared utilities for syncing Nix-generated configs to mutable locations.
-# Solves: Claude, Codex, Gemini all need writable config files that
-# home-manager symlinks can't provide (OAuth tokens, runtime state).
+# Syncs Nix-generated configs to mutable locations with backup.
+# For tools that require writable config files (e.g. OAuth tokens, runtime state).
 {
   lib,
   pkgs,
@@ -10,8 +9,7 @@
   chmod = lib.getExe' pkgs.coreutils "chmod";
   sponge = lib.getExe' pkgs.moreutils "sponge";
 in {
-  # Deep-merge a Nix-generated JSON source into a mutable target file.
-  # Preserves existing keys in target (e.g. OAuth tokens) while updating managed keys.
+  # Deep-merge a JSON source into a mutable target, preserving existing keys.
   mkJsonSync = {
     name,
     target,
@@ -37,8 +35,7 @@ in {
       ${chmod} u+w "$TARGET"
     '';
 
-  # Copy a Nix-generated file to a mutable target, removing symlinks if present.
-  # Used when merge is unnecessary — just overwrite with a writable copy.
+  # Overwrite a mutable target with a Nix-generated file, removing stale symlinks.
   mkFileCopy = {
     name,
     target,

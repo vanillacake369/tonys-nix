@@ -1,7 +1,4 @@
 # Google Gemini CLI configuration
-# Package: nixpkgs (binary cache)
-# MCP: manually merged (activation script for writable config)
-# Instructions: shared/AGENTS.md -> ~/.gemini/GEMINI.md
 {
   config,
   lib,
@@ -10,14 +7,10 @@
 }: let
   jsonFormat = pkgs.formats.json {};
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
+  mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
 
   geminiSettings = {
-    mcpServers =
-      lib.mapAttrs (_: srv: {
-        command = srv.command;
-        args = srv.args or [];
-      })
-      config.programs.mcp.servers;
+    mcpServers = mcpAdapt.gemini;
     hooks.AfterAgent = [
       {
         hooks = [

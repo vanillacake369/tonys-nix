@@ -1,7 +1,4 @@
 # OpenAI Codex CLI configuration
-# Package: nixpkgs (binary cache)
-# MCP: manually merged (activation script for writable config)
-# Instructions: shared/AGENTS.md (SSoT)
 {
   config,
   lib,
@@ -10,17 +7,7 @@
 }: let
   tomlFormat = pkgs.formats.toml {};
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
-
-  mcpServers =
-    lib.mapAttrs (
-      _: srv:
-        (lib.removeAttrs srv ["disabled" "headers"])
-        // (lib.optionalAttrs (srv ? headers && !(srv ? http_headers)) {
-          http_headers = srv.headers;
-        })
-        // {enabled = !(srv.disabled or false);}
-    )
-    config.programs.mcp.servers;
+  mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
 
   codexSettings = {
     hooks.Stop = [
@@ -34,7 +21,7 @@
         ];
       }
     ];
-    mcp_servers = mcpServers;
+    mcp_servers = mcpAdapt.codex;
   };
 
   configFile = tomlFormat.generate "codex-config" codexSettings;

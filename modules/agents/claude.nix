@@ -1,7 +1,4 @@
 # Claude Code configuration (no official home-manager module)
-# Dotfiles: commands, agents, skills symlinked
-# MCP: synced to ~/.claude.json via activation script
-# Settings: synced to ~/.claude/settings.json via activation script
 {
   config,
   lib,
@@ -10,11 +7,10 @@
 }: let
   jsonFormat = pkgs.formats.json {};
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
+  mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
 
-  # Claude's MCP config: generate a source file that mkJsonSync deep-merges
-  # into ~/.claude.json, preserving non-MCP keys (permissions, project settings).
   mcpSourceFile = jsonFormat.generate "claude-mcp.json" {
-    mcpServers = config.programs.mcp.servers;
+    mcpServers = mcpAdapt.claude;
   };
 in {
   home.file = {
