@@ -1,163 +1,193 @@
 #!/usr/bin/env bash
 # Claude Code status line hook
-# Outputs 2 lines:
-#   Line 1: [Model] 📁 dirname | 🌿 branch +staged ~modified | 🤖 agent_name
-#   Line 2: ████░░░░░░ 42% | $0.45 | ⏱ 3m 12s | 5h:23%
+# Adaptive layout: single line when terminal is wide, multi-line when narrow.
 #
-# Input: JSON via stdin from Claude Code
+# Input: JSON via stdin from Claude Code (includes `columns` field)
 # This hook never exits non-zero — it must not block the agent.
 
 set -uo pipefail
 
 # ANSI colors
-GREEN="\033[32m"
-YELLOW="\033[33m"
-RED="\033[31m"
-RESET="\033[0m"
+GREEN=$'\033[32m'
+YELLOW=$'\033[33m'
+RED=$'\033[31m'
+DIM=$'\033[2m'
+RESET=$'\033[0m'
 
 # ===========================================================================
-# Parse input JSON
+# JSON parsing
 # ===========================================================================
 INPUT=$(cat 2>/dev/null || true)
 
-_jq() {
-  echo "$INPUT" | jq -r "${1}" 2>/dev/null || true
-}
-
-MODEL=$(_jq '.model.display_name // "Claude"')
-CURRENT_DIR=$(_jq '.workspace.current_dir // ""')
-USED_PCT=$(_jq '.context_window.used_percentage // 0')
-TOTAL_COST=$(_jq '.cost.total_cost_usd // 0')
-DURATION_MS=$(_jq '.cost.total_duration_ms // 0')
-SESSION_ID=$(_jq '.session_id // "default"')
-AGENT_NAME=$(_jq '.agent.name // ""')
-FIVE_HOUR_PCT=$(_jq '.rate_limits.five_hour.used_percentage // ""')
+_jq() { echo "$INPUT" | jq -r "${1}" 2>/dev/null || true; }
 
 # ===========================================================================
-# Git info with 5-second cache (keyed by session_id)
+# Data extraction (single parse, SSOT)
 # ===========================================================================
-CACHE_DIR="${TMPDIR:-/tmp}/claude-statusline"
-mkdir -p "$CACHE_DIR"
-CACHE_FILE="$CACHE_DIR/${SESSION_ID//[^a-zA-Z0-9_-]/_}.cache"
-CACHE_TTL=5
-
-_get_cache_mtime() {
-  if [[ "$(uname)" == "Darwin" ]]; then
-    stat -f %m "$1" 2>/dev/null || echo 0
-  else
-    stat -c %Y "$1" 2>/dev/null || echo 0
-  fi
+_extract_data() {
+  MODEL=$(_jq '.model.display_name // "Claude"')
+  CURRENT_DIR=$(_jq '.workspace.current_dir // ""')
+  USED_PCT=$(_jq '.context_window.used_percentage // 0')
+  SESSION_ID=$(_jq '.session_id // "default"')
+  AGENT_NAME=$(_jq '.agent.name // ""')
+  COLUMNS=$(_jq '.columns // 80')
 }
 
+# ===========================================================================
+# Git info (cached, DRY — single source for branch/staged/modified)
+# ===========================================================================
 _get_git_info() {
   local dir="${1:-$(pwd)}"
-  if ! git -C "$dir" rev-parse --is-inside-work-tree &>/dev/null; then
-    echo ""
-    return
-  fi
+  git -C "$dir" rev-parse --is-inside-work-tree &>/dev/null || return
 
   local branch staged modified
   branch=$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null \
     || git -C "$dir" rev-parse --short HEAD 2>/dev/null \
     || echo "HEAD")
-
   staged=$(git -C "$dir" diff --cached --name-only 2>/dev/null | wc -l | tr -d ' ')
   modified=$(git -C "$dir" diff --name-only 2>/dev/null | wc -l | tr -d ' ')
-
   echo "${branch}|${staged}|${modified}"
 }
 
-NOW=$(date +%s)
-CACHE_MTIME=$(_get_cache_mtime "$CACHE_FILE")
+_cached_git_info() {
+  local cache_dir="${TMPDIR:-/tmp}/claude-statusline"
+  mkdir -p "$cache_dir"
+  local cache_file="$cache_dir/${SESSION_ID//[^a-zA-Z0-9_-]/_}.cache"
+  local now
+  now=$(date +%s)
 
-if [[ $((NOW - CACHE_MTIME)) -gt $CACHE_TTL ]]; then
-  GIT_DATA=$(_get_git_info "${CURRENT_DIR:-$(pwd)}")
-  echo "$GIT_DATA" > "$CACHE_FILE"
-else
-  GIT_DATA=$(cat "$CACHE_FILE" 2>/dev/null || echo "")
-fi
-
-# ===========================================================================
-# Build Line 1
-# ===========================================================================
-DIRNAME=""
-if [[ -n "$CURRENT_DIR" ]]; then
-  DIRNAME=$(basename "$CURRENT_DIR")
-fi
-
-GIT_PART=""
-if [[ -n "$GIT_DATA" ]]; then
-  IFS='|' read -r BRANCH STAGED MODIFIED <<< "$GIT_DATA"
-  STAGED_STR=""
-  MODIFIED_STR=""
-  if [[ "$STAGED" -gt 0 ]]; then
-    STAGED_STR="${GREEN}+${STAGED}${RESET}"
-  fi
-  if [[ "$MODIFIED" -gt 0 ]]; then
-    MODIFIED_STR="${YELLOW}~${MODIFIED}${RESET}"
-  fi
-
-  if [[ -n "$STAGED_STR" && -n "$MODIFIED_STR" ]]; then
-    GIT_PART=" | 🌿 ${BRANCH} ${STAGED_STR} ${MODIFIED_STR}"
-  elif [[ -n "$STAGED_STR" ]]; then
-    GIT_PART=" | 🌿 ${BRANCH} ${STAGED_STR}"
-  elif [[ -n "$MODIFIED_STR" ]]; then
-    GIT_PART=" | 🌿 ${BRANCH} ${MODIFIED_STR}"
+  local mtime
+  if [[ "$(uname)" == "Darwin" ]]; then
+    mtime=$(stat -f %m "$cache_file" 2>/dev/null || echo 0)
   else
-    GIT_PART=" | 🌿 ${BRANCH}"
+    mtime=$(stat -c %Y "$cache_file" 2>/dev/null || echo 0)
   fi
-fi
 
-AGENT_PART=""
-if [[ -n "$AGENT_NAME" ]]; then
-  AGENT_PART=" | 🤖 ${AGENT_NAME}"
-fi
-
-LINE1="[${MODEL}] 📁 ${DIRNAME}${GIT_PART}${AGENT_PART}"
+  if [[ $((now - mtime)) -gt 5 ]]; then
+    _get_git_info "${CURRENT_DIR:-$(pwd)}" > "$cache_file"
+  fi
+  cat "$cache_file" 2>/dev/null || true
+}
 
 # ===========================================================================
-# Build Line 2
+# Segment builders (SRP — each returns one decorated string)
 # ===========================================================================
+_seg_model()   { echo "[${MODEL}]"; }
+_seg_dir()     { [[ -n "$CURRENT_DIR" ]] && echo "📁 $(basename "$CURRENT_DIR")"; }
+_seg_session() { echo "🔑 ${SESSION_ID:0:8}"; }
+_seg_agent()   { [[ -n "$AGENT_NAME" ]] && echo "🤖 ${AGENT_NAME}"; }
 
-# Context progress bar (10 chars)
-USED_INT=${USED_PCT%.*}
-USED_INT=${USED_INT:-0}
-FILLED=$(( (USED_INT * 10 + 50) / 100 ))
-[[ $FILLED -gt 10 ]] && FILLED=10
-[[ $FILLED -lt 0 ]] && FILLED=0
-EMPTY=$(( 10 - FILLED ))
+_seg_git() {
+  local data="$1"
+  [[ -z "$data" ]] && return
+  local branch staged modified
+  IFS='|' read -r branch staged modified <<< "$data"
+  local parts="🌿 ${branch}"
+  [[ "$staged" -gt 0 ]]   && parts+=" ${GREEN}+${staged}${RESET}"
+  [[ "$modified" -gt 0 ]] && parts+=" ${YELLOW}~${modified}${RESET}"
+  echo "$parts"
+}
 
-if [[ $USED_INT -ge 90 ]]; then
-  BAR_COLOR="$RED"
-elif [[ $USED_INT -ge 70 ]]; then
-  BAR_COLOR="$YELLOW"
-else
-  BAR_COLOR="$GREEN"
-fi
+_seg_progress_bar() {
+  local used_int=${USED_PCT%.*}
+  used_int=${used_int:-0}
+  local filled=$(( (used_int * 10 + 50) / 100 ))
+  [[ $filled -gt 10 ]] && filled=10
+  [[ $filled -lt 0 ]]  && filled=0
+  local empty=$(( 10 - filled ))
 
-BAR_FILLED=$(printf '%0.s█' $(seq 1 $FILLED) 2>/dev/null || printf '█%.0s' $(seq 1 $FILLED))
-BAR_EMPTY=$(printf '%0.s░' $(seq 1 $EMPTY) 2>/dev/null || printf '░%.0s' $(seq 1 $EMPTY))
-PROGRESS_BAR="${BAR_COLOR}${BAR_FILLED}${BAR_EMPTY}${RESET} ${USED_INT}%"
+  local color="$GREEN"
+  [[ $used_int -ge 70 ]] && color="$YELLOW"
+  [[ $used_int -ge 90 ]] && color="$RED"
 
-# Cost
-COST_STR=$(printf '\$%.2f' "$TOTAL_COST" 2>/dev/null || echo "\$0.00")
+  local bar_filled bar_empty
+  bar_filled=$(printf '█%.0s' $(seq 1 "$filled") 2>/dev/null || true)
+  bar_empty=$(printf '░%.0s' $(seq 1 "$empty") 2>/dev/null || true)
+  echo "${color}${bar_filled}${bar_empty}${RESET} ${used_int}%"
+}
 
-# Elapsed time
-DURATION_S=$(( DURATION_MS / 1000 ))
-ELAPSED_MIN=$(( DURATION_S / 60 ))
-ELAPSED_SEC=$(( DURATION_S % 60 ))
-ELAPSED_STR="⏱ ${ELAPSED_MIN}m ${ELAPSED_SEC}s"
-
-# 5-hour rate limit
-RATE_PART=""
-if [[ -n "$FIVE_HOUR_PCT" && "$FIVE_HOUR_PCT" != "null" ]]; then
-  FIVE_HOUR_INT=${FIVE_HOUR_PCT%.*}
-  RATE_PART=" | 5h:${FIVE_HOUR_INT}%"
-fi
-
-LINE2="${PROGRESS_BAR} | ${COST_STR} | ${ELAPSED_STR}${RATE_PART}"
 
 # ===========================================================================
-# Output
+# Visible length (strip ANSI escape codes + account for emoji width)
 # ===========================================================================
-printf '%b\n%b\n' "$LINE1" "$LINE2"
+_visible_len() {
+  local stripped
+  stripped=$(printf '%s' "$1" | sed -E $'s/\033\\[[0-9;]*m//g')
+  # wc -m counts unicode chars; add 1 per 4-byte char (emoji = 2 cols, counted as 1)
+  local chars bytes extra
+  chars=$(printf '%s' "$stripped" | wc -m | tr -d ' ')
+  bytes=$(printf '%s' "$stripped" | wc -c | tr -d ' ')
+  # 4-byte UTF-8 sequences are emoji (2 display cols, wc -m counts as 1)
+  # Approximate: extra_width = (bytes - chars) / 3 for 4-byte seqs
+  extra=$(( (bytes - chars) / 3 ))
+  echo $(( chars + extra ))
+}
+
+# ===========================================================================
+# Layout: join segments with separator, respecting width
+# ===========================================================================
+_join_segments() {
+  local sep=" ${DIM}|${RESET} "
+  local result=""
+  local first=true
+  for seg in "$@"; do
+    [[ -z "$seg" ]] && continue
+    if [[ "$first" == "true" ]]; then
+      result="$seg"
+      first=false
+    else
+      result+="${sep}${seg}"
+    fi
+  done
+  echo "$result"
+}
+
+_render() {
+  local git_data
+  git_data=$(_cached_git_info)
+
+  # Build all segments
+  local s_model s_dir s_git s_agent s_bar s_cost s_elapsed s_session
+  s_model=$(_seg_model)
+  s_dir=$(_seg_dir)
+  s_git=$(_seg_git "$git_data")
+  s_agent=$(_seg_agent)
+  s_bar=$(_seg_progress_bar)
+  s_session=$(_seg_session)
+
+  # Try single line
+  local single
+  single=$(_join_segments "$s_model" "$s_dir" "$s_git" "$s_agent" "$s_bar" "$s_session")
+  local single_len
+  single_len=$(_visible_len "$single")
+
+  if [[ "$single_len" -le "$COLUMNS" ]]; then
+    printf '%b\n' "$single"
+    return
+  fi
+
+  # Try 2 lines: identity | metrics
+  local line1 line2
+  line1=$(_join_segments "$s_model" "$s_dir" "$s_git" "$s_agent")
+  line2=$(_join_segments "$s_bar" "$s_session")
+  local line1_len
+  line1_len=$(_visible_len "$line1")
+
+  if [[ "$line1_len" -le "$COLUMNS" ]]; then
+    printf '%b\n%b\n' "$line1" "$line2"
+    return
+  fi
+
+  # Narrow terminal (< ~60 cols): 3 lines
+  local line_a line_b line_c
+  line_a=$(_join_segments "$s_model" "$s_dir")
+  line_b=$(_join_segments "$s_git" "$s_agent")
+  line_c=$(_join_segments "$s_bar" "$s_session")
+  printf '%b\n%b\n%b\n' "$line_a" "$line_b" "$line_c"
+}
+
+# ===========================================================================
+# Main
+# ===========================================================================
+_extract_data
+_render
