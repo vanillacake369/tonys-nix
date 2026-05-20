@@ -36,6 +36,17 @@
     "command": "~/.claude/hooks/subagent-statusline.sh"
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/complexity-router.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -58,6 +69,11 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/path-guard.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/complexity-gate.sh",
             "timeout": 5
           }
         ]
