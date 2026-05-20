@@ -1,21 +1,18 @@
 # cli-proxy-api: unified AI provider proxy
 # Provides: localhost:4001 with OpenAI/Claude/Gemini compatible endpoints
-# Used by: Claude hooks (Pattern A) + Bash delegation (Pattern B)
 {
   config,
   lib,
   pkgs,
+  isDarwin,
   ...
 }: let
   configPath = "${config.home.homeDirectory}/.cli-proxy-api/config.yaml";
-  authDir = "${config.home.homeDirectory}/.cli-proxy-api";
-  cliProxy = "${pkgs.llm-agents.cli-proxy-api}/bin/cli-proxy-api";
 in {
   home.packages = [
     pkgs.llm-agents.cli-proxy-api
   ];
 
-  # Proxy config (see https://github.com/router-for-me/CLIProxyAPI/blob/main/config.example.yaml)
   home.file.".cli-proxy-api/config.yaml".text = ''
     host: "127.0.0.1"
     port: 4001
@@ -29,8 +26,7 @@ in {
       switch-preview-model: true
   '';
 
-  # macOS: auto-start proxy via launchd
-  launchd.agents.cli-proxy-api = {
+  launchd.agents.cli-proxy-api = lib.mkIf isDarwin {
     enable = true;
     config = {
       Label = "com.cli-proxy-api";
