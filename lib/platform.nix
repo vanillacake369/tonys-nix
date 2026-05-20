@@ -20,7 +20,7 @@
     systemd = isLinux || isNixOs;
     launchd = isDarwin;
     wsl = isWsl;
-    tiling = isDarwin; # aerospace
+    tiling = isDarwin;
     hyprland = isNixOs;
   };
 }
