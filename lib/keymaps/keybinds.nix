@@ -40,8 +40,8 @@ in {
 
   settings = {
     gaps = {
-      inner = 12;
-      outer = 12;
+      inner = 9;
+      outer = 9;
     };
     floating_apps = [
       "System Settings"

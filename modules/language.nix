@@ -29,7 +29,7 @@
 
     # Go
     go
-    gotools
+    (lib.hiPrio gotools)
     gopls
     golangci-lint
     delve

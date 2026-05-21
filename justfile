@@ -26,7 +26,7 @@ SYSTEM_ARCH := `case "$(uname -s):$(uname -m)" in
 esac`
 GC_MIN_INTERVAL_DAYS := "3"
 GC_MAX_INTERVAL_DAYS := "14"
-GC_DELETE_OLDER_THAN := "3d"
+GC_DELETE_OLDER_THAN := "3"
 GC_STATE_FILE := ".nix-gc-state"
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
@@ -418,9 +418,9 @@ gc:
     fi
 
     run_gc() {
-      nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
+      nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}d
       if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
-    sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
+    sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}d
       fi
       just gc-record
     }
@@ -454,12 +454,15 @@ gc:
 # Run garbage collection immediately.
 gc-force:
     #!/usr/bin/env bash
+    echo "[!] Force running home manager GC"
+    home-manager expire-generations "-{{ GC_DELETE_OLDER_THAN }} days"
+
     echo "[!] Force running garbage collection"
-    nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
+    nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}d
 
     if [[ "{{ OS_TYPE }}" == "nixos" ]]; then
       echo "[!] Running system-wide garbage collection"
-      sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}
+      sudo -H nix-collect-garbage -d --delete-older-than {{ GC_DELETE_OLDER_THAN }}d
     fi
 
     echo "[!] Running nix store optimization"
@@ -494,7 +497,7 @@ gc-info:
     echo
     echo "Min interval: {{ GC_MIN_INTERVAL_DAYS }} days"
     echo "Max interval: {{ GC_MAX_INTERVAL_DAYS }} days"
-    echo "Delete older than: {{ GC_DELETE_OLDER_THAN }}"
+    echo "Delete older than: {{ GC_DELETE_OLDER_THAN }} days"
     echo "State file: {{ GC_STATE_FILE }}"
 
 ########### Quality Gate ##########
