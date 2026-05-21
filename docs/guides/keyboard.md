@@ -104,7 +104,7 @@ The Karabiner configuration is located at:
 dotfiles/karabiner/karabiner.json
 ```
 
-When home-manager is applied (via `just install-pckgs`), this file is symlinked to:
+When home-manager is applied (via `just apply`), this file is symlinked to:
 ```
 ~/.config/karabiner/karabiner.json
 ```
@@ -127,7 +127,7 @@ This ensures terminal applications maintain their expected keyboard shortcuts wi
 
 The configuration is automatically installed when you run:
 ```bash
-just install-pckgs
+just apply
 ```
 
 Or manually with home-manager:
@@ -175,7 +175,7 @@ To add shortcuts for your own applications:
 
 3. **Apply the changes**:
    ```bash
-   just install-pckgs
+   just apply
    ```
 
 ### Modifying Keyboard Shortcuts
@@ -202,7 +202,7 @@ To change existing shortcuts:
 
 3. **Apply the changes**:
    ```bash
-   just install-pckgs
+   just apply
    ```
 
 ### Adding Terminal App Exclusions
@@ -235,7 +235,7 @@ To exclude additional terminal applications from remapping:
 
 3. **Apply the changes**:
    ```bash
-   just install-pckgs
+   just apply
    ```
 
 ---
@@ -317,7 +317,7 @@ To exclude additional terminal applications from remapping:
 **Solution**:
 ```bash
 # Apply configuration
-just install-pckgs
+just apply
 
 # Restart Karabiner-Elements
 # Via GUI or:
@@ -343,7 +343,7 @@ brew install --cask karabiner-elements
 
 Then apply the configuration:
 ```bash
-just install-pckgs
+just apply
 ```
 
 ---
@@ -427,13 +427,12 @@ The `karabiner.json` file has this structure:
 
 - [Karabiner-Elements Official Documentation](https://karabiner-elements.pqrs.org/docs/)
 - [Karabiner-Elements GitHub](https://github.com/pqrs-org/Karabiner-Elements)
-- [macOS Setup Guide](setup.md)
-- [Repository Structure](../../reference/repository-structure.md)
+- [Platforms Guide](../getting-started/platforms.md)
 
 ---
 
 ## See Also
 
-- [macOS Setup Guide](setup.md) - Complete macOS configuration guide
-- [Commands Reference](../../guides/commands-reference.md) - All available justfile commands
-- [Troubleshooting](../../guides/troubleshooting.md) - General troubleshooting guide
+- [Platforms Guide](../getting-started/platforms.md) - macOS and other platform setup
+- [Commands Reference](../getting-started/commands.md) - All available justfile commands
+- [Troubleshooting](troubleshooting.md) - General troubleshooting guide

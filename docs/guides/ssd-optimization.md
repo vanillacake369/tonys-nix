@@ -192,12 +192,12 @@ This configuration includes an **intelligent garbage collection system** that dr
 
 ### Commands
 
-#### `just smart-clean`
+#### `just gc`
 
 **Intelligent cleanup** that only runs when needed:
 
 ```bash
-just smart-clean
+just gc
 ```
 
 **When it runs GC**:
@@ -208,12 +208,12 @@ just smart-clean
 - Days < 3 (minimum interval not met)
 - Days < 14 AND disk usage ≤ 80%
 
-#### `just force-clean`
+#### `just gc-force`
 
 **Manual override** to force cleanup regardless of conditions:
 
 ```bash
-just force-clean
+just gc-force
 ```
 
 **When to use**:
@@ -221,12 +221,12 @@ just force-clean
 - Before major system updates
 - Troubleshooting performance issues
 
-#### `just gc-status`
+#### `just gc-info`
 
 **Check current GC status** and get recommendations:
 
 ```bash
-just gc-status
+just gc-info
 ```
 
 **Example output**:
@@ -243,8 +243,8 @@ Max interval: 14 days
 State file: .nix-gc-state
 
 Commands:
-  just smart-clean   # Run intelligent cleanup
-  just force-clean   # Force cleanup regardless of conditions
+  just gc   # Run intelligent cleanup
+  just gc-force   # Force cleanup regardless of conditions
 ```
 
 ### Configuration
@@ -494,13 +494,13 @@ time nix shell nixpkgs#hello --command hello
 
 ```bash
 # Weekly: Check GC status
-just gc-status
+just gc-info
 
 # Monthly: Review performance
 just performance-test
 
 # Quarterly: Force cleanup if needed
-just force-clean
+just gc-force
 
 # Yearly: Check SSD health
 sudo smartctl -a /dev/nvme0n1
@@ -508,7 +508,7 @@ sudo smartctl -a /dev/nvme0n1
 
 ### When to Force Cleanup
 
-Run `just force-clean` when:
+Run `just gc-force` when:
 - Before major system upgrades
 - After removing large packages
 - When experiencing performance issues
@@ -517,10 +517,10 @@ Run `just force-clean` when:
 
 ### When to Skip Cleanup
 
-Let `just smart-clean` handle it when:
+Let `just gc` handle it when:
 - Regular development workflow
 - Automated pipelines
-- Part of `install-all` process
+- Part of `bootstrap` process
 - Disk space is adequate
 - Recent cleanup was performed
 
@@ -564,7 +564,7 @@ GC_MIN_INTERVAL_DAYS := "1"
 GC_MAX_INTERVAL_DAYS := "3"
 
 # Run after each build
-just install-pckgs && just force-clean
+just apply && just gc-force
 ```
 
 ---
@@ -593,29 +593,29 @@ just install-pckgs && just force-clean
 
 3. **More aggressive GC**:
    ```bash
-   just force-clean
+   just gc-force
    ```
 
 ### Smart-Clean Always Skipping
 
-**Symptoms**: `just smart-clean` never runs GC
+**Symptoms**: `just gc` never runs GC
 
 **Solutions**:
 
 1. **Check GC status**:
    ```bash
-   just gc-status
+   just gc-info
    ```
 
 2. **Reset GC timestamp** if needed:
    ```bash
    rm .nix-gc-state
-   just smart-clean
+   just gc
    ```
 
 3. **Force cleanup**:
    ```bash
-   just force-clean
+   just gc-force
    ```
 
 ### High Disk Usage Despite GC
@@ -672,7 +672,7 @@ systemd.timers.nix-gc = {
 systemd.services.nix-gc = {
   script = ''
     cd /path/to/tonys-nix
-    ${pkgs.just}/bin/just smart-clean
+    ${pkgs.just}/bin/just gc
   '';
   serviceConfig = {
     Type = "oneshot";
@@ -700,6 +700,4 @@ echo "nix_store_paths $num_paths"
 ## See Also
 
 - [Commands Reference](commands-reference.md) - All available commands
-- [Performance Test Details](../reference/performance-testing.md) - Performance analysis
 - [Troubleshooting Guide](troubleshooting.md) - Common issues
-- [Development Workflow](development-workflow.md) - Recommended workflows

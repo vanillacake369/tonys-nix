@@ -8,7 +8,7 @@ Complete reference for all justfile commands available in this repository.
 - [Individual Installation Steps](#individual-installation-steps)
 - [System-Specific Configurations](#system-specific-configurations)
 - [Maintenance and Cleanup](#maintenance-and-cleanup)
-- [Development Connections](#development-connections)
+- [Development Connections](#development-connections-1)
 - [Image Generation](#image-generation)
 - [Manual Home-Manager Operations](#manual-home-manager-operations)
 
@@ -18,7 +18,7 @@ Complete reference for all justfile commands available in this repository.
 
 These are the recommended commands for daily use:
 
-### `just install-all`
+### `just bootstrap`
 
 **Description**: Complete installation pipeline (nix, home-manager, packages)
 
@@ -28,11 +28,11 @@ These are the recommended commands for daily use:
 3. Installs uidmap for containers (Linux only)
 4. Installs all packages via home-manager
 5. Sets up macOS power schedule (macOS only, interactive)
-6. Runs intelligent cleanup (smart-clean)
+6. Runs intelligent cleanup (gc)
 
 **Usage**:
 ```bash
-just install-all
+just bootstrap
 ```
 
 **When to use**:
@@ -42,7 +42,7 @@ just install-all
 
 ---
 
-### `just install-pckgs`
+### `just apply`
 
 **Description**: Install packages using home-manager (auto-detects system)
 
@@ -55,11 +55,11 @@ just install-all
 **Usage**:
 ```bash
 # Auto-detect system
-just install-pckgs
+just apply
 
 # Specify architecture manually
-just install-pckgs x86_64-linux
-just install-pckgs aarch64-darwin
+just apply x86_64-linux
+just apply aarch64-darwin
 ```
 
 **Supported architectures**:
@@ -75,7 +75,7 @@ just install-pckgs aarch64-darwin
 
 ---
 
-### `just smart-clean`
+### `just gc`
 
 **Description**: Intelligent SSD-optimized garbage collection (skips when not needed)
 
@@ -87,7 +87,7 @@ just install-pckgs aarch64-darwin
 
 **Usage**:
 ```bash
-just smart-clean
+just gc
 ```
 
 **Decision logic**:
@@ -96,7 +96,7 @@ just smart-clean
 - **Checks size if**: 3 ≤ days < 14
 
 **When to use**:
-- Included in `install-all` pipeline
+- Included in `bootstrap` pipeline
 - Run manually when experiencing performance issues
 - Part of regular maintenance routine
 
@@ -213,7 +213,7 @@ sudo pmset repeat cancel
 
 ---
 
-### `just link-nix-conf`
+### `just system-link-nix-conf`
 
 **Description**: Link nix.conf to system configuration
 
@@ -224,7 +224,7 @@ sudo pmset repeat cancel
 
 **Usage**:
 ```bash
-just link-nix-conf
+just system-link-nix-conf
 ```
 
 **Requirements**: sudo access
@@ -233,13 +233,13 @@ just link-nix-conf
 
 ## Maintenance and Cleanup
 
-### `just smart-clean`
+### `just gc`
 
-See [Primary Workflow](#just-smart-clean) section above.
+See [Primary Workflow](#just-gc) section above.
 
 ---
 
-### `just force-clean`
+### `just gc-force`
 
 **Description**: Force garbage collection regardless of conditions (manual override)
 
@@ -247,16 +247,16 @@ See [Primary Workflow](#just-smart-clean) section above.
 - Runs nix-collect-garbage with 14-day threshold
 - Runs system-wide GC on NixOS (requires sudo)
 - Records cleanup timestamp
-- Ignores smart-clean conditions
+- Ignores gc conditions
 
 **Usage**:
 ```bash
-just force-clean
+just gc-force
 ```
 
 **When to use**:
 - When store is very large and you want immediate cleanup
-- When smart-clean keeps skipping
+- When gc keeps skipping
 - Before major system updates
 - When troubleshooting performance issues
 
@@ -264,7 +264,7 @@ just force-clean
 
 ---
 
-### `just gc-status`
+### `just gc-info`
 
 **Description**: Show garbage collection status and analysis
 
@@ -277,7 +277,7 @@ just force-clean
 
 **Usage**:
 ```bash
-just gc-status
+just gc-info
 ```
 
 **Example output**:
@@ -294,13 +294,13 @@ Max interval: 14 days
 State file: .nix-gc-state
 
 Commands:
-  just smart-clean   # Run intelligent cleanup
-  just force-clean   # Force cleanup regardless of conditions
+  just gc        # Run intelligent cleanup
+  just gc-force  # Force cleanup regardless of conditions
 ```
 
 ---
 
-### `just clear-all`
+### `just uninstall-home-manager`
 
 **Description**: Uninstall home-manager completely
 
@@ -310,14 +310,14 @@ Commands:
 
 **Usage**:
 ```bash
-just clear-all
+just uninstall-home-manager
 ```
 
 **Warning**: This removes all home-manager configurations. Use with caution.
 
 ---
 
-### `just remove-configs`
+### `just purge-local-configs`
 
 **Description**: Remove all dotfiles and configurations
 
@@ -331,7 +331,7 @@ just clear-all
 
 **Usage**:
 ```bash
-just remove-configs
+just purge-local-configs
 ```
 
 **Warning**: Destructive operation. Make sure to backup important configurations first.
@@ -390,70 +390,7 @@ just performance-test
 
 ## Development Connections
 
-### `just source-env`
-
-**Description**: Load environment variables from scripts/env.sh
-
-**What it does**:
-- Sources scripts/env.sh
-- Validates required environment variables
-- Displays loaded variables (masked)
-
-**Usage**:
-```bash
-just source-env
-```
-
-**Requirements**: scripts/env.sh must exist with proper credentials
-
-**Environment variables loaded**:
-- AQUANURI_BASTION_URL
-- AQUANURI_BASTION_PW
-- AQUANURI_BASTION_PORT
-- AQUANURI_TARGET_URL
-- AQUANURI_LOCAL_PORT
-- HAMA_VPN_PW
-
-📖 See [Development Connections Guide](../integrations/development-connections.md) for setup details.
-
----
-
-### `just aquanuri-connect`
-
-**Description**: Connect to Aquanuri development database via SSH tunnel
-
-**What it does**:
-- Sources environment variables
-- Creates SSH tunnel to development database
-- Handles password authentication automatically
-
-**Usage**:
-```bash
-just source-env          # Load credentials first
-just aquanuri-connect    # Connect to database
-```
-
-📖 See [Development Connections Guide](../integrations/development-connections.md) for complete setup.
-
----
-
-### `just vpn-connect`
-
-**Description**: Connect to VPN (default: lonelynight1026.ovpn)
-
-**What it does**:
-- Sources environment variables
-- Connects to VPN using OpenVPN
-- Handles password authentication automatically
-
-**Usage**:
-```bash
-just source-env                    # Load credentials first
-just vpn-connect                   # Use default config
-just vpn-connect custom-config.ovpn  # Use custom config
-```
-
-📖 See [Development Connections Guide](../integrations/development-connections.md) for complete setup.
+> Development connection scripts (SSH tunnels, VPN) are not included in this repository. Configure them separately per your organization's requirements.
 
 ---
 
@@ -492,7 +429,7 @@ just build-image vmware
 just build-image qcow
 ```
 
-📖 See [Image Generation Guide](image-generation.md) for complete documentation.
+📖 See [Image Generation Guide](../guides/image-generation.md) for complete documentation.
 
 ---
 
@@ -512,7 +449,7 @@ just build-image-arch qcow aarch64-linux
 
 ---
 
-### `just build-all-images`
+### `just build-images`
 
 **Description**: Build all formats for current architecture
 
@@ -523,7 +460,7 @@ just build-image-arch qcow aarch64-linux
 
 **Usage**:
 ```bash
-just build-all-images
+just build-images
 ```
 
 **Warning**: Requires significant disk space (10GB+) and time
@@ -591,11 +528,9 @@ These variables are automatically set by justfile and can be referenced:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `USERNAME` | Current user | `limjihoon` |
 | `HOSTNAME` | System hostname | `my-machine` |
 | `OS_TYPE` | Operating system type | `nixos`, `darwin`, `wsl`, `unsupported` |
 | `SYSTEM_ARCH` | System architecture | `x86_64-linux`, `aarch64-darwin` |
-| `GC_SIZE_THRESHOLD_GB` | GC size threshold | `10` |
 | `GC_MIN_INTERVAL_DAYS` | Minimum GC interval | `3` |
 | `GC_MAX_INTERVAL_DAYS` | Maximum GC interval | `14` |
 | `GC_STATE_FILE` | GC state tracking file | `.nix-gc-state` |
@@ -606,8 +541,8 @@ These variables are automatically set by justfile and can be referenced:
 # Check detected values
 echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
 
-# Use in custom commands
-just install-pckgs $(just SYSTEM_ARCH)
+# Apply configuration for current system
+just apply
 ```
 
 ---
@@ -617,35 +552,30 @@ just install-pckgs $(just SYSTEM_ARCH)
 ### Complete Fresh Installation
 
 ```bash
-just install-all
+just bootstrap
 ```
 
 Equivalent to:
 ```bash
 just install-nix
-just link-nix-conf
+just system-link-nix-conf
 just install-home-manager
-just install-uidmap-conditional
-just install-pckgs
+just bootstrap-uidmap
+just apply
 just setup-mac-power-schedule  # macOS only
-just smart-clean
+just gc
 ```
 
-### Development Session Setup
+### Development Connections
 
-```bash
-just source-env
-just aquanuri-connect
-# ... work in another terminal ...
-just vpn-connect
-```
+Development connection scripts (SSH tunnels, VPN) are not included in this repository. Configure them separately per your organization's requirements.
 
 ### Performance Troubleshooting
 
 ```bash
 just performance-test  # Analyze system
-just gc-status         # Check GC status
-just force-clean       # Force cleanup if needed
+just gc-info           # Check GC status
+just gc-force          # Force cleanup if needed
 ```
 
 ### Image Generation Workflow
@@ -660,8 +590,6 @@ just show-images         # Check result
 
 ## See Also
 
-- [Troubleshooting Guide](troubleshooting.md) - Common issues and solutions
-- [Development Workflow Guide](development-workflow.md) - Recommended workflows
-- [SSD Optimization Guide](ssd-optimization.md) - Performance and longevity
-- [Image Generation Guide](image-generation.md) - Complete image building reference
-- [Development Connections Guide](../integrations/development-connections.md) - Environment setup
+- [Troubleshooting Guide](../guides/troubleshooting.md) - Common issues and solutions
+- [SSD Optimization Guide](../guides/ssd-optimization.md) - Performance and longevity
+- [Image Generation Guide](../guides/image-generation.md) - Complete image building reference

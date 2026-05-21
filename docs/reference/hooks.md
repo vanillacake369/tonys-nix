@@ -1,5 +1,7 @@
 # Hook Pipeline Reference
 
+> **Note: Generated hooks** — Hooks marked as "Generated" in the table below do not exist in the repository source tree. They are produced by the Agent Policy Contract system during `nix build` and merged into provider settings at activation time (`just apply`). Hand-editing these scripts directly has no effect; regenerate them by modifying the relevant policy options and running `just apply`.
+
 ## How Hooks Work
 
 Claude Code (and compatible providers) execute hook scripts at specific lifecycle events. Each hook receives a JSON payload on `stdin` describing the event context. Scripts communicate intent through their exit code:

@@ -11,7 +11,7 @@ No other software is required. The bootstrap process installs Nix and everything
 ## One-Command Bootstrap
 
 ```bash
-git clone https://github.com/vanillacake369/my-nixos.git && cd my-nixos
+git clone https://github.com/vanillacake369/tonys-nix.git && cd tonys-nix
 just bootstrap
 ```
 
@@ -32,13 +32,16 @@ just system-link-nix-conf
 # 3. Bootstrap home-manager (skipped if already present)
 just install-home-manager
 
-# 4. Apply the configuration for the detected platform
+# 4. Install uidmap for rootless containers (Linux/WSL only, skipped elsewhere)
+just bootstrap-uidmap
+
+# 5. Apply the configuration for the detected platform
 just apply
 
-# 5. Authenticate all AI providers via cli-proxy-api OAuth
+# 6. Authenticate all AI providers via cli-proxy-api OAuth
 just agent-login
 
-# 6. Run conditional garbage collection
+# 7. Run conditional garbage collection
 just gc
 ```
 
