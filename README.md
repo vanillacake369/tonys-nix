@@ -1,328 +1,222 @@
+[![CI](https://github.com/vanillacake369/tonys-nix/actions/workflows/ci.yml/badge.svg)](https://github.com/vanillacake369/tonys-nix/actions/workflows/ci.yml)
+[![Docs](https://github.com/vanillacake369/tonys-nix/actions/workflows/deploy-docs.yml/badge.svg)](https://vanillacake369.github.io/tonys-nix/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Nix Flake](https://img.shields.io/badge/nix-flake-blue?logo=nixos)](https://nixos.wiki/wiki/Flakes)
+[![Platform](https://img.shields.io/badge/platform-NixOS%20%7C%20macOS%20%7C%20WSL%20%7C%20Linux-teal)]()
+
 # Multi-Platform Nix Configuration
 
-A comprehensive personal Nix configuration using flakes and home-manager for multi-platform development environments.
-Supports NixOS, WSL, macOS, and standard Linux distributions with automatic environment detection.
+A comprehensive personal Nix configuration using flakes and home-manager for multi-platform development environments, with built-in AI agent orchestration for Claude Code, Gemini CLI, and Codex.
 
-## ✨ Features
+Supports NixOS, WSL, macOS (Intel & Apple Silicon), and standard Linux distributions with automatic environment detection.
 
-- **Multi-platform support**: NixOS, WSL, macOS (Intel & Apple Silicon), Linux
-- **Automated setup**: One-command installation with environment detection
-- **Development tools**: Go, Java, Kubernetes, Podman with compose support, modern CLI utilities
-- **Desktop environment**: GNOME with Wayland optimizations (NixOS)
-- **Shell configuration**: fish with modern shell integrations
+## Features
+
+- **Multi-platform support**: NixOS, WSL, macOS, Linux -- one flake, auto-detected at apply time
+- **Automated setup**: `just bootstrap` does everything from Nix installation to AI provider authentication
+- **Development tools**: Go, Java, Rust, Python, Node.js, Terraform, Lua, C/C++ with LSP servers for each
+- **Shell configuration**: fish + zellij + modern CLI (bat, ripgrep, fd, fzf, lazygit)
 - **Editor setup**: Neovim with LazyVim configuration
-- **Container support**: Rootless Podman with Docker compatibility and podman-compose
-- **Image generation**: Create ISOs, VM images (VirtualBox, VMware, qcow2), and container images
-- **Dynamic binary support**: nix-ld enabled for running non-Nix executables seamlessly
-- **macOS productivity**: Karabiner-Elements config for Windows/GNOME shortcuts and app launching
+- **AI agent orchestration**: Claude Code (orchestrator), Gemini CLI (researcher), Codex (verifier) with policy contracts
+- **macOS productivity**: Karabiner + AeroSpace keymaps generated from a single Nix spec
+- **SSD optimization**: Conditional garbage collection (age + disk pressure), 80-90% fewer write operations
+- **Image generation**: Bootable ISOs, VirtualBox, VMware, and QEMU images from NixOS configuration
 
-## 📦 Included Packages
+## Included Packages
 
-Packages are automatically managed through home-manager modules. Key categories include:
+| Category | Packages |
+|---|---|
+| Languages | Go, Java (Zulu 17), Rust, Python 3.13, Node.js 22, Lua 5.4, C/C++ |
+| Infra & DevOps | Terraform, Ansible, AWS CLI, ngrok, nuclei |
+| Nix Tooling | nixd, alejandra, statix, deadnix |
+| Shell & CLI | fish, zellij, bat, ripgrep, fd, fzf, direnv, lazygit, sops, age |
+| Editor | Neovim (LazyVim) + language servers for all above |
+| AI Agents | Claude Code, Gemini CLI, Codex, cli-proxy-api (unified auth proxy) |
+| macOS Apps | AeroSpace, Karabiner, WezTerm, AlDente, JankyBorders, Hidden Bar |
+| Linux Apps | Firefox, Slack, TickTick, LibreOffice |
+| JetBrains | IntelliJ, GoLand (via packages/jetbrains.nix) |
+| Secrets | sops, age, ssh-to-age, git-crypt, gnupg |
 
-- **Development**: Go, Java (Zulu), Node.js, Python
-- **DevOps**: kubectl, helm, k9s, minikube, podman-compose, AWS CLI
-- **Editors**: Neovim (LazyVim), VS Code, JetBrains IDEs
-- **Shell**: fish, direnv, modern CLI tools (bat, fzf, ripgrep)
-- **Applications**: Firefox, Chrome, Slack, Obsidian, LibreOffice
+> **Note**: Package versions are managed by nixpkgs-unstable. Run `home-manager packages` to see current versions.
 
-> **Note**: Package versions are automatically managed. Run `home-manager packages` to see current versions.
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- Git (for cloning the repository)
-- Internet connection (for downloading Nix and packages)
+- Git
+- Internet connection
 
 ### One-Command Setup
 
-The easiest way to get started:
-
 ```bash
-git clone https://github.com/vanillacake369/my-nixos.git
-cd my-nixos
-./justfile install-all  # or just 'just' if you have just installed
+git clone https://github.com/vanillacake369/tonys-nix.git
+cd tonys-nix
+just bootstrap
 ```
 
 This will automatically:
 1. Install Nix package manager
-2. Install home-manager 
-3. Detect your system architecture
-4. Install all packages and configurations
-5. Set up your development environment
+2. Link nix.conf (caches, flakes, auto-optimize)
+3. Install home-manager via flake
+4. Detect your platform and apply the configuration
+5. Authenticate AI providers (Claude, Gemini, Codex) via cli-proxy-api
+6. Run conditional garbage collection
 
 ### Manual Installation
 
-If you prefer step-by-step installation:
-
-#### 1. Install Nix
-
 ```bash
-# Multi-user installation (recommended)
-sh <(curl -L https://nixos.org/nix/install) --daemon
-
-# Or single-user installation
-sh <(curl -L https://nixos.org/nix/install) --no-daemon
-```
-
-#### 2. Install home-manager
-
-```bash
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --update
-nix-shell '<home-manager>' -A install
-```
-
-#### 3. Install packages
-
-```bash
-# Install just command runner (optional but recommended)
-nix-env -iA nixpkgs.just
-
-# Apply configuration
-just install-pckgs  # Auto-detects your system
-```
-
-
-## 🔧 Configuration
-
-### Customizing for Your System
-
-The configuration automatically detects your username and system architecture. However, you may want to customize:
-
-1. **User Configuration**: Edit `limjihoon-user.nix` or create your own user file
-2. **Module Selection**: Modify `home.nix` to enable/disable specific modules
-3. **Package Selection**: Edit individual module files in `modules/` directory
-
-### Multi-Host Deployment
-
-This configuration is designed to work across multiple machines. When setting up on a new NixOS host:
-
-#### For NixOS Systems
-
-1. **Clone the repository** on your new machine
-2. **Generate hardware configuration** for the new machine:
-   ```bash
-   sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
-   ```
-3. **Apply the configuration**:
-   ```bash
-   just install-all
-   ```
-
-> **Note**: `hardware-configuration.nix` is excluded from git and stored in `/etc/nixos/` because it contains machine-specific settings like disk UUIDs, kernel modules, and CPU types that differ between hosts. The flake uses `--impure` flag to access this system-level configuration.
-
-#### For Non-NixOS Systems (WSL, macOS, Linux)
-
-The configuration works seamlessly across different hosts since home-manager doesn't require hardware-specific settings:
-
-```bash
-git clone <your-repo>
-cd my-nixos
-just install-all
+just install-nix              # 1. Install Nix daemon
+just system-link-nix-conf     # 2. Link nix.conf to /etc/nix/
+just install-home-manager     # 3. Bootstrap home-manager
+just apply                    # 4. Apply config (auto-detects platform)
+just agent-login              # 5. OAuth for AI providers
 ```
 
 ### Supported Configurations
 
-The flake automatically selects the appropriate configuration:
+| Platform | Flake Target | Auto-Detected |
+|---|---|---|
+| macOS (Apple Silicon) | `hm-aarch64-darwin` | Yes |
+| macOS (Intel) | `hm-x86_64-darwin` | Yes |
+| NixOS | `hm-nixos-x86_64-linux` | Yes |
+| WSL | `hm-wsl-x86_64-linux` | Yes |
+| Linux | `hm-x86_64-linux` | Yes |
 
-- `hm-x86_64-linux`: Standard Linux (64-bit)
-- `hm-aarch64-linux`: ARM64 Linux
-- `hm-wsl-x86_64-linux`: Windows Subsystem for Linux  
-- `hm-x86_64-darwin`: Intel macOS
-- `hm-aarch64-darwin`: Apple Silicon macOS
+## AI Agent Orchestration
 
-### Available Commands
+This repository doubles as an agent orchestration harness. Three providers collaborate through a contract-based policy system:
+
+```mermaid
+graph LR
+    subgraph Nix Flake
+        F[flake.nix] --> B[builders.nix]
+        B --> H[home.nix]
+        H --> AG[modules/agents]
+    end
+
+    subgraph Agent Policy Contract
+        AG --> P[policy.nix]
+        P --> MC[Claude Code<br/>Orchestrator]
+        P --> MG[Gemini CLI<br/>Researcher]
+        P --> MX[Codex<br/>Verifier]
+    end
+
+    P -->|generates| HK[Hook Scripts]
+```
+
+| Provider | Role | What It Does |
+|---|---|---|
+| **Claude Code** | Orchestrator | Phase-locked workflow, strategy lint, live verification oracle |
+| **Gemini CLI** | Researcher / Critic | Async background tasks (strategy review, blindspot audit) via FIFO |
+| **Codex** | Logic Verifier | Independent second opinion, reasoning traces logged to disk |
+
+The policy system uses the Nix module system as an IoC container -- contracts are `mkOption` types, implementations are provider values, and assertions fail `nix build` if violated.
+
+> **Full documentation**: [Agent Policy Contract](https://vanillacake369.github.io/tonys-nix/architecture/agent-policy-contract/) | [Claude Integration](https://vanillacake369.github.io/tonys-nix/agents/claude/) | [Hook Pipeline Reference](https://vanillacake369.github.io/tonys-nix/reference/hooks/)
+
+## Available Commands
 
 ```bash
-# Primary workflow
-just install-all    # Complete setup pipeline with intelligent cleanup
-just install-pckgs  # Install/update packages
-just smart-clean    # Intelligent SSD-optimized cleanup (skips when not needed)
+# Lifecycle
+just bootstrap              # Full first-time setup
+just apply                  # Apply config for current platform
+just agent-login            # OAuth for AI providers
 
-# Development connections (requires scripts/env.sh)
-just source-env            # Load development environment variables
-just aquanuri-connect      # Connect to Aquanuri database via SSH tunnel  
-just vpn-connect [config]  # Connect to VPN (default: lonelynight1026.ovpn)
+# Maintenance
+just gc                     # Conditional garbage collection
+just gc-force               # Force GC + store optimization
+just gc-info                # Show GC status
 
-# Maintenance and cleanup
-just smart-clean           # Intelligent SSD-optimized garbage collection
-just force-clean           # Force cleanup regardless of conditions
-just gc-status             # Show garbage collection status and analysis
-just clean                 # Legacy cleanup command (same as force-clean)
+# Quality
+just test                   # Guard tests (nix eval)
+just lint                   # deadnix + statix + alejandra
 
-# Performance and diagnostics
-just performance-test      # Run comprehensive Nix performance analysis
+# Diagnostics
+just performance-test       # Nix store metrics, cache config, shell speed
 
-# Image generation
-just list-image-formats    # Show available image formats
-just build-image <format>  # Build specific image format
-just build-all-images      # Build all image formats
-just show-images           # Show built images and sizes
-
-# Specific installations
-just install-nix           # Install Nix package manager
-just install-home-manager  # Install home-manager
-just apply-fish           # Configure fish shell
+# Images (NixOS only)
+just build-image iso        # Bootable ISO
+just build-images           # All formats (iso, virtualbox, vmware, qcow)
 ```
 
-> **Tip**: See `CLAUDE.md` for detailed development workflows and troubleshooting.
+> **Full reference**: [Commands Reference](https://vanillacake369.github.io/tonys-nix/getting-started/commands/)
 
+## SSD Optimization
 
+The garbage collection system is designed to protect SSD lifespan:
 
-## ⚡ SSD Optimization Features
+- **Conditional execution**: Only runs when last GC > 14 days ago OR disk usage > 80%
+- **Minimum interval**: Skips if last GC was < 3 days ago
+- **Store optimization**: Automatic deduplication via hardlinks (`auto-optimise-store = true`)
+- **Binary caches**: nixos.org + community caches reduce local builds by 80-90%
 
-This configuration includes several optimizations to reduce SSD wear and extend drive lifespan:
-
-### Automatic Performance & SSD Optimizations
-- **Store Auto-Optimization**: Automatic deduplication reduces store size and improves I/O performance
-- **Optimized Build Settings**: Uses all available CPU cores with `max-jobs=auto` for faster parallel builds
-- **Binary Caches**: Uses Cachix and community caches to minimize local builds (80-90% reduction in SSD writes)
-- **Smart Garbage Collection**: Intelligent cleanup system that runs only when needed (size > 10GB or > 14 days), reducing SSD wear by 80-90%
-- **Journal Limiting**: SystemD logs are capped at 500MB with automatic rotation
-- **Firmware Updates**: fwupd service enabled for SSD firmware optimization
-
-### Smart Garbage Collection System
-The configuration includes an intelligent garbage collection system designed to protect SSD lifespan:
-
-**Key Features:**
-- **Conditional execution**: Only runs when `/nix/store` exceeds 10GB or hasn't run for 14+ days
-- **SSD protection**: Eliminates 80-90% of unnecessary cleanup operations
-- **User transparency**: Clear feedback about cleanup decisions and recommendations
-- **Manual override**: Force cleanup when needed with `just force-clean`
-
-**Usage:**
 ```bash
-# Check garbage collection status
-just gc-status
-
-# Run intelligent cleanup (automatically used in install-all)
-just smart-clean
-
-# Force cleanup regardless of conditions
-just force-clean
+just gc-info      # Check status and recommendations
+just gc           # Run conditional cleanup
+just gc-force     # Force cleanup regardless
 ```
 
-### Manual Hardware Optimizations
-For NixOS systems, add these mount options to your `/etc/nixos/hardware-configuration.nix`:
+> **Full guide**: [SSD Optimization](https://vanillacake369.github.io/tonys-nix/guides/ssd-optimization/)
 
-```nix
-fileSystems."/" = {
-  device = "/dev/your-device";
-  fsType = "ext4";
-  options = [ "noatime" "discard=async" ];
-};
-```
+## macOS Keyboard Customization
 
-- `noatime` - Prevents access time updates (reduces writes)
-- `discard=async` - Enables TRIM for better SSD management
+Karabiner-Elements + AeroSpace configuration generated from a single Nix spec (`lib/keymaps/`):
 
-### SSD Health Monitoring
-```bash
-# Check SSD health and firmware
-sudo fwupdmgr get-devices
-sudo fwupdmgr refresh && sudo fwupdmgr get-updates
+- **Windows/GNOME shortcuts** in all apps except terminals: Ctrl+C/V/X/A/Z/S, Ctrl+T/W, Ctrl+arrows
+- **Quick app launching**: Cmd+1-6 for TickTick, Slack, Obsidian, Chrome, IntelliJ, GoLand
+- **Tiling window management**: AeroSpace with workspace bindings
 
-# Monitor SSD usage (if available)
-sudo smartctl -a /dev/nvme0n1
-```
+> **Full guide**: [macOS Keyboard](https://vanillacake369.github.io/tonys-nix/guides/keyboard/)
 
-## 🖼️ Image Generation
+## Documentation
 
-Create bootable ISOs and VM images from your NixOS configuration. Supports multiple formats with automatic multi-architecture generation.
+Full documentation is deployed as an MkDocs Material site:
 
-**Quick Start**:
-```bash
-just build-image iso          # Bootable ISO
-just build-image virtualbox   # VirtualBox OVA
-just build-all-images         # All formats
-```
+**[vanillacake369.github.io/tonys-nix](https://vanillacake369.github.io/tonys-nix/)**
 
-**Supported Formats**: ISO, VirtualBox OVA, VMware VMDK, QEMU qcow2
+| Section | What You'll Find |
+|---|---|
+| [Getting Started](https://vanillacake369.github.io/tonys-nix/getting-started/installation/) | Installation, platform-specific notes, command reference |
+| [Architecture](https://vanillacake369.github.io/tonys-nix/architecture/overview/) | Repository layout, module system, agent policy contracts |
+| [Agents](https://vanillacake369.github.io/tonys-nix/agents/overview/) | Multi-provider orchestration, Claude/Gemini/Codex integration |
+| [Guides](https://vanillacake369.github.io/tonys-nix/guides/troubleshooting/) | SSD optimization, image generation, keyboard customization, troubleshooting |
+| [Reference](https://vanillacake369.github.io/tonys-nix/reference/hooks/) | Hook pipeline, package inventory, environment variables |
 
-📖 **[Full Image Generation Guide](docs/guides/image-generation.md)** - Detailed documentation including use cases, troubleshooting, and advanced usage.
+Docs are deployed via `git tag docs-v* && git push origin docs-v*` (GitHub Actions + GitHub Pages).
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Quick Diagnostics
 
 ```bash
-just performance-test  # Comprehensive system analysis
-just gc-status         # Check garbage collection status
-nix flake check        # Validate configuration
+just performance-test    # Comprehensive system analysis
+just gc-info             # Check garbage collection status
+nix flake check          # Validate configuration
 ```
 
 ### Common Issues
 
-**NixOS Configuration**
-- Hardware config missing → `sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix`
-- Slow builds → `just smart-clean` then `just performance-test`
+| Problem | Solution |
+|---|---|
+| NixOS hardware config missing | `sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix` |
+| Slow builds | `just gc-force` then `just performance-test` |
+| Podman permission denied | `just enable-shared-mount` |
+| Architecture mismatch | `just apply aarch64-darwin` (specify manually) |
+| Shell not updating | `exec fish` or restart terminal |
 
-**Containers (Podman/Minikube)**
-- Permission denied → `just enable-shared-mount`
-- cgroup errors → Enable cgroup v2 in WSL config
+> **Full guide**: [Troubleshooting](https://vanillacake369.github.io/tonys-nix/guides/troubleshooting/)
 
-**Development Environment**
-- Missing env vars → Create `scripts/env.sh` and run `just source-env`
-- Connection issues → Verify credentials and network connectivity
+## Contributing
 
-📖 **[Full Troubleshooting Guide](docs/guides/troubleshooting.md)** - Comprehensive solutions for all common issues, including NixOS configuration, performance, containers, development environment, and build problems.
+Issues and pull requests are welcome. The agent policy contract system and hook patterns are designed to be reusable beyond this personal configuration.
 
+Before submitting:
 
-## 🖥️ macOS Keyboard Customization
-
-Karabiner-Elements configuration for macOS providing Windows/GNOME-style shortcuts and quick app launching.
-
-**Windows/GNOME Shortcuts** (all apps except terminals):
-- `Ctrl+C/V/X/A/Z/S` → Copy, paste, cut, select all, undo, save
-- `Ctrl+T/W` → New/close tab
-- `Ctrl+←/→` → Word navigation
-
-**Quick App Launching**:
-- `Cmd+1-6` → TickTick, Slack, Obsidian, Chrome, IntelliJ, GoLand
-- `Cmd+Option+T/D/M/C/I/G` → WezTerm, Docker, Music, Chrome, IntelliJ, GoLand
-
-📖 **[Full macOS Keyboard Guide](docs/platform/macos/keyboard.md)** - Complete key mappings, customization, and troubleshooting.
-
-## 🤖 Claude Code Integration
-
-Optimized **Claude Code slash commands** for Nix development workflows with automatic configuration sync.
-
-**Available Commands**:
-- `/solve` - Universal problem solver
-- `/enhance` - Code and system improvements
-- `/scaffold` - Generate working skeleton code (KISS approach)
-- `/debug` - Systematic debugging
-
-**Example**:
 ```bash
-/solve "Getting permission denied when running just install-pckgs"
-/enhance "Optimize justfile GC system to reduce SSD wear"
+just lint    # deadnix + statix + alejandra
+just test    # guard tests (nix eval)
 ```
 
-**Features**:
-- Project-aware solutions following repository patterns
-- Automatic config sync across machines (permissions, MCP servers)
-- Detailed implementation plans with validation strategies
+## License
 
-📖 **[Full Claude Code Integration Guide](docs/integrations/claude-code/overview.md)** - Complete command reference, configuration management, and best practices.
-
-## 📚 Additional Resources
-
-- **[CLAUDE.md](./CLAUDE.md)**: Detailed development workflows, architecture, and Claude Code integration
-- **[Nix Tutorial](https://velog.io/@vanillacake369/Nix-Tutorial)**: In-depth Nix guide (Korean)
-- **[Justfile Reference](./justfile)**: All available automation commands
-- **[Home Manager Manual](https://nix-community.github.io/home-manager/)**: Official documentation
-
-## 👍 Contributing
-
-Contributions are welcome! Feel free to:
-
-- Open issues for bugs or feature requests
-- Submit pull requests for improvements
-- Share your own configurations or customizations
-
----
-
-**Enjoy your Nix journey!** 🎉
+[MIT](LICENSE) -- free for any purpose, commercial or non-commercial.
