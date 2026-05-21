@@ -1,4 +1,5 @@
 # Claude Code configuration (no official home-manager module)
+# Contract implementation: orchestrator role with full policy enforcement
 {
   config,
   lib,
@@ -12,7 +13,58 @@
   mcpSourceFile = jsonFormat.generate "claude-mcp.json" {
     mcpServers = mcpAdapt.claude;
   };
+
+  # Merge policy-generated hooks into base settings
+  baseSettings = builtins.fromJSON (builtins.readFile ../../dotfiles/claude/settings.json);
+  policyHooks = config.agentPolicy._assembledHooks.claude or {};
+
+  # Deep-merge hook arrays: base hooks ++ policy hooks per event
+  mergedHooks = let
+    baseHooks = baseSettings.hooks or {};
+    events = lib.unique (lib.attrNames baseHooks ++ lib.attrNames policyHooks);
+  in
+    lib.genAttrs events (event:
+      (baseHooks.${event} or []) ++ (policyHooks.${event} or []));
+
+  finalSettings = baseSettings // {hooks = mergedHooks;};
+  settingsFile = jsonFormat.generate "claude-settings.json" finalSettings;
 in {
+  # Contract: Claude is the orchestrator — full policy suite
+  agentPolicy.providers.claude = {
+    enable = true;
+
+    # (A) Silent reasoning — orchestrator shows decisions, not chain-of-thought
+    reasoning.mode = "silent";
+    reasoning.traceDir = "/tmp/agent-traces";
+
+    # (D) Live verification oracle
+    oracle.enabled = true;
+    oracle.healthChecks = [
+      {
+        command = "nix flake check --no-build 2>&1 | head -20";
+        pattern = ".*\\.nix$";
+        timeout = 60;
+      }
+    ];
+    oracle.streamAnalysis = true;
+
+    # (E) Phase state machine enforcement
+    phases.enforced = true;
+    phases.stateDir = "/tmp/claude-complexity";
+    phases.gatedTools = ["Write" "Edit" "NotebookEdit"];
+
+    # (F) Strategy lint gate with Gemini peer review
+    strategyLint.enabled = true;
+    strategyLint.requiredSections = ["pre-mortem" "tradeoffs" "peer-review"];
+    strategyLint.peerReviewProvider = "gemini";
+    strategyLint.strategyPath = "/tmp/agent-strategy";
+
+    # Hook format
+    hooks.format = "claude";
+    hooks.outputPath = "~/.claude/settings.json";
+    hooks.timeout = 5;
+  };
+
   home.file = {
     ".claude/commands".source = ../../dotfiles/claude/commands;
     ".claude/AGENTS.md".source = ../../dotfiles/shared/AGENTS.md;
@@ -30,6 +82,6 @@ in {
   home.activation.syncClaudeSettings = sync.mkJsonSync {
     name = "claude-settings";
     target = "$HOME/.claude/settings.json";
-    source = "${../../dotfiles/claude/settings.json}";
+    source = "${settingsFile}";
   };
 }
