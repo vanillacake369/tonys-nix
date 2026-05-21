@@ -1,11 +1,8 @@
 # Infrastructure and DevOps tools
 {
-  config,
   pkgs,
   lib,
-  isWsl,
   isDarwin,
-  isLinux,
   ...
 }: {
   # =============================================================================

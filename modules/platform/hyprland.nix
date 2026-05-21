@@ -1,9 +1,5 @@
 # NixOS-specific settings and configurations (Hyprland)
-{
-  lib,
-  pkgs,
-  ...
-}: {
+{...}: {
   # =============================================================================
   # Hyprland Wayland Compositor Settings
   # =============================================================================

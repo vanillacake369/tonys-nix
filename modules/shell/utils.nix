@@ -1,7 +1,6 @@
 # General CLI utilities and tools
 # Core utilities, terminal tools, recording, database clients, platform-specific services
 {
-  config,
   pkgs,
   lib,
   isWsl,

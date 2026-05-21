@@ -1,9 +1,6 @@
 # Generates platform-specific zellij config from a single base.
 # Differences: copy_command, Ctrl unbinds (darwin only), kitty protocol (darwin only).
-{
-  lib,
-  isDarwin,
-}: let
+{isDarwin}: let
   base = builtins.readFile ../dotfiles/zellij/config.kdl.base;
 
   copyCommand =

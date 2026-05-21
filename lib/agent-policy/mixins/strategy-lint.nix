@@ -8,7 +8,6 @@
   ...
 }: let
   providers = lib.filterAttrs (_: p: p.enable && p.strategyLint.enabled) config.agentPolicy.providers;
-  stateRoot = config.agentPolicy.global.stateRoot;
 
   mkScript = name: prov: let
     sections = prov.strategyLint.requiredSections;

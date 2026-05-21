@@ -11,9 +11,9 @@
 in {
   # Deep-merge a JSON source into a mutable target, preserving existing keys.
   mkJsonSync = {
-    name,
     target,
     source,
+    ...
   }:
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       TARGET="${target}"
@@ -37,9 +37,9 @@ in {
 
   # Overwrite a mutable target with a Nix-generated file, removing stale symlinks.
   mkFileCopy = {
-    name,
     target,
     source,
+    ...
   }:
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       TARGET="${target}"

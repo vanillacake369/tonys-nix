@@ -12,8 +12,6 @@
 
   # Build case statements from patterns
   dotenvCases = lib.filter (p: lib.hasPrefix ".env" p) patterns;
-  keyCases = lib.filter (p: lib.hasSuffix ".pem" p || lib.hasSuffix ".key" p || lib.hasSuffix ".p12" p) patterns;
-  credCases = lib.filter (p: p == "credentials" || p == "credentials.json") patterns;
   dirCases = lib.filter (p: lib.hasSuffix "/*" p) patterns;
 
   mkScript = name: _prov:
