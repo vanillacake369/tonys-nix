@@ -1,11 +1,9 @@
 # Monitoring and debugging tools
 # System monitoring, process debugging, performance analysis
 {
-  config,
   pkgs,
   lib,
   isWsl,
-  isDarwin,
   isLinux,
   ...
 }: {

@@ -173,11 +173,9 @@
   # =========================================================================
   zellijTests = let
     darwinConfig = import ../lib/mk-zellij-config.nix {
-      inherit lib;
       isDarwin = true;
     };
     linuxConfig = import ../lib/mk-zellij-config.nix {
-      inherit lib;
       isDarwin = false;
     };
   in [

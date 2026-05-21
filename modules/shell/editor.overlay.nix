@@ -1,6 +1,6 @@
 # Pin neovim to 0.11.x — prevents breaking changes from unstable nixpkgs updates.
-final: prev: {
-  neovim = prev.neovim.overrideAttrs (old: rec {
+_final: prev: {
+  neovim = prev.neovim.overrideAttrs (_old: rec {
     version = "0.11.6";
     src = prev.fetchFromGitHub {
       owner = "neovim";

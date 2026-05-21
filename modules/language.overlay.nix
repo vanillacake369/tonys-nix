@@ -1,6 +1,6 @@
 # Pin terraform — state file format locks to version; accidental upgrade can corrupt state.
-final: prev: {
-  terraform = prev.terraform.overrideAttrs (old: rec {
+_final: prev: {
+  terraform = prev.terraform.overrideAttrs (_old: rec {
     version = "1.15.2";
     src = prev.fetchFromGitHub {
       owner = "hashicorp";

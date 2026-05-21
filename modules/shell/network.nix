@@ -1,11 +1,8 @@
 # Network tools and utilities
 # SSH, autossh, netcat, network diagnostics
 {
-  config,
   pkgs,
   lib,
-  isWsl,
-  isDarwin,
   isLinux,
   ...
 }: {

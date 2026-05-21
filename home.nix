@@ -7,7 +7,7 @@
   ...
 }: let
   keymaps = import ./lib/keymaps {inherit lib userProfile;};
-  zellijConfig = import ./lib/mk-zellij-config.nix {inherit lib isDarwin;};
+  zellijConfig = import ./lib/mk-zellij-config.nix {inherit isDarwin;};
 in {
   programs.home-manager.enable = true;
   targets.genericLinux.enable = isLinux;

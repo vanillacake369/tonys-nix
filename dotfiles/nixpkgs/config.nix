@@ -1,4 +1,4 @@
 {
   allowUnfree = true;
-  allowUnfreePredicate = pkg: true;
+  allowUnfreePredicate = _pkg: true;
 }

@@ -5,7 +5,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }: let
   hookAdapt = import ./hook-adapters.nix {inherit lib;};
@@ -14,7 +13,7 @@
   enabledProviders = lib.filterAttrs (_: p: p.enable) providers;
 
   # Per-provider assembled hook configs
-  assembledHooks = lib.mapAttrs (name: prov:
+  assembledHooks = lib.mapAttrs (_name: prov:
     hookAdapt.${prov.hooks.format} allHooks prov.hooks.timeout)
   enabledProviders;
 in {
