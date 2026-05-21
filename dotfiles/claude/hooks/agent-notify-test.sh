@@ -505,6 +505,71 @@ assert_eq "exit code is 0 even with bad json" "0" "$?"
 echo ""
 
 # ===========================================================================
+# 13. Session Switch Strategy Router (agent-notify-open.sh)
+# ===========================================================================
+
+OPEN_SCRIPT="$SCRIPT_DIR/agent-notify-open.sh"
+
+echo "=== 13. Session Switch Strategy Router ==="
+
+# 13-1. Terminal detection: AGENT_NOTIFY_TERMINAL override
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm bash "$OPEN_SCRIPT" --detect-terminal-test)
+assert_eq "detect: env override WezTerm" "terminal=wezterm" "$result"
+
+result=$(AGENT_NOTIFY_TERMINAL=Ghostty bash "$OPEN_SCRIPT" --detect-terminal-test)
+assert_eq "detect: env override Ghostty" "terminal=ghostty" "$result"
+
+result=$(AGENT_NOTIFY_TERMINAL=iTerm2 bash "$OPEN_SCRIPT" --detect-terminal-test)
+assert_eq "detect: env override unknown falls to generic" "terminal=iterm2" "$result"
+
+# 13-2. Current session detection from WezTerm title
+result=$(_TEST_WEZTERM_TITLE="tonys-nix | some task" bash "$OPEN_SCRIPT" --detect-session-test)
+assert_eq "session detect: parses 'name | task'" "session=tonys-nix" "$result"
+
+result=$(_TEST_WEZTERM_TITLE="valkey | ~/d/ossca" bash "$OPEN_SCRIPT" --detect-session-test)
+assert_eq "session detect: parses 'valkey | path'" "session=valkey" "$result"
+
+result=$(_TEST_WEZTERM_TITLE="" bash "$OPEN_SCRIPT" --detect-session-test)
+assert_eq "session detect: empty title → unknown" "session=" "$result"
+
+# 13-3. Strategy selection: WezTerm + target != current
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_WEZTERM_TITLE="valkey | task" \
+  _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
+assert_contains "wezterm switch: strategy=wezterm" "strategy=wezterm" "$result"
+assert_contains "wezterm switch: sends switch command" "send-text" "$result"
+assert_contains "wezterm switch: target session" "tonys-nix" "$result"
+
+# 13-4. Strategy selection: WezTerm + target == current → skip
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_WEZTERM_TITLE="tonys-nix | task" \
+  _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
+assert_contains "wezterm same session: skip" "skip" "$result"
+
+# 13-5. Strategy selection: WezTerm + no target → focus only
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test "")
+assert_contains "wezterm no target: focus-only" "focus-only" "$result"
+
+# 13-6. Strategy selection: Ghostty + target
+result=$(AGENT_NOTIFY_TERMINAL=Ghostty _TEST_WEZTERM_TITLE="" \
+  _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
+assert_contains "ghostty: strategy=ghostty" "strategy=ghostty" "$result"
+
+# 13-7. Strategy selection: Unknown terminal → fallback
+result=$(AGENT_NOTIFY_TERMINAL=iTerm2 _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
+assert_contains "unknown terminal: strategy=fallback" "strategy=fallback" "$result"
+
+# 13-8. Transcript gating: Claude opens, Gemini/Codex skip
+result=$(AGENT_NOTIFY_PROVIDER=claude _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --transcript-test /tmp/t.jsonl)
+assert_contains "claude: opens transcript" "open=true" "$result"
+
+result=$(AGENT_NOTIFY_PROVIDER=gemini _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --transcript-test /tmp/t.jsonl)
+assert_contains "gemini: skips transcript" "open=false" "$result"
+
+result=$(AGENT_NOTIFY_PROVIDER=codex _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --transcript-test /tmp/t.jsonl)
+assert_contains "codex: skips transcript" "open=false" "$result"
+
+echo ""
+
+# ===========================================================================
 # Summary
 # ===========================================================================
 
