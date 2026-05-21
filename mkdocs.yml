@@ -1,0 +1,95 @@
+site_name: tonys-nix
+site_description: Multi-platform Nix configuration with AI agent orchestration
+site_url: https://vanillacake369.github.io/tonys-nix/
+repo_url: https://github.com/vanillacake369/tonys-nix
+repo_name: vanillacake369/tonys-nix
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Light mode
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Dark mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      lang: en
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.details
+  - pymdownx.critic
+  - pymdownx.mark
+  - pymdownx.keys
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/vanillacake369/my-nixos
+
+extra_javascript:
+  - https://unpkg.com/mermaid@11/dist/mermaid.min.js
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Platforms: getting-started/platforms.md
+      - Commands: getting-started/commands.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Module System: architecture/module-system.md
+      - Agent Policy Contract: architecture/agent-policy-contract.md
+  - Agents:
+      - Orchestration: agents/overview.md
+      - Claude Code: agents/claude.md
+      - Gemini CLI: agents/gemini.md
+      - Codex: agents/codex.md
+  - Guides:
+      - SSD Optimization: guides/ssd-optimization.md
+      - Image Generation: guides/image-generation.md
+      - macOS Keyboard: guides/keyboard.md
+      - Troubleshooting: guides/troubleshooting.md
+  - Reference:
+      - Hook Pipeline: reference/hooks.md
+      - Packages: reference/packages.md
+      - Environment: reference/environment.md
