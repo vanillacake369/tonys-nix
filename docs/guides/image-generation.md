@@ -102,7 +102,7 @@ just build-image-arch qcow aarch64-linux
 
 Build all available formats for your current architecture:
 ```bash
-just build-all-images
+just build-images
 ```
 
 This will build:
@@ -309,7 +309,7 @@ nix build .#iso --verbose
 df -h /nix/store
 
 # Run garbage collection
-just force-clean
+just gc-force
 
 # Check store size after cleanup
 du -sh /nix/store
@@ -334,7 +334,7 @@ just build-image virtualbox
 just build-image qcow
 
 # Instead of:
-# just build-all-images  # May require more memory
+# just build-images  # May require more memory
 ```
 
 #### Image Won't Boot
@@ -360,7 +360,7 @@ just build-image qcow
    rm -rf result*
 
    # Clean nix store
-   just force-clean
+   just gc-force
 
    # Rebuild image
    just build-image iso
@@ -413,7 +413,7 @@ nix build .#iso --print-build-logs
 
 5. **Optimize store** before large builds:
    ```bash
-   just force-clean
+   just gc-force
    nix store optimise
    ```
 

@@ -35,7 +35,7 @@ sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configur
 sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
 
 # Then reapply configuration
-just install-pckgs
+just apply
 ```
 
 ### Flake Evaluation Errors with Hardware Config
@@ -69,7 +69,7 @@ sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configur
 just performance-test
 
 # Check garbage collection status
-just gc-status
+just gc-info
 
 # Check current store size
 du -sh /nix/store
@@ -82,12 +82,12 @@ nix show-config | grep auto-optimise
 
 1. **Run intelligent cleanup** (recommended first):
    ```bash
-   just smart-clean
+   just gc
    ```
 
 2. **Force cleanup if needed**:
    ```bash
-   just force-clean
+   just gc-force
    ```
 
 3. **Manual store optimization**:
@@ -111,13 +111,13 @@ nix show-config | grep auto-optimise
 du -sh /nix/store
 
 # Check GC status and recommendations
-just gc-status
+just gc-info
 
 # Run intelligent cleanup (skips if not needed)
-just smart-clean
+just gc
 
 # Force cleanup regardless of conditions
-just force-clean
+just gc-force
 
 # Preview optimization savings
 nix store optimise --dry-run
@@ -129,7 +129,7 @@ nix store optimise
 **Understanding Smart GC**:
 - Only runs when store > 10GB or > 14 days since last cleanup
 - Reduces SSD wear by 80-90%
-- Use `just gc-status` to see current status and recommendations
+- Use `just gc-info` to see current status and recommendations
 
 ### Flake Lock Conflicts
 
@@ -212,51 +212,9 @@ grep cgroup /proc/filesystems
 
 ## Development Environment Issues
 
-### Environment Variables Not Loaded
+### Development Connection Scripts Not Available
 
-**Symptom**: "Required environment variable not set" errors when running connection scripts
-
-**Solution**: Create and load environment variables:
-```bash
-# Create scripts/env.sh with your credentials (gitignored)
-cat > scripts/env.sh << 'EOF'
-#!/bin/bash
-# Environment variables for development connections
-
-# Aquanuri database connection (SSH tunnel)
-export AQUANURI_BASTION_URL="your-bastion-host-ip"
-export AQUANURI_BASTION_PW="your-ssh-password"
-export AQUANURI_BASTION_PORT="3306"
-export AQUANURI_TARGET_URL="your-target-server-ip"
-export AQUANURI_LOCAL_PORT="3307"
-
-# VPN connection
-export HAMA_VPN_PW="your-vpn-password"
-EOF
-
-# Load environment variables
-just source-env
-
-# Verify variables are loaded
-echo $AQUANURI_BASTION_URL
-```
-
-### SSH/VPN Connection Issues
-
-**Symptom**: Password prompts not being handled automatically
-
-**Solutions**:
-1. Ensure environment variables are loaded:
-   ```bash
-   just source-env
-   ```
-
-2. Check debug output in the connection scripts
-
-3. Verify network connectivity to target hosts:
-   ```bash
-   ping $AQUANURI_BASTION_URL
-   ```
+Development connection scripts (SSH tunnels, VPN) are not included in this repository. Configure them separately per your organization's requirements.
 
 ### Korean Input Not Working
 
@@ -281,7 +239,7 @@ ibus-daemon -drx
 
 ### Home-Manager Build Failures
 
-**Symptom**: Build errors when running `just install-pckgs`
+**Symptom**: Build errors when running `just apply`
 
 **Solutions**:
 
@@ -298,8 +256,8 @@ ibus-daemon -drx
 
 3. **Clear old generations and retry**:
    ```bash
-   just force-clean
-   just install-pckgs
+   just gc-force
+   just apply
    ```
 
 ### Architecture Mismatch
@@ -312,10 +270,10 @@ ibus-daemon -drx
 echo "OS: $(just OS_TYPE), Arch: $(just SYSTEM_ARCH)"
 
 # Manually specify architecture if needed
-just install-pckgs x86_64-linux    # 64-bit Linux
-just install-pckgs aarch64-linux   # ARM64 Linux
-just install-pckgs x86_64-darwin   # Intel macOS
-just install-pckgs aarch64-darwin  # Apple Silicon macOS
+just apply x86_64-linux    # 64-bit Linux
+just apply aarch64-linux   # ARM64 Linux
+just apply x86_64-darwin   # Intel macOS
+just apply aarch64-darwin  # Apple Silicon macOS
 ```
 
 ### Dynamically Linked Executables Failing
@@ -425,13 +383,13 @@ If all else fails, perform a clean installation:
 
 ```bash
 # Remove home-manager completely
-just clear-all
+just uninstall-home-manager
 
 # Remove all dotfiles and configurations
-just remove-configs
+just purge-local-configs
 
 # Fresh installation from scratch
-just install-all
+just bootstrap
 ```
 
 **Warning**: This will remove all home-manager configurations. Make sure to backup any important customizations first.
@@ -441,13 +399,10 @@ just install-all
 ## Getting Additional Help
 
 1. **Run performance analysis**: `just performance-test`
-2. **Check GC status**: `just gc-status`
+2. **Check GC status**: `just gc-info`
 3. **Review module files**: Check individual files in `modules/` directory
 4. **File issues**: Report bugs or feature requests on the repository
 5. **Check CLAUDE.md**: Detailed development workflows and architecture
 
 For platform-specific issues, see:
-- [NixOS Guide](../platform/nixos.md)
-- [WSL Guide](../platform/wsl.md)
-- [macOS Guide](../platform/macos/setup.md)
-- [Linux Guide](../platform/linux.md)
+- [Platforms Guide](../getting-started/platforms.md)

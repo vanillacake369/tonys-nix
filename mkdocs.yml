@@ -9,18 +9,26 @@ theme:
   name: material
   language: en
   palette:
-    - scheme: slate
-      primary: teal
-      accent: cyan
+    - media: "(prefers-color-scheme)"
+      primary: indigo
+      accent: light-blue
       toggle:
-        icon: material/brightness-4
-        name: Light mode
-    - scheme: default
-      primary: teal
-      accent: cyan
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: light-blue
       toggle:
         icon: material/brightness-7
-        name: Dark mode
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: light-blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
   features:
     - navigation.instant
     - navigation.tracking
@@ -29,8 +37,8 @@ theme:
     - navigation.expand
     - navigation.indexes
     - navigation.top
+    - navigation.footer
     - toc.follow
-    - toc.integrate
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -64,7 +72,10 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/vanillacake369/my-nixos
+      link: https://github.com/vanillacake369/tonys-nix
+
+extra_css:
+  - stylesheets/nix-brand.css
 
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js
@@ -75,6 +86,10 @@ nav:
       - Installation: getting-started/installation.md
       - Platforms: getting-started/platforms.md
       - Commands: getting-started/commands.md
+  - Concepts:
+      - Philosophy: concepts/philosophy.md
+      - How Nix Powers This: concepts/how-nix-works.md
+      - Agent Orchestration: concepts/agent-orchestration.md
   - Architecture:
       - Overview: architecture/overview.md
       - Module System: architecture/module-system.md
@@ -92,4 +107,3 @@ nav:
   - Reference:
       - Hook Pipeline: reference/hooks.md
       - Packages: reference/packages.md
-      - Environment: reference/environment.md

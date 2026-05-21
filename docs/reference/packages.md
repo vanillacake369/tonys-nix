@@ -11,7 +11,7 @@ Language support includes the runtime, build tooling, language server, formatter
 | **Go** | `go`, `gotools`, `gopls`, `golangci-lint`, `delve` |
 | **Java** | `zulu17` (JDK), `gradle`, `jdt-language-server`, `google-java-format`, `lombok` |
 | **Rust** | `rustc`, `cargo` |
-| **Python 3.13** | `python313`, `uv`, `pip`, `pytest`, `python-lsp-server`, `ruff`, `uvicorn`, `black` |
+| **Python 3.13** | `python313Packages.python` (interpreter), `uv`, `pip`, `pytest`, `python-lsp-server`, `ruff` (also via `python313Packages.ruff`), `uvicorn`, `black` (also via `python313Packages.black`) |
 | **Node 22 / TypeScript** | `nodejs_22`, `pnpm`, `typescript-language-server`, `prettier`, `biome` |
 | **Lua 5.4** | `lua54Packages.lua`, `lua54Packages.luaunit`, `lua-language-server`, `stylua`, `selene` |
 | **C / C++** | `gcc`, `clang-tools`, `bear` |
@@ -92,7 +92,7 @@ Language support includes the runtime, build tooling, language server, formatter
 | `gnupg` | GPG toolchain |
 
 **macOS additions:** `pngpaste`, `terminal-notifier`
-**Linux additions:** `xclip`, `google-authenticator` (native Linux only)
+**Linux additions:** `xclip`, `google-authenticator` (Linux, including WSL)
 
 ### Infrastructure Tools (`infra.nix`, macOS only)
 
