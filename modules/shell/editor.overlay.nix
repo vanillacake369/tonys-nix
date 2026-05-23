@@ -1,6 +1,8 @@
 # Pin neovim to 0.11.x — prevents breaking changes from unstable nixpkgs updates.
+# Pin neovim-unwrapped — programs.neovim (home-manager) wraps neovim-unwrapped,
+# so the overlay must target neovim-unwrapped, not the wrapper.
 _final: prev: {
-  neovim = prev.neovim.overrideAttrs (_old: rec {
+  neovim-unwrapped = prev.neovim-unwrapped.overrideAttrs (_old: rec {
     version = "0.11.6";
     src = prev.fetchFromGitHub {
       owner = "neovim";
