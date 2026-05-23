@@ -58,6 +58,7 @@ in {
       "Discord"
       "Opal"
       "KakaoTalk"
+      "ActivityMonitor"
     ];
   };
 
