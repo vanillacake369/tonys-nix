@@ -62,11 +62,11 @@
 
 | Component | File | Role |
 |---|---|---|
-| Contract (Interface) | `lib/agent-policy/contract.nix` | 6개 policy 영역의 option type 선언 |
-| Assertions | `lib/agent-policy/assertions.nix` | `nix build` 시 contract 위반 자동 검출 |
+| Contract (Interface) | `lib/agent-policy/agent-contract.nix` | 6개 policy 영역의 option type 선언 |
+| Assertions | `lib/agent-policy/agent-assertions.nix` | `nix build` 시 contract 위반 자동 검출 |
 | Mixins | `lib/agent-policy/mixins/` | capability별 hook 생성 (phase-gate, path-guard, strategy-lint, reasoning-trace, async-handshake, live-oracle) |
-| IoC Assembler | `lib/agent-policy/policy.nix` | mixin 산출물을 provider별 format으로 조립 |
-| Adapters | `lib/agent-policy/hook-adapters.nix` | claude/gemini/codex hook 스키마 변환 (SSoT) |
+| IoC Assembler | `lib/agent-policy/agent-assembler.nix` | mixin 산출물을 provider별 format으로 조립 |
+| Adapters | `lib/agent-policy/agent-hook-adapters.nix` | claude/gemini/codex hook 스키마 변환 (SSoT) |
 
 Provider별 contract implementation:
 - **Claude** (`modules/agents/claude.nix`): Orchestrator — silent reasoning, phase-gate, strategy-lint (gemini peer review), live-oracle (`nix flake check`)
