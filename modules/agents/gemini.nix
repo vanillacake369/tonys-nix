@@ -10,26 +10,10 @@
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
   mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
 
-  # Merge policy-generated hooks with base hooks
+  # Merge policy-generated hooks with base hooks (SSoT: lib/agent-policy/agent-provider-hooks.nix)
+  baseHooksLib = import ../../lib/agent-policy/agent-provider-hooks.nix {inherit lib;};
   policyHooks = config.agentPolicy._assembledHooks.gemini or {};
-  baseHooks = {
-    AfterAgent = [
-      {
-        hooks = [
-          {
-            type = "command";
-            command = "~/.claude/hooks/agent-notify.sh gemini";
-            timeout = 5000;
-          }
-        ];
-      }
-    ];
-  };
-  mergedHooks = let
-    events = lib.unique (lib.attrNames baseHooks ++ lib.attrNames policyHooks);
-  in
-    lib.genAttrs events (event:
-      (baseHooks.${event} or []) ++ (policyHooks.${event} or []));
+  mergedHooks = baseHooksLib.mergeHooks baseHooksLib.gemini policyHooks;
 
   geminiSettings = {
     mcpServers = mcpAdapt.gemini;
@@ -40,7 +24,7 @@
 in {
   # Contract: Gemini is the async research/critic agent
   agentPolicy.providers.gemini = {
-    enable = true;
+    enable = lib.mkDefault config.programs.gemini-cli.enable;
 
     # (A) Verbose reasoning — research results fully visible
     reasoning.mode = "verbose";

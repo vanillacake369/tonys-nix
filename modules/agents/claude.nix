@@ -15,23 +15,17 @@
   };
 
   # Merge policy-generated hooks into base settings
+  baseHooksLib = import ../../lib/agent-policy/agent-provider-hooks.nix {inherit lib;};
   baseSettings = builtins.fromJSON (builtins.readFile ../../dotfiles/claude/settings.json);
   policyHooks = config.agentPolicy._assembledHooks.claude or {};
-
-  # Deep-merge hook arrays: base hooks ++ policy hooks per event
-  mergedHooks = let
-    baseHooks = baseSettings.hooks or {};
-    events = lib.unique (lib.attrNames baseHooks ++ lib.attrNames policyHooks);
-  in
-    lib.genAttrs events (event:
-      (baseHooks.${event} or []) ++ (policyHooks.${event} or []));
+  mergedHooks = baseHooksLib.mergeHooks (baseSettings.hooks or {}) policyHooks;
 
   finalSettings = baseSettings // {hooks = mergedHooks;};
   settingsFile = jsonFormat.generate "claude-settings.json" finalSettings;
 in {
   # Contract: Claude is the orchestrator — full policy suite
   agentPolicy.providers.claude = {
-    enable = true;
+    enable = lib.mkDefault true;
 
     # (A) Silent reasoning — orchestrator shows decisions, not chain-of-thought
     reasoning.mode = "silent";

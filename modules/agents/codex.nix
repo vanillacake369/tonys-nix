@@ -10,26 +10,10 @@
   sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
   mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
 
-  # Merge policy-generated hooks with base hooks
+  # Merge policy-generated hooks with base hooks (SSoT: lib/agent-policy/agent-provider-hooks.nix)
+  baseHooksLib = import ../../lib/agent-policy/agent-provider-hooks.nix {inherit lib;};
   policyHooks = config.agentPolicy._assembledHooks.codex or {};
-  baseHooks = {
-    Stop = [
-      {
-        hooks = [
-          {
-            type = "command";
-            command = "~/.claude/hooks/agent-notify.sh codex";
-            timeout = 5;
-          }
-        ];
-      }
-    ];
-  };
-  mergedHooks = let
-    events = lib.unique (lib.attrNames baseHooks ++ lib.attrNames policyHooks);
-  in
-    lib.genAttrs events (event:
-      (baseHooks.${event} or []) ++ (policyHooks.${event} or []));
+  mergedHooks = baseHooksLib.mergeHooks baseHooksLib.codex policyHooks;
 
   codexSettings = {
     hooks = mergedHooks;
@@ -40,7 +24,7 @@
 in {
   # Contract: Codex is the logic verifier — log-only reasoning
   agentPolicy.providers.codex = {
-    enable = true;
+    enable = lib.mkDefault config.programs.codex.enable;
 
     # (A) Log-only reasoning — verification traces saved, not shown
     reasoning.mode = "log-only";
