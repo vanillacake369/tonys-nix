@@ -36,10 +36,20 @@ _detect_terminal() {
 }
 
 # ===========================================================================
-# Detect current zellij session from WezTerm pane title
-# Zellij sets title as "session_name | ..." or "session_name - ..."
+# Detect current zellij session via zellij list-sessions (socket IPC)
+# Fallback: parse WezTerm pane title
 # ===========================================================================
 _detect_current_session() {
+  # Primary: zellij list-sessions (works from outside zellij too)
+  if command -v zellij &>/dev/null; then
+    local session
+    session=$(zellij list-sessions 2>/dev/null | grep '(current)' | sed -E 's/\x1b\[[0-9;]*m//g; s/ .*//' || true)
+    if [[ -n "$session" ]]; then
+      echo "$session"
+      return
+    fi
+  fi
+  # Fallback: WezTerm pane title parsing
   local title="${_TEST_WEZTERM_TITLE-__unset__}"
   if [[ "$title" == "__unset__" ]] && command -v wezterm &>/dev/null; then
     title=$(wezterm cli list --format json 2>/dev/null \
@@ -49,12 +59,11 @@ for p in json.load(sys.stdin):
     print(p.get('title','')); break
 " 2>/dev/null || true)
   fi
-  # Extract session name: everything before " | " or " - "
-  local session=""
-  if [[ -n "$title" ]]; then
-    session=$(echo "$title" | sed -E 's/ [|] .*//;s/ - .*//' | tr -d '[:space:]' | head -1)
+  local parsed=""
+  if [[ -n "${title:-}" ]]; then
+    parsed=$(echo "$title" | sed -E 's/ [|] .*//;s/ - .*//' | tr -d '[:space:]' | head -1)
   fi
-  echo "$session"
+  echo "$parsed"
 }
 
 # ===========================================================================
@@ -68,34 +77,28 @@ _focus_terminal() {
 }
 
 # ===========================================================================
-# Strategy: WezTerm
-# Uses wezterm cli send-text to type zellij switch command into active pane.
-# Works when the current pane has an idle shell (typical at notification time).
+# Strategy: Zellij IPC (terminal-agnostic)
+# Uses `zellij --session <current> action switch-session <target>` to switch
+# via zellij's Unix socket. Safe regardless of pane state (nvim, agent, etc).
 # ===========================================================================
-_switch_wezterm() {
+_switch_zellij_ipc() {
   local target="$1"
   local current
   current=$(_detect_current_session)
+
+  if [[ -z "$current" ]]; then
+    echo "action=focus-only reason=no-current-session"
+    return 0
+  fi
 
   if [[ "$current" == "$target" ]]; then
     echo "action=skip reason=already-on-target"
     return 0
   fi
 
-  local pane_id="${_TEST_WEZTERM_PANE:-}"
-  if [[ -z "$pane_id" ]] && command -v wezterm &>/dev/null; then
-    pane_id=$(wezterm cli list --format json 2>/dev/null \
-      | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['pane_id'])" 2>/dev/null || true)
-  fi
-
-  if [[ -n "$pane_id" ]]; then
-    echo "action=send-text pane=$pane_id target=$target"
-    if [[ -z "${_TEST_DRY_RUN:-}" ]]; then
-      wezterm cli send-text --pane-id "$pane_id" --no-paste \
-        -- "zellij action switch-session ${target}"$'\r' 2>/dev/null || true
-    fi
-  else
-    echo "action=focus-only reason=no-pane"
+  echo "action=zellij-ipc current=$current target=$target"
+  if [[ -z "${_TEST_DRY_RUN:-}" ]]; then
+    zellij --session "$current" action switch-session "$target" 2>/dev/null || true
   fi
 }
 
@@ -119,23 +122,28 @@ _switch_fallback() {
 }
 
 # ===========================================================================
-# Strategy Router: dispatch to terminal-specific implementation
+# Strategy Router: zellij IPC first, terminal-specific fallback
 # ===========================================================================
 _switch_session() {
   local target="$1"
-  local terminal
-  terminal=$(_detect_terminal)
 
   if [[ -z "$target" ]]; then
     echo "strategy=none action=focus-only reason=no-target"
     return 0
   fi
 
+  # Primary: zellij socket IPC (terminal-agnostic, pane-state-safe)
+  if command -v zellij &>/dev/null; then
+    echo "strategy=zellij-ipc"
+    _switch_zellij_ipc "$target"
+    return $?
+  fi
+
+  # Fallback: terminal-specific strategies
+  local terminal
+  terminal=$(_detect_terminal)
+
   case "$terminal" in
-    wezterm)
-      echo "strategy=wezterm"
-      _switch_wezterm "$target"
-      ;;
     ghostty)
       echo "strategy=ghostty"
       _switch_ghostty "$target"
