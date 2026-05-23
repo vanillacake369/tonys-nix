@@ -15,10 +15,14 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Pin neovim 0.11.6 — last nixpkgs commit before 0.12 bump.
+    # 0.12.x breaks treesitter plugins; this input provides neovim-unwrapped only.
+    nixpkgs-neovim.url = "github:nixos/nixpkgs/d86da6ff1a3db2d1e667684c6f34c21896767b3e";
   };
 
   outputs = {
     nixpkgs,
+    nixpkgs-neovim,
     home-manager,
     nixos-generators,
     llm-agents,
@@ -30,7 +34,15 @@
 
     # Auto-collect overlays from modules (*.overlay.nix convention)
     collectOverlays = import ./lib/discover-overlays.nix {inherit lib;};
-    overlays = collectOverlays ./modules ++ [llm-agents.overlays.default];
+    overlays =
+      collectOverlays ./modules
+      ++ [
+        llm-agents.overlays.default
+        # Pin neovim-unwrapped from older nixpkgs (0.11.6)
+        (_final: _prev: {
+          neovim-unwrapped = nixpkgs-neovim.legacyPackages.${_prev.stdenv.hostPlatform.system}.neovim-unwrapped;
+        })
+      ];
 
     # Auto-discover user profiles
     discoverModules = import ./lib/discover-modules.nix {inherit lib;};
