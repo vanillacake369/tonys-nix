@@ -20,9 +20,9 @@ graph TD
     end
 
     subgraph NixBuildTime["Nix Build Time"]
-        Contract["lib/agent-policy/contract.nix\nOption interface"]
+        Contract["lib/agent-policy/agent-contract.nix\nOption interface"]
         Mixins["lib/agent-policy/mixins/\n6 capability modules"]
-        HookAdapters["lib/agent-policy/hook-adapters.nix\nFormat conversion"]
+        HookAdapters["lib/agent-policy/agent-hook-adapters.nix\nFormat conversion"]
         MCPAdapters["lib/mcp-adapters.nix\nSSoT transformation"]
     end
 
@@ -46,10 +46,10 @@ graph TD
 
 ## MCP Server Single Source of Truth
 
-MCP servers are declared once in `modules/agents/mcp.nix` and adapted to each provider's required format by `lib/mcp-adapters.nix`. No provider-specific MCP configuration is written by hand.
+MCP servers are declared once in `modules/agents/agents-mcp.nix` and adapted to each provider's required format by `lib/mcp-adapters.nix`. No provider-specific MCP configuration is written by hand.
 
 ```
-modules/agents/mcp.nix          (canonical server definitions)
+modules/agents/agents-mcp.nix   (canonical server definitions)
         |
         v
 lib/mcp-adapters.nix            (SSoT transformer)
@@ -115,20 +115,15 @@ Each provider fires `~/.claude/hooks/agent-notify.sh <provider>` on session end.
 
 ```
 modules/agents/
-├── default.nix          # imports all provider modules
-├── mcp.nix              # MCP server SSoT (programs.mcp.servers)
+├── agents-module.nix    # imports all provider modules
+├── agents-mcp.nix       # MCP server SSoT (programs.mcp.servers)
 ├── claude.nix           # Claude: dotfiles + activation + policy contract
 ├── gemini.nix           # Gemini: settings + policy contract
 ├── codex.nix            # Codex: config.toml + policy contract
-└── proxy.nix            # cli-proxy-api binary + launchd service (macOS)
+└── agents-proxy.nix     # cli-proxy-api binary + launchd service (macOS)
 
 lib/
 ├── mcp-adapters.nix     # SSoT: programs.mcp.servers → per-provider format
 ├── sync-mutable-config.nix  # mkJsonSync + mkFileCopy helpers
-└── agent-policy/
-    ├── contract.nix     # Option interface (6 option groups)
-    ├── assertions.nix   # 6 build-time contract checks
-    ├── hook-adapters.nix # Hook format conversion (claude/gemini/codex)
-    ├── policy.nix       # IoC assembler + activation entry point
-    └── mixins/          # 6 capability modules
+└── agent-policy/        # see lib/agent-policy/ for full file listing
 ```

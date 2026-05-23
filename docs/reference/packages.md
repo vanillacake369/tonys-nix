@@ -138,7 +138,7 @@ JetBrains IDEs are declared in a dedicated module. The exact set may vary; check
 | `claude-code` | `apps.nix` | Claude Code CLI binary |
 | `gemini-cli` | `apps.nix` | Gemini CLI binary |
 | `codex` | `apps.nix` | OpenAI Codex CLI binary |
-| `cli-proxy-api` | `agents/proxy.nix` | OAuth proxy; routes requests to all three providers |
-| MCP servers | `agents/mcp.nix` | SSoT MCP server definitions, adapted per provider |
+| `cli-proxy-api` | `agents/agents-proxy.nix` | OAuth proxy; routes requests to all three providers |
+| MCP servers | `agents/agents-mcp.nix` | SSoT MCP server definitions, adapted per provider |
 
 `cli-proxy-api` is managed as a `launchd` service on macOS (auto-start on login). On Linux it runs as a user systemd service.

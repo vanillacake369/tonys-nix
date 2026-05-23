@@ -18,16 +18,16 @@ The Nix module system already provides the infrastructure needed for this: optio
 
 | OOP / DDD Concept | Nix Module System Equivalent | Location |
 |---|---|---|
-| Contract / Interface | `mkOption` type declarations | `lib/agent-policy/contract.nix` |
+| Contract / Interface | `mkOption` type declarations | `lib/agent-policy/agent-contract.nix` |
 | Implementation | Provider module sets `agentPolicy.providers.<name>` values | `modules/agents/<provider>.nix` |
-| Assertion / Precondition | `config.assertions` — fails `nix build` on violation | `lib/agent-policy/assertions.nix` |
+| Assertion / Precondition | `config.assertions` — fails `nix build` on violation | `lib/agent-policy/agent-assertions.nix` |
 | Mixin / Trait | Module in `mixins/` that reads options and writes `_hooks` | `lib/agent-policy/mixins/` |
-| IoC Container | Nix module system auto-wires option producers to consumers | `lib/agent-policy/policy.nix` |
-| Adapter | Format conversion from canonical hooks to provider-native | `lib/agent-policy/hook-adapters.nix` |
+| IoC Container | Nix module system auto-wires option producers to consumers | `lib/agent-policy/agent-assembler.nix` |
+| Adapter | Format conversion from canonical hooks to provider-native | `lib/agent-policy/agent-hook-adapters.nix` |
 
 ## Contract Interface
 
-`lib/agent-policy/contract.nix` defines a `providerModule` submodule with six option groups. Every provider that sets `agentPolicy.providers.<name>` must satisfy this type.
+`lib/agent-policy/agent-contract.nix` defines a `providerModule` submodule with six option groups. Every provider that sets `agentPolicy.providers.<name>` must satisfy this type.
 
 ### (A) reasoning
 
@@ -106,7 +106,7 @@ Describes how to format and where to write the assembled hooks.
 
 ## Build-Time Assertions
 
-`lib/agent-policy/assertions.nix` adds six entries to `config.assertions`. All checks run across every enabled provider. A failing assertion terminates `nix build` with the message shown.
+`lib/agent-policy/agent-assertions.nix` adds six entries to `config.assertions`. All checks run across every enabled provider. A failing assertion terminates `nix build` with the message shown.
 
 | # | Condition | Error Message |
 |---|---|---|
@@ -138,9 +138,9 @@ flowchart TD
 
     B["Mixins evaluate options\nfor each enabled provider\nand write to\nagentPolicy._hooks.&lt;mixin&gt;.&lt;provider&gt;"]
 
-    C["hook-adapters.nix\ngroupByProvider + groupByEvent\nconverts to provider-native format\nclaude: settings.json shape\ngemini: settings.json shape\ncodex: config.toml shape"]
+    C["agent-hook-adapters.nix\ngroupByProvider + groupByEvent\nconverts to provider-native format\nclaude: settings.json shape\ngemini: settings.json shape\ncodex: config.toml shape"]
 
-    D["policy.nix assembler\nmaps each enabled provider\nthrough its format adapter\nproduces agentPolicy._assembledHooks"]
+    D["agent-assembler.nix\nmaps each enabled provider\nthrough its format adapter\nproduces agentPolicy._assembledHooks"]
 
     E["Provider module reads\nagentPolicy._assembledHooks.&lt;name&gt;\ndeep-merges with base hooks\ngenerates final settings file"]
 
@@ -234,8 +234,8 @@ Hook output format: `config.toml` with event keys mapping to arrays of `{ hooks:
 
 1. Create `modules/agents/<name>.nix`.
 2. Set `agentPolicy.providers.<name> = { enable = true; hooks.format = "..."; ... }` with whatever capabilities the provider needs.
-3. Ensure `policy.nix` is imported (it imports all mixins and the contract). This is typically handled by including the new module in `modules/agents/default.nix`.
-4. If the provider uses a format not already in `hook-adapters.nix` (currently `claude`, `gemini`, `codex`), add a new format function to `hook-adapters.nix` that maps the internal `{ event, matcher, script }` structure to the provider's settings schema.
+3. Ensure `agent-assembler.nix` is imported (it imports all mixins and the contract). This is typically handled by including the new module in `modules/agents/agents-module.nix`.
+4. If the provider uses a format not already in `agent-hook-adapters.nix` (currently `claude`, `gemini`, `codex`), add a new format function to `agent-hook-adapters.nix` that maps the internal `{ event, matcher, script }` structure to the provider's settings schema.
 5. Run `nix build`. Assertions will catch any missing required options.
 
 ## Adding a New Mixin
@@ -244,11 +244,11 @@ Hook output format: `config.toml` with event keys mapping to arrays of `{ hooks:
 2. In the module body, read from `config.agentPolicy.providers` — filter to providers where the relevant option is enabled.
 3. For each matching provider, generate a shell script using `pkgs.writeShellScript`.
 4. Write hook entries to `config.agentPolicy._hooks.<name>` as an attrset of `{ event, matcher, script }` per provider name.
-5. Add the new mixin to the imports list in `lib/agent-policy/policy.nix`. The hook will automatically appear in each matching provider's assembled settings after the next `just apply`.
+5. Add the new mixin to the imports list in `lib/agent-policy/agent-assembler.nix`. The hook will automatically appear in each matching provider's assembled settings after the next `just apply`.
 
 ## Adding a New Assertion
 
-Add a new attrset to the `config.assertions` list in `lib/agent-policy/assertions.nix`:
+Add a new attrset to the `config.assertions` list in `lib/agent-policy/agent-assertions.nix`:
 
 ```nix
 {

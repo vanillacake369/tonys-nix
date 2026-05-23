@@ -10,7 +10,7 @@ This page is for readers who are already comfortable with Nix basics — derivat
 - `home-manager` — the user environment manager, follows the same nixpkgs
 - `llm-agents` — a private flake providing `claude-code`, `gemini-cli`, `codex`, and `cli-proxy-api` as packages and an overlay
 
-The flake's `outputs` function calls `lib/builders.nix` to produce `homeConfigurations` entries — one per platform and architecture combination. For NixOS hosts it also produces `nixosConfigurations`. There are no `devShells` or `packages` outputs that a downstream consumer would import; this is a leaf configuration, not a library.
+The flake's `outputs` function calls `lib/mk-home-config.nix` to produce `homeConfigurations` entries — one per platform and architecture combination. For NixOS hosts it also produces `nixosConfigurations`. There are no `devShells` or `packages` outputs that a downstream consumer would import; this is a leaf configuration, not a library.
 
 ```nix
 # flake.nix (conceptual shape)
@@ -23,7 +23,7 @@ The flake's `outputs` function calls `lib/builders.nix` to produce `homeConfigur
 
   outputs = { nixpkgs, home-manager, llm-agents, ... }:
     let
-      builders = import ./lib/builders.nix { ... };
+      builders = import ./lib/mk-home-config.nix { ... };
     in {
       homeConfigurations = {
         "hm-aarch64-darwin"    = builders.mkHomeConfig { ... };
@@ -38,7 +38,7 @@ The flake's `outputs` function calls `lib/builders.nix` to produce `homeConfigur
 
 ## Platform Detection
 
-`lib/builders.nix` derives four boolean flags and threads them through `extraSpecialArgs` to every module in the configuration:
+`lib/mk-home-config.nix` derives four boolean flags and threads them through `extraSpecialArgs` to every module in the configuration:
 
 | Flag | Source |
 |---|---|
@@ -65,11 +65,11 @@ The flags travel from `flake.nix` down through `extraSpecialArgs` without any mo
 
 ## The Overlay Convention
 
-Any file named `*.overlay.nix` inside the `modules/` directory tree is automatically collected by `lib/collect-overlays.nix` and applied to nixpkgs. The `llm-agents` flake overlay is appended on top.
+Any file named `*.overlay.nix` inside the `modules/` directory tree is automatically collected by `lib/discover-overlays.nix` and applied to nixpkgs. The `llm-agents` flake overlay is appended on top.
 
 ```nix
 # flake.nix (excerpt)
-collectOverlays = import ./lib/collect-overlays.nix { inherit lib; };
+collectOverlays = import ./lib/discover-overlays.nix { inherit lib; };
 overlays = collectOverlays ./modules ++ [ llm-agents.overlays.default ];
 ```
 
@@ -97,30 +97,30 @@ The agent policy contract system uses the Nix module system's dependency resolut
 
 The flow works as follows:
 
-1. **Provider modules** (e.g. `modules/agents/claude.nix`) set values on `agentPolicy.providers.claude.*` — the capability options defined in `lib/agent-policy/contract.nix`.
+1. **Provider modules** (e.g. `modules/agents/claude.nix`) set values on `agentPolicy.providers.claude.*` — the capability options defined in `lib/agent-policy/agent-contract.nix`.
 2. **Mixin modules** (in `lib/agent-policy/mixins/`) each declare a dependency on `config.agentPolicy.providers` and write their output to `config.agentPolicy._hooks.<mixin>.<provider>`. They are passive: they run when imported, generate hooks only for providers where the relevant option is enabled, and write nothing else.
-3. **`hook-adapters.nix`** reads `config.agentPolicy._hooks` and converts the internal `{ event, matcher, script }` representation to each provider's native settings schema.
-4. **`policy.nix`** is the assembler. It imports all mixins and the contract, maps the adapted hooks per provider, and writes the final result to `config.agentPolicy._assembledHooks`.
+3. **`agent-hook-adapters.nix`** reads `config.agentPolicy._hooks` and converts the internal `{ event, matcher, script }` representation to each provider's native settings schema.
+4. **`agent-assembler.nix`** is the assembler. It imports all mixins and the contract, maps the adapted hooks per provider, and writes the final result to `config.agentPolicy._assembledHooks`.
 5. **Provider modules** read `config.agentPolicy._assembledHooks.<name>`, deep-merge with their base hooks, generate a Nix-store JSON file, and register an activation script to sync it into the live settings file.
 
-No module explicitly calls another. The Nix module system evaluates all modules together, resolves the option graph, and produces a single consistent `config`. Adding a new mixin means importing it in `policy.nix`; the hook automatically appears in any provider that has the relevant option enabled.
+No module explicitly calls another. The Nix module system evaluates all modules together, resolves the option graph, and produces a single consistent `config`. Adding a new mixin means importing it in `agent-assembler.nix`; the hook automatically appears in any provider that has the relevant option enabled.
 
 ```mermaid
 graph TD
-    A[flake.nix] --> B[builders.nix]
+    A[flake.nix] --> B[mk-home-config.nix]
     B --> C[home.nix]
     C --> D[modules/]
     D --> E[shell/ language.nix apps.nix]
     D --> F[agents/]
-    F --> G[policy.nix]
-    G --> H[contract.nix]
+    F --> G[agent-assembler.nix]
+    G --> H[agent-contract.nix]
     G --> I[mixins/]
     I --> J[Generated Hooks]
     J --> K[sync-mutable-config]
     K --> L["~/.claude/settings.json"]
 ```
 
-The build-time assertions in `lib/agent-policy/assertions.nix` run as part of normal `config.assertions` evaluation — the same mechanism used throughout nixpkgs to catch invalid option combinations. If an assertion fires, `nix build` stops with a message like:
+The build-time assertions in `lib/agent-policy/agent-assertions.nix` run as part of normal `config.assertions` evaluation — the same mechanism used throughout nixpkgs to catch invalid option combinations. If an assertion fires, `nix build` stops with a message like:
 
 ```
 error: Failed assertions:

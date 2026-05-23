@@ -136,7 +136,7 @@ Claude's contract implementation in `modules/agents/claude.nix` activates the fo
 
 **Add or remove tool permissions**: edit `dotfiles/claude/settings.json` under the `permissions.allow` array, then run `just apply`.
 
-**Add an MCP server**: edit `modules/agents/mcp.nix` (single source of truth). The adapter automatically formats it for Claude, Gemini, and Codex. Run `just apply`.
+**Add an MCP server**: edit `modules/agents/agents-mcp.nix` (single source of truth). The adapter automatically formats it for Claude, Gemini, and Codex. Run `just apply`.
 
 **Add a hook**: for one-off hooks, add an entry directly to `dotfiles/claude/settings.json`. For policy-driven hooks that should apply across providers, create a mixin in `lib/agent-policy/mixins/`. See [architecture/agent-policy-contract.md](../architecture/agent-policy-contract.md#adding-a-new-mixin).
 

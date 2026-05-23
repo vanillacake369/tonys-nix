@@ -39,7 +39,7 @@ This repository's approach is to encode guardrails as Nix module options that ge
 
 The phase gate, path guard, strategy lint, and live oracle are all implemented as hooks. They do not ask for compliance. They enforce it at the process boundary.
 
-The Nix layer adds a second property: contract coherence. Before any hook script is written, `nix build` validates that the configuration is internally consistent. A phase gate that would silently pass everything (because `gatedTools` is empty) is caught at build time. A strategy lint requirement that has no peer review provider assigned is caught at build time. The invariants are expressed once, in `lib/agent-policy/assertions.nix`, and checked on every build.
+The Nix layer adds a second property: contract coherence. Before any hook script is written, `nix build` validates that the configuration is internally consistent. A phase gate that would silently pass everything (because `gatedTools` is empty) is caught at build time. A strategy lint requirement that has no peer review provider assigned is caught at build time. The invariants are expressed once, in `lib/agent-policy/agent-assertions.nix`, and checked on every build.
 
 ## Reasoning Separation
 

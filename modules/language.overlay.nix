@@ -26,4 +26,12 @@ _final: prev: {
   prettier = prev.prettier.override {nodejs = prev.nodejs_24;};
   bash-language-server = prev.bash-language-server.override {nodejs-slim = prev.nodejs-slim_24;};
   pnpm = prev.pnpm.override {nodejs = prev.nodejs_24;};
+
+  # Fix python-lsp-server: requires jedi<0.20.0 but nixpkgs ships 0.20.0
+  python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
+    python-lsp-server = pyPrev.python-lsp-server.overridePythonAttrs (_: {
+      pythonRelaxDeps = ["jedi"];
+      doCheck = false;
+    });
+  });
 }
