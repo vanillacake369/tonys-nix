@@ -10,6 +10,17 @@
     lib.optionals (builtins.pathExists /etc/nixos/hardware-configuration.nix) [
       /etc/nixos/hardware-configuration.nix
     ]
+    # Fallback for non-NixOS environments (macOS, CI) where hardware-configuration.nix is absent.
+    # mkDefault ensures real hardware-configuration.nix takes precedence on actual NixOS machines.
+    ++ lib.optionals (! builtins.pathExists /etc/nixos/hardware-configuration.nix) [
+      {
+        fileSystems."/" = lib.mkDefault {
+          device = "/dev/sda1";
+          fsType = "ext4";
+        };
+        boot.loader.grub.device = lib.mkDefault "/dev/sda";
+      }
+    ]
     ++ [
       # System configuration modules
       ./nixos-modules/boot.nix

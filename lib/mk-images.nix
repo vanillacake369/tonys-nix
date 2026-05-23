@@ -12,10 +12,12 @@ lib.optionalAttrs (lib.hasSuffix "-linux" system) (
       modules = configModules;
       format = fmt;
     })
-  {
-    iso = "iso";
-    virtualbox = "virtualbox";
-    vmware = "vmware";
-    qcow = "qcow";
-  }
+  ({
+      iso = "iso";
+      vmware = "vmware";
+      qcow = "qcow";
+    }
+    // lib.optionalAttrs (system == "x86_64-linux") {
+      virtualbox = "virtualbox";
+    })
 )
