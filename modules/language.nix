@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   # Java environment
   home.sessionVariables = {
-    JAVA_HOME = "${pkgs.zulu17}";
+    JAVA_HOME = "${pkgs.zulu21}";
   };
 
   home.packages = with pkgs; [
@@ -14,8 +14,9 @@
     shellcheck
 
     # Java
-    zulu17
+    zulu21
     gradle
+    maven
     jdt-language-server
     google-java-format
     lombok
@@ -63,7 +64,7 @@
     taplo
 
     # TypeScript/JavaScript
-    nodejs_22
+    nodejs_24
     typescript-language-server
     prettier
     biome
