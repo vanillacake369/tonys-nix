@@ -6,7 +6,7 @@
   userProfile,
   ...
 }: let
-  keymaps = import ./lib/keymaps {inherit lib userProfile;};
+  keymaps = import ./lib/keymaps/keymap-pipeline.nix {inherit lib userProfile;};
   zellijConfig = import ./lib/mk-zellij-config.nix {inherit isDarwin;};
 in {
   programs.home-manager.enable = true;
@@ -33,11 +33,11 @@ in {
 
   imports =
     [
-      ./modules/agents
+      ./modules/agents/agents-module.nix
       ./modules/apps.nix
       ./modules/packages/jetbrains.nix
       ./modules/language.nix
-      ./modules/shell
+      ./modules/shell/shell-module.nix
     ]
     ++ lib.optionals isNixOs [./modules/platform/hyprland.nix]
     ++ lib.optionals (isLinux && !isNixOs) [./modules/platform/wsl.nix];

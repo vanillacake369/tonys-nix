@@ -29,7 +29,7 @@
     forAllSystems = lib.genAttrs supportedSystems;
 
     # Auto-collect overlays from modules (*.overlay.nix convention)
-    collectOverlays = import ./lib/collect-overlays.nix {inherit lib;};
+    collectOverlays = import ./lib/discover-overlays.nix {inherit lib;};
     overlays = collectOverlays ./modules ++ [llm-agents.overlays.default];
 
     # Auto-discover user profiles
@@ -37,7 +37,7 @@
     userProfiles = discoverModules ./user;
 
     # Builders
-    builders = import ./lib/builders.nix {
+    builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
       homeManagerModules = [./home.nix];
     };
@@ -86,6 +86,6 @@
 
     packages = forAllSystems mkImages;
 
-    tests = import ./tests {inherit lib;};
+    tests = import ./tests/guard-tests.nix {inherit lib;};
   };
 }
