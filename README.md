@@ -89,13 +89,13 @@ This repository doubles as an agent orchestration harness. Three providers colla
 ```mermaid
 graph LR
     subgraph Nix Flake
-        F[flake.nix] --> B[builders.nix]
+        F[flake.nix] --> B[mk-home-config.nix]
         B --> H[home.nix]
         H --> AG[modules/agents]
     end
 
     subgraph Agent Policy Contract
-        AG --> P[policy.nix]
+        AG --> P[agent-assembler.nix]
         P --> MC[Claude Code<br/>Orchestrator]
         P --> MG[Gemini CLI<br/>Researcher]
         P --> MX[Codex<br/>Verifier]

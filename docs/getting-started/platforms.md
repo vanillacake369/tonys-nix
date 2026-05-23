@@ -26,12 +26,12 @@ The following packages are installed only on macOS (via `lib.optionals isDarwin`
 
 ### Karabiner and AeroSpace
 
-Both configurations are generated from `lib/keymaps/keybinds.nix` at build time. After `just apply`, the generated files are written to:
+Both configurations are generated from `lib/keymaps/keymap-binds.nix` at build time. After `just apply`, the generated files are written to:
 
 - `~/.config/karabiner/karabiner.json`
 - `~/.config/aerospace/aerospace.toml`
 
-AeroSpace is reloaded automatically when `lib/keymaps/keybinds.nix` has uncommitted changes in git. To force a reload:
+AeroSpace is reloaded automatically when `lib/keymaps/keymap-binds.nix` has uncommitted changes in git. To force a reload:
 
 ```bash
 aerospace reload-config

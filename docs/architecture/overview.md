@@ -9,12 +9,12 @@ CLAUDE.md                       # Governance doc for Claude Code sessions
 
 modules/
   agents/
-    default.nix                 # Orchestration root (imports policy.nix)
+    agents-module.nix           # Orchestration root (imports agent-assembler.nix)
     claude.nix                  # Claude contract impl (orchestrator)
     gemini.nix                  # Gemini contract impl (researcher)
     codex.nix                   # Codex contract impl (verifier)
-    mcp.nix                     # MCP server definitions (SSoT)
-    proxy.nix                   # cli-proxy-api + launchd
+    agents-mcp.nix              # MCP server definitions (SSoT)
+    agents-proxy.nix            # cli-proxy-api + launchd
   shell/                        # fish, git, neovim, fzf, direnv, yazi, zellij
   language.nix                  # Toolchains — Go, Java, Rust, Python, Node, Lua, Nix
   apps.nix                      # GUI apps — claude-code, gemini-cli, codex, platform-specific
@@ -22,21 +22,10 @@ modules/
   platform/                     # hyprland (NixOS), wsl
 
 lib/
-  agent-policy/
-    contract.nix                # Interface — mkOption type declarations for 6 policy areas
-    assertions.nix              # Build-time contract validation (6 rules)
-    hook-adapters.nix           # Provider-specific hook format adapter (SSoT)
-    policy.nix                  # IoC assembler — wires mixins to providers
-    mixins/
-      phase-gate.nix            # (E) State machine enforcement
-      path-guard.nix            # Security-sensitive file blocking
-      strategy-lint.nix         # (F) Strategy doc validation + peer review gate
-      reasoning-trace.nix       # (A) Reasoning/decision separation
-      async-handshake.nix       # (B) Background task FIFO communication
-      live-oracle.nix           # (D) Runtime health verification
+  agent-policy/                 # see lib/agent-policy/ for full file listing
   mcp-adapters.nix              # MCP server SSoT adapter
   sync-mutable-config.nix       # JSON/file sync with backup
-  builders.nix                  # mkSystem, mkHomeConfig
+  mk-home-config.nix            # mkSystem, mkHomeConfig
   keymaps/                      # Karabiner + AeroSpace config generation
 
 dotfiles/
@@ -57,7 +46,7 @@ justfile                        # Task runner — bootstrap, apply, gc, lint, te
 ```mermaid
 flowchart TD
     flake["flake.nix\n(entry point)"]
-    builders["lib/builders.nix\nmkSystem · mkHomeConfig"]
+    builders["lib/mk-home-config.nix\nmkSystem · mkHomeConfig"]
     homeNix["home.nix\nhome-manager root"]
     modules["modules/\nagents · shell · language · apps · platform"]
     lib["lib/agent-policy/\ncontract · assertions · mixins · policy"]
@@ -76,11 +65,11 @@ The flake produces `homeConfigurations` outputs (one per platform/arch combinati
 
 ## How Overlays Work
 
-Any file named `*.overlay.nix` inside `modules/` is auto-collected by `lib/collect-overlays.nix` and applied to nixpkgs. The `llm-agents.nix` flake overlay is appended on top, which provides `claude-code`, `gemini-cli`, `codex`, and `cli-proxy-api`.
+Any file named `*.overlay.nix` inside `modules/` is auto-collected by `lib/discover-overlays.nix` and applied to nixpkgs. The `llm-agents.nix` flake overlay is appended on top, which provides `claude-code`, `gemini-cli`, `codex`, and `cli-proxy-api`.
 
 ```nix
 # flake.nix (excerpt)
-collectOverlays = import ./lib/collect-overlays.nix { inherit lib; };
+collectOverlays = import ./lib/discover-overlays.nix { inherit lib; };
 overlays = collectOverlays ./modules ++ [ llm-agents.overlays.default ];
 ```
 
@@ -102,7 +91,7 @@ Adding a new user means adding `user/<username>.nix` and passing it to `mkHomeCo
 
 ## How Platform Detection Works
 
-`lib/builders.nix` calls `lib/platform.nix` with four boolean flags:
+`lib/mk-home-config.nix` calls `lib/platform.nix` with four boolean flags:
 
 | Flag | True when |
 |---|---|
@@ -115,7 +104,7 @@ These flags are threaded through `extraSpecialArgs` to every module. Modules use
 
 ```mermaid
 flowchart LR
-    flake["flake.nix"] -- "isWsl / isNixOs" --> builders["lib/builders.nix"]
+    flake["flake.nix"] -- "isWsl / isNixOs" --> builders["lib/mk-home-config.nix"]
     builders -- "isDarwin / isLinux / isWsl / isNixOs" --> extraSpecialArgs
     extraSpecialArgs --> home["home.nix"]
     home --> modules["modules (conditional imports)"]

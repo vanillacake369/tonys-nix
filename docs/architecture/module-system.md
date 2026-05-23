@@ -42,10 +42,10 @@ Platform modules are imported conditionally:
 
 ## Overlay Convention
 
-Any file named `*.overlay.nix` inside `modules/` is auto-discovered by `lib/collect-overlays.nix`. The function walks the directory tree and applies every matching file as a nixpkgs overlay.
+Any file named `*.overlay.nix` inside `modules/` is auto-discovered by `lib/discover-overlays.nix`. The function walks the directory tree and applies every matching file as a nixpkgs overlay.
 
 ```nix
-# lib/collect-overlays.nix (conceptual)
+# lib/discover-overlays.nix (conceptual)
 # Returns: [ overlay1 overlay2 ... ]
 collectOverlays = dir: lib.flatten (
   map (f: import f) (findFiles "*.overlay.nix" dir)
@@ -58,10 +58,10 @@ The only current example is `modules/shell/editor.overlay.nix`, which patches th
 
 | File | Purpose |
 |---|---|
-| `lib/builders.nix` | `mkSystem` and `mkHomeConfig` factory functions |
+| `lib/mk-home-config.nix` | `mkSystem` and `mkHomeConfig` factory functions |
 | `lib/sync-mutable-config.nix` | `mkJsonSync` — write JSON configs that home-manager cannot symlink (e.g. Claude settings, which the agent writes at runtime) |
 | `lib/mcp-adapters.nix` | Transforms `programs.mcp.servers` (SSoT) into provider-specific MCP JSON formats |
-| `lib/collect-overlays.nix` | Auto-collects `*.overlay.nix` files |
+| `lib/discover-overlays.nix` | Auto-collects `*.overlay.nix` files |
 | `lib/discover-modules.nix` | Auto-discovers user profiles from `user/` |
 | `lib/platform.nix` | Computes `isDarwin`, `isLinux`, `isWsl`, `isNixOs` |
 | `lib/keymaps/` | Generates Karabiner JSON and AeroSpace TOML from a single `keybinds.nix` source |
@@ -72,11 +72,11 @@ The only current example is `modules/shell/editor.overlay.nix`, which patches th
 ```mermaid
 flowchart TD
     homeNix["home.nix"]
-    agents["modules/agents/default.nix"]
+    agents["modules/agents/agents-module.nix"]
     apps["modules/apps.nix"]
     jetbrains["modules/packages/jetbrains.nix"]
     language["modules/language.nix"]
-    shell["modules/shell/default.nix"]
+    shell["modules/shell/shell-module.nix"]
     platform["modules/platform/ (conditional)"]
 
     homeNix --> agents
@@ -104,7 +104,7 @@ flowchart TD
 2. Import it from the parent `default.nix`:
 
 ```nix
-# modules/shell/default.nix
+# modules/shell/shell-module.nix
 imports = [
   ./fish.nix
   ./git.nix

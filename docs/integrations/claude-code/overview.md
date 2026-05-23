@@ -21,7 +21,7 @@ Configuration is managed declaratively through Nix:
 When you run `just apply`, home-manager:
 
 1. Symlinks `dotfiles/claude/{commands,agents,skills,hooks}` to `~/.claude/`
-2. Generates MCP server config from `modules/agents/mcp.nix` (SSoT) and merges into `~/.claude.json`
+2. Generates MCP server config from `modules/agents/agents-mcp.nix` (SSoT) and merges into `~/.claude.json`
 3. Generates settings from `dotfiles/claude/settings.json` + policy hooks and merges into `~/.claude/settings.json`
 4. Preserves runtime data (projects, tips, OAuth tokens) through `jq` deep-merge
 
@@ -139,7 +139,7 @@ Then apply: `just apply`
 
 ### Add MCP Servers
 
-Edit `modules/agents/mcp.nix` (single source of truth):
+Edit `modules/agents/agents-mcp.nix` (single source of truth):
 ```nix
 programs.mcp.servers.my-server = {
   command = "npx";
