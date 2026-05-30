@@ -8,7 +8,6 @@
     ./yazi.nix
     ./infra.nix
     ./monitor.nix
-    ./network.nix
     ./utils.nix
   ];
 }

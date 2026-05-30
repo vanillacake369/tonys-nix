@@ -24,7 +24,9 @@
       openssl
 
       # Git tools
-      # INFO : git 에 대해서는 ./shell-core.nix 를 확인할 것
+      # INFO :
+      # git 에 대해서는
+      # ./shell-core.nix 를 확인할 것
       ghalint
       lazygit
       bfg-repo-cleaner
@@ -37,6 +39,7 @@
       # Recording
       asciinema
       asciinema-agg
+      vhs
 
       # Database
       redli

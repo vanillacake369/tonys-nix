@@ -21,20 +21,8 @@
         boot.loader.grub.device = lib.mkDefault "/dev/sda";
       }
     ]
-    ++ [
-      # System configuration modules
-      ./nixos-modules/boot.nix
-      ./nixos-modules/locale.nix
-      ./nixos-modules/desktop.nix
-      ./nixos-modules/remote-desktop.nix
-      ./nixos-modules/hardware.nix
-      ./nixos-modules/security.nix
-      ./nixos-modules/network.nix
-      ./nixos-modules/nix-settings.nix
-      ./nixos-modules/virtualization.nix
-      ./nixos-modules/power.nix
-      ./nixos-modules/users.nix
-    ];
+    # Auto-discovered nixos domain modules (*.nixos.nix convention)
+    ++ (import ./lib/discover-modules.nix {inherit lib;} ./modules).nixos;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
