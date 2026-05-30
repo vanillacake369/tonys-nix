@@ -1,0 +1,2701 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-platform Nix configuration with AI agent orchestration">
+      
+      
+      
+        <link rel="canonical" href="https://vanillacake369.github.io/tonys-nix/AGENTIC_WORKFLOWS_2025_2026/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Agentic Coding Workflows & Best Practices: 2025-2026 Research Report - tonys-nix</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/nix-brand.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agentic-coding-workflows-best-practices-2025-2026-research-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="tonys-nix" class="md-header__button md-logo" aria-label="tonys-nix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tonys-nix
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agentic Coding Workflows &amp; Best Practices: 2025-2026 Research Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vanillacake369/tonys-nix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vanillacake369/tonys-nix
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../concepts/philosophy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../agents/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Agents
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../guides/ssd-optimization/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/hooks/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="tonys-nix" class="md-nav__button md-logo" aria-label="tonys-nix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tonys-nix
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vanillacake369/tonys-nix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vanillacake369/tonys-nix
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/platforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/how-nix-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How Nix Powers This
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/agent-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/module-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/agent-policy-contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Policy Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/gemini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gemini CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/codex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/ssd-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSD Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/image-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/keyboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    macOS Keyboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hook Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-core-workflows-the-4-phase-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. CORE WORKFLOWS: The 4-Phase Model
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. CORE WORKFLOWS: The 4-Phase Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-the-explore-plan-implement-commit-pattern-anthropicclaude-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 The "Explore-Plan-Implement-Commit" Pattern (Anthropic/Claude Code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-spec-driven-development-thoughtworks-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Spec-Driven Development (ThoughtWorks, 2025)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-redgreen-tdd-with-agents-simon-willison-kent-beck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Red/Green TDD with Agents (Simon Willison, Kent Beck)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-multi-agent-state-management-anthropic-long-running-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Multi-Agent State Management (Anthropic Long-Running Agents)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-verification-self-correction-the-critique-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. VERIFICATION &amp; SELF-CORRECTION: The Critique Loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. VERIFICATION &amp; SELF-CORRECTION: The Critique Loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-naive-vs-adaptive-critique" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Naive vs. Adaptive Critique
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-concrete-verification-mechanisms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Concrete Verification Mechanisms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-react-loop-reasoning-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 ReAct Loop (Reasoning + Action)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-token-efficiency-context-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. TOKEN EFFICIENCY &amp; CONTEXT MANAGEMENT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. TOKEN EFFICIENCY &amp; CONTEXT MANAGEMENT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-the-token-economics-crisis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 The Token Economics Crisis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-context-engineering-framework-production-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Context Engineering Framework (Production Optimization)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-concrete-token-reduction-tactics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Concrete Token Reduction Tactics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Concrete Token Reduction Tactics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#githubs-production-results-62-reduction-across-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub's Production Results (62% reduction across workflows):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#structured-output-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structured Output Formats:
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prompt-caching-multi-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prompt Caching (Multi-Provider):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-comparison-the-4-phase-model-vs-claudemd-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. COMPARISON: The 4-Phase Model vs. CLAUDE.md Pattern
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. COMPARISON: The 4-Phase Model vs. CLAUDE.md Pattern">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#your-current-pattern-tonys-nix-claudemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your Current Pattern (tonys-nix CLAUDE.md):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#industry-standard-2025-2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Industry Standard (2025-2026):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-alignment-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Alignment &amp; Differences:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-thought-leader-synthesis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. THOUGHT LEADER SYNTHESIS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. THOUGHT LEADER SYNTHESIS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-martin-fowler-thoughtworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Martin Fowler / ThoughtWorks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-kent-beck" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Kent Beck
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-simon-willison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Simon Willison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-anthropic-claude-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 Anthropic (Claude Code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-self-critique-iterative-refinement-academic-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. SELF-CRITIQUE &amp; ITERATIVE REFINEMENT: Academic Findings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. SELF-CRITIQUE &amp; ITERATIVE REFINEMENT: Academic Findings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-sew-self-evolving-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 SEW (Self-Evolving Workflows)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-adaptive-critique-refinement-refinecoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Adaptive Critique Refinement (RefineCoder)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-chain-of-thought-for-code-reasoning-jason-wei" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Chain-of-Thought for Code Reasoning (Jason Wei)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-emerging-consensus-key-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. EMERGING CONSENSUS &amp; KEY PATTERNS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. EMERGING CONSENSUS &amp; KEY PATTERNS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-the-verification-first-imperative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 The Verification-First Imperative
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-explore-then-plan-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Explore-Then-Plan Separation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-state-management-across-context-windows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 State Management Across Context Windows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74-context-engineering-as-core-discipline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.4 Context Engineering as Core Discipline
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-comparative-analysis-traditional-vs-agentic-tdd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. COMPARATIVE ANALYSIS: Traditional vs. Agentic TDD
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. COMPARATIVE ANALYSIS: Traditional vs. Agentic TDD">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traditional-tdd-human-written-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traditional TDD (Human-Written Code)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ai-augmented-tdd-with-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AI-Augmented TDD (with Agent)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Differences:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-summary-table-workflow-recommendations-by-scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. SUMMARY TABLE: Workflow Recommendations by Scenario
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-recommended-action-items-for-your-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. RECOMMENDED ACTION ITEMS FOR YOUR PROJECT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. RECOMMENDED ACTION ITEMS FOR YOUR PROJECT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#for-tonys-nix-multi-provider-agent-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For tonys-nix (Multi-Provider Agent Architecture):
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-confidence-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. CONFIDENCE ASSESSMENT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agentic-coding-workflows-best-practices-2025-2026-research-report">Agentic Coding Workflows &amp; Best Practices: 2025-2026 Research Report<a class="headerlink" href="#agentic-coding-workflows-best-practices-2025-2026-research-report" title="Permanent link">&para;</a></h1>
+<p><strong>Research Date</strong>: May 2026<br />
+<strong>Cutoff Knowledge</strong>: February 2025<br />
+<strong>Primary Sources</strong>: Martin Fowler / ThoughtWorks, Kent Beck, Simon Willison, Anthropic, Academic Research</p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>The agentic coding landscape has crystallized around a <strong>core loop paradigm</strong> that emphasizes:
+1. <strong>Structured verification</strong> (tests, specs, scripts) as force multipliers
+2. <strong>Context-efficient state management</strong> to overcome token economics
+3. <strong>Multi-phase workflows</strong> separating exploration from implementation
+4. <strong>Human-in-the-loop at strategic gates</strong> rather than continuous oversight</p>
+<p>This document synthesizes insights from industry leaders and academic research to provide actionable patterns for production agentic systems.</p>
+<hr />
+<h2 id="1-core-workflows-the-4-phase-model">1. CORE WORKFLOWS: The 4-Phase Model<a class="headerlink" href="#1-core-workflows-the-4-phase-model" title="Permanent link">&para;</a></h2>
+<h3 id="11-the-explore-plan-implement-commit-pattern-anthropicclaude-code">1.1 The "Explore-Plan-Implement-Commit" Pattern (Anthropic/Claude Code)<a class="headerlink" href="#11-the-explore-plan-implement-commit-pattern-anthropicclaude-code" title="Permanent link">&para;</a></h3>
+<p><strong>Phase 1: Explore (Plan Mode)</strong>
+- Agent reads codebase without making changes
+- Questions and context gathering dominate
+- Goal: Build understanding of existing patterns and constraints</p>
+<p><strong>Phase 2: Plan</strong>
+- Agent generates detailed implementation plan
+- Identifies which files must change and what the flow is
+- Output written to text editor for human refinement before proceeding
+- This <strong>gate prevents solving the wrong problem</strong></p>
+<p><strong>Phase 3: Implement</strong>
+- Agent exits plan mode and codes against the refined plan
+- Tests run automatically as part of implementation
+- Agent verifies work against success criteria
+- Failures trigger self-correction</p>
+<p><strong>Phase 4: Commit</strong>
+- Agent creates git commit with descriptive message
+- Opens PR for human review
+- Clear handoff to review process</p>
+<p><strong>Key Insight</strong>: Plan mode adds overhead but is <strong>critical for multi-file changes</strong> or uncertain approaches. Skip it only for small, well-scoped tasks.</p>
+<hr />
+<h3 id="12-spec-driven-development-thoughtworks-2025">1.2 Spec-Driven Development (ThoughtWorks, 2025)<a class="headerlink" href="#12-spec-driven-development-thoughtworks-2025" title="Permanent link">&para;</a></h3>
+<p><strong>What It Is</strong>: A development paradigm where <strong>well-crafted specifications serve as the primary artifact</strong>, not secondary documentation.</p>
+<p><strong>Formula</strong>: <code>Specifications → Planning → Implementation → Validation</code></p>
+<p><strong>Three Levels of Implementation Maturity</strong>:
+1. <strong>Spec-First</strong>: Specification guides initial development; code becomes primary
+2. <strong>Spec-Anchored</strong>: Specifications evolve with code; tests enforce alignment
+3. <strong>Spec-as-Source</strong>: Specifications are the only human-edited artifact; code is entirely generated</p>
+<p><strong>Differs from TDD Because</strong>:
+- TDD operates at <strong>unit level</strong> (test-driven design)
+- SDD operates at <strong>system level</strong> (behavior-driven architecture)
+- TDD emphasizes incremental refinement; SDD emphasizes upfront clarity
+- With AI: specs provide "super-prompts" that eliminate ambiguity, reducing AI guess-work by ~50% (measured via error reduction)</p>
+<p><strong>Workflow</strong>:
+<div class="highlight"><pre><span></span><code>1. Write detailed behavioral specifications (Markdown)
+2. Include acceptance criteria and constraints
+3. Human review and iteration on specs
+4. Finalize specs as canonical requirements
+5. Agent receives specs and implements to specification
+6. Automated tests validate against spec
+</code></pre></div></p>
+<p><strong>Token Efficiency</strong>: Detailed upfront specifications eliminate multiple agent attempts to "figure out" requirements.</p>
+<hr />
+<h3 id="13-redgreen-tdd-with-agents-simon-willison-kent-beck">1.3 Red/Green TDD with Agents (Simon Willison, Kent Beck)<a class="headerlink" href="#13-redgreen-tdd-with-agents-simon-willison-kent-beck" title="Permanent link">&para;</a></h3>
+<p><strong>What It Is</strong>: Test-first development adapted for agentic code generation.</p>
+<p><strong>The Loop</strong>:
+1. <strong>Red</strong>: Write a failing test
+2. <strong>Green</strong>: Agent implements code to pass the test
+3. <strong>Refactor</strong>: (Optional) Agent improves code quality</p>
+<p><strong>Why It Works with Agents</strong>:
+- Tests provide <strong>unambiguous success criteria</strong> (the most high-leverage thing you can provide)
+- Agent can verify its own work and self-correct
+- No need for human to manually inspect code
+- Prevents "vibe coding" (plausible but broken implementations)</p>
+<p><strong>Key Quote (Kent Beck)</strong>: "Canon TDD" is: list test scenarios → write one concrete runnable test → code to pass → refactor. If you're critiquing TDD, you must critique this specific workflow, not a strawman.</p>
+<p><strong>Psychological Shift</strong>: The agent becomes an "unpredictable genie" that grants wishes in unexpected ways. TDD keeps it honest.</p>
+<hr />
+<h3 id="14-multi-agent-state-management-anthropic-long-running-agents">1.4 Multi-Agent State Management (Anthropic Long-Running Agents)<a class="headerlink" href="#14-multi-agent-state-management-anthropic-long-running-agents" title="Permanent link">&para;</a></h3>
+<p>For tasks spanning multiple context windows:</p>
+<p><strong>The Two-Agent System</strong>:</p>
+<p><strong>Initializer Agent (First Run)</strong>:
+- Sets up <code>init.sh</code> script
+- Creates <code>claude-progress.txt</code> (human-readable work log)
+- Initial git commit with baseline
+- Generates feature list (JSON, 200+ items for complex apps)</p>
+<p><strong>Coding Agent (All Subsequent Runs)</strong>:
+- Reads progress file and git history to understand state
+- Works on <strong>one feature at a time</strong> to avoid context exhaustion
+- Commits changes frequently
+- Updates progress documentation</p>
+<p><strong>State Artifacts</strong>:
+- Git history = snapshots of working code
+- Progress file = human-readable summary (not parsed by agent)
+- Feature list = structured requirements (agent only updates completion flags, never deletes)</p>
+<p><strong>Why This Works</strong>:
+- Clear handoffs between sessions
+- No need to re-read entire codebase
+- Human can track what was done
+- Deterministic initialization ritual (read working dir → read progress → read git log)</p>
+<hr />
+<h2 id="2-verification-self-correction-the-critique-loop">2. VERIFICATION &amp; SELF-CORRECTION: The Critique Loop<a class="headerlink" href="#2-verification-self-correction-the-critique-loop" title="Permanent link">&para;</a></h2>
+<h3 id="21-naive-vs-adaptive-critique">2.1 Naive vs. Adaptive Critique<a class="headerlink" href="#21-naive-vs-adaptive-critique" title="Permanent link">&para;</a></h3>
+<p><strong>Naive Self-Critique</strong> (❌ Anti-pattern):
+- Agent generates code
+- Agent reviews its own output with generic quality checks
+- Flawed critique can reinforce errors</p>
+<p><strong>Adaptive Critique Refinement</strong> (✅ Pattern):
+- Agent generates code
+- <strong>Specific error analysis</strong>: identify particular classes of bugs
+- <strong>Targeted feedback</strong>: corrections address identified problems, not blanket rules
+- <strong>Iterative refinement</strong>: each round builds on previous insights
+- Prevents reinforcement of flawed patterns</p>
+<p><strong>Result</strong>: 2-3 iterations typically produce passing output.</p>
+<hr />
+<h3 id="22-concrete-verification-mechanisms">2.2 Concrete Verification Mechanisms<a class="headerlink" href="#22-concrete-verification-mechanisms" title="Permanent link">&para;</a></h3>
+<p><strong>Highest-Leverage Verification</strong>:
+1. <strong>Tests</strong> (automated, runnable)
+   - Unit tests for logic
+   - Integration tests for features
+   - Agent can detect and fix failures immediately
+   - Prevents the "looks right" trap</p>
+<ol>
+<li><strong>Screenshots/Visual Verification</strong> (for UI)</li>
+<li>Agent takes screenshots</li>
+<li>Compares to expected design</li>
+<li>Lists differences and fixes them</li>
+<li>
+<p>Claude in Chrome extension opens new tabs and iterates</p>
+</li>
+<li>
+<p><strong>Linting &amp; Type Checking</strong></p>
+</li>
+<li>Run immediately after code edits</li>
+<li>Agent fixes violations</li>
+<li>
+<p>Continuous feedback loop</p>
+</li>
+<li>
+<p><strong>End-to-End Test Suites</strong></p>
+</li>
+<li>Claude performs better when explicitly prompted to use browser automation</li>
+<li>Tests UI as a human would</li>
+<li>Catches integration issues</li>
+</ol>
+<p><strong>Anti-Pattern</strong>: "The build is failing" without providing error messages.<br />
+<strong>Pattern</strong>: "The build fails with [error]. Fix it and verify the build succeeds. Address the root cause, don't suppress the error."</p>
+<hr />
+<h3 id="23-react-loop-reasoning-action">2.3 ReAct Loop (Reasoning + Action)<a class="headerlink" href="#23-react-loop-reasoning-action" title="Permanent link">&para;</a></h3>
+<p><strong>Architecture</strong>:
+<div class="highlight"><pre><span></span><code>Agent State → [Reason] → Action Plan → [Execute] → Observe → Evaluate → Loop
+</code></pre></div></p>
+<p><strong>Concrete Example</strong>:
+1. Agent reasons: "This test is failing because the async promise isn't being awaited"
+2. Agent modifies file: adds <code>await</code>
+3. Executes: runs test suite
+4. Observes: test now passes
+5. Evaluates: success criteria met
+6. Loop: move to next failing test</p>
+<p><strong>Self-Correction Capability</strong>: Separates 2026 agents from 2024 chatbots. The agent reads failures and tries different approaches.</p>
+<hr />
+<h2 id="3-token-efficiency-context-management">3. TOKEN EFFICIENCY &amp; CONTEXT MANAGEMENT<a class="headerlink" href="#3-token-efficiency-context-management" title="Permanent link">&para;</a></h2>
+<h3 id="31-the-token-economics-crisis">3.1 The Token Economics Crisis<a class="headerlink" href="#31-the-token-economics-crisis" title="Permanent link">&para;</a></h3>
+<p><strong>Baseline</strong>: Agentic coding sessions average <strong>1-3.5M tokens per task</strong> including retries and self-correction.</p>
+<p><strong>The Problem</strong>: By turn 30 of a session, the agent carries <strong>25,000-35,000 input tokens</strong> of accumulated context on every request, degrading performance.</p>
+<p><strong>Cost Implications</strong>:
+- Production agents typically consume <strong>100:1 input-output ratio</strong>
+- A 15-turn customer service conversation costs $0.07
+- Scales to $255,000 annually for 10,000 daily conversations
+- With optimization: reduces to ~$102,000 (40% savings)</p>
+<hr />
+<h3 id="32-context-engineering-framework-production-optimization">3.2 Context Engineering Framework (Production Optimization)<a class="headerlink" href="#32-context-engineering-framework-production-optimization" title="Permanent link">&para;</a></h3>
+<p><strong>Core Insight</strong>: "Context management represents the most significant operational cost factor in production agent systems." Performance degrades from 98.1% to 64.1% accuracy based solely on how information is structured.</p>
+<p><strong>Token Allocation Budget</strong> (per session):
+- System instructions: 10-15%
+- Tools/MCP schemas: 15-20%
+- Knowledge/documentation: 30-40%
+- Conversation history: 20-30%
+- Buffer reserve: 10-15%</p>
+<p><strong>Lifecycle Management Strategies</strong>:</p>
+<ol>
+<li><strong>Initialization</strong>: Structured startup with clear token accounting</li>
+<li><strong>Incremental Summarization</strong>: Compress older turns as context fills</li>
+<li><strong>Reference-Based Storage</strong>: Don't repeat large outputs; reference them</li>
+<li><strong>Automatic Compaction</strong>: Trigger when utilization exceeds 70% threshold</li>
+</ol>
+<hr />
+<h3 id="33-concrete-token-reduction-tactics">3.3 Concrete Token Reduction Tactics<a class="headerlink" href="#33-concrete-token-reduction-tactics" title="Permanent link">&para;</a></h3>
+<h4 id="githubs-production-results-62-reduction-across-workflows">GitHub's Production Results (62% reduction across workflows):<a class="headerlink" href="#githubs-production-results-62-reduction-across-workflows" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Remove Unused MCP Tools</strong></li>
+<li>Unused tool schemas = 10-15 KB each</li>
+<li>Removing unused tools saved 8-12 KB per API call</li>
+<li>
+<p>Cumulative: thousands of tokens per run</p>
+</li>
+<li>
+<p><strong>Replace GitHub MCP with CLI</strong></p>
+</li>
+<li>Move data-fetching outside the LLM loop</li>
+<li><strong>Pre-agentic downloads</strong>: Run <code>gh api</code> commands before agent starts</li>
+<li>Write results to files agent reads</li>
+<li>
+<p><strong>Principle</strong>: "The cheapest LLM call is the one you don't make"</p>
+</li>
+<li>
+<p><strong>CLI Proxy Substitution</strong></p>
+</li>
+<li>Route agent CLI requests directly to API</li>
+<li>
+<p>Skip LLM reasoning for deterministic operations</p>
+</li>
+<li>
+<p><strong>Observability &amp; Auditing</strong></p>
+</li>
+<li>Log token usage through API proxy</li>
+<li>Flag unusual consumption patterns</li>
+<li>Recommend optimizations per workflow</li>
+</ol>
+<p><strong>Measured Savings</strong>:
+- Auto-Triage Issues: 62% reduction
+- Security Guard: 43% reduction
+- Smoke Test: 59% reduction</p>
+<h4 id="structured-output-formats">Structured Output Formats:<a class="headerlink" href="#structured-output-formats" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Native Markdown vs. raw HTML: <strong>67% token savings</strong></li>
+<li>Semantic locators vs. full DOM trees: <strong>93% savings</strong></li>
+<li>Caching static components: <strong>10x cost reduction</strong> on cached tokens</li>
+</ul>
+<h4 id="prompt-caching-multi-provider">Prompt Caching (Multi-Provider):<a class="headerlink" href="#prompt-caching-multi-provider" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Anthropic, OpenAI, Bedrock all support prompt caching</li>
+<li>Cached input charged at 10-25% of normal input cost</li>
+<li>Static system instructions achieve <strong>95%+ cache hit rates</strong></li>
+<li>Semi-static user data: 60-80% hit rates</li>
+<li>Result: 60-80% reduction in operational costs</li>
+</ul>
+<hr />
+<h2 id="4-comparison-the-4-phase-model-vs-claudemd-pattern">4. COMPARISON: The 4-Phase Model vs. CLAUDE.md Pattern<a class="headerlink" href="#4-comparison-the-4-phase-model-vs-claudemd-pattern" title="Permanent link">&para;</a></h2>
+<h3 id="your-current-pattern-tonys-nix-claudemd">Your Current Pattern (tonys-nix CLAUDE.md):<a class="headerlink" href="#your-current-pattern-tonys-nix-claudemd" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Phase 1: RESEARCH (현황 파악 및 도구 탐색)
+Phase 2: STRATEGY (전략 수립 &amp; 컨펌)
+Phase 3: EXECUTION (구현 및 검증)
+Phase 4: REPORT &amp; EXIT (세션 종료 및 핸드오버)
+</code></pre></div>
+<h3 id="industry-standard-2025-2026">Industry Standard (2025-2026):<a class="headerlink" href="#industry-standard-2025-2026" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Explore → Plan → Implement → Commit
+</code></pre></div>
+<h3 id="key-alignment-differences">Key Alignment &amp; Differences:<a class="headerlink" href="#key-alignment-differences" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Your Model</th>
+<th>Industry Standard</th>
+<th>Mapping</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RESEARCH (Zero-Inference)</td>
+<td>Explore (Plan Mode)</td>
+<td>✓ Same: read-only analysis</td>
+</tr>
+<tr>
+<td>STRATEGY (Peer Review)</td>
+<td>Plan</td>
+<td>✓ Similar: design review gate</td>
+</tr>
+<tr>
+<td>EXECUTION</td>
+<td>Implement</td>
+<td>✓ Same: code generation &amp; test</td>
+</tr>
+<tr>
+<td>REPORT &amp; EXIT</td>
+<td>Commit</td>
+<td>✓ Similar: handoff documentation</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Insight</strong>: Your 4-phase model is <strong>aligned with industry best practices</strong>. The main difference is:
+- Industry calls it "Explore-Plan-Implement-Commit"
+- You call it "Research-Strategy-Execution-Report"
+- Functionally they're nearly identical
+- Your pattern is <strong>more rigorous</strong> with explicit peer review gates</p>
+<hr />
+<h2 id="5-thought-leader-synthesis">5. THOUGHT LEADER SYNTHESIS<a class="headerlink" href="#5-thought-leader-synthesis" title="Permanent link">&para;</a></h2>
+<h3 id="51-martin-fowler-thoughtworks">5.1 Martin Fowler / ThoughtWorks<a class="headerlink" href="#51-martin-fowler-thoughtworks" title="Permanent link">&para;</a></h3>
+<p><strong>Core Position</strong>: TDD is the strongest form of prompt engineering for AI.</p>
+<p><strong>Key Insights</strong>:
+- TDD teams release <strong>32% more frequently</strong> (2024 survey)
+- Three experiments: vibe coding produces unmaintainable software
+- Structured guidance (TDD + conversation) significantly improves quality
+- <strong>"TDD keeps it honest"</strong>: when directing thousands of lines of code generation, tests act as forcing function</p>
+<p><strong>AI-Aided Test-First Development</strong>: 
+- Generate tests with ChatGPT/Claude
+- Developers implement functionality
+- Prevents exposing sensitive implementation code to external models</p>
+<p><strong>Emerging Practice</strong>: Spec-Driven Development (SDD) as natural evolution combining TDD + specification clarity.</p>
+<hr />
+<h3 id="52-kent-beck">5.2 Kent Beck<a class="headerlink" href="#52-kent-beck" title="Permanent link">&para;</a></h3>
+<p><strong>Core Position</strong>: AI agents are "unpredictable genies" that grant wishes in unexpected ways.</p>
+<p><strong>Key Insights</strong>:
+- He's <strong>re-energized</strong> by AI agents because he doesn't need to know all details upfront
+- Can be more ambitious: let agent explore
+- <strong>Canon TDD</strong> is the strawman target: test list → concrete test → code → refactor
+- TDD is even more relevant now: provides clear exit criteria for agents</p>
+<p><strong>Philosophical Shift</strong>: From "I know exactly what to build" → "I have clear success criteria; agent figures out path"</p>
+<hr />
+<h3 id="53-simon-willison">5.3 Simon Willison<a class="headerlink" href="#53-simon-willison" title="Permanent link">&para;</a></h3>
+<p><strong>Core Position</strong>: "Writing code is cheap now." Engineers must rethink workflows.</p>
+<p><strong>Key Patterns</strong> (Daily Use):
+1. <strong>Red/Green TDD</strong>: Test-first development to minimize prompting
+2. <strong>Templates</strong>: Reusable code structures to reduce token spent on common patterns
+3. <strong>Hoarding</strong>: Collecting working examples and patterns locally for reuse</p>
+<p><strong>Definition of Agentic Engineering</strong>: Building software with tools that can both <strong>generate AND execute code</strong>, creating feedback loops. Distinct from "vibe coding"—applies to professional engineers amplifying expertise.</p>
+<p><strong>November 2025 Inflection Point</strong>: AI coding agents crossed from "mostly works" to "actually works" (production-grade).</p>
+<hr />
+<h3 id="54-anthropic-claude-code">5.4 Anthropic (Claude Code)<a class="headerlink" href="#54-anthropic-claude-code" title="Permanent link">&para;</a></h3>
+<p><strong>Core Architecture</strong>: 98.4% is deterministic infrastructure; only 1.6% is AI decision logic.</p>
+<p><strong>Best Practice Framework</strong>:</p>
+<ol>
+<li><strong>Give Claude Verification Criteria</strong></li>
+<li>Include tests, screenshots, expected outputs</li>
+<li>
+<p>"Single highest-leverage thing you can do"</p>
+</li>
+<li>
+<p><strong>CLAUDE.md as Persistent Context</strong></p>
+</li>
+<li>Project-level conventions (code style, workflow rules)</li>
+<li>Keep concise: if Claude can infer from code, delete it</li>
+<li>
+<p>Git-checked-in for team access</p>
+</li>
+<li>
+<p><strong>Context Window Management</strong></p>
+</li>
+<li>Most critical resource is context space</li>
+<li>Use <code>/clear</code> between unrelated tasks</li>
+<li>Automatic compaction at 70% threshold</li>
+<li>
+<p>Rewind checkpoints for course-correction</p>
+</li>
+<li>
+<p><strong>Subagents for Investigation</strong></p>
+</li>
+<li>Delegate research to separate context</li>
+<li>Keeps main conversation clean for implementation</li>
+<li>
+<p>Reports back summaries</p>
+</li>
+<li>
+<p><strong>Multi-Session Patterns</strong></p>
+</li>
+<li>Worktrees for parallel isolated sessions</li>
+<li>Writer/Reviewer pattern for quality focus</li>
+<li>Agent teams for coordinated multi-session work</li>
+</ol>
+<hr />
+<h2 id="6-self-critique-iterative-refinement-academic-findings">6. SELF-CRITIQUE &amp; ITERATIVE REFINEMENT: Academic Findings<a class="headerlink" href="#6-self-critique-iterative-refinement-academic-findings" title="Permanent link">&para;</a></h2>
+<h3 id="61-sew-self-evolving-workflows">6.1 SEW (Self-Evolving Workflows)<a class="headerlink" href="#61-sew-self-evolving-workflows" title="Permanent link">&para;</a></h3>
+<p><strong>Pattern</strong>: Automatically design and optimize agentic workflows through self-evolution.</p>
+<p><strong>Results</strong>: Up to 12% improvement on LiveCodeBench compared to backbone LLM alone.</p>
+<p><strong>Process</strong>:
+- Decompose complex task into sub-tasks
+- Assign to specialized agents
+- Refine assignments iteratively
+- Optimize both topology and prompts</p>
+<p><strong>Insight</strong>: Move from hand-crafted workflows to automatically-optimized ones.</p>
+<hr />
+<h3 id="62-adaptive-critique-refinement-refinecoder">6.2 Adaptive Critique Refinement (RefineCoder)<a class="headerlink" href="#62-adaptive-critique-refinement-refinecoder" title="Permanent link">&para;</a></h3>
+<p><strong>Innovation</strong>: Instead of generic self-review, provide problem-specific feedback.</p>
+<p><strong>Process</strong>:
+1. Agent generates code
+2. Identify specific error classes (logic bugs, type errors, boundary conditions)
+3. Target feedback on those specific issues
+4. Iterate with context from previous failures</p>
+<p><strong>vs. Naive Critique</strong>:
+- Naive: "Review this for quality issues"
+- Adaptive: "This failed on edge case X; here's why; fix that specific issue"</p>
+<hr />
+<h3 id="63-chain-of-thought-for-code-reasoning-jason-wei">6.3 Chain-of-Thought for Code Reasoning (Jason Wei)<a class="headerlink" href="#63-chain-of-thought-for-code-reasoning-jason-wei" title="Permanent link">&para;</a></h3>
+<p><strong>Finding</strong>: Generating intermediate reasoning steps significantly improves code generation.</p>
+<p><strong>Mechanism</strong>:
+- Agent articulates <em>why</em> it's making a change before implementing
+- Forces step-by-step logic
+- Enables verification of reasoning before code</p>
+<p><strong>Application to Agentic Code</strong>:
+- "Agentic code reasoning" = agent's ability to navigate files, trace dependencies, gather context iteratively
+- Enables deep semantic analysis without execution</p>
+<hr />
+<h2 id="7-emerging-consensus-key-patterns">7. EMERGING CONSENSUS &amp; KEY PATTERNS<a class="headerlink" href="#7-emerging-consensus-key-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="71-the-verification-first-imperative">7.1 The Verification-First Imperative<a class="headerlink" href="#71-the-verification-first-imperative" title="Permanent link">&para;</a></h3>
+<p><strong>Consensus</strong>: Provide verification mechanisms before agent starts coding.</p>
+<p><strong>Concrete Checklist</strong>:
+- [ ] Tests exist or are specified
+- [ ] Success criteria are measurable
+- [ ] Expected output is clear (screenshot, file contents, test results)
+- [ ] Agent can run verification command directly</p>
+<p><strong>Result</strong>: Dramatically better code quality, fewer corrections needed.</p>
+<hr />
+<h3 id="72-explore-then-plan-separation">7.2 Explore-Then-Plan Separation<a class="headerlink" href="#72-explore-then-plan-separation" title="Permanent link">&para;</a></h3>
+<p><strong>Consensus</strong>: Don't let agent jump straight to coding.</p>
+<p><strong>Pattern</strong>:
+1. Read codebase (plan mode)
+2. Generate implementation plan
+3. Human refines plan
+4. Agent codes against plan</p>
+<p><strong>Exception</strong>: Small, well-scoped changes (typo fixes, variable renames) can skip planning.</p>
+<hr />
+<h3 id="73-state-management-across-context-windows">7.3 State Management Across Context Windows<a class="headerlink" href="#73-state-management-across-context-windows" title="Permanent link">&para;</a></h3>
+<p><strong>Consensus</strong>: Structure state as git history + progress artifacts, not conversation history.</p>
+<p><strong>Pattern</strong>:
+- Git commits = snapshots of working code
+- Progress file = human-readable summary
+- Feature list = structured requirements</p>
+<p><strong>Why</strong>: Enables agents to work effectively across multiple sessions without context explosion.</p>
+<hr />
+<h3 id="74-context-engineering-as-core-discipline">7.4 Context Engineering as Core Discipline<a class="headerlink" href="#74-context-engineering-as-core-discipline" title="Permanent link">&para;</a></h3>
+<p><strong>Consensus</strong>: Token efficiency is not an optimization detail—it's a primary design constraint.</p>
+<p><strong>Investment Areas</strong>:
+- Structured output formats (save 67%)
+- Strategic caching (save 10x on static content)
+- Pre-agentic CLI operations (skip LLM calls entirely)
+- Observability and auditing</p>
+<p><strong>ROI</strong>: 60-80% cost reduction possible through engineering alone.</p>
+<hr />
+<h2 id="8-comparative-analysis-traditional-vs-agentic-tdd">8. COMPARATIVE ANALYSIS: Traditional vs. Agentic TDD<a class="headerlink" href="#8-comparative-analysis-traditional-vs-agentic-tdd" title="Permanent link">&para;</a></h2>
+<h3 id="traditional-tdd-human-written-code">Traditional TDD (Human-Written Code)<a class="headerlink" href="#traditional-tdd-human-written-code" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Red (write test) → Green (write code) → Refactor
+</code></pre></div>
+<h3 id="ai-augmented-tdd-with-agent">AI-Augmented TDD (with Agent)<a class="headerlink" href="#ai-augmented-tdd-with-agent" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>Red (write test) → Green (agent writes code) → Refactor (agent improves) → Verify (human checks)
+</code></pre></div>
+<h3 id="key-differences">Key Differences:<a class="headerlink" href="#key-differences" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Traditional</th>
+<th>AI-Augmented</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Who writes test?</strong></td>
+<td>Developer</td>
+<td>Developer (or AI with spec)</td>
+</tr>
+<tr>
+<td><strong>Who writes code?</strong></td>
+<td>Developer</td>
+<td>Agent</td>
+</tr>
+<tr>
+<td><strong>Feedback loop</strong></td>
+<td>Manual implementation</td>
+<td>Automated test + self-correction</td>
+</tr>
+<tr>
+<td><strong>Iteration time</strong></td>
+<td>Seconds per cycle</td>
+<td>Milliseconds per cycle</td>
+</tr>
+<tr>
+<td><strong>Leverage</strong></td>
+<td>1x human effort</td>
+<td>5-10x human time (with verification)</td>
+</tr>
+<tr>
+<td><strong>Risk</strong></td>
+<td>Misunderstanding logic</td>
+<td>Agent misinterprets requirements</td>
+</tr>
+<tr>
+<td><strong>Mitigation</strong></td>
+<td>Code review</td>
+<td>Tests + verification criteria</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-summary-table-workflow-recommendations-by-scenario">9. SUMMARY TABLE: Workflow Recommendations by Scenario<a class="headerlink" href="#9-summary-table-workflow-recommendations-by-scenario" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Recommended Pattern</th>
+<th>Key Tool</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>New feature, large scope</strong></td>
+<td>Spec-Driven Dev</td>
+<td>Specifications</td>
+</tr>
+<tr>
+<td><strong>Bug fix, small scope</strong></td>
+<td>Red/Green TDD</td>
+<td>Tests</td>
+</tr>
+<tr>
+<td><strong>API integration</strong></td>
+<td>Plan mode → Implement</td>
+<td>Plan gate</td>
+</tr>
+<tr>
+<td><strong>Refactoring</strong></td>
+<td>Red/Green TDD</td>
+<td>Tests</td>
+</tr>
+<tr>
+<td><strong>Complex logic</strong></td>
+<td>Chain-of-thought</td>
+<td>Reasoning prompts</td>
+</tr>
+<tr>
+<td><strong>Long-running task</strong></td>
+<td>Multi-agent + state artifacts</td>
+<td>Progress file + git</td>
+</tr>
+<tr>
+<td><strong>UI work</strong></td>
+<td>Screenshots + visual verification</td>
+<td>Claude in Chrome</td>
+</tr>
+<tr>
+<td><strong>Cost-sensitive</strong></td>
+<td>Context engineering</td>
+<td>Caching + CLI proxy</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-recommended-action-items-for-your-project">10. RECOMMENDED ACTION ITEMS FOR YOUR PROJECT<a class="headerlink" href="#10-recommended-action-items-for-your-project" title="Permanent link">&para;</a></h2>
+<h3 id="for-tonys-nix-multi-provider-agent-architecture">For tonys-nix (Multi-Provider Agent Architecture):<a class="headerlink" href="#for-tonys-nix-multi-provider-agent-architecture" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Alignment Check</strong> (No Change Needed)</li>
+<li>Your 4-phase model (Research-Strategy-Execution-Report) is already aligned with industry best practices</li>
+<li>Consider renaming for clarity: RESEARCH → EXPLORE, STRATEGY → PLAN</li>
+<li>
+<p>Continue requiring peer review gates before execution</p>
+</li>
+<li>
+<p><strong>Token Efficiency</strong></p>
+</li>
+<li>Implement context lifecycle management (summarization at 70% threshold)</li>
+<li>Add observability logging for Gemini/Codex calls to track token usage</li>
+<li>
+<p>Consider structured output formats for Gemini responses</p>
+</li>
+<li>
+<p><strong>Verification First</strong></p>
+</li>
+<li>In EXECUTION phase: always define success criteria before starting</li>
+<li>
+<p>Leverage nix flake check, helm lint, test suites as verification oracles</p>
+</li>
+<li>
+<p><strong>State Management for Subagents</strong></p>
+</li>
+<li>If implementing subagent patterns: structure handoffs via progress files + git</li>
+<li>Avoid relying on conversation history alone</li>
+</ol>
+<hr />
+<h2 id="11-confidence-assessment">11. CONFIDENCE ASSESSMENT<a class="headerlink" href="#11-confidence-assessment" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Confidence</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Explore-Plan-Implement-Commit is consensus pattern</td>
+<td><strong>High</strong></td>
+<td>Anthropic, ThoughtWorks, Simon Willison</td>
+</tr>
+<tr>
+<td>TDD/Verification-first improves output quality</td>
+<td><strong>High</strong></td>
+<td>Kent Beck, Martin Fowler, multiple studies</td>
+</tr>
+<tr>
+<td>Spec-Driven Development reduces iterations</td>
+<td><strong>High</strong></td>
+<td>ThoughtWorks research, academic studies</td>
+</tr>
+<tr>
+<td>Token efficiency is critical production concern</td>
+<td><strong>High</strong></td>
+<td>GitHub, Anthropic, multiple case studies</td>
+</tr>
+<tr>
+<td>Context engineering achieves 60-80% cost reduction</td>
+<td><strong>Medium-High</strong></td>
+<td>Context Engineering article, industry reports</td>
+</tr>
+<tr>
+<td>Adaptive critique beats naive self-critique</td>
+<td><strong>Medium</strong></td>
+<td>RefineCoder paper, limited field data</td>
+</tr>
+<tr>
+<td>Multi-agent state artifacts scale better than history</td>
+<td><strong>Medium-High</strong></td>
+<td>Anthropic research, limited production data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="sources">Sources<a class="headerlink" href="#sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://martinfowler.com/fragments/2026-01-08.html">Martin Fowler: January 2026</a></li>
+<li><a href="https://martinfowler.com/fragments/2026-02-18.html">Martin Fowler: February 2026</a></li>
+<li><a href="https://www.metasticworld.com/en/insights/thoughtworks-future-of-software-development-retreat-2026-insights">ThoughtWorks Future of Software Development 2026</a></li>
+<li><a href="https://newsletter.pragmaticengineer.com/p/tdd-ai-agents-and-coding-with-kent-beck">Kent Beck on AI Agents and TDD</a></li>
+<li><a href="https://simonwillison.net/2026/Feb/23/agentic-engineering-patterns/">Simon Willison: Agentic Engineering Patterns</a></li>
+<li><a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a></li>
+<li><a href="https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents">Anthropic: Effective Harnesses for Long-Running Agents</a></li>
+<li><a href="https://www.thoughtworks.com/en-us/insights/blog/agile-engineering-practices/spec-driven-development-unpacking-2025-new-engineering-practices">ThoughtWorks: Spec-Driven Development</a></li>
+<li><a href="https://arxiv.org/abs/2505.18646">SEW: Self-Evolving Agentic Workflows</a></li>
+<li><a href="https://arxiv.org/pdf/2502.09183">RefineCoder: Adaptive Critique Refinement</a></li>
+<li><a href="https://github.blog/ai-and-ml/github-copilot/improving-token-efficiency-in-github-agentic-workflows/">GitHub: Improving Token Efficiency in Agentic Workflows</a></li>
+<li><a href="https://www.getmaxim.ai/articles/context-engineering-for-ai-agents-production-optimization-strategies/">Context Engineering for Production Agents</a></li>
+<li><a href="https://arxiv.org/html/2601.14470v1">Tokenomics: Quantifying Where Tokens Are Used in Agentic Software Engineering</a></li>
+<li><a href="https://arxiv.org/html/2511.17330v3">Agentic Verification of Software Systems</a></li>
+<li><a href="https://resources.anthropic.com/hubfs/2026%20Agentic%20Coding%20Trends%20Report.pdf">2026 Agentic Coding Trends Report</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/vanillacake369/tonys-nix" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

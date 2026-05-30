@@ -1,0 +1,2633 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-platform Nix configuration with AI agent orchestration">
+      
+      
+      
+        <link rel="canonical" href="https://vanillacake369.github.io/tonys-nix/architecture/agent-policy-contract/">
+      
+      
+        <link rel="prev" href="../module-system/">
+      
+      
+        <link rel="next" href="../../agents/overview/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Agent Policy Contract - tonys-nix</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/nix-brand.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agent-policy-contract-system" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="tonys-nix" class="md-header__button md-logo" aria-label="tonys-nix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tonys-nix
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agent Policy Contract
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vanillacake369/tonys-nix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vanillacake369/tonys-nix
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/installation/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../concepts/philosophy/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../agents/overview/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Agents
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/ssd-optimization/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/hooks/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="tonys-nix" class="md-nav__button md-logo" aria-label="tonys-nix" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    tonys-nix
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vanillacake369/tonys-nix" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vanillacake369/tonys-nix
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/platforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/commands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/philosophy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Philosophy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/how-nix-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How Nix Powers This
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/agent-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module System
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Policy Contract
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Policy Contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Interface
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract Interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-reasoning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (A) reasoning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (B) async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (D) oracle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (E) phases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-strategylint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (F) strategyLint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-runtime-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Runtime Metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-time-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build-Time Assertions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mixins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mixins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hook-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hook Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#provider-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Implementations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Implementations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claude-orchestrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude (Orchestrator)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemini-researcher-critic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gemini (Researcher / Critic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codex-logic-verifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codex (Logic Verifier)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-mixin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Mixin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-assertion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Assertion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agents
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Agents
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/claude/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/gemini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gemini CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agents/codex/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/ssd-optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SSD Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/image-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/keyboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    macOS Keyboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/hooks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hook Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/packages/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Packages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Motivation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pattern Mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File Layout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#contract-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contract Interface
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contract Interface">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-reasoning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (A) reasoning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (B) async
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-oracle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (D) oracle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (E) phases
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-strategylint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        (F) strategyLint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#provider-runtime-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Runtime Metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-time-assertions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build-Time Assertions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mixins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mixins
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hook-generation-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hook Generation Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#provider-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Provider Implementations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Provider Implementations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#claude-orchestrator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Claude (Orchestrator)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gemini-researcher-critic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gemini (Researcher / Critic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codex-logic-verifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Codex (Logic Verifier)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-mixin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Mixin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-assertion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a New Assertion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#global-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agent-policy-contract-system">Agent Policy Contract System<a class="headerlink" href="#agent-policy-contract-system" title="Permanent link">&para;</a></h1>
+<p>The Agent Policy Contract system translates behavioral rules from <code>CLAUDE.md</code> into Nix module options that are validated at build time. Violations cause <code>nix build</code> to fail with a descriptive message before any hook script reaches a provider's settings file.</p>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>Text-based guardrails in <code>CLAUDE.md</code> work until they do not. A hook script might be missing, a required section might be skipped under time pressure, or a new provider might be added without implementing the full policy suite. These failures are silent: the developer only discovers the missing guardrail when the situation it was designed to handle occurs.</p>
+<p>The contract system makes the same rules structural:</p>
+<ul>
+<li><strong>A missing peerReviewProvider is a build error</strong>, not a runtime surprise.</li>
+<li><strong>An empty gatedTools list with enforcement enabled is a build error</strong>, not a hook that silently passes everything.</li>
+<li><strong>A new enabled provider without runtime hook metadata is a build error</strong>, not a config file that fails to load.</li>
+</ul>
+<p>The Nix module system already provides the infrastructure needed for this: option type declarations act as interfaces, provider modules act as implementations, and <code>config.assertions</code> act as contract validation.</p>
+<h2 id="pattern-mapping">Pattern Mapping<a class="headerlink" href="#pattern-mapping" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>OOP / DDD Concept</th>
+<th>Nix Module System Equivalent</th>
+<th>Location</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Contract / Interface</td>
+<td><code>mkOption</code> type declarations</td>
+<td><code>modules/agents/policy-contract.nix</code></td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>Provider module sets <code>agentPolicy.providers.&lt;name&gt;</code> values</td>
+<td><code>modules/agents/&lt;provider&gt;.nix</code></td>
+</tr>
+<tr>
+<td>Assertion / Precondition</td>
+<td><code>config.assertions</code> — fails <code>nix build</code> on violation</td>
+<td><code>modules/agents/policy-assertions.nix</code></td>
+</tr>
+<tr>
+<td>Mixin / Trait</td>
+<td><code>policy-&lt;name&gt;.nix</code> file that reads options and writes <code>_hooks</code></td>
+<td><code>modules/agents/policy-*.nix</code></td>
+</tr>
+<tr>
+<td>IoC Container</td>
+<td>Nix module system auto-wires option producers to consumers</td>
+<td><code>modules/agents/policy-assembler.nix</code></td>
+</tr>
+<tr>
+<td>Adapter</td>
+<td>Format conversion from canonical hooks to provider-native</td>
+<td><code>modules/agents/policy-hook-adapters.nix</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="file-layout">File Layout<a class="headerlink" href="#file-layout" title="Permanent link">&para;</a></h2>
+<p>All policy files live flat under <code>modules/agents/</code> with a <code>policy-</code> prefix. There is no <code>policy/</code> subdirectory or <code>mixins/</code> subfolder.</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>policy-contract.nix</code></td>
+<td>Interface: <code>agentPolicy.providers.&lt;name&gt;</code> option types</td>
+</tr>
+<tr>
+<td><code>policy-assertions.nix</code></td>
+<td>build-time contract assertions</td>
+</tr>
+<tr>
+<td><code>policy-assembler.nix</code></td>
+<td>IoC assembler — imports all <code>policy-*</code> files, produces <code>_assembledHooks</code></td>
+</tr>
+<tr>
+<td><code>policy-hook-adapters.nix</code></td>
+<td>SSoT format adapter (claude / gemini / codex)</td>
+</tr>
+<tr>
+<td><code>policy-provider-hooks.nix</code></td>
+<td>base + policy hook merge helper</td>
+</tr>
+<tr>
+<td><code>policy-phase-gate.nix</code></td>
+<td>mixin: phase-gate</td>
+</tr>
+<tr>
+<td><code>policy-path-guard.nix</code></td>
+<td>mixin: path-guard</td>
+</tr>
+<tr>
+<td><code>policy-strategy-lint.nix</code></td>
+<td>mixin: strategy-lint</td>
+</tr>
+<tr>
+<td><code>policy-reasoning-trace.nix</code></td>
+<td>mixin: reasoning-trace</td>
+</tr>
+<tr>
+<td><code>policy-async-handshake.nix</code></td>
+<td>mixin: async-handshake</td>
+</tr>
+<tr>
+<td><code>policy-live-oracle.nix</code></td>
+<td>mixin: live-oracle</td>
+</tr>
+</tbody>
+</table>
+<p><code>sync-mutable-config.nix</code> (providing <code>mkJsonSync</code> / <code>mkFileCopy</code>) also lives in <code>modules/agents/</code> and is used by the hook generation flow to inject assembled hooks into mutable settings files at activation time.</p>
+<h2 id="contract-interface">Contract Interface<a class="headerlink" href="#contract-interface" title="Permanent link">&para;</a></h2>
+<p><code>modules/agents/policy-contract.nix</code> defines a <code>providerModule</code> submodule with six option groups. Every provider that sets <code>agentPolicy.providers.&lt;name&gt;</code> must satisfy this type.</p>
+<h3 id="a-reasoning">(A) reasoning<a class="headerlink" href="#a-reasoning" title="Permanent link">&para;</a></h3>
+<p>Controls whether the agent's chain-of-thought is displayed, logged, or suppressed.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Values</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mode</code></td>
+<td>enum</td>
+<td><code>silent</code>, <code>verbose</code>, <code>log-only</code></td>
+<td><code>"verbose"</code></td>
+</tr>
+<tr>
+<td><code>traceDir</code></td>
+<td>string</td>
+<td>filesystem path</td>
+<td><code>"/tmp/agent-traces"</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>silent</code>: reasoning is written to <code>traceDir/&lt;provider&gt;/&lt;session&gt;.log</code>; only lines matching <code>^\[</code> or starting with <code>DECISION:</code>, <code>ACTION:</code>, <code>RESULT:</code>, <code>OUTPUT:</code> are emitted to the terminal.</p>
+<p><code>verbose</code>: full output passes through unchanged. No hook file is generated.</p>
+<p><code>log-only</code>: all tool output is appended to the trace log. Nothing is shown in the terminal.</p>
+<h3 id="b-async">(B) async<a class="headerlink" href="#b-async" title="Permanent link">&para;</a></h3>
+<p>Configures background task execution via FIFO pipes.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>backgroundTasks</code></td>
+<td>list of string</td>
+<td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>handshakeProtocol</code></td>
+<td>enum: <code>poll</code>, <code>fifo</code>, <code>callback</code></td>
+<td><code>"fifo"</code></td>
+</tr>
+<tr>
+<td><code>fifoDir</code></td>
+<td>string</td>
+<td><code>"/tmp/agent-handshake"</code></td>
+</tr>
+</tbody>
+</table>
+<p>When <code>enabled = true</code>, a named pipe is created in <code>fifoDir/&lt;provider&gt;/</code> for each entry in <code>backgroundTasks</code>. A <code>PostToolUse</code> hook captures completion records to <code>fifoDir/&lt;provider&gt;/results/</code>.</p>
+<h3 id="d-oracle">(D) oracle<a class="headerlink" href="#d-oracle" title="Permanent link">&para;</a></h3>
+<p>Runs shell commands after file mutations to verify the environment remains healthy.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>healthChecks</code></td>
+<td>list of <code>{ command, pattern, timeout }</code></td>
+<td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>streamAnalysis</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each health check runs only when the mutated file path matches <code>pattern</code> (a regex). If <code>streamAnalysis = true</code>, failed checks are re-executed with their output captured and printed inline.</p>
+<h3 id="e-phases">(E) phases<a class="headerlink" href="#e-phases" title="Permanent link">&para;</a></h3>
+<p>Enforces the RESEARCH → STRATEGY → EXECUTION state machine by blocking certain tools until a complexity classification and approval exist.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enforced</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>stateDir</code></td>
+<td>string</td>
+<td><code>"/tmp/agent-phases"</code></td>
+</tr>
+<tr>
+<td><code>gatedTools</code></td>
+<td>list of string</td>
+<td><code>["Write" "Edit"]</code></td>
+</tr>
+</tbody>
+</table>
+<p>State is stored in flat files at <code>agentPolicy.global.stateRoot/phases/&lt;provider&gt;/&lt;session-id&gt;</code>. The first character of this file holds the complexity level (<code>S</code>, <code>M</code>, or <code>L</code>). An <code>&lt;session-id&gt;.approved</code> file signals strategy approval.</p>
+<h3 id="f-strategylint">(F) strategyLint<a class="headerlink" href="#f-strategylint" title="Permanent link">&para;</a></h3>
+<p>Validates that strategy documents contain required sections and that a peer review exists before allowing execution.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>bool</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>requiredSections</code></td>
+<td>list of string</td>
+<td><code>[]</code></td>
+</tr>
+<tr>
+<td><code>peerReviewProvider</code></td>
+<td>null or string</td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>strategyPath</code></td>
+<td>string</td>
+<td><code>"/tmp/agent-strategy"</code></td>
+</tr>
+</tbody>
+</table>
+<p>When <code>peerReviewProvider</code> is set, the mixin also checks for <code>&lt;strategyPath&gt;/&lt;session-id&gt;-review.md</code>. If that file is absent, mutation tools are blocked.</p>
+<h3 id="provider-runtime-metadata">Provider Runtime Metadata<a class="headerlink" href="#provider-runtime-metadata" title="Permanent link">&para;</a></h3>
+<p><code>agentPolicy.providers.&lt;name&gt;</code> intentionally contains policy capabilities only. Provider-native hook rendering metadata lives under the internal <code>agentPolicy._providerRuntime.&lt;name&gt;.hooks</code> namespace and is consumed by <code>modules/agents/policy-assembler.nix</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>format</code></td>
+<td>one of the hook adapter names in <code>policy-hook-adapters.nix</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>timeout</code></td>
+<td>int (seconds)</td>
+<td><code>5</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="build-time-assertions">Build-Time Assertions<a class="headerlink" href="#build-time-assertions" title="Permanent link">&para;</a></h2>
+<p><code>modules/agents/policy-assertions.nix</code> adds seven entries to <code>config.assertions</code>. All checks run across every enabled provider. A failing assertion terminates <code>nix build</code> with the message shown.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Condition</th>
+<th>Error Message</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>strategyLint.enabled → peerReviewProvider != null</code></td>
+<td><code>strategyLint.enabled=true requires peerReviewProvider to be set</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>peerReviewProvider → provider exists in agentPolicy.providers</code></td>
+<td><code>strategyLint.peerReviewProvider references a non-existent provider</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>phases.enforced → gatedTools != []</code></td>
+<td><code>phases.enforced=true but gatedTools is empty</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>oracle.enabled → healthChecks != []</code></td>
+<td><code>oracle.enabled=true but no healthChecks defined</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>async.enabled → backgroundTasks != []</code></td>
+<td><code>async.enabled=true but no backgroundTasks defined</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>strategyLint.enabled → requiredSections != []</code></td>
+<td><code>strategyLint.enabled=true but requiredSections is empty</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>provider.enable → agentPolicy._providerRuntime.&lt;name&gt; exists</code></td>
+<td><code>enabled provider is missing agentPolicy._providerRuntime.&lt;name&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="mixins">Mixins<a class="headerlink" href="#mixins" title="Permanent link">&para;</a></h2>
+<p>Six mixin modules live flat in <code>modules/agents/</code> with the <code>policy-</code> prefix. Each reads from <code>config.agentPolicy.providers</code> and writes to <code>config.agentPolicy._hooks.&lt;mixin-name&gt;</code>, the internal hook registry. The mixin is only active when the relevant option is enabled.</p>
+<table>
+<thead>
+<tr>
+<th>Mixin</th>
+<th>File</th>
+<th>Trigger Option</th>
+<th>Generated Hook Event</th>
+<th>What It Produces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>phase-gate</td>
+<td><code>policy-phase-gate.nix</code></td>
+<td><code>phases.enforced = true</code></td>
+<td><code>PreToolUse</code></td>
+<td>Blocks <code>gatedTools</code> for L-complexity sessions without <code>.approved</code> marker</td>
+</tr>
+<tr>
+<td>path-guard</td>
+<td><code>policy-path-guard.nix</code></td>
+<td>provider <code>enable = true</code></td>
+<td><code>PreToolUse</code></td>
+<td>Blocks Read/Write/Edit on patterns from <code>global.sensitivePatterns</code></td>
+</tr>
+<tr>
+<td>strategy-lint</td>
+<td><code>policy-strategy-lint.nix</code></td>
+<td><code>strategyLint.enabled = true</code></td>
+<td><code>PreToolUse</code></td>
+<td>Validates strategy doc sections; gates on peer review file existence</td>
+</tr>
+<tr>
+<td>reasoning-trace</td>
+<td><code>policy-reasoning-trace.nix</code></td>
+<td><code>reasoning.mode != "verbose"</code></td>
+<td><code>PostToolUse</code></td>
+<td>Logs or filters tool output based on <code>silent</code> vs <code>log-only</code> mode</td>
+</tr>
+<tr>
+<td>async-handshake</td>
+<td><code>policy-async-handshake.nix</code></td>
+<td><code>async.enabled = true</code></td>
+<td><code>PostToolUse</code></td>
+<td>Captures Agent tool completion records; FIFO setup in activation</td>
+</tr>
+<tr>
+<td>live-oracle</td>
+<td><code>policy-live-oracle.nix</code></td>
+<td><code>oracle.enabled = true</code></td>
+<td><code>PostToolUse</code></td>
+<td>Runs health check commands after Write/Edit; reports failures</td>
+</tr>
+</tbody>
+</table>
+<h2 id="hook-generation-flow">Hook Generation Flow<a class="headerlink" href="#hook-generation-flow" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart TD
+    A["Provider module sets\nagentPolicy.providers.&amp;lt;name&amp;gt;\noptions"]
+
+    B["Mixins evaluate options\nfor each enabled provider\nand write to\nagentPolicy._hooks.&amp;lt;mixin&amp;gt;.&amp;lt;provider&amp;gt;"]
+
+    C["policy-hook-adapters.nix\ngroupByProvider + groupByEvent\nconverts to provider-native format\nclaude: settings.json shape\ngemini: settings.json shape\ncodex: config.toml shape"]
+
+    D["policy-assembler.nix\nmaps each enabled provider\nthrough its format adapter\nproduces agentPolicy._assembledHooks"]
+
+    E["provider-runtime.nix reads\nagentPolicy._assembledHooks.&amp;lt;name&amp;gt;\ndeep-merges with base hooks\ngenerates final settings file"]
+
+    F["modules/agents/sync-mutable-config.nix\nmkJsonSync / mkFileCopy\ninjects into mutable settings\nat home-manager activation"]
+
+    G["Provider CLI\nreads settings file on startup\nhooks are live"]
+
+    A --&gt; B
+    B --&gt; C
+    C --&gt; D
+    D --&gt; E
+    E --&gt; F
+    F --&gt; G</code></pre>
+<h2 id="provider-implementations">Provider Implementations<a class="headerlink" href="#provider-implementations" title="Permanent link">&para;</a></h2>
+<h3 id="claude-orchestrator">Claude (Orchestrator)<a class="headerlink" href="#claude-orchestrator" title="Permanent link">&para;</a></h3>
+<p>Full policy suite. Every mixin except async-handshake is active.</p>
+<div class="highlight"><pre><span></span><code>agentPolicy<span class="o">.</span>providers<span class="o">.</span><span class="ss">claude</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">enable</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  reasoning<span class="o">.</span><span class="ss">mode</span> <span class="o">=</span> <span class="s2">&quot;silent&quot;</span><span class="p">;</span>
+  reasoning<span class="o">.</span><span class="ss">traceDir</span> <span class="o">=</span> <span class="s2">&quot;/tmp/agent-traces&quot;</span><span class="p">;</span>
+  oracle<span class="o">.</span><span class="ss">enabled</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  oracle<span class="o">.</span><span class="ss">healthChecks</span> <span class="o">=</span> <span class="p">[{</span>
+    <span class="ss">command</span> <span class="o">=</span> <span class="s2">&quot;nix flake check --no-build 2&gt;&amp;1 | head -20&quot;</span><span class="p">;</span>
+    <span class="ss">pattern</span> <span class="o">=</span> <span class="s2">&quot;.*</span><span class="se">\\</span><span class="s2">.nix$&quot;</span><span class="p">;</span>
+    <span class="ss">timeout</span> <span class="o">=</span> <span class="mi">60</span><span class="p">;</span>
+  <span class="p">}];</span>
+  oracle<span class="o">.</span><span class="ss">streamAnalysis</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  phases<span class="o">.</span><span class="ss">enforced</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  phases<span class="o">.</span><span class="ss">stateDir</span> <span class="o">=</span> <span class="s2">&quot;/tmp/claude-complexity&quot;</span><span class="p">;</span>
+  phases<span class="o">.</span><span class="ss">gatedTools</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Write&quot;</span> <span class="s2">&quot;Edit&quot;</span> <span class="s2">&quot;NotebookEdit&quot;</span><span class="p">];</span>
+  strategyLint<span class="o">.</span><span class="ss">enabled</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  strategyLint<span class="o">.</span><span class="ss">requiredSections</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pre-mortem&quot;</span> <span class="s2">&quot;tradeoffs&quot;</span> <span class="s2">&quot;peer-review&quot;</span><span class="p">];</span>
+  strategyLint<span class="o">.</span><span class="ss">peerReviewProvider</span> <span class="o">=</span> <span class="s2">&quot;gemini&quot;</span><span class="p">;</span>
+  strategyLint<span class="o">.</span><span class="ss">strategyPath</span> <span class="o">=</span> <span class="s2">&quot;/tmp/agent-strategy&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p><code>agentPolicy._providerRuntime.claude.hooks</code> supplies the internal hook render format and timeout used by the provider runtime layer.</p>
+<p>Active mixins: phase-gate, path-guard, strategy-lint, reasoning-trace, live-oracle.</p>
+<p>Hook output format: <code>settings.json</code> with event keys mapping to arrays of <code>{ matcher, hooks: [{ type, command, timeout }] }</code> objects.</p>
+<h3 id="gemini-researcher-critic">Gemini (Researcher / Critic)<a class="headerlink" href="#gemini-researcher-critic" title="Permanent link">&para;</a></h3>
+<p>Async-capable configuration. Three background tasks, verbose reasoning.</p>
+<div class="highlight"><pre><span></span><code>agentPolicy<span class="o">.</span>providers<span class="o">.</span><span class="ss">gemini</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">enable</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  reasoning<span class="o">.</span><span class="ss">mode</span> <span class="o">=</span> <span class="s2">&quot;verbose&quot;</span><span class="p">;</span>
+  async<span class="o">.</span><span class="ss">enabled</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  async<span class="o">.</span><span class="ss">handshakeProtocol</span> <span class="o">=</span> <span class="s2">&quot;fifo&quot;</span><span class="p">;</span>
+  async<span class="o">.</span><span class="ss">backgroundTasks</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;strategy-review&quot;</span> <span class="s2">&quot;blindspot-audit&quot;</span> <span class="s2">&quot;impact-analysis&quot;</span><span class="p">];</span>
+  async<span class="o">.</span><span class="ss">fifoDir</span> <span class="o">=</span> <span class="s2">&quot;/tmp/agent-handshake&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p><code>agentPolicy._providerRuntime.gemini.hooks</code> supplies the internal hook render format and timeout used by the provider runtime layer.</p>
+<p>Active mixins: path-guard, async-handshake. (reasoning-trace is a no-op in verbose mode; phase-gate, strategy-lint, live-oracle are not enabled.)</p>
+<h3 id="codex-logic-verifier">Codex (Logic Verifier)<a class="headerlink" href="#codex-logic-verifier" title="Permanent link">&para;</a></h3>
+<p>Minimal configuration. Log-only reasoning, no other capabilities.</p>
+<div class="highlight"><pre><span></span><code>agentPolicy<span class="o">.</span>providers<span class="o">.</span><span class="ss">codex</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="ss">enable</span> <span class="o">=</span> <span class="no">true</span><span class="p">;</span>
+  reasoning<span class="o">.</span><span class="ss">mode</span> <span class="o">=</span> <span class="s2">&quot;log-only&quot;</span><span class="p">;</span>
+  reasoning<span class="o">.</span><span class="ss">traceDir</span> <span class="o">=</span> <span class="s2">&quot;/tmp/agent-traces&quot;</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+<p><code>agentPolicy._providerRuntime.codex.hooks</code> supplies the internal hook render format and timeout used by the provider runtime layer.</p>
+<p>Active mixins: path-guard, reasoning-trace.</p>
+<p>Hook output format: <code>config.toml</code> with event keys mapping to arrays of <code>{ hooks: [{ type, command, timeout }] }</code> objects.</p>
+<h2 id="adding-a-new-provider">Adding a New Provider<a class="headerlink" href="#adding-a-new-provider" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Create <code>modules/agents/&lt;name&gt;.nix</code>.</li>
+<li>Set <code>agentPolicy.providers.&lt;name&gt; = { enable = true; ... }</code> with whatever policy capabilities the provider needs.</li>
+<li>Set <code>agentPolicy._providerRuntime.&lt;name&gt;.hooks = { format = "..."; timeout = 5; }</code> so the internal assembler can render hooks in that provider's native format.</li>
+<li>Ensure <code>policy-assembler.nix</code> is imported (it imports all <code>policy-*</code> files and the contract). This is typically handled by including the new module in <code>modules/agents/agents-module.hm.nix</code>.</li>
+<li>If the provider uses a format not already in <code>policy-hook-adapters.nix</code> (currently <code>claude</code>, <code>gemini</code>, <code>codex</code>), add a new format function to <code>policy-hook-adapters.nix</code> that maps the internal <code>{ event, matcher, script }</code> structure to the provider's settings schema.</li>
+<li>Run <code>nix build</code>. Assertions will catch any missing required options.</li>
+</ol>
+<h2 id="adding-a-new-mixin">Adding a New Mixin<a class="headerlink" href="#adding-a-new-mixin" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Create <code>modules/agents/policy-&lt;name&gt;.nix</code>.</li>
+<li>In the module body, read from <code>config.agentPolicy.providers</code> — filter to providers where the relevant option is enabled.</li>
+<li>For each matching provider, generate a shell script using <code>pkgs.writeShellScript</code>.</li>
+<li>Write hook entries to <code>config.agentPolicy._hooks.&lt;name&gt;</code> as an attrset of <code>{ event, matcher, script }</code> per provider name.</li>
+<li>Add the new mixin to the imports list in <code>modules/agents/policy-assembler.nix</code>. The hook will automatically appear in each matching provider's assembled settings after the next <code>just apply</code>.</li>
+</ol>
+<h2 id="adding-a-new-assertion">Adding a New Assertion<a class="headerlink" href="#adding-a-new-assertion" title="Permanent link">&para;</a></h2>
+<p>Add a new attrset to the <code>config.assertions</code> list in <code>modules/agents/policy-assertions.nix</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+  <span class="ss">assertion</span> <span class="o">=</span> forAllEnabled <span class="p">(</span>_<span class="p">:</span> p<span class="p">:</span>
+    <span class="c1"># your predicate — return true when the config is valid</span>
+    <span class="o">!</span>p<span class="o">.</span>someOption<span class="o">.</span>enabled <span class="o">||</span> p<span class="o">.</span>someOption<span class="o">.</span>requiredField <span class="o">!=</span> <span class="no">null</span><span class="p">);</span>
+  <span class="ss">message</span> <span class="o">=</span> <span class="s2">&quot;[AgentPolicy] descriptive error message for the developer&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The <code>forAllEnabled</code> helper iterates over all providers where <code>enable = true</code> and short-circuits on the first violation. The message is printed by <code>nix build</code> when the assertion fails.</p>
+<h2 id="global-configuration">Global Configuration<a class="headerlink" href="#global-configuration" title="Permanent link">&para;</a></h2>
+<p><code>agentPolicy.global</code> holds cross-cutting settings shared by all providers:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stateRoot</code></td>
+<td><code>"/tmp/agent-policy"</code></td>
+<td>Root directory for all phase state files</td>
+</tr>
+<tr>
+<td><code>sensitivePatterns</code></td>
+<td><code>.env*</code>, <code>*.pem</code>, <code>*.key</code>, <code>secrets/*</code>, etc.</td>
+<td>File patterns blocked by path-guard on all providers</td>
+</tr>
+<tr>
+<td><code>maxRetries</code></td>
+<td><code>3</code></td>
+<td>Max consecutive failures before escalation-gate triggers</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../module-system/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Module System">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Module System
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../agents/overview/" class="md-footer__link md-footer__link--next" aria-label="Next: Orchestration">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Orchestration
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/vanillacake369/tonys-nix" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.suggest", "search.highlight", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
