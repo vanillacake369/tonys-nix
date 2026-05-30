@@ -1,0 +1,5 @@
+# repeated_keys is intentionally allowed: the dotted-key style
+# (e.g. `oracle.enabled` + `oracle.healthChecks`) is idiomatic and readable,
+# used deliberately across the agent/module configs. All other statix lints
+# remain enforced (CI + pre-commit).
+disabled = ["repeated_keys"]

@@ -33,7 +33,7 @@ MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
 NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
 NIX_CONF_TARGET := "/etc/nix/nix.conf"
-AEROSPACE_CONFIG_PATH := "lib/keymaps/keybinds.nix"
+AEROSPACE_CONFIG_PATH := "modules/keymap/binds.nix"
 
 ########### Bootstrap ##########
 
@@ -502,14 +502,23 @@ gc-info:
 
 ########### Quality Gate ##########
 
-# Run guard tests (nix eval).
-test:
+# Run guard tests (nix eval) + shell hook tests (bats).
+test: test-hooks
     #!/usr/bin/env bash
     result=$(nix eval .#tests.summary --json)
     total=$(echo "$result" | jq -r .total)
     passed=$(echo "$result" | jq -r .passed)
     echo "[✓] $passed/$total guard tests passed"
     if [[ "$total" != "$passed" ]]; then exit 1; fi
+
+# Run shell hook tests (bats). Falls back to `nix run` when bats is unbuilt.
+test-hooks:
+    #!/usr/bin/env bash
+    if command -v bats &>/dev/null; then
+      bats tests/hooks/*.bats
+    else
+      nix run nixpkgs#bats -- tests/hooks/*.bats
+    fi
 
 # Run linters (deadnix, statix, alejandra).
 lint:
