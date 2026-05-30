@@ -23,13 +23,9 @@
     isNixOs ? false,
   }: let
     systemConfig = mkSystem system;
-    platform = import ./platform.nix {
-      inherit (systemConfig) isDarwin isLinux;
-      inherit isWsl isNixOs;
-    };
   in
     home-manager.lib.homeManagerConfiguration {
-      pkgs = systemConfig.pkgs;
+      inherit (systemConfig) pkgs;
       modules =
         homeManagerModules
         ++ [
@@ -44,7 +40,7 @@
         ];
       extraSpecialArgs = {
         inherit (systemConfig) isLinux isDarwin;
-        inherit isWsl isNixOs userProfile platform;
+        inherit isWsl isNixOs userProfile;
       };
     };
 in {

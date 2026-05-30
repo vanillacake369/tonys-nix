@@ -7,10 +7,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-generators = {
-      url = "github:nix-community/nixos-generators";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -24,18 +20,16 @@
     nixpkgs,
     nixpkgs-neovim,
     home-manager,
-    nixos-generators,
     llm-agents,
     ...
   }: let
-    lib = nixpkgs.lib;
+    inherit (nixpkgs) lib;
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
     forAllSystems = lib.genAttrs supportedSystems;
 
     # Auto-collect overlays from modules (*.overlay.nix convention)
-    collectOverlays = import ./lib/discover-overlays.nix {inherit lib;};
     overlays =
-      collectOverlays ./modules
+      (import ./lib/collect-overlays.nix {inherit lib;}) ./modules
       ++ [
         llm-agents.overlays.default
         # Pin neovim-unwrapped from older nixpkgs (0.11.6)
@@ -44,9 +38,17 @@
         })
       ];
 
-    # Auto-discover user profiles
-    discoverModules = import ./lib/discover-modules.nix {inherit lib;};
-    userProfiles = discoverModules ./user;
+    # Auto-discover user profiles (one attr per user/<name>.nix)
+    userProfiles = lib.pipe (builtins.readDir ./user) [
+      (lib.filterAttrs (_: type: type == "regular"))
+      builtins.attrNames
+      (builtins.filter (lib.hasSuffix ".nix"))
+      (map (name: {
+        name = lib.removeSuffix ".nix" name;
+        value = import (./user + "/${name}");
+      }))
+      builtins.listToAttrs
+    ];
 
     # Builders
     builders = import ./lib/mk-home-config.nix {
@@ -54,7 +56,7 @@
       homeManagerModules = [./home.nix];
     };
     mkImages = import ./lib/mk-images.nix {
-      inherit lib nixos-generators;
+      inherit lib nixpkgs;
       configModules = [./configuration.nix];
     };
 
@@ -63,7 +65,7 @@
     nixosConfigurations = lib.genAttrs hostnames (_:
       nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        pkgs = (builders.mkSystem "x86_64-linux").pkgs;
+        inherit ((builders.mkSystem "x86_64-linux")) pkgs;
         modules = [./configuration.nix];
       });
 
