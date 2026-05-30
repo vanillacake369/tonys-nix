@@ -12,13 +12,13 @@ The failure mode is silent. A hook script is accidentally excluded from a provid
 
 Encode the guardrails as Nix modules. Make the rules structural rather than advisory.
 
-The agent policy contract system in `lib/agent-policy/` translates behavioral requirements into typed Nix options. Every provider that participates in the orchestration declares its capabilities against a shared interface defined in `agent-contract.nix`. The Nix module system then validates those declarations at build time through `config.assertions` in `agent-assertions.nix`. If any contract invariant is violated, `nix build` fails before any hook script is written to any provider's settings file.
+The agent policy contract system translates behavioral requirements into typed Nix options. Every provider that participates in the orchestration declares its capabilities against a shared interface defined in `policy-contract.nix`. The Nix module system then validates those declarations at build time through `config.assertions` in `policy-assertions.nix`. If any contract invariant is violated, `nix build` fails before any hook script is written to any provider's settings file.
 
 Concretely, this means:
 
 - A provider that enables `strategyLint` without setting `peerReviewProvider` is a **build error**, not a runtime omission.
 - A phase gate configured with an empty `gatedTools` list is a **build error**, not a hook that silently allows everything through.
-- A provider without a `hooks.format` declaration is a **build error**, not a config file that fails to parse at startup.
+- An enabled provider without runtime hook render metadata is a **build error**, not a config file that fails to parse at startup.
 - An `oracle.enabled = true` with no `healthChecks` defined is a **build error**, not a check that never runs.
 
 The same `nix build` that produces your home-manager activation also validates that the agent policy contract is coherent. The environment and its guardrails are deployed atomically or not at all.
@@ -39,7 +39,7 @@ Nix's `config.assertions` mechanism was designed for exactly this purpose: catch
 
 ### 3. Composition over inheritance
 
-The six policy capabilities — reasoning trace, async handshake, live oracle, phase gate, path guard, and strategy lint — are independent mixins. Each lives in its own file in `lib/agent-policy/mixins/`. A provider activates the capabilities it needs by setting the corresponding options.
+The six policy capabilities — reasoning trace, async handshake, live oracle, phase gate, path guard, and strategy lint — are independent mixins. Each lives in its own `policy-<name>.nix` file in `modules/agents/`. A provider activates the capabilities it needs by setting the corresponding options.
 
 Claude uses five mixins. Gemini uses two. Codex uses two, a different two. There is no base class, no inheritance hierarchy, and no requirement that every provider implement every capability. Adding a new provider means declaring which capabilities it needs. Adding a new capability means writing a single mixin that reads from `config.agentPolicy.providers` and writes to `config.agentPolicy._hooks`. The Nix module system handles the wiring.
 
@@ -47,7 +47,7 @@ Claude uses five mixins. Gemini uses two. Codex uses two, a different two. There
 
 Two cross-cutting concerns apply to all providers and are declared exactly once:
 
-**MCP servers** are defined in `modules/agents/agents-mcp.nix`. The `lib/mcp-adapters.nix` file transforms that single declaration into the format each provider expects: pass-through for Claude, `command + args` only for Gemini, TOML with an `enabled` flag for Codex. Adding a new MCP server means editing one file.
+**MCP servers** are defined in `modules/agents/agents-mcp.nix`. The `modules/agents/mcp-adapters.nix` file transforms that single declaration into the format each provider expects: pass-through for Claude, `command + args` only for Gemini, TOML with an `enabled` flag for Codex. Adding a new MCP server means editing one file.
 
 **Path guard patterns** are defined in `agentPolicy.global.sensitivePatterns`. Every enabled provider's path-guard hook is generated from this single list. There is no per-provider copy of `.env*` patterns to keep in sync.
 
@@ -61,6 +61,6 @@ This means migration is incremental. You can adopt the contract system for new c
 
 This is not a framework or library. There is no package to import, no API to program against. It is a personal configuration that demonstrates a pattern: using the Nix module system's type declarations, assertions, and IoC wiring to make agent guardrails structural.
 
-The pattern is designed to be understood and adapted. If you want to adopt it, the relevant code is in `lib/agent-policy/` — roughly 400 lines across six files. Reading `agent-contract.nix`, `agent-assertions.nix`, and one mixin is enough to understand the shape of the whole system.
+The pattern is designed to be understood and adapted. If you want to adopt it, the relevant code is the `policy-*.nix` files in `modules/agents/`. Reading `policy-contract.nix`, `policy-assertions.nix`, and one mixin is enough to understand the shape of the whole system.
 
 If you want to extend it — adding a new mixin, a new assertion, or a new provider format — the process is additive. No existing code needs to change. See [Agent Policy Contract](../architecture/agent-policy-contract.md#adding-a-new-mixin) for the step-by-step.

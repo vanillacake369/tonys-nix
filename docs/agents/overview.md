@@ -20,10 +20,10 @@ graph TD
     end
 
     subgraph NixBuildTime["Nix Build Time"]
-        Contract["lib/agent-policy/agent-contract.nix\nOption interface"]
-        Mixins["lib/agent-policy/mixins/\n6 capability modules"]
-        HookAdapters["lib/agent-policy/agent-hook-adapters.nix\nFormat conversion"]
-        MCPAdapters["lib/mcp-adapters.nix\nSSoT transformation"]
+        Contract["modules/agents/policy-contract.nix\nOption interface"]
+        Mixins["modules/agents/policy-*.nix\n6 capability modules"]
+        HookAdapters["modules/agents/policy-hook-adapters.nix\nFormat conversion"]
+        MCPAdapters["modules/agents/mcp-adapters.nix\nSSoT transformation"]
     end
 
     User --> Claude
@@ -46,13 +46,13 @@ graph TD
 
 ## MCP Server Single Source of Truth
 
-MCP servers are declared once in `modules/agents/agents-mcp.nix` and adapted to each provider's required format by `lib/mcp-adapters.nix`. No provider-specific MCP configuration is written by hand.
+MCP servers are declared once in `modules/agents/agents-mcp.nix` and adapted to each provider's required format by `modules/agents/mcp-adapters.nix`. No provider-specific MCP configuration is written by hand.
 
 ```
 modules/agents/agents-mcp.nix   (canonical server definitions)
         |
         v
-lib/mcp-adapters.nix            (SSoT transformer)
+modules/agents/mcp-adapters.nix (SSoT transformer)
         |
         +---> claude format     (passed through as-is → ~/.claude.json)
         +---> gemini format     (command + args only → ~/.gemini/settings.json)
@@ -71,13 +71,13 @@ Each provider has a dedicated Nix module in `modules/agents/`. All modules follo
 | Gemini | `modules/agents/gemini.nix` | `mkJsonSync` (deep-merge) | `~/.gemini/settings.json` |
 | Codex | `modules/agents/codex.nix` | `mkFileCopy` (overwrite + backup) | `~/.codex/config.toml` |
 
-`lib/sync-mutable-config.nix` provides both helpers. Deep-merge preserves runtime data (OAuth tokens, project history, usage stats) that the provider CLIs write back to their config files.
+`modules/agents/sync-mutable-config.nix` provides both helpers. Deep-merge preserves runtime data (OAuth tokens, project history, usage stats) that the provider CLIs write back to their config files.
 
 Static assets (commands, agents, skills, hooks) are managed separately as read-only symlinks via `home.file` in `claude.nix`.
 
 ## Agent Policy Contract
 
-The policy contract system (`lib/agent-policy/`) encodes the behavioral rules from `CLAUDE.md` as Nix module options that are validated at build time. Each provider declares its capabilities against a shared interface; Nix assertions reject invalid combinations before any code is deployed.
+The policy-*.nix modules in `modules/agents/` encode the behavioral rules from `CLAUDE.md` as Nix module options that are validated at build time. Each provider declares its capabilities against a shared interface; Nix assertions reject invalid combinations before any code is deployed.
 
 Full documentation: [architecture/agent-policy-contract.md](../architecture/agent-policy-contract.md)
 
@@ -115,15 +115,23 @@ Each provider fires `~/.claude/hooks/agent-notify.sh <provider>` on session end.
 
 ```
 modules/agents/
-├── agents-module.nix    # imports all provider modules
-├── agents-mcp.nix       # MCP server SSoT (programs.mcp.servers)
-├── claude.nix           # Claude: dotfiles + activation + policy contract
-├── gemini.nix           # Gemini: settings + policy contract
-├── codex.nix            # Codex: config.toml + policy contract
-└── agents-proxy.nix     # cli-proxy-api binary + launchd service (macOS)
-
-lib/
-├── mcp-adapters.nix     # SSoT: programs.mcp.servers → per-provider format
-├── sync-mutable-config.nix  # mkJsonSync + mkFileCopy helpers
-└── agent-policy/        # see lib/agent-policy/ for full file listing
+├── agents-module.hm.nix        # imports all provider modules + policy assembler
+├── agents-mcp.nix              # MCP server SSoT (programs.mcp.servers)
+├── mcp-adapters.nix            # SSoT: programs.mcp.servers → per-provider format
+├── claude.nix                  # Claude: dotfiles + activation + policy contract
+├── gemini.nix                  # Gemini: settings + policy contract
+├── codex.nix                   # Codex: config.toml + policy contract
+├── agents-proxy.nix            # cli-proxy-api binary + launchd service (macOS)
+├── sync-mutable-config.nix     # mkJsonSync + mkFileCopy helpers
+├── policy-contract.nix         # Interface: agentPolicy option types
+├── policy-assertions.nix       # build-time contract assertions
+├── policy-assembler.nix        # IoC assembler (entry point)
+├── policy-hook-adapters.nix    # SSoT format adapter (claude/gemini/codex)
+├── policy-provider-hooks.nix   # base + policy hook merge helper
+├── policy-phase-gate.nix       # capability mixin: phase gate
+├── policy-path-guard.nix       # capability mixin: path guard
+├── policy-strategy-lint.nix    # capability mixin: strategy lint
+├── policy-reasoning-trace.nix  # capability mixin: reasoning trace
+├── policy-async-handshake.nix  # capability mixin: async FIFO handshake
+└── policy-live-oracle.nix      # capability mixin: live oracle
 ```

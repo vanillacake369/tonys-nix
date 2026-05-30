@@ -18,7 +18,7 @@ Because Codex uses a different underlying model than Claude, its agreement or di
 `modules/agents/codex.nix` is the entry point. It:
 
 1. Reads MCP server definitions from `config.programs.mcp.servers` (set in `mcp.nix`).
-2. Passes them through `lib/mcp-adapters.nix` using the `codex` adapter, which adds an `enabled` flag and renames `headers` to `http_headers`.
+2. Passes them through `modules/agents/mcp-adapters.nix` using the `codex` adapter, which adds an `enabled` flag and renames `headers` to `http_headers`.
 3. Reads policy-generated hooks from `config.agentPolicy._assembledHooks.codex`.
 4. Merges base hooks with policy hooks per event name.
 5. Generates a TOML config file and syncs it to `~/.codex/config.toml` via `mkFileCopy`.
@@ -69,7 +69,7 @@ The minimal surface area is intentional. Codex is a targeted verification tool, 
 
 ## Reasoning Traces
 
-When `mode = "log-only"`, the reasoning-trace mixin (`lib/agent-policy/mixins/reasoning-trace.nix`) generates a `PostToolUse` hook that:
+When `mode = "log-only"`, the reasoning-trace mixin (`modules/agents/policy-reasoning-trace.nix`) generates a `PostToolUse` hook that:
 
 1. Reads `tool_output` from the JSON stdin payload.
 2. Creates `/tmp/agent-traces/codex/<session-id>.log` if it does not exist.

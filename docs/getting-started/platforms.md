@@ -9,12 +9,12 @@
 
 ### macOS-Specific Packages
 
-The following packages are installed only on macOS (via `lib.optionals isDarwin` in `modules/apps.nix` and `modules/shell/infra.nix`):
+The following packages are installed only on macOS (via `lib.optionals isDarwin` in `modules/packages/apps.hm.nix` and `modules/shell/infra.nix`):
 
 | Package | Purpose |
 |---|---|
 | AeroSpace | Tiling window manager |
-| Karabiner | Keyboard remapping (config generated from `lib/keymaps/`) |
+| Karabiner | Keyboard remapping (config generated from `modules/keymap/`) |
 | WezTerm | GPU-accelerated terminal emulator |
 | AlDente | Battery charge limiter |
 | JankyBorders | Active window border highlight |
@@ -26,12 +26,12 @@ The following packages are installed only on macOS (via `lib.optionals isDarwin`
 
 ### Karabiner and AeroSpace
 
-Both configurations are generated from `lib/keymaps/keymap-binds.nix` at build time. After `just apply`, the generated files are written to:
+Both configurations are generated from `modules/keymap/binds.nix` at build time. After `just apply`, the generated files are written to:
 
 - `~/.config/karabiner/karabiner.json`
 - `~/.config/aerospace/aerospace.toml`
 
-AeroSpace is reloaded automatically when `lib/keymaps/keymap-binds.nix` has uncommitted changes in git. To force a reload:
+AeroSpace is reloaded automatically when `modules/keymap/binds.nix` has uncommitted changes in git. To force a reload:
 
 ```bash
 aerospace reload-config
@@ -83,7 +83,7 @@ The `--impure` flag is required because `hardware-configuration.nix` is read fro
 
 ### Hyprland
 
-Hyprland is enabled on NixOS via `modules/platform/hyprland.nix`, imported conditionally with `lib.optionals isNixOs`.
+Hyprland is enabled on NixOS via `modules/desktop/hyprland.nix`, imported conditionally with `lib.optionals isNixOs`.
 
 ---
 
@@ -114,7 +114,7 @@ This runs `sudo mount --make-rshared /`. The setting does not persist across WSL
 
 ### WSL-Specific Module
 
-`modules/platform/wsl.nix` is imported when `isLinux && !isNixOs`. It enables `targets.genericLinux` and configures the WSL environment.
+`modules/system/wsl.nix` is imported when `isLinux && !isNixOs`. It enables `targets.genericLinux` and configures the WSL environment.
 
 ---
 
@@ -138,7 +138,7 @@ Same as WSL — `just bootstrap` runs `just install-uidmap` on plain Linux hosts
 
 ### Linux GUI Packages
 
-The following GUI packages are installed on Linux (excluding WSL), via `lib.optionals (isLinux && !isWsl)` in `modules/apps.nix`:
+The following GUI packages are installed on Linux (excluding WSL), via `lib.optionals (isLinux && !isWsl)` in `modules/packages/apps.hm.nix`:
 
 - Firefox
 - Slack

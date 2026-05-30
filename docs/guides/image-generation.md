@@ -1,6 +1,6 @@
 # Image Generation Guide
 
-This guide explains how to create bootable ISOs, VM images, and container images from your NixOS configuration using nixos-generators.
+This guide explains how to create bootable ISOs, VM images, and container images from your NixOS configuration using nixpkgs' built-in image builders.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This guide explains how to create bootable ISOs, VM images, and container images
 
 ## Overview
 
-This flake includes nixos-generators integration for creating various system images. You can generate bootable ISOs, VM images, and container images from your NixOS configuration with automatic multi-architecture support.
+This flake uses nixpkgs' native `system.build.images` infrastructure (upstreamed from nixos-generators in NixOS 25.05) for creating various system images. You can generate bootable ISOs, VM images, and container images from your NixOS configuration with automatic multi-architecture support.
 
 ### Key Features
 
@@ -442,7 +442,7 @@ docker pull nixos/nix
 ## Additional Resources
 
 - [NixOS Manual - Building Images](https://nixos.org/manual/nixos/stable/#sec-building-image)
-- [nixos-generators Documentation](https://github.com/nix-community/nixos-generators)
+- [NixOS Manual - system.build.images](https://nixos.org/manual/nixos/stable/#sec-image-nixos-rebuild-build-image)
 - [Justfile Commands Reference](commands-reference.md)
 - [Troubleshooting Guide](troubleshooting.md)
 

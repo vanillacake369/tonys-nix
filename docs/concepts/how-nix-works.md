@@ -65,12 +65,11 @@ The flags travel from `flake.nix` down through `extraSpecialArgs` without any mo
 
 ## The Overlay Convention
 
-Any file named `*.overlay.nix` inside the `modules/` directory tree is automatically collected by `lib/discover-overlays.nix` and applied to nixpkgs. The `llm-agents` flake overlay is appended on top.
+Any file named `*.overlay.nix` inside the `modules/` directory tree is automatically collected by `lib/collect-overlays.nix` and applied to nixpkgs. The `llm-agents` flake overlay is appended on top.
 
 ```nix
 # flake.nix (excerpt)
-collectOverlays = import ./lib/discover-overlays.nix { inherit lib; };
-overlays = collectOverlays ./modules ++ [ llm-agents.overlays.default ];
+overlays = (import ./lib/collect-overlays.nix { inherit lib; }) ./modules ++ [ llm-agents.overlays.default ];
 ```
 
 This convention allows package pinning or patching to be co-located with the module that needs it. To pin terraform to a specific version, drop a `terraform.overlay.nix` file into `modules/` alongside the module that uses it. No modification to `flake.nix` is required. The overlay is picked up automatically on the next `nix build`.
@@ -83,7 +82,7 @@ Several tools that this configuration manages — Claude Code, Gemini CLI, Codex
 
 The standard home-manager approach (symlink everything from the Nix store) does not work for these files. A read-only symlink blocks the OAuth flow entirely.
 
-`lib/sync-mutable-config.nix` provides two helpers:
+`modules/agents/sync-mutable-config.nix` provides two helpers:
 
 **`mkJsonSync` (deep-merge)** — reads an existing file, deep-merges the Nix-generated content on top, and writes the result back. Used for Claude Code and Gemini settings, where the provider CLIs write keys that must be preserved across activations (OAuth tokens, project IDs, usage data).
 
@@ -97,30 +96,30 @@ The agent policy contract system uses the Nix module system's dependency resolut
 
 The flow works as follows:
 
-1. **Provider modules** (e.g. `modules/agents/claude.nix`) set values on `agentPolicy.providers.claude.*` — the capability options defined in `lib/agent-policy/agent-contract.nix`.
-2. **Mixin modules** (in `lib/agent-policy/mixins/`) each declare a dependency on `config.agentPolicy.providers` and write their output to `config.agentPolicy._hooks.<mixin>.<provider>`. They are passive: they run when imported, generate hooks only for providers where the relevant option is enabled, and write nothing else.
-3. **`agent-hook-adapters.nix`** reads `config.agentPolicy._hooks` and converts the internal `{ event, matcher, script }` representation to each provider's native settings schema.
-4. **`agent-assembler.nix`** is the assembler. It imports all mixins and the contract, maps the adapted hooks per provider, and writes the final result to `config.agentPolicy._assembledHooks`.
+1. **Provider modules** (e.g. `modules/agents/claude.nix`) set values on `agentPolicy.providers.claude.*` — the capability options defined in `modules/agents/policy-contract.nix`.
+2. **Mixin modules** (`policy-phase-gate.nix`, `policy-path-guard.nix`, etc. in `modules/agents/`) each declare a dependency on `config.agentPolicy.providers` and write their output to `config.agentPolicy._hooks.<mixin>.<provider>`. They are passive: they run when imported, generate hooks only for providers where the relevant option is enabled, and write nothing else.
+3. **`policy-hook-adapters.nix`** reads `config.agentPolicy._hooks` and converts the internal `{ event, matcher, script }` representation to each provider's native settings schema.
+4. **`policy-assembler.nix`** is the assembler. It imports all mixin files and the contract, maps the adapted hooks per provider, and writes the final result to `config.agentPolicy._assembledHooks`.
 5. **Provider modules** read `config.agentPolicy._assembledHooks.<name>`, deep-merge with their base hooks, generate a Nix-store JSON file, and register an activation script to sync it into the live settings file.
 
-No module explicitly calls another. The Nix module system evaluates all modules together, resolves the option graph, and produces a single consistent `config`. Adding a new mixin means importing it in `agent-assembler.nix`; the hook automatically appears in any provider that has the relevant option enabled.
+No module explicitly calls another. The Nix module system evaluates all modules together, resolves the option graph, and produces a single consistent `config`. Adding a new mixin means importing it in `assembler.nix`; the hook automatically appears in any provider that has the relevant option enabled.
 
 ```mermaid
 graph TD
     A[flake.nix] --> B[mk-home-config.nix]
     B --> C[home.nix]
     C --> D[modules/]
-    D --> E[shell/ language.nix apps.nix]
+    D --> E["shell/ language/ packages/apps.hm.nix"]
     D --> F[agents/]
-    F --> G[agent-assembler.nix]
-    G --> H[agent-contract.nix]
-    G --> I[mixins/]
+    F --> G[policy-assembler.nix]
+    G --> H[policy-contract.nix]
+    G --> I["policy-*.nix (mixins)"]
     I --> J[Generated Hooks]
     J --> K[sync-mutable-config]
     K --> L["~/.claude/settings.json"]
 ```
 
-The build-time assertions in `lib/agent-policy/agent-assertions.nix` run as part of normal `config.assertions` evaluation — the same mechanism used throughout nixpkgs to catch invalid option combinations. If an assertion fires, `nix build` stops with a message like:
+The build-time assertions in `modules/agents/policy-assertions.nix` run as part of normal `config.assertions` evaluation — the same mechanism used throughout nixpkgs to catch invalid option combinations. If an assertion fires, `nix build` stops with a message like:
 
 ```
 error: Failed assertions:

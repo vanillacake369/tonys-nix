@@ -2,7 +2,7 @@
 
 All packages are declared in Nix modules. Run `home-manager packages` to see exact store paths and versions for your current profile.
 
-## Language Toolchains — `modules/language.nix`
+## Language Toolchains — `modules/language/language.hm.nix`
 
 Language support includes the runtime, build tooling, language server, formatter, and linter for each language.
 
@@ -28,7 +28,7 @@ Language support includes the runtime, build tooling, language server, formatter
 
 ---
 
-## Applications — `modules/apps.nix`
+## Applications — `modules/packages/apps.hm.nix`
 
 ### All Platforms
 
@@ -125,7 +125,7 @@ These modules configure programs via `programs.<name>` rather than `home.package
 
 ---
 
-## JetBrains IDEs — `modules/packages/jetbrains.nix`
+## JetBrains IDEs — `modules/packages/jetbrains.hm.nix`
 
 JetBrains IDEs are declared in a dedicated module. The exact set may vary; check the file for the current list.
 
