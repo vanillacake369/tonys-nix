@@ -52,8 +52,6 @@ All hooks read JSON from stdin, do their work, and exit with:
 |---|---|---|---|
 | `Bash` | `cmd-guard.sh` | Manual | Blocks destructive shell patterns (rm -rf, git push --force to main) |
 | `Bash` | `branch-guard.sh` | Manual | Prevents checkout/reset on protected branches |
-| `Write\|Edit\|Read` | `path-guard.sh` | Manual | Blocks dotenv, private keys, credential files |
-| `Write\|Edit\|Read` | `complexity-gate.sh` | Manual | Blocks L-complexity mutations without a state file |
 | `Write\|Edit\|NotebookEdit` | `phase-gate-claude.sh` | Policy: phase-gate mixin | Blocks gated tools until L-complexity strategy is approved |
 | `Write\|Edit\|NotebookEdit` | `strategy-lint-claude.sh` | Policy: strategy-lint mixin | Validates strategy document has required sections + peer review |
 | `Write\|Edit\|Read` | `path-guard-claude.sh` | Policy: path-guard mixin | Contract-driven sensitive file blocking from `global.sensitivePatterns` |
@@ -138,7 +136,7 @@ Claude's contract implementation in `modules/agents/claude.nix` activates the fo
 
 **Add an MCP server**: edit `modules/agents/agents-mcp.nix` (single source of truth). The adapter automatically formats it for Claude, Gemini, and Codex. Run `just apply`.
 
-**Add a hook**: for one-off hooks, add an entry directly to `dotfiles/claude/settings.json`. For policy-driven hooks that should apply across providers, create a mixin in `lib/agent-policy/mixins/`. See [architecture/agent-policy-contract.md](../architecture/agent-policy-contract.md#adding-a-new-mixin).
+**Add a hook**: for one-off hooks, add an entry directly to `dotfiles/claude/settings.json`. For policy-driven hooks that should apply across providers, create a `policy-<name>.nix` mixin module in `modules/agents/`. See [architecture/agent-policy-contract.md](../architecture/agent-policy-contract.md#adding-a-new-mixin).
 
 **Add a slash command**: create a Markdown file in `dotfiles/claude/commands/`. The filename (without `.md`) becomes the command name.
 

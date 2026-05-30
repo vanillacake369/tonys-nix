@@ -34,7 +34,7 @@ Supports NixOS, WSL, macOS (Intel & Apple Silicon), and standard Linux distribut
 | AI Agents | Claude Code, Gemini CLI, Codex, cli-proxy-api (unified auth proxy) |
 | macOS Apps | AeroSpace, Karabiner, WezTerm, AlDente, JankyBorders, Hidden Bar |
 | Linux Apps | Firefox, Slack, TickTick, LibreOffice |
-| JetBrains | IntelliJ, GoLand (via packages/jetbrains.nix) |
+| JetBrains | IntelliJ, GoLand (via packages/jetbrains.hm.nix) |
 | Secrets | sops, age, ssh-to-age, git-crypt, gnupg |
 
 > **Note**: Package versions are managed by nixpkgs-unstable. Run `home-manager packages` to see current versions.
@@ -95,7 +95,7 @@ graph LR
     end
 
     subgraph Agent Policy Contract
-        AG --> P[agent-assembler.nix]
+        AG --> P[policy/assembler.nix]
         P --> MC[Claude Code<br/>Orchestrator]
         P --> MG[Gemini CLI<br/>Researcher]
         P --> MX[Codex<br/>Verifier]
@@ -160,7 +160,7 @@ just gc-force     # Force cleanup regardless
 
 ## macOS Keyboard Customization
 
-Karabiner-Elements + AeroSpace configuration generated from a single Nix spec (`lib/keymaps/`):
+Karabiner-Elements + AeroSpace configuration generated from a single Nix spec (`modules/keymap/`):
 
 - **Windows/GNOME shortcuts** in all apps except terminals: Ctrl+C/V/X/A/Z/S, Ctrl+T/W, Ctrl+arrows
 - **Quick app launching**: Cmd+1-6 for TickTick, Slack, Obsidian, Chrome, IntelliJ, GoLand

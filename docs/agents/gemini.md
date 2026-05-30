@@ -19,7 +19,7 @@ The three named tasks Gemini handles are:
 `modules/agents/gemini.nix` is the entry point. It:
 
 1. Reads MCP server definitions from `config.programs.mcp.servers` (set in `mcp.nix`).
-2. Passes them through `lib/mcp-adapters.nix` using the `gemini` adapter, which keeps only `command` and `args`.
+2. Passes them through `modules/agents/mcp-adapters.nix` using the `gemini` adapter, which keeps only `command` and `args`.
 3. Reads policy-generated hooks from `config.agentPolicy._assembledHooks.gemini`.
 4. Merges base hooks with policy hooks per event name.
 5. Generates a JSON settings file and syncs it to `~/.gemini/settings.json` via `mkJsonSync`.
@@ -46,7 +46,7 @@ Policy-generated hooks (from `async-handshake`, `path-guard`, `reasoning-trace` 
 
 ## Async FIFO Handshake
 
-The async-handshake mixin (`lib/agent-policy/mixins/async-handshake.nix`) creates the infrastructure when Gemini's contract is evaluated:
+The async-handshake mixin (`modules/agents/policy-async-handshake.nix`) creates the infrastructure when Gemini's contract is evaluated:
 
 **At `nix build` / `just apply` time:**
 

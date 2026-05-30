@@ -14,7 +14,7 @@ Claude Code (orchestrator)
 Configuration is managed declaratively through Nix:
 - **Static files** (commands, agents, skills, hooks) are symlinked via `home.file`
 - **Dynamic settings** (permissions, MCP servers, hooks) are deep-merged into `~/.claude.json` and `~/.claude/settings.json` via activation scripts
-- **Policy-generated hooks** are produced by `lib/agent-policy/` at build time and merged with base hooks
+- **Policy-generated hooks** are produced by the policy-*.nix mixin modules in `modules/agents/` at build time and merged with base hooks
 
 ## Configuration Sync
 
@@ -26,8 +26,8 @@ When you run `just apply`, home-manager:
 4. Preserves runtime data (projects, tips, OAuth tokens) through `jq` deep-merge
 
 Key implementation files:
-- `lib/sync-mutable-config.nix` — `mkJsonSync` (deep-merge) and `mkFileCopy` (overwrite with backup)
-- `lib/mcp-adapters.nix` — transforms canonical MCP definitions to Claude/Gemini/Codex formats
+- `modules/agents/sync-mutable-config.nix` — `mkJsonSync` (deep-merge) and `mkFileCopy` (overwrite with backup)
+- `modules/agents/mcp-adapters.nix` — transforms canonical MCP definitions to Claude/Gemini/Codex formats
 
 ## Hook Pipeline
 
@@ -45,8 +45,6 @@ All hooks are shell scripts that read JSON from stdin and return exit codes: 0 (
 |---|---|---|
 | `Bash` | `cmd-guard.sh` | Blocks destructive shell commands |
 | `Bash` | `branch-guard.sh` | Protects main/production branches |
-| `Write\|Edit\|Read` | `path-guard.sh` | Blocks `.env`, private keys, credentials |
-| `Write\|Edit\|Read` | `complexity-gate.sh` | Blocks L-complexity without approval |
 | `Write\|Edit\|NotebookEdit` | `phase-gate-claude.sh` * | Contract-generated phase enforcement |
 | `Write\|Edit\|NotebookEdit` | `strategy-lint-claude.sh` * | Contract-generated strategy validation |
 | `Write\|Edit\|Read` | `path-guard-claude.sh` * | Contract-generated from `global.sensitivePatterns` |
@@ -112,7 +110,7 @@ Three reusable skills in `dotfiles/claude/skills/`:
 
 ## Agent Policy Contract
 
-The policy system (`lib/agent-policy/`) uses Nix modules as a DDD-style IoC container. Claude's contract implementation enables:
+The policy system (policy-*.nix modules under `modules/agents/`) uses Nix modules as a DDD-style IoC container. Claude's contract implementation enables:
 
 - **Silent reasoning** — chain-of-thought logged to `/tmp/agent-traces/claude/`, only decisions shown
 - **Phase gate** — Write/Edit blocked until L-complexity strategy is approved
@@ -147,11 +145,11 @@ programs.mcp.servers.my-server = {
 };
 ```
 
-The adapter (`lib/mcp-adapters.nix`) automatically converts to Claude/Gemini/Codex formats.
+The adapter (`modules/agents/mcp-adapters.nix`) automatically converts to Claude/Gemini/Codex formats.
 
 ### Add a Hook
 
-For one-off hooks, add to `dotfiles/claude/settings.json`. For policy-driven hooks, create or modify a mixin in `lib/agent-policy/mixins/` — it will be generated and merged at build time.
+For one-off hooks, add to `dotfiles/claude/settings.json`. For policy-driven hooks, create or modify a policy-*.nix mixin module in `modules/agents/` — it will be generated and merged at build time.
 
 ## Related Documentation
 

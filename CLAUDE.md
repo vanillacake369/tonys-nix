@@ -11,12 +11,18 @@
 - **Discovery**: `justfile`, `Makefile` 등을 자동 탐색하고 발견 시 정의된 태스크(`just <task>`)를 최우선 사용하라.
 - **Exit Condition**: 해결책에 대한 명확한 근거(Evidence) 확보 시 전략 단계로 이동.
 
-### Phase 2: STRATEGY (전략 수립 & 컨펌)
-- **Action**: 분석 결과를 바탕으로 설계안, 트레이드오프, **Pre-mortem (실패 시나리오 3선)**을 작성하라.
-- **Peer Review**: Gemini 등을 활용하여 설계의 허점을 공격하게 하고 그 결과를 사용자에게 함께 보고하라.
+### Phase 2: STRATEGY (전략 수립 & 컨펌) — Reversibility-Tiered
+
+**Default (reversible & local, ~90%의 작업):**
+- Lightweight plan = 1-line intent + 1-line testable success criterion.
+- Pre-mortem / tradeoffs / grilled-decisions / peer-review **불필요**.
+- Invariant hooks (path-guard, phase-gate, auto-lint 등) + reversibility가 안전망.
+
+**Irreversible / wide-blast (또는 risk-keyword로 complexity-router가 자동 에스컬레이션):**
+- Full cognitive guardrails 필수: tradeoffs, pre-mortem (실패 시나리오 3선), **Grilled Decisions** ([revision-loop, `techniques/grilled-decisions.md`](dotfiles/claude/skills/shared/techniques/grilled-decisions.md)), peer-review (Gemini 비판).
 - **[CRITICAL GATE]**: 전략 보고 후 **사용자의 명시적 승인(예: "진행하세요")이 있기 전까지는 어떠한 파일 수정(`write`, `replace`)도 금지한다.**
 
-> **Code-enforced**: `complexity-gate.sh` + `phase-gate-claude.sh`가 L-complexity 작업에서 승인 없는 Write/Edit를 시스템 레벨에서 차단한다.
+> **Code-enforced**: `phase-gate-claude.sh`(contract-generated)가 L-complexity 작업에서 승인 없는 Write/Edit를 시스템 레벨에서 차단한다. `strategy-lint-claude.sh`는 required sections(pre-mortem/tradeoffs/peer-review/grilled-decisions)을 **irreversible 세션에서만** 강제한다 — reversible 작업은 즉시 통과.
 
 ### Phase 3: EXECUTION (구현 및 검증)
 - **Requirement-Test Mapping**: 구현 전, 요구사항과 테스트 케이스(5대 엣지 케이스 포함) 매핑 테이블 작성.
@@ -35,7 +41,7 @@
 
 ## 3. Hard Rules & Guardrails
 1. **추론 금지**: 확인되지 않은 사실은 "미확인"으로 명시. "~일 수 있습니다" 표현 지양.
-2. **보안 가드 (Path Guard)**: `.env`, `secrets/*`, 개인키 접근 시 시스템이 자동 차단 (`path-guard.sh` + `path-guard-claude.sh`).
+2. **보안 가드 (Path Guard)**: `.env`, `secrets/*`, 개인키 접근 시 시스템이 자동 차단 (`path-guard-claude.sh` — contract `global.sensitivePatterns` 기반 SSoT).
 3. **사용자 승인 필수**: 임의의 리팩토링이나 구조 변경 금지. 승인된 스펙 내에서만 작업.
 4. **역방향 에스컬레이션**: 설계 결함 발견 시 하위 에이전트는 즉시 멈추고 상위/사용자에게 보고하라.
 5. **도구 활용**: `nvim`의 LSP, lint, formatter가 있는 경우 이를 존중하여 파일 작성.
@@ -47,7 +53,7 @@
 - **[MANDATORY] Strategy Peer Review**:
   - `STRATEGY` 보고 전, 반드시 **Gemini (연구/비판)**에게 제안할 설계의 맹점과 리스크를 묻는다.
   - 보고서에 `[Peer Review: Gemini]` 섹션을 포함하여, 본인의 안과 Gemini의 비판 내용을 나란히 제시하라.
-  - **Code-enforced**: `strategy-lint-claude.sh`가 `pre-mortem`, `tradeoffs`, `peer-review` 섹션 존재 여부를 검증한다.
+  - **Code-enforced**: `strategy-lint-claude.sh`가 `pre-mortem`, `tradeoffs`, `peer-review`, `grilled-decisions` 섹션 존재 여부를 검증한다 — **irreversible 세션에서만** (reversible은 즉시 통과).
 - **[MANDATORY] Logic Verification**:
   - `EXECUTION` 직전, 복잡한 알고리즘이나 추상화 레이어 도입 시 **Codex (논리/구현)**에게 로직의 완결성을 검토받는다.
 
@@ -58,15 +64,15 @@
 
 ## 5. Agent Policy Contract System
 
-위 규칙들의 핵심은 `lib/agent-policy/`에서 **코드로 강제**된다. Nix module system이 IoC 컨테이너 역할을 수행한다.
+위 규칙들의 핵심은 `modules/agents/`의 flat `policy-*.nix` 파일들에서 **코드로 강제**된다. Nix module system이 IoC 컨테이너 역할을 수행한다.
 
 | Component | File | Role |
 |---|---|---|
-| Contract (Interface) | `lib/agent-policy/agent-contract.nix` | 6개 policy 영역의 option type 선언 |
-| Assertions | `lib/agent-policy/agent-assertions.nix` | `nix build` 시 contract 위반 자동 검출 |
-| Mixins | `lib/agent-policy/mixins/` | capability별 hook 생성 (phase-gate, path-guard, strategy-lint, reasoning-trace, async-handshake, live-oracle) |
-| IoC Assembler | `lib/agent-policy/agent-assembler.nix` | mixin 산출물을 provider별 format으로 조립 |
-| Adapters | `lib/agent-policy/agent-hook-adapters.nix` | claude/gemini/codex hook 스키마 변환 (SSoT) |
+| Contract (Interface) | `modules/agents/policy-contract.nix` | 6개 policy 영역의 option type 선언 |
+| Assertions | `modules/agents/policy-assertions.nix` | `nix build` 시 contract 위반 자동 검출 |
+| Mixins | `modules/agents/policy-{phase-gate,path-guard,strategy-lint,reasoning-trace,async-handshake,live-oracle}.nix` | capability별 hook 생성 |
+| IoC Assembler | `modules/agents/policy-assembler.nix` | mixin 산출물을 provider별 format으로 조립 |
+| Adapters | `modules/agents/policy-hook-adapters.nix` | claude/gemini/codex hook 스키마 변환 (SSoT) |
 
 Provider별 contract implementation:
 - **Claude** (`modules/agents/claude.nix`): Orchestrator — silent reasoning, phase-gate, strategy-lint (gemini peer review), live-oracle (`nix flake check`)
@@ -84,10 +90,10 @@ UserPromptSubmit
   └─ complexity-router.sh         # S/M/L 분류 프롬프트 주입
 
 PreToolUse
-  ├─ [Bash]          cmd-guard.sh, branch-guard.sh
-  ├─ [Write|Edit|Read]  path-guard.sh, complexity-gate.sh, phase-gate-claude.sh*, path-guard-claude.sh*
-  ├─ [Write|Edit|NB]    strategy-lint-claude.sh*
-  └─ [Agent]         cost-gate.sh
+  ├─ [Bash]             cmd-guard.sh, branch-guard.sh
+  ├─ [Write|Edit|Read]  path-guard-claude.sh*
+  ├─ [Write|Edit|NB]    phase-gate-claude.sh*, strategy-lint-claude.sh*
+  └─ [Agent]            cost-gate.sh
 
 PostToolUse
   ├─ [Bash]          proxy-route.sh, escalation-gate.sh, test-feedback.sh

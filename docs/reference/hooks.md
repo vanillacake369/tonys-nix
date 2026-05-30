@@ -29,8 +29,6 @@ The exact JSON schema varies by event type. `PreToolUse` events include `tool_na
 | `UserPromptSubmit` | *(all prompts)* | `complexity-router.sh` | Classify prompt as S/M/L and inject the complexity tier into the conversation context | No |
 | `PreToolUse` | `Bash` | `cmd-guard.sh` | Block destructive shell commands (`rm -rf /`, `git push --force` to main, etc.) | No |
 | `PreToolUse` | `Bash` | `branch-guard.sh` | Prevent commits and force-pushes to protected branches | No |
-| `PreToolUse` | `Write`, `Edit`, `Read` | `path-guard.sh` | Block access to `.env`, `secrets/*`, private keys, and other sensitive paths | No |
-| `PreToolUse` | `Write`, `Edit`, `Read` | `complexity-gate.sh` | Require an S/M/L classification before allowing file mutations | No |
 | `PreToolUse` | `Write`, `Edit`, `Read` | `phase-gate-claude.sh` | Enforce the RESEARCH → STRATEGY → EXECUTION state machine; block writes until strategy is approved | Yes* |
 | `PreToolUse` | `Write`, `Edit`, `Read` | `path-guard-claude.sh` | Provider-specific path guard generated from the policy contract | Yes* |
 | `PreToolUse` | `Write`, `Edit`, `NotebookEdit` | `strategy-lint-claude.sh` | Validate that a strategy document containing required sections (`pre-mortem`, `tradeoffs`, `peer-review`) exists before allowing writes | Yes* |
@@ -44,7 +42,7 @@ The exact JSON schema varies by event type. `PreToolUse` events include `tool_na
 | `PostToolUse` | *(all tools)* | `reasoning-trace-claude.sh` | Capture reasoning traces to `/tmp/agent-traces` (silent mode for Claude) | Yes* |
 | `Stop` | *(session end)* | `agent-notify.sh claude` | Send a macOS notification when the Claude session ends | No |
 
-*Marked **Yes** in the Generated column means the script is produced by the Agent Policy Contract system at `nix build` time. These scripts are not hand-written; they are rendered from mixin templates in `lib/agent-policy/mixins/` and written to `~/.claude/settings.json` via `home.activation.syncClaudeSettings`.*
+*Marked **Yes** in the Generated column means the script is produced by the Agent Policy Contract system at `nix build` time. These scripts are not hand-written; they are rendered from the policy-*.nix mixin modules in `modules/agents/` and written to `~/.claude/settings.json` via `home.activation.syncClaudeSettings`.*
 
 ## Agent Policy Contract Hooks
 
@@ -52,11 +50,11 @@ The four generated hooks correspond to policy mixins:
 
 | Hook | Mixin Source | Policy Option |
 |---|---|---|
-| `phase-gate-claude.sh` | `lib/agent-policy/mixins/phase-gate.nix` | `agentPolicy.providers.claude.phases.enforced` |
-| `path-guard-claude.sh` | `lib/agent-policy/mixins/path-guard.nix` | *(always active when provider is enabled)* |
-| `strategy-lint-claude.sh` | `lib/agent-policy/mixins/strategy-lint.nix` | `agentPolicy.providers.claude.strategyLint.enabled` |
-| `live-oracle-claude.sh` | `lib/agent-policy/mixins/live-oracle.nix` | `agentPolicy.providers.claude.oracle.enabled` |
-| `reasoning-trace-claude.sh` | `lib/agent-policy/mixins/reasoning-trace.nix` | `agentPolicy.providers.claude.reasoning.mode` |
+| `phase-gate-claude.sh` | `modules/agents/policy-phase-gate.nix` | `agentPolicy.providers.claude.phases.enforced` |
+| `path-guard-claude.sh` | `modules/agents/policy-path-guard.nix` | *(always active when provider is enabled)* |
+| `strategy-lint-claude.sh` | `modules/agents/policy-strategy-lint.nix` | `agentPolicy.providers.claude.strategyLint.enabled` |
+| `live-oracle-claude.sh` | `modules/agents/policy-live-oracle.nix` | `agentPolicy.providers.claude.oracle.enabled` |
+| `reasoning-trace-claude.sh` | `modules/agents/policy-reasoning-trace.nix` | `agentPolicy.providers.claude.reasoning.mode` |
 
 Changing any of these options and running `just apply` regenerates the corresponding scripts. Violations of contract invariants (e.g. enabling `strategyLint` without setting `peerReviewProvider`) cause `nix build` to fail with an assertion error before any scripts are written.
 
