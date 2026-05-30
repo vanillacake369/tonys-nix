@@ -18,11 +18,10 @@ lib.optionalAttrs (lib.hasSuffix "-linux" system) (
         .config.system.build.images;
   in
     {
-      iso = images.iso;
+      inherit (images) iso vmware;
       qcow = images.qemu;
-      vmware = images.vmware;
     }
     // lib.optionalAttrs (system == "x86_64-linux") {
-      virtualbox = images.virtualbox;
+      inherit (images) virtualbox;
     }
 )

@@ -34,14 +34,14 @@ in {
 
   home.activation = {
     copyAutoHotkeyScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      run cp -f ${../dotfiles/autohotkey/win11-shortcut.ahk} \
+      run cp -f ${../../dotfiles/autohotkey/win11-shortcut.ahk} \
         "${winUserDir}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/win11-shortcut.ahk"
     '';
 
     copyWindowsShutdownScript = lib.hm.dag.entryAfter ["writeBoundary"] (
       if isWindowsAdmin
       then ''
-        run cp -f ${../dotfiles/windows/script/shutdown_idle.ps1} \
+        run cp -f ${../../dotfiles/windows/script/shutdown_idle.ps1} \
           "${winUserDir}/shutdown_idle.ps1"
       ''
       else ''
@@ -52,7 +52,7 @@ in {
     registerWindowsSchedulerTask = lib.hm.dag.entryAfter ["writeBoundary"] (
       if isWindowsAdmin
       then ''
-        run cp -f ${../dotfiles/windows/scheduler/SystemIdleShutdown.xml} "${wslXmlPath}"
+        run cp -f ${../../dotfiles/windows/scheduler/SystemIdleShutdown.xml} "${wslXmlPath}"
         run /mnt/c/Windows/System32/schtasks.exe /create /tn "${taskName}" /xml "${winXmlPath}" /F
         run rm -f "${wslXmlPath}"
       ''
