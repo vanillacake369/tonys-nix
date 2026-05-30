@@ -2,6 +2,7 @@
   lib,
   isLinux,
   isDarwin,
+  isWsl,
   isNixOs,
   userProfile,
   ...
@@ -35,5 +36,5 @@ in {
   imports =
     domainModules.homeManager
     ++ lib.optionals isNixOs [./modules/desktop/hyprland.nix]
-    ++ lib.optionals (isLinux && !isNixOs) [./modules/system/wsl.nix];
+    ++ lib.optionals isWsl [./modules/system/wsl.nix];
 }
