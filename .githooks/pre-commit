@@ -20,4 +20,43 @@ if command -v alejandra &>/dev/null; then
   }
 fi
 
+echo "[pre-commit] Running statix (anti-patterns)..."
+if command -v statix &>/dev/null; then
+  statix check . || {
+    echo "[FAIL] statix found anti-patterns — run 'statix fix .' to address them"
+    exit 1
+  }
+else
+  nix run nixpkgs#statix -- check . || {
+    echo "[FAIL] statix found anti-patterns"
+    exit 1
+  }
+fi
+
+echo "[pre-commit] Running deadnix (unused code)..."
+if command -v deadnix &>/dev/null; then
+  deadnix --fail . || {
+    echo "[FAIL] deadnix found unused nix code — remove the dead bindings"
+    exit 1
+  }
+else
+  nix run nixpkgs#deadnix -- --fail . || {
+    echo "[FAIL] deadnix found unused nix code"
+    exit 1
+  }
+fi
+
+echo "[pre-commit] Running bats hook tests..."
+if command -v bats &>/dev/null; then
+  bats tests/hooks/*.bats || {
+    echo "[FAIL] bats hook tests failed"
+    exit 1
+  }
+else
+  nix run nixpkgs#bats -- tests/hooks/*.bats || {
+    echo "[FAIL] bats hook tests failed"
+    exit 1
+  }
+fi
+
 echo "[pre-commit] All checks passed"

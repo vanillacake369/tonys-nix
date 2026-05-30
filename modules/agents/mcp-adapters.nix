@@ -16,7 +16,7 @@
   # Gemini: only keeps command + args
   gemini =
     lib.mapAttrs (_: srv: {
-      command = srv.command;
+      inherit (srv) command;
       args = srv.args or [];
     })
     servers;
