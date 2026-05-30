@@ -6,22 +6,17 @@
   pkgs,
   ...
 }: let
-  jsonFormat = pkgs.formats.json {};
-  sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
-  mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
+  providerRuntime = import ./provider-runtime.nix {inherit config lib pkgs;};
 
-  mcpSourceFile = jsonFormat.generate "claude-mcp.json" {
-    mcpServers = mcpAdapt.claude;
+  mcpSourceFile = providerRuntime.mkFile {
+    format = "json";
+    name = "claude-mcp.json";
+    value = {
+      mcpServers = providerRuntime.mcp.claude;
+    };
   };
 
-  # Merge policy-generated hooks into base settings
-  baseHooksLib = import ../../lib/agent-policy/agent-provider-hooks.nix {inherit lib;};
   baseSettings = builtins.fromJSON (builtins.readFile ../../dotfiles/claude/settings.json);
-  policyHooks = config.agentPolicy._assembledHooks.claude or {};
-  mergedHooks = baseHooksLib.mergeHooks (baseSettings.hooks or {}) policyHooks;
-
-  finalSettings = baseSettings // {hooks = mergedHooks;};
-  settingsFile = jsonFormat.generate "claude-settings.json" finalSettings;
 in {
   # Contract: Claude is the orchestrator — full policy suite
   agentPolicy.providers.claude = {
@@ -49,14 +44,14 @@ in {
 
     # (F) Strategy lint gate with Gemini peer review
     strategyLint.enabled = true;
-    strategyLint.requiredSections = ["pre-mortem" "tradeoffs" "peer-review"];
+    strategyLint.requiredSections = ["pre-mortem" "tradeoffs" "peer-review" "grilled-decisions"];
     strategyLint.peerReviewProvider = "gemini";
     strategyLint.strategyPath = "/tmp/agent-strategy";
+  };
 
-    # Hook format
-    hooks.format = "claude";
-    hooks.outputPath = "~/.claude/settings.json";
-    hooks.timeout = 5;
+  agentPolicy._providerRuntime.claude.hooks = {
+    format = "claude";
+    timeout = 5;
   };
 
   home.file = {
@@ -67,15 +62,19 @@ in {
     ".claude/hooks".source = ../../dotfiles/claude/hooks;
   };
 
-  home.activation.syncClaudeMcp = sync.mkJsonSync {
+  home.activation.syncClaudeMcp = providerRuntime.mkSync {
     name = "claude-mcp";
     target = "$HOME/.claude.json";
     source = "${mcpSourceFile}";
   };
 
-  home.activation.syncClaudeSettings = sync.mkJsonSync {
-    name = "claude-settings";
+  home.activation.syncClaudeSettings = providerRuntime.mkSettingsSync {
+    provider = "claude";
+    format = "json";
+    fileName = "claude-settings.json";
+    syncName = "claude-settings";
     target = "$HOME/.claude/settings.json";
-    source = "${settingsFile}";
+    baseHooks = baseSettings.hooks or {};
+    render = {hooks, ...}: baseSettings // {inherit hooks;};
   };
 }

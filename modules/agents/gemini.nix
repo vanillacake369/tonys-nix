@@ -6,21 +6,7 @@
   pkgs,
   ...
 }: let
-  jsonFormat = pkgs.formats.json {};
-  sync = import ../../lib/sync-mutable-config.nix {inherit lib pkgs;};
-  mcpAdapt = import ../../lib/mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
-
-  # Merge policy-generated hooks with base hooks (SSoT: lib/agent-policy/agent-provider-hooks.nix)
-  baseHooksLib = import ../../lib/agent-policy/agent-provider-hooks.nix {inherit lib;};
-  policyHooks = config.agentPolicy._assembledHooks.gemini or {};
-  mergedHooks = baseHooksLib.mergeHooks baseHooksLib.gemini policyHooks;
-
-  geminiSettings = {
-    mcpServers = mcpAdapt.gemini;
-    hooks = mergedHooks;
-  };
-
-  settingsFile = jsonFormat.generate "gemini-cli-settings.json" geminiSettings;
+  providerRuntime = import ./provider-runtime.nix {inherit config lib pkgs;};
 in {
   # Contract: Gemini is the async research/critic agent
   agentPolicy.providers.gemini = {
@@ -34,11 +20,11 @@ in {
     async.handshakeProtocol = "fifo";
     async.backgroundTasks = ["strategy-review" "blindspot-audit" "impact-analysis"];
     async.fifoDir = "/tmp/agent-handshake";
+  };
 
-    # Hook format
-    hooks.format = "gemini";
-    hooks.outputPath = "~/.gemini/settings.json";
-    hooks.timeout = 5;
+  agentPolicy._providerRuntime.gemini.hooks = {
+    format = "gemini";
+    timeout = 5;
   };
 
   programs.gemini-cli = {
@@ -49,9 +35,19 @@ in {
     };
   };
 
-  home.activation.syncGeminiSettings = sync.mkJsonSync {
-    name = "gemini-settings";
+  home.activation.syncGeminiSettings = providerRuntime.mkSettingsSync {
+    provider = "gemini";
+    format = "json";
+    fileName = "gemini-cli-settings.json";
+    syncName = "gemini-settings";
     target = "$HOME/.gemini/settings.json";
-    source = "${settingsFile}";
+    baseHooks = providerRuntime.providerHooks.gemini;
+    render = {
+      hooks,
+      mcp,
+    }: {
+      mcpServers = mcp;
+      inherit hooks;
+    };
   };
 }

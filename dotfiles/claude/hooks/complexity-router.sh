@@ -16,12 +16,26 @@ set -uo pipefail
 
 INPUT=$(cat)
 SESSION_ID=$(echo "$INPUT" | jq -r '.session_id // "default"' 2>/dev/null)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // ""' 2>/dev/null)
 
-STATE_DIR="/tmp/claude-complexity"
+STATE_DIR="${COMPLEXITY_DIR:-/tmp/claude-complexity}"
 mkdir -p "$STATE_DIR"
 STATE_FILE="$STATE_DIR/$SESSION_ID"
+REVERSIBILITY_FILE="$STATE_DIR/${SESSION_ID}.reversibility"
 
-# If state already classified, skip injection (save tokens)
+# --- Reversibility classification (runs every turn, overwriting on each call) ---
+# Grep prompt for risk keywords (case-insensitive). Deterministic: any match = irreversible.
+# Narrow on purpose: only genuinely destructive command/DDL patterns escalate to the
+# heavy ceremony tier. Benign mentions (delete/remove/prod/deploy) must NOT over-escalate
+# — routine action safety is handled by cmd-guard/branch-guard/path-guard hooks instead.
+RISK_PATTERN='rm -rf|reset --hard|force[ -]push|drop table|drop database|truncate|migrate|revoke'
+if echo "$PROMPT" | grep -qiE "$RISK_PATTERN"; then
+  echo "irreversible" > "$REVERSIBILITY_FILE"
+else
+  echo "reversible" > "$REVERSIBILITY_FILE"
+fi
+
+# If complexity state already classified, skip injection (save tokens)
 if [[ -f "$STATE_FILE" ]]; then
   exit 0
 fi

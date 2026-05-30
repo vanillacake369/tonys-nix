@@ -1,6 +1,6 @@
 # MCP server definitions (Single Source of Truth)
 # Consumed by: codex (enableMcpIntegration), gemini (settings.mcpServers), claude (activation script)
-{...}: {
+_: {
   programs.mcp = {
     enable = true;
     servers = {

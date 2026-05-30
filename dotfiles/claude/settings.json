@@ -64,21 +64,6 @@
         ]
       },
       {
-        "matcher": "Write|Edit|Read",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/path-guard.sh",
-            "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/complexity-gate.sh",
-            "timeout": 5
-          }
-        ]
-      },
-      {
         "matcher": "Agent",
         "hooks": [
           {
@@ -122,6 +107,11 @@
             "type": "command",
             "command": "~/.claude/hooks/auto-lint.sh",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/semantic-oracle.sh",
+            "timeout": 90
           }
         ]
       }
