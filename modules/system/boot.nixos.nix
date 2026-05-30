@@ -1,5 +1,5 @@
 # Boot loader and kernel configuration
-{...}: {
+_: {
   boot = {
     loader = {
       systemd-boot.enable = true;

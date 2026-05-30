@@ -1,5 +1,5 @@
 # Power management and sleep configuration
-{...}: {
+_: {
   # Disable systemd sleep targets to prevent automatic suspend/hibernate
   systemd.targets = {
     sleep.enable = false;

@@ -4,7 +4,7 @@
     settings = {
       user = {
         name = userProfile.gitUser;
-        email = userProfile.email;
+        inherit (userProfile) email;
       };
       credential.helper = "store";
     };
