@@ -4,6 +4,7 @@
   pkgs,
   lib,
   isLinux,
+  isDarwin,
   ...
 }: {
   # =============================================================================
@@ -17,10 +18,12 @@
       inetutils
       netcat
       dig
-      iproute2mac
 
       # Wireguard
       wireguard-go
+    ]
+    ++ lib.optionals isDarwin [
+      iproute2mac # darwin-only (macOS `ip` shim)
     ]
     ++ lib.optionals isLinux [
       # Linux-specific network tools
