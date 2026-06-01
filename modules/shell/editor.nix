@@ -3,8 +3,17 @@
     enable = true;
     defaultEditor = true;
     withRuby = false;
-    withNodeJs = true;
-    withPython3 = true;
+    # withNodeJs / withPython3 = false:
+    # When true, home-manager's wrapNeovim injects a non-empty initLua
+    # preamble (vim.g.node_host_prog / python3_host_prog) — which makes
+    # `luaConfigStr != ""` and forces home-manager to write a nix-store
+    # symlink at ~/.config/nvim/init.lua, colliding with the tonys-nvim
+    # clone. Setting both to false keeps luaConfigStr empty so init.lua
+    # is never managed by home-manager. Provider host paths are emitted
+    # via nix-providers.lua below (Nix-managed) and loaded by
+    # tonys-nvim's init.lua dofile guard.
+    withNodeJs = false;
+    withPython3 = false;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
