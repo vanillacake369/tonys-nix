@@ -1,19 +1,15 @@
-{pkgs, ...}: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   programs.neovim = {
     enable = true;
     defaultEditor = true;
     withRuby = false;
-    # withNodeJs / withPython3 = false:
-    # When true, home-manager's wrapNeovim injects a non-empty initLua
-    # preamble (vim.g.node_host_prog / python3_host_prog) — which makes
-    # `luaConfigStr != ""` and forces home-manager to write a nix-store
-    # symlink at ~/.config/nvim/init.lua, colliding with the tonys-nvim
-    # clone. Setting both to false keeps luaConfigStr empty so init.lua
-    # is never managed by home-manager. Provider host paths are emitted
-    # via nix-providers.lua below (Nix-managed) and loaded by
-    # tonys-nvim's init.lua dofile guard.
-    withNodeJs = false;
-    withPython3 = false;
+    withNodeJs = true;
+    withPython3 = true;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
@@ -25,39 +21,42 @@
     # via passthru.dependencies, which home-manager's neovim wrapper symlinks
     # into the rtp.
     plugins = [pkgs.vimPlugins.nvim-treesitter.withAllGrammars];
-    # NOTE: initLua intentionally absent.
-    # - With empty initLua/extraLuaConfig/extraConfig, programs.neovim does
-    #   not write ~/.config/nvim/init.lua at all (mkIf guard on luaConfigStr).
-    # - tonys-nvim (https://github.com/vanillacake369/tonys-nvim) is cloned
-    #   to ~/.config/nvim and owns init.lua as a regular tracked file.
-    # - The python3 provider path is emitted via nix-providers.lua below;
-    #   tonys-nvim's init.lua dofile's it when present.
-    #
-    # An earlier attempt used xdg.configFile."nvim/init.lua".source =
-    # mkForce (mkOutOfStoreSymlink "${homeDir}/.config/nvim/init.lua") to
-    # let home-manager "manage" init.lua without overwriting it, but a
-    # source path equal to the target path creates a two-hop self-referential
-    # symlink chain (target → /nix/store/<hash> → target) that triggers
-    # ELOOP at nvim startup. Dropping the override entirely (since
-    # programs.neovim now writes no init.lua) avoids the cycle.
   };
 
-  # Nix-managed provider configuration. tonys-nvim's init.lua dofile's this
-  # file under a fs_stat guard so non-Nix users skip it silently.
+  # Disable home-manager's xdg.configFile."nvim/init.lua" entry so the
+  # standalone tonys-nvim clone at ~/.config/nvim owns init.lua directly.
   #
-  # python3_host_prog: pin to a pkgs.python3 with pynvim so the python3
-  #   provider works without depending on whatever PATH-resolved python3
-  #   happens to be first (which on macOS may be Apple's framework python).
-  # node_host_prog: intentionally omitted. The neovim-node-host package
-  #   moved out of pkgs.nodePackages in nixpkgs 2026-03 and pinning it
-  #   reliably across nixpkgs revisions is brittle. nvim falls back to
-  #   PATH-based detection (`node` + npm root -g neovim), which works
-  #   when `programs.neovim.withNodeJs = true` puts nodejs on PATH.
-  # ruby/perl: disabled to silence :checkhealth warnings on systems
-  #   without those runtimes.
-  xdg.configFile."nvim/nix-providers.lua".text = ''
-    vim.g.python3_host_prog = "${(pkgs.python3.withPackages (ps: [ps.pynvim])).interpreter}"
-    vim.g.loaded_ruby_provider = 0
-    vim.g.loaded_perl_provider = 0
-  '';
+  # Why this is needed (verified against live home-manager source):
+  #
+  #   modules/programs/neovim.nix:553
+  #     "nvim/init.lua" = mkIf (cfg.initLua != "") { text = cfg.initLua; };
+  #   modules/programs/neovim.nix:476
+  #     wrapperHasUserConfig =
+  #       wrappedNeovim'.luaRcContent != wrappedNeovim'.providerLuaRc;
+  #   modules/programs/neovim.nix:527-530
+  #     mkIf wrapperHasUserConfig (mkOrder 200 wrappedNeovim'.luaRcContent)
+  #
+  # `wrapperHasUserConfig` is true whenever the wrapper's lua rc differs from
+  # just the provider preamble. nixpkgs' neovim wrapper.nix builds
+  # `rcContent` (= wrapper luaRcContent) from:
+  #   luaPathLuaRc (only if luaDependencies != [])
+  #   + providerLuaRc
+  #   + optional user luaRcContent
+  #
+  # nvim-treesitter contributes lua deps via vimPackageInfo.luaDependencies,
+  # so luaPathLuaRc is non-empty → wrapperHasUserConfig is true →
+  # programs.neovim.initLua receives wrappedNeovim'.luaRcContent → not empty
+  # → mkIf at neovim.nix:553 fires → init.lua is materialized in nix-store.
+  #
+  # The previous workaround (drop initLua / set mkOutOfStoreSymlink / disable
+  # withNodeJs/withPython3) does not help because the luaPathLuaRc path is
+  # plugin-driven, not provider-driven.
+  #
+  # Setting `enable = false` on this specific xdg.configFile entry tells
+  # home-manager to skip the activation step for ~/.config/nvim/init.lua,
+  # leaving the path to whatever tonys-nvim's clone provides. withNodeJs /
+  # withPython3 stay true so the wrapper's PATH still gets nodejs +
+  # pkgs.python3.withPackages [ps.pynvim], which nvim's provider
+  # auto-detection picks up at runtime.
+  xdg.configFile."nvim/init.lua".enable = lib.mkForce false;
 }
