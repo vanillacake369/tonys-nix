@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: {
+{pkgs, ...}: {
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -26,24 +21,32 @@
     #   not write ~/.config/nvim/init.lua at all (mkIf guard on luaConfigStr).
     # - tonys-nvim (https://github.com/vanillacake369/tonys-nvim) is cloned
     #   to ~/.config/nvim and owns init.lua as a regular tracked file.
-    # - Provider host paths (vim.g.python3_host_prog, vim.g.node_host_prog)
-    #   are emitted to a separate nix-managed file (nix-providers.lua below)
-    #   that tonys-nvim's init.lua dofile's at startup.
+    # - The python3 provider path is emitted via nix-providers.lua below;
+    #   tonys-nvim's init.lua dofile's it when present.
     #
-    # The earlier xdg.configFile."nvim/init.lua".source = mkForce
-    # (mkOutOfStoreSymlink "${homeDir}/.config/nvim/init.lua") attempt was
-    # reverted because mkOutOfStoreSymlink with a source path equal to the
-    # target path creates a two-hop self-referential symlink chain
-    # (~/.config/nvim/init.lua -> /nix/store/<hash>-init.lua ->
-    # ~/.config/nvim/init.lua) that triggers ELOOP at nvim startup.
+    # An earlier attempt used xdg.configFile."nvim/init.lua".source =
+    # mkForce (mkOutOfStoreSymlink "${homeDir}/.config/nvim/init.lua") to
+    # let home-manager "manage" init.lua without overwriting it, but a
+    # source path equal to the target path creates a two-hop self-referential
+    # symlink chain (target → /nix/store/<hash> → target) that triggers
+    # ELOOP at nvim startup. Dropping the override entirely (since
+    # programs.neovim now writes no init.lua) avoids the cycle.
   };
 
-  # Nix-managed provider host paths for tonys-nvim. This file is dofile'd by
-  # tonys-nvim's init.lua when present (non-Nix users simply skip the load).
-  # Splitting providers out of init.lua keeps init.lua mutable and standalone
-  # while still injecting Nix-pinned paths.
+  # Nix-managed provider configuration. tonys-nvim's init.lua dofile's this
+  # file under a fs_stat guard so non-Nix users skip it silently.
+  #
+  # python3_host_prog: pin to a pkgs.python3 with pynvim so the python3
+  #   provider works without depending on whatever PATH-resolved python3
+  #   happens to be first (which on macOS may be Apple's framework python).
+  # node_host_prog: intentionally omitted. The neovim-node-host package
+  #   moved out of pkgs.nodePackages in nixpkgs 2026-03 and pinning it
+  #   reliably across nixpkgs revisions is brittle. nvim falls back to
+  #   PATH-based detection (`node` + npm root -g neovim), which works
+  #   when `programs.neovim.withNodeJs = true` puts nodejs on PATH.
+  # ruby/perl: disabled to silence :checkhealth warnings on systems
+  #   without those runtimes.
   xdg.configFile."nvim/nix-providers.lua".text = ''
-    vim.g.node_host_prog = "${pkgs.nodePackages.neovim}/bin/neovim-node-host"
     vim.g.python3_host_prog = "${(pkgs.python3.withPackages (ps: [ps.pynvim])).interpreter}"
     vim.g.loaded_ruby_provider = 0
     vim.g.loaded_perl_provider = 0
