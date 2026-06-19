@@ -901,6 +901,7 @@ in {
       "Opal"
       "KakaoTalk"
       "Activity Monitor"
+      "Telegram"
     ];
   };
 
