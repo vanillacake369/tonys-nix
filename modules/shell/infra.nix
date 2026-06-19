@@ -37,6 +37,11 @@
       # kubectl-tree
       # ngrok
       # terraform
+
+      /*
+      Networking tools
+      */
+      v2ray
     ]
     ++ lib.optionals isDarwin [
       /*
