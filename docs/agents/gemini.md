@@ -24,7 +24,7 @@ The three named tasks Gemini handles are:
 4. Merges base hooks with policy hooks per event name.
 5. Generates a JSON settings file and syncs it to `~/.gemini/settings.json` via `mkJsonSync`.
 
-The `programs.gemini-cli` home-manager module handles binary installation. The shared `dotfiles/shared/AGENTS.md` is injected as the `GEMINI` context file, giving Gemini the same behavioral instructions as the other providers.
+The `programs.antigravity-cli` home-manager module handles binary installation. The shared `dotfiles/shared/AGENTS.md` is injected as the `GEMINI` context file, giving Gemini the same behavioral instructions as the other providers.
 
 ### Generated settings.json structure
 

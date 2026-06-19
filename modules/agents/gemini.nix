@@ -10,7 +10,7 @@
 in {
   # Contract: Gemini is the async research/critic agent
   agentPolicy.providers.gemini = {
-    enable = lib.mkDefault config.programs.gemini-cli.enable;
+    enable = lib.mkDefault config.programs.antigravity-cli.enable;
 
     # (A) Verbose reasoning — research results fully visible
     reasoning.mode = "verbose";
@@ -27,7 +27,7 @@ in {
     timeout = 5;
   };
 
-  programs.gemini-cli = {
+  programs.antigravity-cli = {
     enable = true;
     settings = {};
     context = {
@@ -38,7 +38,7 @@ in {
   home.activation.syncGeminiSettings = providerRuntime.mkSettingsSync {
     provider = "gemini";
     format = "json";
-    fileName = "gemini-cli-settings.json";
+    fileName = "antigravity-cli-settings.json";
     syncName = "gemini-settings";
     target = "$HOME/.gemini/settings.json";
     baseHooks = providerRuntime.providerHooks.gemini;
