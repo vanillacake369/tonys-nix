@@ -21,9 +21,9 @@
     else "unknown";
 
   validateEntry = i: m:
-    assert m ? bind || builtins.throw "keymaps[${toString i}]: missing 'bind'";
-    assert m ? tags && builtins.isList m.tags || builtins.throw "keymaps[${toString i}] (${m.bind}): missing or invalid 'tags'";
-    assert detectType m != "unknown" || builtins.throw "keymaps[${toString i}] (${m.bind}): no action field (to/exec/shell/to_if_alone)"; m;
+    assert m ? bind || throw "keymaps[${toString i}]: missing 'bind'";
+    assert m ? tags && builtins.isList m.tags || throw "keymaps[${toString i}] (${m.bind}): missing or invalid 'tags'";
+    assert detectType m != "unknown" || throw "keymaps[${toString i}] (${m.bind}): no action field (to/exec/shell/to_if_alone)"; m;
 
   validate = entries: lib.imap0 validateEntry entries;
 
