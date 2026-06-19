@@ -1,7 +1,6 @@
 # WSL-specific settings (JetBrains keymap linking moved to packages/jetbrains.nix)
 {
   lib,
-  pkgs,
   userProfile,
   ...
 }: let
@@ -11,19 +10,10 @@
   winXmlPath = "C:\\Users\\${userProfile.username}\\${taskXmlName}";
   wslXmlPath = "${winUserDir}/${taskXmlName}";
 
-  isWindowsAdmin =
-    (builtins.compareVersions
-      (builtins.readFile (
-        pkgs.runCommand "check-windows-admin" {} ''
-          if /mnt/c/Windows/System32/net.exe session >/dev/null 2>&1; then
-            echo -n "1" > $out
-          else
-            echo -n "0" > $out
-          fi
-        ''
-      ))
-      "0")
-    > 0;
+  # Windows admin status is a runtime/activation concern, not a build-time fact:
+  # the build host may differ from the activation host, and admin rights can
+  # change between `nix build` and `home-manager switch`. Checked live below.
+  adminCheck = "/mnt/c/Windows/System32/net.exe session";
 in {
   home.sessionVariables = {
     DISPLAY = ":0.0";
@@ -38,27 +28,23 @@ in {
         "${winUserDir}/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/win11-shortcut.ahk"
     '';
 
-    copyWindowsShutdownScript = lib.hm.dag.entryAfter ["writeBoundary"] (
-      if isWindowsAdmin
-      then ''
+    copyWindowsShutdownScript = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      if ${adminCheck} >/dev/null 2>&1; then
         run cp -f ${../../dotfiles/windows/script/shutdown_idle.ps1} \
           "${winUserDir}/shutdown_idle.ps1"
-      ''
-      else ''
+      else
         echo "No Windows admin access. Skipping shutdown script."
-      ''
-    );
+      fi
+    '';
 
-    registerWindowsSchedulerTask = lib.hm.dag.entryAfter ["writeBoundary"] (
-      if isWindowsAdmin
-      then ''
+    registerWindowsSchedulerTask = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      if ${adminCheck} >/dev/null 2>&1; then
         run cp -f ${../../dotfiles/windows/scheduler/SystemIdleShutdown.xml} "${wslXmlPath}"
         run /mnt/c/Windows/System32/schtasks.exe /create /tn "${taskName}" /xml "${winXmlPath}" /F
         run rm -f "${wslXmlPath}"
-      ''
-      else ''
+      else
         echo "No Windows admin access. Skipping scheduled task registration."
-      ''
-    );
+      fi
+    '';
   };
 }
