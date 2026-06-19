@@ -30,6 +30,7 @@
       ghalint
       lazygit
       bfg-repo-cleaner
+      lefthook
 
       # Terminal tools
       zellij
