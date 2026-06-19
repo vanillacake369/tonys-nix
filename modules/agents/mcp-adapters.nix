@@ -1,13 +1,23 @@
 # Adapts the canonical MCP server definitions (from mcp.nix) to each agent's format.
 # SSoT: programs.mcp.servers → agent-specific config shape.
-{lib}: servers: {
+{lib}: servers: let
+  removeNulls = value:
+    if builtins.isAttrs value
+    then
+      lib.filterAttrsRecursive (_: v: v != null) (
+        lib.mapAttrs (_: removeNulls) value
+      )
+    else if builtins.isList value
+    then map removeNulls value
+    else value;
+in {
   # Codex: renames headers→http_headers, adds enabled flag, strips unknown fields
   codex =
     lib.mapAttrs (
       _: srv:
-        (lib.removeAttrs srv ["disabled" "headers"])
+        removeNulls (lib.removeAttrs srv ["disabled" "headers" "enabled"])
         // (lib.optionalAttrs (srv ? headers && !(srv ? http_headers)) {
-          http_headers = srv.headers;
+          http_headers = removeNulls srv.headers;
         })
         // {enabled = !(srv.disabled or false);}
     )
