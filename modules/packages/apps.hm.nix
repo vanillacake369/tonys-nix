@@ -9,7 +9,7 @@
   home.packages = with pkgs;
     [
       claude-code
-      gemini-cli
+      antigravity-cli
       codex
     ]
     ++ lib.optionals (isLinux && !isWsl) [

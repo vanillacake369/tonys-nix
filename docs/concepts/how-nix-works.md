@@ -8,7 +8,7 @@ This page is for readers who are already comfortable with Nix basics — derivat
 
 - `nixpkgs` — the package collection, pinned to a specific commit via `flake.lock`
 - `home-manager` — the user environment manager, follows the same nixpkgs
-- `llm-agents` — a private flake providing `claude-code`, `gemini-cli`, `codex`, and `cli-proxy-api` as packages and an overlay
+- `llm-agents` — a private flake providing `claude-code`, `antigravity-cli`, `codex`, and `cli-proxy-api` as packages and an overlay
 
 The flake's `outputs` function calls `lib/mk-home-config.nix` to produce `homeConfigurations` entries — one per platform and architecture combination. For NixOS hosts it also produces `nixosConfigurations`. There are no `devShells` or `packages` outputs that a downstream consumer would import; this is a leaf configuration, not a library.
 

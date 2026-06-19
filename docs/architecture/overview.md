@@ -31,7 +31,7 @@ modules/
   shell/                        # fish, git, neovim, fzf, direnv, yazi, zellij
   language/language.hm.nix      # Toolchains — Go, Java, Rust, Python, Node, Lua, Nix
   packages/
-    apps.hm.nix                 # GUI apps — claude-code, gemini-cli, codex, platform-specific
+    apps.hm.nix                 # GUI apps — claude-code, antigravity-cli, codex, platform-specific
     apps.overlay.nix            # Package overlay for apps
     jetbrains.hm.nix            # JetBrains IDEs
   keymap/                       # Karabiner + AeroSpace config generation
@@ -92,7 +92,7 @@ The flake produces `homeConfigurations` outputs (one per platform/arch combinati
 
 ## How Overlays Work
 
-Any file named `*.overlay.nix` inside `modules/` is auto-collected by `lib/collect-overlays.nix` and applied to nixpkgs. The `llm-agents.nix` flake overlay is appended on top, which provides `claude-code`, `gemini-cli`, `codex`, and `cli-proxy-api`.
+Any file named `*.overlay.nix` inside `modules/` is auto-collected by `lib/collect-overlays.nix` and applied to nixpkgs. The `llm-agents.nix` flake overlay is appended on top, which provides `claude-code`, `antigravity-cli`, `codex`, and `cli-proxy-api`.
 
 ```nix
 # flake.nix (excerpt)

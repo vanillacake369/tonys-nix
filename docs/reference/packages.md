@@ -35,7 +35,7 @@ Language support includes the runtime, build tooling, language server, formatter
 | Package | Purpose |
 |---|---|
 | `claude-code` | Claude Code CLI (from `llm-agents.nix` overlay) |
-| `gemini-cli` | Gemini CLI |
+| `antigravity-cli` | Gemini CLI |
 | `codex` | OpenAI Codex CLI |
 
 ### Linux (not WSL)
@@ -136,7 +136,7 @@ JetBrains IDEs are declared in a dedicated module. The exact set may vary; check
 | Package / Service | Module | Purpose |
 |---|---|---|
 | `claude-code` | `apps.nix` | Claude Code CLI binary |
-| `gemini-cli` | `apps.nix` | Gemini CLI binary |
+| `antigravity-cli` | `apps.nix` | Gemini CLI binary |
 | `codex` | `apps.nix` | OpenAI Codex CLI binary |
 | `cli-proxy-api` | `agents/agents-proxy.nix` | OAuth proxy; routes requests to all three providers |
 | MCP servers | `agents/agents-mcp.nix` | SSoT MCP server definitions, adapted per provider |
