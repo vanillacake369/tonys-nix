@@ -30,5 +30,6 @@
       wezterm
       aerospace
       hidden-bar
+      telegram-desktop
     ];
 }
