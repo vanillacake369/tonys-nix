@@ -209,8 +209,33 @@
   jsonFormat = pkgs.formats.json {};
 in {
   home = {
-    sessionVariables.JAVA_HOME = "${pkgs.zulu21}";
+    sessionVariables = {
+      JAVA_HOME = "${pkgs.zulu21}";
+      # Appended to every JVM (jdtls, gradle daemon, maven, ...). Survives
+      # per-project `org.gradle.jvmargs` overrides, which would otherwise
+      # replace (not merge) any encoding flag set in user gradle.properties.
+      JAVA_TOOL_OPTIONS = "-Dfile.encoding=UTF-8";
+      RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
+    };
     packages = langPackages ++ commonTools;
     file.".claude/lang-tools.json".source = jsonFormat.generate "lang-tools.json" toolTable;
+    file.".gradle/gradle.properties".text = ''
+      org.gradle.daemon.idletimeout=300000
+    '';
+    # Required by neotest-java at runtime. Plugin doesn't bundle the JAR and
+    # otherwise prompts for `:NeotestJava setup` on every fresh machine.
+    #
+    # NOTE:
+    # [VERSION DRIFT]
+    # this is pinned to 6.0.3 (the version neotest-java expects
+    # as of plugin tag v0.37.3). When neotest-java updates and bumps its
+    # expected version, the symlink filename will no longer match and the
+    # plugin falls back to its interactive setup. Detection signal: `:Lazy log
+    # neotest-java` shows a version bump → update both URL and hash here (run
+    # `nix-prefetch-url` on the new URL to get the new hash).
+    file.".local/share/nvim/neotest-java/junit-platform-console-standalone-6.0.3.jar".source = pkgs.fetchurl {
+      url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/6.0.3/junit-platform-console-standalone-6.0.3.jar";
+      hash = "sha256-O6DWFQr3khShQR+eovvvhk7vaLaMiaF/ZywLib/506I=";
+    };
   };
 }
