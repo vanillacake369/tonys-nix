@@ -61,7 +61,7 @@
     (assert' "keymaps: karabiner maps" (builtins.length karabinerMaps > 0))
     (assert' "keymaps: aerospace maps" (builtins.length aerospaceMaps > 0))
     (assert' "keymaps: 6+ workspaces" (builtins.length (builtins.attrNames keybinds.workspaces) >= 6))
-    (assert' "keymaps: browsers from userProfile" (builtins.any (m: m ? only && m.only == userProfile.browsers.bundleIds) karabinerMaps))
+    (assert' "keymaps: browser app-ids route AeroSpace workspace" (keybinds.workspaces.Browser.apps == userProfile.browsers.appIds))
     (assert' "keymaps: jetbrains bundleIds from userProfile" (keybinds.workspaces.Code.apps == userProfile.jetbrains.bundleIds))
   ];
 

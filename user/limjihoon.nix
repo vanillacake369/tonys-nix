@@ -30,9 +30,11 @@
   };
 
   browsers = {
-    bundleIds = [
-      "^com\\.google\\.Chrome$"
-      "^com\\.brave\\.Browser$"
+    # Plain macOS bundle IDs. AeroSpace matches windows by this literal app-id;
+    # Karabiner derives an anchored regex from it in binds.nix.
+    appIds = [
+      "com.google.Chrome"
+      "com.brave.Browser"
     ];
   };
 }

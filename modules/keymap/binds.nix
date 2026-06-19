@@ -39,7 +39,11 @@
     "^com\\.jetbrains\\..*$"
     "^com\\.knollsoft\\.Rectangle$"
   ];
-  browsers = userProfile.browsers.bundleIds;
+  # AeroSpace routes browser windows by literal app-id; Karabiner only/unless
+  # match the frontmost app by a bundle-identifier regex. Derive the regex from
+  # the one canonical app-id list so the two stay in sync.
+  browserAppIds = userProfile.browsers.appIds;
+  browsers = map (id: "^${lib.replaceStrings ["."] ["\\."] id}$") browserAppIds;
   darwinHome = "/Users/${userProfile.username}";
 
   rawKeymaps = [
@@ -864,7 +868,7 @@ in {
     };
     Browser = {
       monitor = 2;
-      apps = browsers;
+      apps = browserAppIds;
     };
     Terminal = {
       monitor = 3;
