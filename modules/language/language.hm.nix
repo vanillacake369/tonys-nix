@@ -88,8 +88,12 @@
       packages = [
         pkgs.cargo
         pkgs.rustc
+        pkgs.rustfmt
+        pkgs.clippy
+        pkgs.rust-analyzer
       ];
-      format = "rustfmt --check";
+      format = "cargo fmt --check";
+      lint = "cargo clippy -- -D warnings";
       diagnose = "cargo check";
     };
 
