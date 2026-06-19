@@ -7,6 +7,9 @@
   jq = lib.getExe' pkgs.jq "jq";
   cp = lib.getExe' pkgs.coreutils "cp";
   chmod = lib.getExe' pkgs.coreutils "chmod";
+  mkdir = lib.getExe' pkgs.coreutils "mkdir";
+  dirname = lib.getExe' pkgs.coreutils "dirname";
+  rm = lib.getExe' pkgs.coreutils "rm";
   sponge = lib.getExe' pkgs.moreutils "sponge";
 in {
   # Deep-merge a JSON source into a mutable target, preserving existing keys.
@@ -19,7 +22,7 @@ in {
       TARGET="${target}"
       SOURCE="${source}"
 
-      mkdir -p "$(dirname "$TARGET")"
+      ${mkdir} -p "$(${dirname} "$TARGET")"
 
       if [[ -f "$TARGET" ]]; then
         ${cp} "$TARGET" "''${TARGET}.backup"
@@ -45,10 +48,10 @@ in {
       TARGET="${target}"
       SOURCE="${source}"
 
-      mkdir -p "$(dirname "$TARGET")"
+      ${mkdir} -p "$(${dirname} "$TARGET")"
 
       if [[ -L "$TARGET" ]]; then
-        rm "$TARGET"
+        ${rm} "$TARGET"
       fi
 
       if [[ -f "$TARGET" ]]; then

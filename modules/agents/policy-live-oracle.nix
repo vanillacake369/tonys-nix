@@ -15,8 +15,8 @@
       lib.concatMapStringsSep "\n" (chk: ''
         # Health check: ${chk.command}
         FILE_PATH=$(echo "$TOOL_INPUT" | $JQ -r '.file_path // empty' 2>/dev/null)
-        if [[ -z "$FILE_PATH" ]] || echo "$FILE_PATH" | grep -qE '${chk.pattern}'; then
-          if timeout ${toString chk.timeout} ${chk.command} >/dev/null 2>&1; then
+        if [[ -z "$FILE_PATH" ]] || echo "$FILE_PATH" | $GREP -qE '${chk.pattern}'; then
+          if $TIMEOUT ${toString chk.timeout} ${chk.command} >/dev/null 2>&1; then
             PASSED=$((PASSED + 1))
           else
             FAILED=$((FAILED + 1))
@@ -30,6 +30,10 @@
     pkgs.writeShellScript "live-oracle-${name}.sh" ''
       set -uo pipefail
       JQ="${lib.getExe' pkgs.jq "jq"}"
+      # Nix-provided GNU timeout — macOS has no `timeout` on PATH by default.
+      TIMEOUT="${lib.getExe' pkgs.coreutils "timeout"}"
+      # Nix-provided GNU grep — deterministic ERE semantics across macOS/Linux.
+      GREP="${lib.getExe' pkgs.gnugrep "grep"}"
 
       INPUT=$(cat)
       TOOL_NAME=$(echo "$INPUT" | $JQ -r '.tool_name // empty' 2>/dev/null)

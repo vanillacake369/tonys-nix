@@ -23,6 +23,9 @@
     pkgs.writeShellScript "path-guard-${name}.sh" ''
       set -euo pipefail
       JQ="${lib.getExe' pkgs.jq "jq"}"
+      # Nix-provided coreutils — macOS ships BSD variants (realpath lacks `-m`).
+      REALPATH="${lib.getExe' pkgs.coreutils "realpath"}"
+      BASENAME_CMD="${lib.getExe' pkgs.coreutils "basename"}"
 
       INPUT=$(cat)
       TOOL_NAME=$(echo "$INPUT" | $JQ -r '.tool_name // empty' 2>/dev/null)
@@ -35,8 +38,8 @@
       esac
       [[ -z "$FILE_PATH" ]] && exit 0
 
-      FILE_PATH=$(realpath -m "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
-      BASENAME=$(basename "$FILE_PATH")
+      FILE_PATH=$($REALPATH -m "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
+      BASENAME=$($BASENAME_CMD "$FILE_PATH")
       ${lib.optionalString (namePatterns != []) ''
         case "$BASENAME" in
           ${lib.concatStringsSep "|" namePatterns})
