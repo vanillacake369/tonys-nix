@@ -170,6 +170,31 @@ assert_contains "default title is Agent" "title=Agent" "$result"
 echo ""
 
 # ===========================================================================
+# 2b. AskUserQuestion (PreToolUse) — Claude asks the user
+# ===========================================================================
+
+echo "=== 2b. AskUserQuestion Notification ==="
+
+ASK_JSON='{"session_id":"ask-1","cwd":"/dev/my-project","hook_event_name":"PreToolUse","tool_name":"AskUserQuestion","tool_input":{"questions":[{"header":"Auth method","question":"Which auth method should we use?"}]}}'
+
+# 2b-1. Parses question text from tool_input
+result=$(echo "$ASK_JSON" | bash "$NOTIFY_SCRIPT" --parse-test claude)
+assert_contains "ask: extracts question from tool_input" "question=Which auth method should we use?" "$result"
+
+# 2b-2. Notify args use a question-styled title + question as message
+result=$(echo "$ASK_JSON" | bash "$NOTIFY_SCRIPT" --notify-args-test claude)
+assert_contains "ask: title indicates a question" "asks" "$result"
+assert_contains "ask: subtitle is project dir" "subtitle=my-project" "$result"
+assert_contains "ask: message shows the question" "Which auth method should we use?" "$result"
+
+# 2b-3. Stop payload (no tool_input) is NOT treated as a question
+result=$(echo '{"session_id":"s-1","cwd":"/dev/app"}' \
+  | bash "$NOTIFY_SCRIPT" --parse-test claude)
+assert_contains "stop: question is empty" "question=" "$result"
+
+echo ""
+
+# ===========================================================================
 # 3. Backend Selection
 # ===========================================================================
 
