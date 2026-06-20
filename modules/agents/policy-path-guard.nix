@@ -5,9 +5,28 @@
   config,
   lib,
   pkgs,
+  isDarwin,
   ...
 }: let
   patterns = config.agentPolicy.global.sensitivePatterns;
+
+  # Platform-branched path canonicalizer (absolute + collapse `..`/symlinks).
+  # macOS BSD `realpath` lacks a reliable `-m`; rather than pull in GNU coreutils,
+  # Darwin resolves the existing parent dir via a `cd` subshell (no GNU dep) and
+  # appends the basename. Linux uses its native GNU `realpath -m`. Both expose:
+  # canonicalize <path> → prints a canonical path (falls back to input on failure).
+  canonicalizeDef =
+    if isDarwin
+    then ''
+      canonicalize() {
+        local _p="$1"
+        ( cd "$(dirname "$_p")" 2>/dev/null && printf '%s/%s\n' "$(pwd -P)" "$(basename "$_p")" ) \
+          || printf '%s\n' "$_p"
+      }
+    ''
+    else ''
+      canonicalize() { realpath -m "$1" 2>/dev/null || printf '%s\n' "$1"; }
+    '';
   enabledProviders = lib.filterAttrs (_: p: p.enable) config.agentPolicy.providers;
 
   # Single source of truth. Three pattern shapes, matched against different
@@ -23,10 +42,8 @@
     pkgs.writeShellScript "path-guard-${name}.sh" ''
       set -euo pipefail
       JQ="${lib.getExe' pkgs.jq "jq"}"
-      # Nix-provided coreutils — macOS ships BSD variants (realpath lacks `-m`).
-      REALPATH="${lib.getExe' pkgs.coreutils "realpath"}"
-      BASENAME_CMD="${lib.getExe' pkgs.coreutils "basename"}"
 
+      ${canonicalizeDef}
       INPUT=$(cat)
       TOOL_NAME=$(echo "$INPUT" | $JQ -r '.tool_name // empty' 2>/dev/null)
       TOOL_INPUT=$(echo "$INPUT" | $JQ -r '.tool_input // empty' 2>/dev/null)
@@ -38,8 +55,8 @@
       esac
       [[ -z "$FILE_PATH" ]] && exit 0
 
-      FILE_PATH=$($REALPATH -m "$FILE_PATH" 2>/dev/null || echo "$FILE_PATH")
-      BASENAME=$($BASENAME_CMD "$FILE_PATH")
+      FILE_PATH=$(canonicalize "$FILE_PATH")
+      BASENAME="''${FILE_PATH##*/}"
       ${lib.optionalString (namePatterns != []) ''
         case "$BASENAME" in
           ${lib.concatStringsSep "|" namePatterns})
