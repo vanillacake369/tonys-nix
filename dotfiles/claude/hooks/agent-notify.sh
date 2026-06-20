@@ -12,7 +12,7 @@ set -uo pipefail
 MAX_MSG_LEN=60
 
 # Global state (populated by _parse_input)
-_PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
+_PROVIDER="" _SESSION_ID="" _CWD="" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH="" _QUESTION=""
 # Global state (populated by _build_notify_args)
 _TITLE="" _SUBTITLE="" _MESSAGE="" _GROUP="" _EXECUTE=""
 
@@ -24,7 +24,7 @@ _parse_input() {
   local input
   input=$(cat 2>/dev/null || true)
 
-  _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH=""
+  _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH="" _QUESTION=""
 
   if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
     _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
@@ -32,6 +32,8 @@ _parse_input() {
     _PROMPT=$(echo "$input" | jq -r '.prompt // ""')
     _SUMMARY=$(echo "$input" | jq -r '(.prompt_response // .last_assistant_message) // ""')
     _TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""')
+    # AskUserQuestion (PreToolUse): the first question Claude is asking the user
+    _QUESTION=$(echo "$input" | jq -r '(.tool_input.questions[0].question) // ""')
   else
     # Fallback to positional arguments if stdin is empty or not JSON
     _PROMPT="${2:-}"
@@ -48,6 +50,7 @@ _print_parsed() {
   echo "prompt=$_PROMPT"
   echo "summary=$_SUMMARY"
   echo "transcript_path=$_TRANSCRIPT_PATH"
+  echo "question=$_QUESTION"
 }
 
 # ===========================================================================
@@ -67,7 +70,12 @@ _truncate() {
 # ===========================================================================
 _build_notify_args() {
   local icon="" sound="default"
-  if [[ "$_PROVIDER" == "human" ]]; then
+  if [[ -n "$_QUESTION" ]]; then
+    # AskUserQuestion: agent is BLOCKED waiting for the user to answer
+    icon="❓ "
+    sound="Submarine"
+    _TITLE="${icon}Claude asks"
+  elif [[ "$_PROVIDER" == "human" ]]; then
     icon="🔴 "
     sound="Basso"
     _TITLE="${icon}[HUMAN REQUIRED]"
@@ -78,7 +86,10 @@ _build_notify_args() {
   _SUBTITLE="$(basename "$_CWD")"
   _GROUP="${_PROVIDER}-${_SESSION_ID}"
 
-  if [[ -n "$_PROMPT" && -n "$_SUMMARY" ]]; then
+  if [[ -n "$_QUESTION" ]]; then
+    # Question takes priority: subtitle stays project dir, message=the question
+    _MESSAGE=$(_truncate "$_QUESTION")
+  elif [[ -n "$_PROMPT" && -n "$_SUMMARY" ]]; then
     # Both available: subtitle=prompt (what was asked), message=summary (what was done)
     _SUBTITLE=$(_truncate "$_PROMPT")
     _MESSAGE=$(_truncate "$_SUMMARY")
