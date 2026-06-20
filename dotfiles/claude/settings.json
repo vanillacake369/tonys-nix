@@ -16,6 +16,13 @@
       "Write(*)",
       "NotebookEdit(*)",
       "Task(*)",
+      "Workflow(*)",
+      "TaskCreate(*)",
+      "TaskGet(*)",
+      "TaskList(*)",
+      "TaskOutput(*)",
+      "TaskStop(*)",
+      "TaskUpdate(*)",
       "Bash(*)",
       "mcp__context7",
       "mcp__playwright"
