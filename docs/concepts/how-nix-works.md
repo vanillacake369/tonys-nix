@@ -82,11 +82,13 @@ Several tools that this configuration manages — Claude Code, Gemini CLI, Codex
 
 The standard home-manager approach (symlink everything from the Nix store) does not work for these files. A read-only symlink blocks the OAuth flow entirely.
 
-`modules/agents/sync-mutable-config.nix` provides two helpers:
+`modules/agents/sync-mutable-config.nix` provides three helpers:
 
 **`mkJsonSync` (deep-merge)** — reads an existing file, deep-merges the Nix-generated content on top, and writes the result back. Used for Claude Code and Gemini settings, where the provider CLIs write keys that must be preserved across activations (OAuth tokens, project IDs, usage data).
 
-**`mkFileCopy` (overwrite with backup)** — copies the generated file over the existing one, saving a timestamped backup first. Used for Codex's TOML config, where the file format does not lend itself to deep-merge and the runtime-written keys are less critical.
+**`mkTomlSync` (generated TOML with preserved runtime paths)** — reads an existing TOML file, copies selected mutable paths into the Nix-generated TOML, and writes the result back. Used for Codex so hook trust, project trust, and TUI state survive activation while hooks, MCP servers, agents, and permissions remain generated.
+
+**`mkFileCopy` (overwrite with backup)** — copies the generated file over the existing one, saving a backup first. Used for provider config formats where the generated Nix contract should remain the source of truth.
 
 Both helpers run as `home.activation` scripts — after the Nix store generation, during the activation phase when writing to `$HOME` is permitted.
 

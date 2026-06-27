@@ -74,7 +74,7 @@ The only current example is `modules/shell/editor.overlay.nix`, which patches th
 | `lib/mk-images.nix` | Builds ISO, VirtualBox, VMware, and qcow images via nixpkgs `system.build.images` |
 | `lib/mk-zellij-config.nix` | Generates Zellij configuration |
 
-`sync-mutable-config.nix` (providing `mkJsonSync` / `mkFileCopy`) was moved from `lib/` to `modules/agents/sync-mutable-config.nix` because it is an agents-only concern.
+`sync-mutable-config.nix` (providing mutable config sync helpers) was moved from `lib/` to `modules/agents/sync-mutable-config.nix` because it is an agents-only concern.
 
 Two subsystems that live in `modules/` (not `lib/`):
 

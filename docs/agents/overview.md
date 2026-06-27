@@ -69,9 +69,9 @@ Each provider has a dedicated Nix module in `modules/agents/`. All modules follo
 |---|---|---|---|
 | Claude | `modules/agents/claude.nix` | `mkJsonSync` (deep-merge) | `~/.claude/settings.json`, `~/.claude.json` |
 | Gemini | `modules/agents/gemini.nix` | `mkJsonSync` (deep-merge) | `~/.gemini/settings.json` |
-| Codex | `modules/agents/codex.nix` | `mkFileCopy` (overwrite + backup) | `~/.codex/config.toml` |
+| Codex | `modules/agents/codex.nix` | `mkTomlSync` (generated TOML + selected runtime state) | `~/.codex/config.toml` |
 
-`modules/agents/sync-mutable-config.nix` provides both helpers. Deep-merge preserves runtime data (OAuth tokens, project history, usage stats) that the provider CLIs write back to their config files.
+`modules/agents/sync-mutable-config.nix` provides these helpers. Deep-merge preserves runtime data (OAuth tokens, project history, usage stats) that the provider CLIs write back to their config files. TOML sync is used for Codex so Nix-owned settings stay generated while Codex-owned hook trust and project trust survive activation.
 
 Static assets (commands, agents, skills, hooks) are managed separately as read-only symlinks via `home.file` in `claude.nix`.
 
@@ -121,8 +121,9 @@ modules/agents/
 ├── claude.nix                  # Claude: dotfiles + activation + policy contract
 ├── gemini.nix                  # Gemini: settings + policy contract
 ├── codex.nix                   # Codex: config.toml + policy contract
+├── codex-bindings.nix          # Codex roles, skills, agents, permissions
 ├── agents-proxy.nix            # cli-proxy-api binary + launchd service (macOS)
-├── sync-mutable-config.nix     # mkJsonSync + mkFileCopy helpers
+├── sync-mutable-config.nix     # mutable config sync helpers
 ├── policy-contract.nix         # Interface: agentPolicy option types
 ├── policy-assertions.nix       # build-time contract assertions
 ├── policy-assembler.nix        # IoC assembler (entry point)
