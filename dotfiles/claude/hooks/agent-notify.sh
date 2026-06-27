@@ -126,6 +126,10 @@ _print_notify_args() {
   echo "execute=$_EXECUTE"
 }
 
+_print_codex_stop_json() {
+  printf '{"continue":true}\n'
+}
+
 # ===========================================================================
 # Select notification backend
 # macOS: terminal-notifier (own app) > noti > osascript > bell
@@ -289,18 +293,37 @@ main() {
 
   if [[ -n "${AGENT_NOTIFY_DRY_RUN:-}" ]]; then
     if _is_session_focused; then
-      echo "skipped (terminal focused)"
+      if [[ "$_PROVIDER" == "codex" ]]; then
+        echo "skipped (terminal focused)" >&2
+        _print_codex_stop_json
+      else
+        echo "skipped (terminal focused)"
+      fi
     else
       _log_notification
-      _print_notify_args
-      echo "backend=$backend"
+      if [[ "$_PROVIDER" == "codex" ]]; then
+        _print_notify_args >&2
+        echo "backend=$backend" >&2
+        _print_codex_stop_json
+      else
+        _print_notify_args
+        echo "backend=$backend"
+      fi
     fi
     exit 0
   fi
 
-  _is_session_focused && exit 0
+  if _is_session_focused; then
+    [[ "$_PROVIDER" == "codex" ]] && _print_codex_stop_json
+    exit 0
+  fi
   _log_notification
-  _send "$backend"
+  if [[ "$_PROVIDER" == "codex" ]]; then
+    _send "$backend" >/dev/null
+    _print_codex_stop_json
+  else
+    _send "$backend"
+  fi
 }
 
 main "$@" || exit 0
