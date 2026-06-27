@@ -17,6 +17,10 @@ in {
     ./utils.nix
   ];
 
+  home.sessionVariables = {
+    NIXPKGS_ALLOW_UNFREE = "1";
+  };
+
   home.file =
     {
       ".config/nix".source = ../../dotfiles/nix;
