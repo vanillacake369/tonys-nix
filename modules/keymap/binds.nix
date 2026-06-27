@@ -116,7 +116,10 @@
       to = "page_up";
       tags = ["karabiner"];
     }
-    # NOTE: hyper+d is aerospace-only (workspace Docs). No karabiner page_down here to avoid conflict.
+
+    # NOTE: :
+    # hyper+d is aerospace-only (workspace Docs).
+    # No karabiner page_down here to avoid conflict.
 
     # --- AeroSpace: cmd+hyper+hjkl -> window focus ---
     {
@@ -864,15 +867,15 @@ in {
     };
     Code = {
       monitor = 2;
-      apps = userProfile.jetbrains.bundleIds;
+      # apps = userProfile.jetbrains.bundleIds;
     };
     Browser = {
       monitor = 2;
-      apps = browserAppIds;
+      # apps = browserAppIds;
     };
     Terminal = {
-      monitor = 3;
-      apps = ["com.github.wez.wezterm" "Docker Desktop" "Podman Desktop"];
+      monitor = 2;
+      # apps = ["com.github.wez.wezterm" "Docker Desktop" "Podman Desktop"];
     };
     Music = {
       monitor = 3;
