@@ -98,7 +98,7 @@
               then mkMoveRule n app
               else mkMoveRuleRegex n app
           )
-          ws.${n}.apps
+          (ws.${n}.apps or [])
       )
       wsNames));
 
