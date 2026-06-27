@@ -1,4 +1,10 @@
 {
+  lib,
+  isDarwin,
+  ...
+}: let
+  zellijConfig = import ../../lib/mk-zellij-config.nix {inherit isDarwin;};
+in {
   imports = [
     ./fish.nix
     ./git.nix
@@ -10,4 +16,12 @@
     ./monitor.nix
     ./utils.nix
   ];
+
+  home.file =
+    {
+      ".config/nix".source = ../../dotfiles/nix;
+      ".config/nixpkgs".source = ../../dotfiles/nixpkgs;
+      ".screenrc".source = ../../dotfiles/screen/.screenrc;
+      ".config/zellij/config.kdl".text = zellijConfig;
+    };
 }

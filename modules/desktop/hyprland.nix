@@ -13,6 +13,8 @@ _: {
     _JAVA_AWT_WM_NONREPARENTING = "1";
   };
 
+  home.file.".config/hypr/hyprland.conf".source = ../../dotfiles/hypr/hyprland.conf;
+
   # =============================================================================
   # Systemd Initiation
   # =============================================================================

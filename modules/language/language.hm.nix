@@ -218,6 +218,7 @@ in {
       RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
     };
     packages = langPackages ++ commonTools;
+    file.".cargo/config.toml".source = ../../dotfiles/cargo/config.toml;
     file.".claude/lang-tools.json".source = jsonFormat.generate "lang-tools.json" toolTable;
     file.".gradle/gradle.properties".text = ''
       org.gradle.daemon.idletimeout=300000
