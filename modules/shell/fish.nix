@@ -104,6 +104,8 @@
           bass source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
       end
 
+      fish_add_path --move --prepend $HOME/.cargo/bin
+
       set -g fish_greeting
       ${pkgs.zellij}/bin/zellij setup --generate-completion fish | source
 
