@@ -21,9 +21,10 @@ Because Codex uses a different underlying model than Claude, its agreement or di
 2. Passes them through `modules/agents/mcp-adapters.nix` using the `codex` adapter, which adds an `enabled` flag and renames `headers` to `http_headers`.
 3. Reads policy-generated hooks from `config.agentPolicy._assembledHooks.codex`.
 4. Merges base hooks with policy hooks per event name.
-5. Generates a TOML config file and syncs it to `~/.codex/config.toml` via `mkFileCopy`.
+5. Reads role, skill, agent, and permission bindings from `modules/agents/codex-bindings.nix`.
+6. Generates a TOML config file and syncs it to `~/.codex/config.toml` via `mkTomlSync`.
 
-Unlike Claude and Gemini which use JSON deep-merge, Codex uses `mkFileCopy` — overwrite with backup. Codex does not write runtime data back to its config file, so overwriting is safe.
+Unlike Claude and Gemini which use JSON deep-merge, Codex uses a TOML-aware sync: activation backs up the existing file, writes the generated TOML, and preserves Codex-owned runtime state under `hooks.state`, `projects`, and `tui`. Nix remains the source of truth for hooks, MCP servers, agents, and permission bindings.
 
 The `programs.codex` home-manager module handles binary installation. `dotfiles/shared/AGENTS.md` is injected as `custom-instructions`.
 
