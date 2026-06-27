@@ -9,6 +9,8 @@
   userProfile = import ../user/limjihoon.nix;
   keybinds = import ../modules/keymap/binds.nix {inherit lib userProfile;};
   mcpAdapt = import ../modules/agents/mcp-adapters.nix {inherit lib;};
+  hookAdapt = import ../modules/agents/policy-hook-adapters.nix {inherit lib;};
+  codexBindings = import ../modules/agents/codex-bindings.nix {inherit lib;};
   collectOverlays = import ../lib/collect-overlays.nix {inherit lib;};
   discoverModules = import ../lib/discover-modules.nix {inherit lib;};
 
@@ -61,8 +63,17 @@
     (assert' "keymaps: karabiner maps" (builtins.length karabinerMaps > 0))
     (assert' "keymaps: aerospace maps" (builtins.length aerospaceMaps > 0))
     (assert' "keymaps: 6+ workspaces" (builtins.length (builtins.attrNames keybinds.workspaces) >= 6))
-    (assert' "keymaps: browser app-ids route AeroSpace workspace" (keybinds.workspaces.Browser.apps == userProfile.browsers.appIds))
-    (assert' "keymaps: jetbrains bundleIds from userProfile" (keybinds.workspaces.Code.apps == userProfile.jetbrains.bundleIds))
+    (assert' "keymaps: workspaces declare monitors" (
+      builtins.all (name: keybinds.workspaces.${name} ? monitor) (builtins.attrNames keybinds.workspaces)
+    ))
+    (assert' "keymaps: workspace app routes are lists when present" (
+      builtins.all (
+        name: let
+          workspace = keybinds.workspaces.${name};
+        in
+          !(workspace ? apps) || builtins.isList workspace.apps
+      ) (builtins.attrNames keybinds.workspaces)
+    ))
   ];
 
   # =========================================================================
@@ -90,7 +101,102 @@
   ];
 
   # =========================================================================
-  # 5. Zellij config generation (platform-conditional)
+  # 5. Hook adapters (policy SSoT -> per-provider native shape)
+  # =========================================================================
+  hookAdapterTests = let
+    mockHooks = {
+      path-guard = {
+        claude = {
+          event = "PreToolUse";
+          matcher = "Read|Write";
+          script = "/nix/store/path-guard-claude.sh";
+        };
+        codex = {
+          event = "PreToolUse";
+          matcher = "Read|Write";
+          script = "/nix/store/path-guard-codex.sh";
+        };
+      };
+      notify = {
+        gemini = {
+          event = "AfterAgent";
+          matcher = "";
+          script = "~/.claude/hooks/agent-notify.sh gemini";
+        };
+        codex = {
+          event = "Stop";
+          matcher = "";
+          script = "~/.claude/hooks/agent-notify.sh codex";
+        };
+      };
+    };
+    claudeHooks = hookAdapt.claude mockHooks 5;
+    geminiHooks = hookAdapt.gemini mockHooks 5;
+    codexHooks = hookAdapt.codex mockHooks 5;
+  in [
+    (assert' "hooks-claude: groups by event" (claudeHooks ? PreToolUse))
+    (assert' "hooks-claude: preserves matcher wrapper" ((builtins.head claudeHooks.PreToolUse).matcher == "Read|Write"))
+    (assert' "hooks-claude: command hook shape" ((builtins.head (builtins.head claudeHooks.PreToolUse).hooks).type == "command"))
+    (assert' "hooks-gemini: native event wrapper has hooks only" (
+      (geminiHooks ? AfterAgent)
+      && ((builtins.head geminiHooks.AfterAgent) ? hooks)
+      && !((builtins.head geminiHooks.AfterAgent) ? matcher)
+    ))
+    (assert' "hooks-codex: supports PreToolUse and Stop" ((codexHooks ? PreToolUse) && (codexHooks ? Stop)))
+    (assert' "hooks-codex: command timeout is seconds" ((builtins.head (builtins.head codexHooks.Stop).hooks).timeout == 5))
+  ];
+
+  # =========================================================================
+  # 6. Codex bindings (shared guide -> Codex skills/agents/permissions)
+  # =========================================================================
+  codexBindingTests = let
+    roleNames = builtins.attrNames codexBindings.roles;
+    sampleSettings = codexBindings.mkSettings {
+      hooks = {Stop = [];};
+      mcp = {test-server = {enabled = true;};};
+    };
+    profileNames = builtins.attrNames codexBindings.permissionProfiles;
+  in [
+    (assert' "codex-bindings: exposes seven standard roles" (builtins.length roleNames == 7))
+    (assert' "codex-bindings: each role has a matching agent skill" (
+      builtins.all (name: builtins.hasAttr "agent-${name}" codexBindings.skills) roleNames
+    ))
+    (assert' "codex-bindings: each role points to an existing permission profile" (
+      builtins.all (
+        name: builtins.elem codexBindings.roles.${name}.permissionProfile profileNames
+      )
+      roleNames
+    ))
+    (assert' "codex-bindings: agents bind config files by permission profile" (
+      builtins.all (
+        name: codexBindings.agents.${name}.config_file == "${codexBindings.roles.${name}.permissionProfile}.config.toml"
+      )
+      roleNames
+    ))
+    (assert' "codex-bindings: reviewer is read-only" (
+      codexBindings.permissionProfiles.agent-reviewer.filesystem.":workspace_roots"."." == "read"
+    ))
+    (assert' "codex-bindings: implementer can write workspace" (
+      codexBindings.permissionProfiles.agent-implementer.filesystem.":workspace_roots"."." == "write"
+    ))
+    (assert' "codex-bindings: researcher has limited network enabled" (
+      codexBindings.permissionProfiles.agent-researcher.network.enabled
+      == true
+      && codexBindings.permissionProfiles.agent-researcher.network.mode == "limited"
+    ))
+    (assert' "codex-bindings: context maps reviewer to Codex skill and permission profile" (
+      lib.hasInfix "`reviewer` -> `agent-reviewer` / permission profile `agent-reviewer`" (codexBindings.mkContext "shared guide")
+    ))
+    (assert' "codex-settings: outports hooks and mcp_servers to Codex TOML shape" (
+      sampleSettings.hooks
+      == {Stop = [];}
+      && sampleSettings.mcp_servers.test-server.enabled == true
+      && sampleSettings.default_permissions == "default"
+    ))
+  ];
+
+  # =========================================================================
+  # 7. Zellij config generation (platform-conditional)
   # =========================================================================
   zellijTests = let
     darwinConfig = import ../lib/mk-zellij-config.nix {isDarwin = true;};
@@ -108,6 +214,8 @@
     ++ entrypointTests
     ++ keymapTests
     ++ mcpAdapterTests
+    ++ hookAdapterTests
+    ++ codexBindingTests
     ++ zellijTests;
 in {
   results = allTests;

@@ -243,9 +243,12 @@ assert_contains "integration gemini: prompt in message" "Fix CSS layout bug" "$r
 
 # 4-3. Codex with last_assistant_message
 result=$(echo '{"session_id":"int-003","cwd":"/workspace/api","last_assistant_message":"Added 3 endpoints"}' \
-  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" codex)
-assert_contains "integration codex: title" "title=Codex" "$result"
-assert_contains "integration codex: summary in message" "Added 3 endpoints" "$result"
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" codex 2>/dev/null)
+assert_eq "integration codex: stdout is Stop JSON" '{"continue":true}' "$result"
+result=$(echo '{"session_id":"int-003","cwd":"/workspace/api","last_assistant_message":"Added 3 endpoints"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=0 bash "$NOTIFY_SCRIPT" codex 2>&1 >/dev/null)
+assert_contains "integration codex: diagnostics title" "title=Codex" "$result"
+assert_contains "integration codex: diagnostics summary" "Added 3 endpoints" "$result"
 
 # 4-4. No provider
 result=$(echo '{"session_id":"no-prov","cwd":"/tmp/test"}' \
