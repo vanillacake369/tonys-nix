@@ -25,6 +25,7 @@
   }: let
     inherit (nixpkgs) lib;
     supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    homeActivationCheckSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-darwin"];
     forAllSystems = lib.genAttrs supportedSystems;
 
     # Auto-collect overlays from modules (*.overlay.nix convention)
@@ -61,7 +62,7 @@
     };
 
     hostnames = ["tony"];
-  in {
+  in rec {
     nixosConfigurations = lib.genAttrs hostnames (_:
       nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -101,5 +102,17 @@
     packages = forAllSystems mkImages;
 
     tests = import ./tests/guard-tests.nix {inherit lib;};
+
+    checks = forAllSystems (system: let
+      pkgs = (builders.mkSystem system).pkgs;
+    in
+      {
+        guard-tests = pkgs.runCommand "guard-tests" {} ''
+          echo '${builtins.toJSON tests.summary}' > "$out"
+        '';
+      }
+      // lib.optionalAttrs (builtins.elem system homeActivationCheckSystems) {
+        home-activation = homeConfigurations."hm-${system}".activationPackage;
+      });
   };
 }
