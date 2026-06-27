@@ -14,12 +14,14 @@ in {
   # Codex: renames headers→http_headers, adds enabled flag, strips unknown fields
   codex =
     lib.mapAttrs (
-      _: srv:
-        removeNulls (lib.removeAttrs srv ["disabled" "headers" "enabled"])
-        // (lib.optionalAttrs (srv ? headers && !(srv ? http_headers)) {
-          http_headers = removeNulls srv.headers;
-        })
-        // {enabled = !(srv.disabled or false);}
+      _: srv: let
+        base = removeNulls (lib.removeAttrs srv ["disabled" "headers" "enabled"])
+          // (lib.optionalAttrs (srv ? headers && srv.headers != {} && !(srv ? http_headers)) {
+            http_headers = removeNulls srv.headers;
+          })
+          // {enabled = !(srv.disabled or false);};
+      in
+        lib.filterAttrs (_: v: v != {}) base
     )
     servers;
 
