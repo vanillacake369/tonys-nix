@@ -46,6 +46,11 @@ in {
     target = "$HOME/.codex/config.toml";
     type = "toml";
     baseHooks = providerRuntime.providerHooks.codex;
+    preserveTomlKeys = [
+      "hooks.state"
+      "projects"
+      "tui"
+    ];
     render = {
       hooks,
       mcp,

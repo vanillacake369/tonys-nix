@@ -19,11 +19,17 @@
     name,
     target,
     source,
+    preserveTomlKeys ? [],
   }:
     if type == "json"
     then
       sync.mkJsonSync {
         inherit name target source;
+      }
+    else if type == "toml"
+    then
+      sync.mkTomlSync {
+        inherit name target source preserveTomlKeys;
       }
     else
       sync.mkFileCopy {
@@ -63,6 +69,7 @@ in {
     target,
     type ? "json",
     baseHooks ? {},
+    preserveTomlKeys ? [],
     render,
   }: let
     source = mkSettingsFile {
@@ -71,7 +78,7 @@ in {
     };
   in
     mkSync {
-      inherit type target;
+      inherit type target preserveTomlKeys;
       name = syncName;
       source = "${source}";
     };
