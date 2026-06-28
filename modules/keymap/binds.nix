@@ -44,7 +44,6 @@
   # the one canonical app-id list so the two stay in sync.
   browserAppIds = userProfile.browsers.appIds;
   browsers = map (id: "^${lib.replaceStrings ["."] ["\\."] id}$") browserAppIds;
-  darwinHome = "/Users/${userProfile.username}";
 
   rawKeymaps = [
     # --- Korean input: ₩ → backtick (only when Korean input active) ---
@@ -825,7 +824,7 @@
     }
     {
       bind = "ctrl+cmd+m";
-      shell = "open '${darwinHome}/Applications/Brave Browser Apps.localized/YouTube Music.app'";
+      shell = "open -a 'Music'";
       tags = ["karabiner"];
       unless = ["^com\\.jetbrains\\..*$" "^com\\.knollsoft\\.Rectangle$"];
     }
@@ -879,7 +878,7 @@ in {
     };
     Music = {
       monitor = 3;
-      apps = ["YouTube Music"];
+      apps = ["Music"];
     };
     Schedule = {
       monitor = 3;
