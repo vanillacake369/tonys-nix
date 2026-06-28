@@ -16,7 +16,7 @@ modules/
     agents-mcp.nix              # MCP server definitions (SSoT)
     mcp-adapters.nix            # MCP server SSoT adapter
     agents-proxy.nix            # cli-proxy-api + launchd
-    sync-mutable-config.nix     # mutable config sync helpers (agents-only concern)
+    mutable-settings-sync.nix     # mutable config sync helpers (agents-only concern)
     policy-contract.nix         # Interface: agentPolicy.providers.<name> option types
     policy-assertions.nix       # build-time contract assertions
     policy-assembler.nix        # IoC assembler (imports all policy-* files)

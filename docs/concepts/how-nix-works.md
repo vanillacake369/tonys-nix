@@ -82,7 +82,7 @@ Several tools that this configuration manages — Claude Code, Gemini CLI, Codex
 
 The standard home-manager approach (symlink everything from the Nix store) does not work for these files. A read-only symlink blocks the OAuth flow entirely.
 
-`modules/agents/sync-mutable-config.nix` provides three helpers:
+`modules/agents/mutable-settings-sync.nix` provides three helpers:
 
 **`mkJsonSync` (deep-merge)** — reads an existing file, deep-merges the Nix-generated content on top, and writes the result back. Used for Claude Code and Gemini settings, where the provider CLIs write keys that must be preserved across activations (OAuth tokens, project IDs, usage data).
 
@@ -117,7 +117,7 @@ graph TD
     G --> H[policy-contract.nix]
     G --> I["policy-*.nix (mixins)"]
     I --> J[Generated Hooks]
-    J --> K[sync-mutable-config]
+    J --> K[mutable-settings-sync]
     K --> L["~/.claude/settings.json"]
 ```
 

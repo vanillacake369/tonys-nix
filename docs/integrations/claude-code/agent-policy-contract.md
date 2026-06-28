@@ -116,10 +116,10 @@ hook-adapters.nix (format conversion)
 assembler.nix (assembler)
     |  produces provider-native assembled hooks
     v
-provider-runtime.nix
+provider-settings.nix
     |  merges with base hooks and renders settings files
     v
-modules/agents/sync-mutable-config.nix (injection)
+modules/agents/mutable-settings-sync.nix (injection)
     |  deep-merge into mutable settings file
     v
 Provider CLI reads settings on startup

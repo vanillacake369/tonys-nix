@@ -26,7 +26,7 @@ When you run `just apply`, home-manager:
 4. Preserves runtime data (projects, tips, OAuth tokens) through `jq` deep-merge
 
 Key implementation files:
-- `modules/agents/sync-mutable-config.nix` — mutable config sync helpers such as JSON deep-merge and file copy
+- `modules/agents/mutable-settings-sync.nix` — mutable config sync helpers such as JSON deep-merge and file copy
 - `modules/agents/mcp-adapters.nix` — transforms canonical MCP definitions to Claude/Gemini/Codex formats
 
 ## Hook Pipeline

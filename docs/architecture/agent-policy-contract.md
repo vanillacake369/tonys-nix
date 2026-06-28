@@ -43,7 +43,7 @@ All policy files live flat under `modules/agents/` with a `policy-` prefix. Ther
 | `policy-async-handshake.nix` | mixin: async-handshake |
 | `policy-live-oracle.nix` | mixin: live-oracle |
 
-`sync-mutable-config.nix` (providing mutable config sync helpers) also lives in `modules/agents/` and is used by the hook generation flow to inject assembled hooks into mutable settings files at activation time.
+`mutable-settings-sync.nix` (providing mutable config sync helpers) also lives in `modules/agents/` and is used by the hook generation flow to inject assembled hooks into mutable settings files at activation time.
 
 ## Contract Interface
 
@@ -162,9 +162,9 @@ flowchart TD
 
     D["policy-assembler.nix\nmaps each enabled provider\nthrough its format adapter\nproduces agentPolicy._assembledHooks"]
 
-    E["provider-runtime.nix reads\nagentPolicy._assembledHooks.&lt;name&gt;\ndeep-merges with base hooks\ngenerates final settings file"]
+    E["provider-settings.nix reads\nagentPolicy._assembledHooks.&lt;name&gt;\ndeep-merges with base hooks\ngenerates final settings file"]
 
-    F["modules/agents/sync-mutable-config.nix\nmutable config sync helpers\ninject into mutable settings\nat home-manager activation"]
+    F["modules/agents/mutable-settings-sync.nix\nmutable config sync helpers\ninject into mutable settings\nat home-manager activation"]
 
     G["Provider CLI\nreads settings file on startup\nhooks are live"]
 
