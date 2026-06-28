@@ -83,6 +83,16 @@
     agent-tester = mkReadProfile {write = true;};
   };
 
+  mkDeveloperInstructions = name: role: ''
+    You are the Codex ${name} subagent.
+
+    ${role.description}
+
+    Follow the shared AGENTS.md contract for orchestration, escalation, and
+    reporting. Keep work scoped to this role. Do not revert edits made by
+    other agents or the user.
+  '';
+
   roleSkills =
     lib.mapAttrs' (name: role: {
       name = "agent-${name}";
@@ -96,8 +106,8 @@
 
         Use this Codex skill when the shared agent guide routes work to `${name}`.
         The shared guide is the behavioral source of truth; this file only binds
-        that provider-neutral role to Codex's skill surface. Runtime permission
-        scope is bound through Codex `agents.${name}.config_file`, which selects
+        that provider-neutral role to Codex's skill surface. Runtime subagent
+        behavior is bound through `~/.codex/agents/${name}.toml`, which selects
         the `${role.permissionProfile}` permission profile.
       '';
     })
@@ -132,23 +142,17 @@
     ${sharedContext}
   '';
 
-  agents =
-    lib.mapAttrs (_name: role: {
+  customAgents =
+    lib.mapAttrs (name: role: {
+      inherit name;
       description = role.description;
-      config_file = "${role.permissionProfile}.config.toml";
-    })
-    roles;
-
-  profiles =
-    lib.mapAttrs' (_: role: {
-      name = role.permissionProfile;
-      value = {
-        default_permissions = role.permissionProfile;
-      };
+      developer_instructions = mkDeveloperInstructions name role;
+      model = "gpt-5.5";
+      default_permissions = role.permissionProfile;
     })
     roles;
 in {
-  inherit roles workflows permissionProfiles roleSkills workflowSkills agents profiles mkContext;
+  inherit roles workflows permissionProfiles roleSkills workflowSkills customAgents mkContext;
 
   skills = roleSkills // workflowSkills;
 
@@ -158,7 +162,7 @@ in {
   }: {
     default_permissions = "default";
     permissions = permissionProfiles;
-    inherit agents hooks;
+    inherit hooks;
     mcp_servers = mcp;
   };
 }

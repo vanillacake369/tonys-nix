@@ -6,13 +6,13 @@
   pkgs,
   ...
 }: let
-  providerRuntime = import ./provider-runtime.nix {inherit config lib pkgs;};
+  providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
 
-  mcpSourceFile = providerRuntime.mkFile {
+  mcpSourceFile = providerSettings.mkFile {
     format = "json";
     name = "claude-mcp.json";
     value = {
-      mcpServers = providerRuntime.mcp.claude;
+      mcpServers = providerSettings.mcp.claude;
     };
   };
 
@@ -62,13 +62,13 @@ in {
     ".claude/hooks".source = ../../dotfiles/claude/hooks;
   };
 
-  home.activation.syncClaudeMcp = providerRuntime.mkSync {
+  home.activation.syncClaudeMcp = providerSettings.mkSync {
     name = "claude-mcp";
     target = "$HOME/.claude.json";
     source = "${mcpSourceFile}";
   };
 
-  home.activation.syncClaudeSettings = providerRuntime.mkSettingsSync {
+  home.activation.syncClaudeSettings = providerSettings.mkSettingsSync {
     provider = "claude";
     format = "json";
     fileName = "claude-settings.json";
