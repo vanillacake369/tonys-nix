@@ -505,11 +505,17 @@ gc-info:
 # Run guard tests (nix eval) + shell hook tests (bats).
 test: test-hooks
     #!/usr/bin/env bash
-    result=$(nix eval .#tests.summary --json)
-    total=$(echo "$result" | jq -r .total)
-    passed=$(echo "$result" | jq -r .passed)
-    echo "[✓] $passed/$total guard tests passed"
-    if [[ "$total" != "$passed" ]]; then exit 1; fi
+    nix eval .#checks.{{ SYSTEM_ARCH }} --apply builtins.attrNames --json | jq -r '.[]' | while IFS= read -r check; do
+      echo "[!] Running flake check: $check"
+      out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.$check" --no-link)
+      if [[ "$check" == "guard-tests" ]]; then
+        result=$(cat "$out")
+        total=$(echo "$result" | jq -r .total)
+        passed=$(echo "$result" | jq -r .passed)
+        echo "[✓] $passed/$total guard tests passed"
+        if [[ "$total" != "$passed" ]]; then exit 1; fi
+      fi
+    done
 
 # Run shell hook tests (bats). Falls back to `nix run` when bats is unbuilt.
 test-hooks:

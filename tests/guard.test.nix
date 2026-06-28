@@ -2,8 +2,9 @@
 # Detailed output-format / platform / policy-internal tests were intentionally
 # dropped — build-time assertions + `nix flake check` + per-platform builds
 # cover the rest. Keep this file small so the structure stays flexible.
-# Run: nix eval .#tests.summary --json
-# Run verbose: nix eval .#tests.results --json | python3 -m json.tool
+# Run: nix build --print-out-paths .#checks.<system>.guard-tests --no-link
+# Run verbose:
+#   nix eval --impure --json --expr 'let flake = builtins.getFlake (toString ./.); collectTests = (import ./lib/collect-tests.nix { lib = flake.inputs.nixpkgs.lib; }) ./tests; in (collectTests { lib = flake.inputs.nixpkgs.lib; }).results'
 {lib}: let
   # --- Fixtures ---
   userProfile = import ../user/limjihoon.nix;
@@ -167,9 +168,15 @@
       )
       roleNames
     ))
-    (assert' "codex-bindings: agents bind config files by permission profile" (
+    (assert' "codex-bindings: custom agents use standalone schema" (
       builtins.all (
-        name: codexBindings.agents.${name}.config_file == "${codexBindings.roles.${name}.permissionProfile}.config.toml"
+        name:
+          codexBindings.customAgents.${name}.name
+          == name
+          && codexBindings.customAgents.${name}.description == codexBindings.roles.${name}.description
+          && builtins.isString codexBindings.customAgents.${name}.developer_instructions
+          && codexBindings.customAgents.${name}.model == "gpt-5.5"
+          && !(codexBindings.customAgents.${name} ? config_file)
       )
       roleNames
     ))
@@ -192,7 +199,9 @@
       == {Stop = [];}
       && sampleSettings.mcp_servers.test-server.enabled == true
       && sampleSettings.default_permissions == "default"
+      && !(sampleSettings ? agents)
     ))
+    (assert' "codex-bindings: stays focused on provider bridge data" (!(sampleSettings ? tui)))
   ];
 
   # =========================================================================

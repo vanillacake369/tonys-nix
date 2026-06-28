@@ -62,6 +62,7 @@
     };
 
     hostnames = ["tony"];
+    collectTests = (import ./lib/collect-tests.nix {inherit lib;}) ./tests;
   in rec {
     nixosConfigurations = lib.genAttrs hostnames (_:
       nixpkgs.lib.nixosSystem {
@@ -101,18 +102,17 @@
 
     packages = forAllSystems mkImages;
 
-    tests = import ./tests/guard-tests.nix {inherit lib;};
-
     checks = forAllSystems (system: let
       pkgs = (builders.mkSystem system).pkgs;
+      homeConfig = homeConfigurations."hm-${system}";
+      collectChecks = (import ./lib/collect-checks.nix {inherit lib;}) ./tests;
+      tests = collectTests {inherit lib;};
     in
-      {
-        guard-tests = pkgs.runCommand "guard-tests" {} ''
-          echo '${builtins.toJSON tests.summary}' > "$out"
-        '';
+      collectChecks {
+        inherit pkgs homeConfig tests;
       }
       // lib.optionalAttrs (builtins.elem system homeActivationCheckSystems) {
-        home-activation = homeConfigurations."hm-${system}".activationPackage;
+        home-activation = homeConfig.activationPackage;
       });
   };
 }
