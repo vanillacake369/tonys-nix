@@ -6,9 +6,23 @@
   pkgs,
   ...
 }: let
-  providerRuntime = import ./provider-runtime.nix {inherit config lib pkgs;};
+  toml = pkgs.formats.toml {};
+  providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
   codexBindings = import ./codex-bindings.nix {inherit lib;};
   sharedContext = builtins.readFile ../../dotfiles/shared/AGENTS.md;
+  model = "gpt-5.5";
+  tuiSettings = {
+    status_line = [
+      "model-with-reasoning"
+      "current-dir"
+      "git-branch"
+      "permissions"
+      "five-hour-limit"
+      "weekly-limit"
+      "task-progress"
+    ];
+    status_line_use_colors = true;
+  };
 in {
   # Contract: Codex is the logic verifier — log-only reasoning
   agentPolicy.providers.codex = {
@@ -34,27 +48,36 @@ in {
       prefix_rule(pattern=["nix", "flake", "check"], decision="allow")
       prefix_rule(pattern=["nix", "eval"], decision="allow")
     '';
-    profiles = codexBindings.profiles;
     settings = lib.mkForce {};
   };
 
-  home.activation.syncCodexConfig = providerRuntime.mkSettingsSync {
+  home.file =
+    lib.mapAttrs' (name: agent: {
+      name = ".codex/agents/${name}.toml";
+      value.source = toml.generate "codex-agent-${name}.toml" agent;
+    })
+    codexBindings.customAgents;
+
+  home.activation.syncCodexConfig = providerSettings.mkSettingsSync {
     provider = "codex";
     format = "toml";
     fileName = "codex-config.toml";
     syncName = "codex-config";
     target = "$HOME/.codex/config.toml";
     type = "toml";
-    baseHooks = providerRuntime.providerHooks.codex;
+    baseHooks = providerSettings.providerHooks.codex;
     preserveTomlKeys = [
       "hooks.state"
       "projects"
-      "tui"
     ];
     render = {
       hooks,
       mcp,
     }:
-      codexBindings.mkSettings {inherit hooks mcp;};
+      codexBindings.mkSettings {inherit hooks mcp;}
+      // {
+        inherit model;
+        tui = tuiSettings;
+      };
   };
 }

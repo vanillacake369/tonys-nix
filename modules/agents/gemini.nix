@@ -6,7 +6,7 @@
   pkgs,
   ...
 }: let
-  providerRuntime = import ./provider-runtime.nix {inherit config lib pkgs;};
+  providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
 in {
   # Contract: Gemini is the async research/critic agent
   agentPolicy.providers.gemini = {
@@ -35,13 +35,13 @@ in {
     };
   };
 
-  home.activation.syncGeminiSettings = providerRuntime.mkSettingsSync {
+  home.activation.syncGeminiSettings = providerSettings.mkSettingsSync {
     provider = "gemini";
     format = "json";
     fileName = "antigravity-cli-settings.json";
     syncName = "gemini-settings";
     target = "$HOME/.gemini/settings.json";
-    baseHooks = providerRuntime.providerHooks.gemini;
+    baseHooks = providerSettings.providerHooks.gemini;
     render = {
       hooks,
       mcp,
