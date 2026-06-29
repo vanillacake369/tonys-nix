@@ -7,6 +7,7 @@
   ...
 }: let
   providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
+  workflowBindings = import ./workflow-bindings.nix {inherit lib;};
 in {
   # Contract: Gemini is the async research/critic agent
   agentPolicy.providers.gemini = {
@@ -32,6 +33,7 @@ in {
     settings = {};
     context = {
       "GEMINI" = ../../dotfiles/shared/AGENTS.md;
+      "AGENT_WORKFLOWS" = workflowBindings.sharedGuide;
     };
   };
 

@@ -11,6 +11,7 @@
   keybinds = import ../modules/keymap/binds.nix {inherit lib userProfile;};
   mcpAdapt = import ../modules/agents/mcp-adapters.nix {inherit lib;};
   hookAdapt = import ../modules/agents/policy-hook-adapters.nix {inherit lib;};
+  workflowBindings = import ../modules/agents/workflow-bindings.nix {inherit lib;};
   codexBindings = import ../modules/agents/codex-bindings.nix {inherit lib;};
   collectOverlays = import ../lib/collect-overlays.nix {inherit lib;};
   discoverModules = import ../lib/discover-modules.nix {inherit lib;};
@@ -152,6 +153,7 @@
   # =========================================================================
   codexBindingTests = let
     roleNames = builtins.attrNames codexBindings.roles;
+    commandWorkflowNames = builtins.attrNames workflowBindings.commandWorkflows;
     sampleSettings = codexBindings.mkSettings {
       hooks = {Stop = [];};
       mcp = {test-server = {enabled = true;};};
@@ -161,6 +163,21 @@
     (assert' "codex-bindings: exposes seven standard roles" (builtins.length roleNames == 7))
     (assert' "codex-bindings: each role has a matching agent skill" (
       builtins.all (name: builtins.hasAttr "agent-${name}" codexBindings.skills) roleNames
+    ))
+    (assert' "workflow-bindings: promotes Claude commands to provider-neutral workflows" (
+      builtins.elem "commit" commandWorkflowNames
+      && builtins.elem "create-pull-request" commandWorkflowNames
+      && workflowBindings.commandWorkflows.commit.claudeCommand == "/commit"
+    ))
+    (assert' "workflow-bindings: exposes command workflows as Codex skills" (
+      builtins.hasAttr "workflow-commit" codexBindings.skills
+      && lib.hasInfix "Source Claude command: `/commit`" codexBindings.skills.workflow-commit
+      && lib.hasInfix "SRP 기준으로 변경사항을 분리하여 커밋한다" codexBindings.skills.workflow-commit
+    ))
+    (assert' "workflow-bindings: renders shared CLI guide for non-Codex providers" (
+      lib.hasInfix "## workflow-commit" workflowBindings.sharedGuide
+      && lib.hasInfix "Use from Claude: `/commit" workflowBindings.sharedGuide
+      && lib.hasInfix "Use from Codex: invoke the `workflow-commit` skill" workflowBindings.sharedGuide
     ))
     (assert' "codex-bindings: each role points to an existing permission profile" (
       builtins.all (

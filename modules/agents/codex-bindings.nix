@@ -3,6 +3,7 @@
 # evaluating a full home-manager configuration.
 {lib}: let
   join = lib.concatStringsSep;
+  workflowBindings = import ./workflow-bindings.nix {inherit lib;};
 
   mkReadProfile = {
     network ? false,
@@ -153,8 +154,9 @@
     roles;
 in {
   inherit roles workflows permissionProfiles roleSkills workflowSkills customAgents mkContext;
+  inherit (workflowBindings) commandWorkflows;
 
-  skills = roleSkills // workflowSkills;
+  skills = roleSkills // workflowSkills // workflowBindings.codexSkills;
 
   mkSettings = {
     hooks ? {},

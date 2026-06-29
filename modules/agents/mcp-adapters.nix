@@ -15,7 +15,8 @@ in {
   codex =
     lib.mapAttrs (
       _: srv: let
-        base = removeNulls (lib.removeAttrs srv ["disabled" "headers" "enabled"])
+        base =
+          removeNulls (lib.removeAttrs srv ["disabled" "headers" "enabled"])
           // (lib.optionalAttrs (srv ? headers && srv.headers != {} && !(srv ? http_headers)) {
             http_headers = removeNulls srv.headers;
           })
