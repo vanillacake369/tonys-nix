@@ -75,6 +75,27 @@ Each provider has a dedicated Nix module in `modules/agents/`. All modules follo
 
 Static assets (commands, agents, skills, hooks) are managed separately as read-only symlinks via `home.file` in `claude.nix`.
 
+## Shared Workflow Bindings
+
+Command-style workflows are declared once in `modules/agents/workflow-bindings.nix`.
+The registry promotes curated prompts from `dotfiles/claude/commands/` into
+provider-neutral workflow metadata and provider adapters:
+
+```
+dotfiles/claude/commands/*.md      (source prompts)
+        |
+        v
+modules/agents/workflow-bindings.nix
+        |
+        +---> Claude: native slash commands + ~/.claude/WORKFLOWS.md
+        +---> Codex: workflow-* skills in programs.codex.skills
+        +---> Gemini/agy: AGENT_WORKFLOWS context guide
+```
+
+Private helper files and session-specific commands are intentionally not
+promoted. The workflow registry uses an explicit allowlist so new commands do
+not silently become cross-provider skills.
+
 ## Agent Policy Contract
 
 The policy-*.nix modules in `modules/agents/` encode the behavioral rules from `CLAUDE.md` as Nix module options that are validated at build time. Each provider declares its capabilities against a shared interface; Nix assertions reject invalid combinations before any code is deployed.
@@ -122,6 +143,7 @@ modules/agents/
 ├── gemini.nix                  # Gemini: settings + policy contract
 ├── codex.nix                   # Codex: config.toml + policy contract
 ├── codex-bindings.nix          # Codex roles, skills, agents, permissions
+├── workflow-bindings.nix       # Shared command workflows -> provider adapters
 ├── agents-proxy.nix            # cli-proxy-api binary + launchd service (macOS)
 ├── mutable-settings-sync.nix     # mutable config sync helpers
 ├── policy-contract.nix         # Interface: agentPolicy option types

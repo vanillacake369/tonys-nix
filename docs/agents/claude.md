@@ -9,6 +9,7 @@ Static assets are symlinked by `modules/agents/claude.nix` via `home.file`:
 | Path | Source | Notes |
 |---|---|---|
 | `~/.claude/commands/` | `dotfiles/claude/commands/` | Slash command definitions |
+| `~/.claude/WORKFLOWS.md` | `modules/agents/workflow-bindings.nix` | Shared workflow catalog for cross-provider names |
 | `~/.claude/agents/` | `dotfiles/claude/agents/` | Sub-agent definitions |
 | `~/.claude/skills/` | `dotfiles/claude/skills/` | Skill definitions |
 | `~/.claude/hooks/` | `dotfiles/claude/hooks/` | Hook shell scripts |
@@ -78,6 +79,10 @@ All hooks read JSON from stdin, do their work, and exit with:
 ## Slash Commands
 
 Commands are Markdown files in `dotfiles/claude/commands/`. Claude Code reads them when the user types the corresponding `/` prefix.
+Curated commands are also registered in `modules/agents/workflow-bindings.nix`,
+which lets Codex expose the same behavior as `workflow-*` skills and gives
+Gemini/agy a concise workflow catalog. Claude keeps the native slash-command
+interface for compatibility.
 
 | Command | File | Purpose |
 |---|---|---|

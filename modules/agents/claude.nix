@@ -7,6 +7,7 @@
   ...
 }: let
   providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
+  workflowBindings = import ./workflow-bindings.nix {inherit lib;};
 
   mcpSourceFile = providerSettings.mkFile {
     format = "json";
@@ -56,6 +57,7 @@ in {
 
   home.file = {
     ".claude/commands".source = ../../dotfiles/claude/commands;
+    ".claude/WORKFLOWS.md".text = workflowBindings.sharedGuide;
     ".claude/AGENTS.md".source = ../../dotfiles/shared/AGENTS.md;
     ".claude/agents".source = ../../dotfiles/claude/agents;
     ".claude/skills".source = ../../dotfiles/claude/skills;

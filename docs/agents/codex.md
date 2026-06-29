@@ -28,6 +28,27 @@ Unlike Claude and Gemini which use JSON deep-merge, Codex uses a TOML-aware sync
 
 The `programs.codex` home-manager module handles binary installation. `dotfiles/shared/AGENTS.md` is injected as `custom-instructions`.
 
+## Workflow Skills
+
+`modules/agents/workflow-bindings.nix` promotes selected Claude slash commands
+into Codex skills with the `workflow-*` prefix. The skill body keeps provenance
+back to the original slash command and includes the full source prompt, while
+the registry stores provider-neutral metadata such as recommended role,
+argument hint, network/MCP needs, and whether the workflow mutates files.
+
+Examples:
+
+| Claude command | Codex skill | Typical Codex request |
+|---|---|---|
+| `/commit` | `workflow-commit` | `Use workflow-commit for the current diff` |
+| `/create-pull-request` | `workflow-create-pull-request` | `Use workflow-create-pull-request and prepare the PR body` |
+| `/debug-system` | `workflow-debug-system` | `Use workflow-debug-system for this failing test output` |
+| `/code-enhance` | `workflow-code-enhance` | `Use workflow-code-enhance on modules/agents` |
+
+The Codex skill treats any `$ARGUMENTS` placeholder in the source command as
+the current user request and explicit context. Claude-only syntax is retained
+as provenance, not as a requirement to use Claude-specific tools.
+
 ### Generated config.toml structure
 
 ```toml

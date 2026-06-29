@@ -25,6 +25,11 @@ The three named tasks Gemini handles are:
 5. Generates a JSON settings file and syncs it to `~/.gemini/settings.json` via `mkJsonSync`.
 
 The `programs.antigravity-cli` home-manager module handles binary installation. The shared `dotfiles/shared/AGENTS.md` is injected as the `GEMINI` context file, giving Gemini the same behavioral instructions as the other providers.
+`modules/agents/workflow-bindings.nix` also generates an `AGENT_WORKFLOWS`
+context file. That file lists the promoted provider-neutral workflow names and
+how they map to Claude slash commands and Codex `workflow-*` skills. Gemini/agy
+uses this as a concise guide rather than loading every full command prompt into
+context.
 
 ### Generated settings.json structure
 
