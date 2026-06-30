@@ -71,34 +71,68 @@
         modules = [./configuration.nix];
       });
 
-    homeConfigurations = lib.listToAttrs (lib.flatten (
-      map (system: [
+    homeConfigurations = let
+      mkHomeEntries = profileName: userProfile: system: [
         {
-          name = "hm-${system}";
+          name = "hm-${profileName}-${system}";
           value = builders.mkHomeConfig {
-            inherit system;
-            userProfile = userProfiles.limjihoon;
+            inherit system userProfile;
           };
         }
         {
-          name = "hm-wsl-${system}";
+          name = "hm-${profileName}-wsl-${system}";
           value = builders.mkHomeConfig {
-            inherit system;
-            userProfile = userProfiles.limjihoon;
+            inherit system userProfile;
             isWsl = true;
           };
         }
         {
-          name = "hm-nixos-${system}";
+          name = "hm-${profileName}-nixos-${system}";
           value = builders.mkHomeConfig {
-            inherit system;
-            userProfile = userProfiles.limjihoon;
+            inherit system userProfile;
             isNixOs = true;
           };
         }
-      ])
-      supportedSystems
-    ));
+      ];
+
+      userHomeEntries = lib.flatten (
+        lib.mapAttrsToList (
+          profileName: userProfile:
+            lib.flatten (map (mkHomeEntries profileName userProfile) supportedSystems)
+        )
+        userProfiles
+      );
+
+      legacyLimjihoonEntries = lib.flatten (
+        map (system: [
+          {
+            name = "hm-${system}";
+            value = builders.mkHomeConfig {
+              inherit system;
+              userProfile = userProfiles.limjihoon;
+            };
+          }
+          {
+            name = "hm-wsl-${system}";
+            value = builders.mkHomeConfig {
+              inherit system;
+              userProfile = userProfiles.limjihoon;
+              isWsl = true;
+            };
+          }
+          {
+            name = "hm-nixos-${system}";
+            value = builders.mkHomeConfig {
+              inherit system;
+              userProfile = userProfiles.limjihoon;
+              isNixOs = true;
+            };
+          }
+        ])
+        supportedSystems
+      );
+    in
+      lib.listToAttrs (legacyLimjihoonEntries ++ userHomeEntries);
 
     packages = forAllSystems mkImages;
 
