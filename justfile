@@ -28,6 +28,8 @@ GC_MIN_INTERVAL_DAYS := "3"
 GC_MAX_INTERVAL_DAYS := "14"
 GC_DELETE_OLDER_THAN := "3"
 GC_STATE_FILE := ".nix-gc-state"
+APPLY_RETRY_THRESHOLD := "3"
+APPLY_FALLBACK_SUBSTITUTERS := "https://cache.nixos.org"
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
@@ -182,16 +184,33 @@ apply-system target:
     fi
 
     echo "[!] Applying NixOS system configuration"
-    sudo nixos-rebuild switch --flake .#"{{ HOSTNAME }}" --impure
+    retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"
+    attempt=1
+    while (( attempt <= retry_threshold )); do
+      echo "[→] Attempt ${attempt}/${retry_threshold}: sudo nixos-rebuild switch --flake .#{{ HOSTNAME }} --impure"
+      if sudo nixos-rebuild switch --flake .#"{{ HOSTNAME }}" --impure; then
+        exit 0
+      fi
+      echo "[!] NixOS system apply failed on attempt ${attempt}/${retry_threshold}"
+      (( attempt++ ))
+    done
+
+    echo "[!] Falling back to substituters={{ APPLY_FALLBACK_SUBSTITUTERS }}"
+    sudo nixos-rebuild switch \
+      --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}" \
+      --flake .#"{{ HOSTNAME }}" \
+      --impure
 
 # Apply the Home Manager profile for the requested target.
 apply-home target:
     #!/usr/bin/env bash
     if command -v home-manager >/dev/null 2>&1; then
       hm_cmd=(home-manager)
+      hm_fallback_cmd=(home-manager switch --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}")
     else
       echo "[!] Bootstrapping Home Manager via flake"
       hm_cmd=(nix run home-manager/master --)
+      hm_fallback_cmd=(nix --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}" run home-manager/master -- switch --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}")
     fi
 
     case "{{ OS_TYPE }}" in
@@ -212,7 +231,19 @@ apply-home target:
 
     echo "[!] Applying Home Manager target: ${flake_target}"
     echo "Running: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
-    "${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back
+    retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"
+    attempt=1
+    while (( attempt <= retry_threshold )); do
+      echo "[→] Attempt ${attempt}/${retry_threshold}: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
+      if "${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back; then
+        exit 0
+      fi
+      echo "[!] Home Manager apply failed on attempt ${attempt}/${retry_threshold}"
+      (( attempt++ ))
+    done
+
+    echo "[!] Falling back to substituters={{ APPLY_FALLBACK_SUBSTITUTERS }}"
+    "${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back
 
 # Sync local desktop integrations after configuration changes are applied.
 sync-local-integrations:
