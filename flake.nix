@@ -11,8 +11,11 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Pin neovim 0.11.6 — last nixpkgs commit before 0.12 bump.
-    # 0.12.x breaks treesitter plugins; this input provides neovim-unwrapped only.
+    # NOTE:
+    # neovim-unwrapped는 editor overlay에서 직접 치환되는 runtime core다.
+    # nixos-unstable을 그대로 따라가면 plugin ABI, treesitter parser, LSP
+    # 동작이 한 번에 움직인다. 이 SHA는 의도적인 release valve이므로 bump는
+    # editor smoke test와 함께 URL을 바꾸는 작업으로 취급한다.
     nixpkgs-neovim.url = "github:nixos/nixpkgs/d86da6ff1a3db2d1e667684c6f34c21896767b3e";
   };
 
@@ -28,30 +31,19 @@
     homeActivationCheckSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-darwin"];
     forAllSystems = lib.genAttrs supportedSystems;
 
-    # Auto-collect overlays from modules (*.overlay.nix convention)
+    # NOTE:
+    # flake.nix는 repo 전체의 조립 루트다. discovery 규칙이나
+    # compatibility entry 생성 규칙을 여기서 직접 펼치면 flake가 곧
+    # 정책 저장소가 되어 다시 비대해진다. 복잡한 변환은 lib/에 두고,
+    # 이 파일은 입력을 연결하는 조합 계층으로만 유지한다.
     overlays =
-      (import ./lib/collect-overlays.nix {inherit lib;}) ./modules
-      ++ [
-        llm-agents.overlays.default
-        # Pin neovim-unwrapped from older nixpkgs (0.11.6)
-        (_final: _prev: {
-          neovim-unwrapped = nixpkgs-neovim.legacyPackages.${_prev.stdenv.hostPlatform.system}.neovim-unwrapped;
-        })
-      ];
+      (import ./lib/collect-flake-overlays.nix {
+        inherit lib llm-agents nixpkgs-neovim;
+      })
+      ./modules;
 
-    # Auto-discover user profiles (one attr per user/<name>.nix)
-    userProfiles = lib.pipe (builtins.readDir ./user) [
-      (lib.filterAttrs (_: type: type == "regular"))
-      builtins.attrNames
-      (builtins.filter (lib.hasSuffix ".nix"))
-      (map (name: {
-        name = lib.removeSuffix ".nix" name;
-        value = import (./user + "/${name}");
-      }))
-      builtins.listToAttrs
-    ];
+    userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./user;
 
-    # Builders
     builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
       homeManagerModules = [./home.nix];
@@ -71,73 +63,21 @@
         modules = [./configuration.nix];
       });
 
-    homeConfigurations = let
-      mkHomeEntries = profileName: userProfile: system: [
-        {
-          name = "hm-${profileName}-${system}";
-          value = builders.mkHomeConfig {
-            inherit system userProfile;
-          };
-        }
-        {
-          name = "hm-${profileName}-wsl-${system}";
-          value = builders.mkHomeConfig {
-            inherit system userProfile;
-            isWsl = true;
-          };
-        }
-        {
-          name = "hm-${profileName}-nixos-${system}";
-          value = builders.mkHomeConfig {
-            inherit system userProfile;
-            isNixOs = true;
-          };
-        }
-      ];
-
-      userHomeEntries = lib.flatten (
-        lib.mapAttrsToList (
-          profileName: userProfile:
-            lib.flatten (map (mkHomeEntries profileName userProfile) supportedSystems)
-        )
-        userProfiles
-      );
-
-      legacyLimjihoonEntries = lib.flatten (
-        map (system: [
-          {
-            name = "hm-${system}";
-            value = builders.mkHomeConfig {
-              inherit system;
-              userProfile = userProfiles.limjihoon;
-            };
-          }
-          {
-            name = "hm-wsl-${system}";
-            value = builders.mkHomeConfig {
-              inherit system;
-              userProfile = userProfiles.limjihoon;
-              isWsl = true;
-            };
-          }
-          {
-            name = "hm-nixos-${system}";
-            value = builders.mkHomeConfig {
-              inherit system;
-              userProfile = userProfiles.limjihoon;
-              isNixOs = true;
-            };
-          }
-        ])
-        supportedSystems
-      );
-    in
-      lib.listToAttrs (legacyLimjihoonEntries ++ userHomeEntries);
+    homeConfigurations = (import ./lib/mk-home-entries.nix {inherit lib;}) {
+      inherit supportedSystems userProfiles;
+      defaultProfile = "limjihoon";
+      inherit (builders) mkHomeConfig;
+    };
 
     packages = forAllSystems mkImages;
 
     checks = forAllSystems (system: let
-      pkgs = (builders.mkSystem system).pkgs;
+      inherit (builders.mkSystem system) pkgs;
+      # WARNING:
+      # guard/home activation check는 기존 hm-${system} alias를 의도적으로
+      # 사용한다. named profile entry를 추가하더라도 mk-home-entries가 이
+      # 호환 alias를 유지하지 않으면, Home Manager config 자체는 맞아도
+      # 기존 CI와 사용자 명령이 깨진다.
       homeConfig = homeConfigurations."hm-${system}";
       collectChecks = (import ./lib/collect-checks.nix {inherit lib;}) ./tests;
       tests = collectTests {inherit lib;};
