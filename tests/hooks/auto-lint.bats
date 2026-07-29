@@ -6,7 +6,7 @@ setup() {
   export TMPDIR="$WORK/tmp"
   mkdir -p "$TMPDIR"
   export LANG_TOOLS_JSON="$BATS_TEST_DIRNAME/fixtures/lang-tools.json"
-  HOOK="$BATS_TEST_DIRNAME/../../dotfiles/claude/hooks/auto-lint.sh"
+  HOOK="$BATS_TEST_DIRNAME/../../modules/agents/providers/claude/hooks/auto-lint.sh"
 }
 
 teardown() { rm -rf "$WORK"; }

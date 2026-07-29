@@ -8,7 +8,7 @@
     builtins.attrValues (
       builtins.mapAttrs (path: file: {
         inherit path;
-        source = file.source;
+        inherit (file) source;
       })
       homeConfig.config.home.file
     )
@@ -38,7 +38,15 @@ in {
 
     [projects.demo]
     trusted = true
+
+    [hooks.state."/tmp/stale:post_tool_use:0:1"]
+    trusted_hash = "sha256:stale"
     TOML
+    {
+      echo
+      echo "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]"
+      echo 'trusted_hash = "sha256:valid"'
+    } >> "$HOME/.codex/config.toml"
 
     ${codexSyncScript}
 
@@ -49,6 +57,13 @@ in {
     grep -F 'status_line_use_colors = true' "$HOME/.codex/config.toml"
     grep -F '[projects.demo]' "$HOME/.codex/config.toml"
     grep -F 'trusted = true' "$HOME/.codex/config.toml"
+    grep -F "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]" "$HOME/.codex/config.toml"
+    grep -F 'sha256:valid' "$HOME/.codex/config.toml"
+    grep -F '/tmp/stale:post_tool_use:0:1' "$HOME/.codex/config.toml"
+    grep -F 'reasoning-trace-codex.sh' "$HOME/.codex/config.toml"
+    grep -F 'path-guard-codex.sh' "$HOME/.codex/config.toml"
+    ! grep -F 'agentops-workflow-gate-pre-codex.sh' "$HOME/.codex/config.toml"
+    ! grep -F 'agentops-workflow-gate-post-codex.sh' "$HOME/.codex/config.toml"
     ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
     test ${toString (builtins.length codexAgentFiles)} -ge 7
     ${agentFileChecks}

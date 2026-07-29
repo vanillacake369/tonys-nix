@@ -24,7 +24,7 @@
 
 set -uo pipefail
 
-ORACLE="$(cd "$(dirname "$0")/../.." && pwd)/dotfiles/claude/hooks/semantic-oracle.sh"
+ORACLE="$(cd "$(dirname "$0")/../.." && pwd)/modules/agents/providers/claude/hooks/semantic-oracle.sh"
 if [[ ! -f "$ORACLE" ]]; then
   echo "[ab-oracle] ERROR: oracle not found at $ORACLE" >&2
   exit 1

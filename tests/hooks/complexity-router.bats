@@ -7,7 +7,7 @@ setup() {
   mkdir -p "$TMPDIR"
   export COMPLEXITY_DIR="$WORK/complexity"
   mkdir -p "$COMPLEXITY_DIR"
-  HOOK="$BATS_TEST_DIRNAME/../../dotfiles/claude/hooks/complexity-router.sh"
+  HOOK="$BATS_TEST_DIRNAME/../../modules/agents/providers/claude/hooks/complexity-router.sh"
 }
 
 teardown() { rm -rf "$WORK"; }

@@ -12,7 +12,7 @@ setup() {
   export TELEMETRY_FILE="$WORK/telemetry.jsonl"
   mkdir -p "$COMPLEXITY_DIR"
   echo "L" > "$COMPLEXITY_DIR/s1" # default session = L complexity
-  HOOK="$BATS_TEST_DIRNAME/../../dotfiles/claude/hooks/semantic-oracle.sh"
+  HOOK="$BATS_TEST_DIRNAME/../../modules/agents/providers/claude/hooks/semantic-oracle.sh"
   for ext in ok bad nd miss; do echo "code" > "$WORK/a.$ext"; done
 }
 
