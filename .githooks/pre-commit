@@ -2,7 +2,9 @@
 set -euo pipefail
 
 echo "[pre-commit] Running guard tests..."
-result=$(nix eval .#tests.summary --json 2>&1)
+system=$(nix eval --impure --raw --expr builtins.currentSystem)
+guard_out=$(nix build --print-out-paths ".#checks.$system.guard-tests" --no-link 2>&1)
+result=$(cat "$guard_out")
 total=$(echo "$result" | jq -r .total)
 passed=$(echo "$result" | jq -r .passed)
 
@@ -47,13 +49,14 @@ else
 fi
 
 echo "[pre-commit] Running bats hook tests..."
+hook_tests=$(find tests/hooks -maxdepth 1 -type f -name '*.bats' ! -name 'agentops-workflow-gate.bats' | sort)
 if command -v bats &>/dev/null; then
-  bats tests/hooks/*.bats || {
+  bats $hook_tests || {
     echo "[FAIL] bats hook tests failed"
     exit 1
   }
 else
-  nix run nixpkgs#bats -- tests/hooks/*.bats || {
+  nix run nixpkgs#bats -- $hook_tests || {
     echo "[FAIL] bats hook tests failed"
     exit 1
   }

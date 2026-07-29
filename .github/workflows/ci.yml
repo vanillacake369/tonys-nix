@@ -31,7 +31,8 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - name: Guard tests
         run: |
-          result=$(nix eval .#tests.summary --json)
+          out=$(nix build --print-out-paths .#checks.x86_64-linux.guard-tests --no-link)
+          result=$(cat "$out")
           echo "$result"
           total=$(echo "$result" | jq .total)
           passed=$(echo "$result" | jq .passed)
