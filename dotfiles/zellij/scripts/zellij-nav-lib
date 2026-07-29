@@ -1,0 +1,919 @@
+#!/usr/bin/env bash
+# Shared Zellij navigation primitives.
+#
+# Responsibilities:
+# - keep one navigation state file: previous-target.json
+# - parse active Zellij sessions without ANSI formatting
+# - capture the best current target available from public Zellij CLI state
+# - validate stored targets before use
+# - perform graceful Pane -> Tab -> Session restoration
+#
+# State contract:
+# - previous-target.json is the only source of truth
+# - it stores the context to return to, never the current context
+# - picker navigation commits the current target only after the selected target
+#   has actually been focused
+# - toggle navigation switches to previous-target and replaces it with the
+#   context it just left only after the switch succeeds
+# - session-manager is an external navigation boundary: we can only record a
+#   best-effort return target before opening it, because the final switch happens
+#   inside the built-in plugin
+#
+# Failure handling:
+# - invalid stored targets are removed immediately
+# - missing sessions are removed from previous-target; stale tab/pane targets
+#   degrade when that causes a real move and otherwise preserve existing history
+# - actions degrade from pane to tab to session when possible
+# - failed picker navigation never overwrites existing previous-target history
+# - focus helpers use consistent result codes:
+#     0 = moved/restored and history committed when a commit is required
+#     1 = failed before movement
+#     2 = target session missing
+#     3 = no-op/already current
+#     4 = moved/restored but history commit failed
+# - important decisions are logged to zellij-navigation.log
+
+NAV_RESULT_MOVED=0
+NAV_RESULT_FAILED=1
+NAV_RESULT_SESSION_MISSING=2
+NAV_RESULT_NOOP=3
+NAV_RESULT_COMMIT_FAILED=4
+
+ZELLIJ_NAV_STATE_DIR="${ZELLIJ_NAV_STATE_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/zellij-workspace}"
+ZELLIJ_NAV_PREVIOUS_TARGET_FILE="$ZELLIJ_NAV_STATE_DIR/previous-target.json"
+ZELLIJ_NAV_LOG_FILE="$ZELLIJ_NAV_STATE_DIR/zellij-navigation.log"
+ZELLIJ_NAV_LOCK_DIR="$ZELLIJ_NAV_STATE_DIR/.navigation.lock"
+ZELLIJ_NAV_LOCK_HELD=0
+
+nav_log() {
+  local message
+  message="$*"
+  mkdir -p "$ZELLIJ_NAV_STATE_DIR"
+  printf '%s %s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')" "$message" >> "$ZELLIJ_NAV_LOG_FILE"
+}
+
+nav_init() {
+  local obsolete obsolete_path
+  mkdir -p "$ZELLIJ_NAV_STATE_DIR"
+
+  for obsolete in \
+    previous-context.json \
+    current-context.json \
+    previous-session \
+    current-session
+  do
+    obsolete_path="$ZELLIJ_NAV_STATE_DIR/$obsolete"
+    if [ -e "$obsolete_path" ]; then
+      rm -f "$obsolete_path"
+      nav_log "removed obsolete state file=$obsolete"
+    fi
+  done
+}
+
+nav_lock_acquire() {
+  local now created_at age
+  mkdir -p "$ZELLIJ_NAV_STATE_DIR"
+
+  if mkdir "$ZELLIJ_NAV_LOCK_DIR" 2>/dev/null; then
+    ZELLIJ_NAV_LOCK_HELD=1
+    date '+%s' > "$ZELLIJ_NAV_LOCK_DIR/created_at" 2>/dev/null || true
+    return 0
+  fi
+
+  now="$(date '+%s')"
+  created_at="$(cat "$ZELLIJ_NAV_LOCK_DIR/created_at" 2>/dev/null || true)"
+  if [ -n "$created_at" ] && [ "$created_at" -eq "$created_at" ] 2>/dev/null; then
+    age=$((now - created_at))
+    if [ "$age" -gt 300 ]; then
+      rm -rf "$ZELLIJ_NAV_LOCK_DIR"
+      if mkdir "$ZELLIJ_NAV_LOCK_DIR" 2>/dev/null; then
+        ZELLIJ_NAV_LOCK_HELD=1
+        date '+%s' > "$ZELLIJ_NAV_LOCK_DIR/created_at" 2>/dev/null || true
+        nav_log "removed stale navigation lock age_seconds=$age"
+        return 0
+      fi
+    fi
+  fi
+
+  nav_log "lock acquisition failure"
+  return 1
+}
+
+nav_lock_release() {
+  if [ "${ZELLIJ_NAV_LOCK_HELD:-0}" = "1" ]; then
+    rm -f "$ZELLIJ_NAV_LOCK_DIR/created_at" 2>/dev/null || true
+    rmdir "$ZELLIJ_NAV_LOCK_DIR" 2>/dev/null || true
+    ZELLIJ_NAV_LOCK_HELD=0
+  fi
+}
+
+nav_current_session() {
+  local current
+  current="$(
+    zellij list-sessions --no-formatting 2>/dev/null |
+      awk '/\(current\)/ { print $1; exit }'
+  )"
+
+  if [ -n "$current" ]; then
+    printf '%s\n' "$current"
+  else
+    printf '%s\n' "${ZELLIJ_SESSION_NAME:-}"
+  fi
+}
+
+nav_active_sessions() {
+  zellij list-sessions --no-formatting 2>/dev/null |
+    awk '!/EXITED/ && NF { print $1 }'
+}
+
+nav_session_exists() {
+  local session
+  session="$1"
+  [ -n "$session" ] || return 1
+  nav_active_sessions | awk -v session="$session" '$1 == session { found = 1 } END { exit found ? 0 : 1 }'
+}
+
+nav_session_panes_json() {
+  local session panes
+  session="$1"
+  [ -n "$session" ] || {
+    printf '[]\n'
+    return 1
+  }
+
+  panes="$(
+    zellij --session "$session" action list-panes --json --all --tab --state --command 2>/dev/null ||
+      true
+  )"
+
+  if printf '%s' "$panes" | jq -e 'type == "array"' >/dev/null 2>&1; then
+    printf '%s\n' "$panes"
+    return 0
+  fi
+
+  printf '[]\n'
+  return 1
+}
+
+nav_make_target() {
+  local kind session tab_id pane_id label
+  kind="$1"
+  session="$2"
+  tab_id="${3:-}"
+  pane_id="${4:-}"
+  label="${5:-}"
+
+  jq -cn \
+    --arg kind "$kind" \
+    --arg session "$session" \
+    --arg tab_id "$tab_id" \
+    --arg pane_id "$pane_id" \
+    --arg label "$label" '
+      {
+        kind: $kind,
+        session: $session,
+        tab_id: (if $tab_id == "" or $tab_id == "-" then null else ($tab_id | tonumber) end),
+        pane_id: (if $pane_id == "" or $pane_id == "-" then null else ($pane_id | tonumber) end),
+        label: $label
+      }'
+}
+
+nav_current_target() {
+  local session panes focused tab_id pane_id label
+  session="$(nav_current_session)"
+  [ -n "$session" ] || return 1
+
+  panes="$(nav_session_panes_json "$session" || true)"
+  focused="$(
+    printf '%s' "$panes" |
+      jq -c --arg self_pane "${ZELLIJ_PANE_ID:-}" '
+        .[]
+        | select(.is_focused == true)
+        | select((.id | tostring) != $self_pane)
+        | select(.is_plugin == false)
+        | select(.is_selectable == true)
+        | select(.exited == false)
+        | {
+            tab_id,
+            pane_id: .id,
+            label: (((.tab_name // "Tab") + " / " + ((.title // .pane_command // .terminal_command // .pane_cwd // "pane") | tostring)))
+          }' |
+      head -n 1
+  )"
+
+  if [ -n "$focused" ]; then
+    tab_id="$(printf '%s' "$focused" | jq -r '.tab_id')"
+    pane_id="$(printf '%s' "$focused" | jq -r '.pane_id')"
+    label="$(printf '%s' "$focused" | jq -r '.label')"
+    nav_make_target "pane" "$session" "$tab_id" "$pane_id" "$label"
+    return 0
+  fi
+
+  nav_log "current-target degraded level=session reason=no-focused-terminal session=$session self_pane=${ZELLIJ_PANE_ID:-unknown}"
+  nav_make_target "session" "$session" "" "" "$session"
+}
+
+nav_focus_underlying_pane_for_capture() {
+  local session self_pane panes attempt
+
+  self_pane="${ZELLIJ_PANE_ID:-}"
+  [ -n "$self_pane" ] || return 0
+
+  session="$(nav_current_session)"
+  [ -n "$session" ] || return 1
+
+  panes="$(nav_session_panes_json "$session" || true)"
+
+  if printf '%s' "$panes" |
+    jq -e --arg self_pane "$self_pane" '
+      any(
+        .[];
+        .is_focused == true
+        and (.id | tostring) != $self_pane
+        and .is_plugin == false
+        and .is_selectable == true
+        and .exited == false
+      )
+    ' >/dev/null 2>&1
+  then
+    return 0
+  fi
+
+  if ! printf '%s' "$panes" |
+    jq -e --arg self_pane "$self_pane" '
+      any(
+        .[];
+        (.id | tostring) == $self_pane
+        and .is_focused == true
+      )
+    ' >/dev/null 2>&1
+  then
+    nav_log "underlying capture unavailable reason=helper-not-focused self_pane=$self_pane"
+    return 1
+  fi
+
+  if ! zellij action focus-previous-pane 2>/dev/null; then
+    nav_log "underlying capture failed action=focus-previous-pane self_pane=$self_pane"
+    return 1
+  fi
+
+  attempt=0
+  while [ "$attempt" -lt 5 ]; do
+    panes="$(nav_session_panes_json "$session" || true)"
+
+    if printf '%s' "$panes" |
+      jq -e --arg self_pane "$self_pane" '
+        any(
+          .[];
+          .is_focused == true
+          and (.id | tostring) != $self_pane
+          and .is_plugin == false
+          and .is_selectable == true
+          and .exited == false
+        )
+      ' >/dev/null 2>&1
+    then
+      nav_log "underlying pane focused for capture self_pane=$self_pane"
+      return 0
+    fi
+
+    attempt=$((attempt + 1))
+    sleep 0.05
+  done
+
+  nav_log "underlying capture failed reason=no-focused-terminal self_pane=$self_pane"
+  return 1
+}
+
+nav_read_previous_target() {
+  local target reason
+  [ -s "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE" ] || return 1
+
+  target="$(cat "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE" 2>/dev/null || true)"
+  if nav_target_is_valid_json "$target"; then
+    printf '%s\n' "$target"
+    return 0
+  fi
+
+  rm -f "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE"
+  reason="$(nav_target_validation_reason "$target")"
+  nav_log "malformed state removed reason=$reason"
+  return 1
+}
+
+nav_write_previous_target() {
+  local target tmp
+  target="$1"
+
+  nav_target_is_valid_json "$target" || {
+    nav_log "refused to write invalid previous-target reason=$(nav_target_validation_reason "$target")"
+    return 1
+  }
+
+  mkdir -p "$ZELLIJ_NAV_STATE_DIR"
+  tmp="$(mktemp "$ZELLIJ_NAV_STATE_DIR/.previous-target.XXXXXX")" || return 1
+  if ! printf '%s\n' "$target" > "$tmp"; then
+    rm -f "$tmp"
+    return 1
+  fi
+  if ! mv "$tmp" "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE"; then
+    rm -f "$tmp"
+    return 1
+  fi
+}
+
+nav_clear_previous_target() {
+  local reason
+  reason="$1"
+  if [ -e "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE" ]; then
+    rm -f "$ZELLIJ_NAV_PREVIOUS_TARGET_FILE"
+    nav_log "cleared previous-target reason=$reason"
+  fi
+}
+
+nav_normalize_terminal_pane_id() {
+  local pane_id
+  pane_id="$1"
+
+  case "$pane_id" in
+    "" | "-") return 1 ;;
+    terminal_* | plugin_*) printf '%s\n' "$pane_id" ;;
+    *) printf 'terminal_%s\n' "$pane_id" ;;
+  esac
+}
+
+nav_close_pane_by_id() {
+  local session pane_id normalized
+  session="$1"
+  pane_id="$2"
+
+  normalized="$(nav_normalize_terminal_pane_id "$pane_id" || true)"
+  [ -n "$normalized" ] || return 0
+
+  if [ -n "$session" ]; then
+    zellij --session "$session" action close-pane --pane-id "$normalized" >/dev/null 2>&1 && {
+      nav_log "closed helper pane session=$session pane=$normalized"
+      return 0
+    }
+  fi
+
+  zellij action close-pane --pane-id "$normalized" >/dev/null 2>&1 && {
+    nav_log "closed helper pane session=current pane=$normalized"
+    return 0
+  }
+
+  nav_log "helper pane close failed session=${session:-unknown} pane=$normalized"
+  return 1
+}
+
+nav_dispatcher_path() {
+  local lib_dir
+  if [ -n "${script_dir:-}" ] && [ -d "$script_dir" ]; then
+    lib_dir="$script_dir"
+  else
+    lib_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+  fi
+  printf '%s/zellij-nav-dispatch\n' "$lib_dir"
+}
+
+nav_defer_navigation_to_target() {
+  local target dispatcher delay
+  target="$1"
+  dispatcher="$(nav_dispatcher_path)"
+  delay="${ZELLIJ_NAV_DEFER_DELAY:-0.12}"
+
+  nav_target_is_valid_json "$target" || {
+    nav_log "deferred navigation refused reason=invalid-target target_reason=$(nav_target_validation_reason "$target")"
+    return 1
+  }
+  [ -x "$dispatcher" ] || {
+    nav_log "deferred navigation refused reason=dispatcher-missing path=$dispatcher"
+    return 1
+  }
+
+  ZELLIJ_NAV_DEFERRED_TARGET="$target" ZELLIJ_NAV_DEFER_DELAY="$delay" \
+    nohup "$dispatcher" navigate >/dev/null 2>&1 &
+  nav_log "deferred navigation scheduled target=$(nav_target_summary "$target") delay=$delay"
+}
+
+nav_defer_context_toggle() {
+  local dispatcher delay
+  dispatcher="$(nav_dispatcher_path)"
+  delay="${ZELLIJ_NAV_DEFER_DELAY:-0.12}"
+
+  [ -x "$dispatcher" ] || {
+    nav_log "deferred toggle refused reason=dispatcher-missing path=$dispatcher"
+    return 1
+  }
+
+  ZELLIJ_NAV_DEFER_DELAY="$delay" nohup "$dispatcher" toggle >/dev/null 2>&1 &
+  nav_log "deferred toggle scheduled delay=$delay"
+}
+
+nav_target_field() {
+  local target field
+  target="$1"
+  field="$2"
+  printf '%s' "$target" | jq -r --arg field "$field" '.[$field] // ""'
+}
+
+nav_current_location() {
+  local session panes focused tab_id pane_id
+  session="$(nav_current_session)"
+  [ -n "$session" ] || return 1
+
+  panes="$(nav_session_panes_json "$session" || true)"
+  focused="$(
+    printf '%s' "$panes" |
+      jq -c --arg self_pane "${ZELLIJ_PANE_ID:-}" '
+        .[]
+        | select(.is_focused == true)
+        | select((.id | tostring) != $self_pane)
+        | select(.is_plugin == false)
+        | select(.is_selectable == true)
+        | select(.exited == false)
+        | {tab_id, pane_id: .id}
+      ' |
+      head -n 1
+  )"
+
+  if [ -n "$focused" ]; then
+    tab_id="$(printf '%s' "$focused" | jq -r '.tab_id')"
+    pane_id="$(printf '%s' "$focused" | jq -r '.pane_id')"
+    jq -cn \
+      --arg session "$session" \
+      --argjson tab_id "$tab_id" \
+      --argjson pane_id "$pane_id" \
+      '{session: $session, tab_id: $tab_id, pane_id: $pane_id}'
+    return 0
+  fi
+
+  jq -cn --arg session "$session" '{session: $session, tab_id: null, pane_id: null}'
+}
+
+nav_location_matches_target_level() {
+  local location target level
+  location="$1"
+  target="$2"
+  level="$3"
+
+  printf '%s\n%s\n' "$location" "$target" |
+    jq -s -e --arg level "$level" '
+      .[0] as $location
+      | .[1] as $target
+      | if $level == "session" then
+          $location.session == $target.session
+        elif $level == "tab" then
+          $location.session == $target.session
+          and $location.tab_id == $target.tab_id
+        elif $level == "pane" then
+          $location.session == $target.session
+          and $location.tab_id == $target.tab_id
+          and $location.pane_id == $target.pane_id
+        else
+          false
+        end
+    ' >/dev/null 2>&1
+}
+
+nav_locations_equal() {
+  local left right
+  left="$1"
+  right="$2"
+  printf '%s\n%s\n' "$left" "$right" |
+    jq -s -e '
+      .[0].session == .[1].session
+      and .[0].tab_id == .[1].tab_id
+      and .[0].pane_id == .[1].pane_id
+    ' >/dev/null 2>&1
+}
+
+nav_location_changed_from() {
+  local origin current
+  origin="$1"
+  current="$(nav_current_location || true)"
+  [ -n "$current" ] || return 1
+  ! nav_locations_equal "$origin" "$current"
+}
+
+nav_target_is_current() {
+  local target kind location
+  target="$1"
+  kind="$(nav_target_field "$target" kind)"
+  location="$(nav_current_location || true)"
+  [ -n "$location" ] || return 1
+  nav_location_matches_target_level "$location" "$target" "$kind"
+}
+
+nav_confirm_focus() {
+  local target level attempt location
+  target="$1"
+  level="$2"
+
+  attempt=0
+  while [ "$attempt" -lt 5 ]; do
+    location="$(nav_current_location || true)"
+    if [ -n "$location" ] && nav_location_matches_target_level "$location" "$target" "$level"; then
+      return 0
+    fi
+    attempt=$((attempt + 1))
+    sleep 0.05
+  done
+
+  return 1
+}
+
+nav_target_is_valid_json() {
+  local target
+  target="$1"
+  printf '%s' "$target" | jq -e '
+    def non_negative_integer: type == "number" and . >= 0 and . == floor;
+    type == "object"
+    and (.kind | type == "string")
+    and (.session | type == "string" and length > 0)
+    and (
+      (.kind == "session"
+        and ((has("tab_id") | not) or .tab_id == null)
+        and ((has("pane_id") | not) or .pane_id == null))
+      or
+      (.kind == "tab"
+        and (.tab_id | non_negative_integer)
+        and ((has("pane_id") | not) or .pane_id == null))
+      or
+      (.kind == "pane"
+        and (.tab_id | non_negative_integer)
+        and (.pane_id | non_negative_integer))
+    )
+  ' >/dev/null 2>&1
+}
+
+nav_target_validation_reason() {
+  local target
+  target="$1"
+  printf '%s' "$target" | jq -r '
+    def non_negative_integer: type == "number" and . >= 0 and . == floor;
+    if type != "object" then "not-object"
+    elif (.kind | type) != "string" then "missing-kind"
+    elif (.kind | IN("session", "tab", "pane") | not) then "unsupported-kind"
+    elif (.session | type) != "string" or (.session | length) == 0 then "missing-session"
+    elif .kind == "session" and (has("tab_id") and .tab_id != null) then "session-has-tab-id"
+    elif .kind == "session" and (has("pane_id") and .pane_id != null) then "session-has-pane-id"
+    elif .kind == "tab" and ((has("tab_id") | not) or (.tab_id | non_negative_integer | not)) then "invalid-tab-id"
+    elif .kind == "tab" and (has("pane_id") and .pane_id != null) then "tab-has-pane-id"
+    elif .kind == "pane" and ((has("tab_id") | not) or (.tab_id | non_negative_integer | not)) then "invalid-tab-id"
+    elif .kind == "pane" and ((has("pane_id") | not) or (.pane_id | non_negative_integer | not)) then "invalid-pane-id"
+    else "unknown"
+    end
+  ' 2>/dev/null || printf 'malformed-json'
+}
+
+nav_tab_target_exists() {
+  local session tab_id panes
+  session="$1"
+  tab_id="$2"
+  [ -n "$session" ] && [ -n "$tab_id" ] || return 1
+
+  panes="$(nav_session_panes_json "$session" || true)"
+  printf '%s' "$panes" |
+    jq -e --argjson tab_id "$tab_id" '
+      any(
+        .[];
+        .tab_id == $tab_id
+        and .is_selectable == true
+        and .exited == false
+      )
+    ' >/dev/null 2>&1
+}
+
+nav_pane_target_exists() {
+  local session tab_id pane_id panes
+  session="$1"
+  tab_id="$2"
+  pane_id="$3"
+  [ -n "$session" ] && [ -n "$tab_id" ] && [ -n "$pane_id" ] || return 1
+
+  panes="$(nav_session_panes_json "$session" || true)"
+  printf '%s' "$panes" |
+    jq -e --argjson tab_id "$tab_id" --argjson pane_id "$pane_id" '
+      any(
+        .[];
+        .id == $pane_id
+        and .tab_id == $tab_id
+        and .is_plugin == false
+        and .is_selectable == true
+        and .exited == false
+      )
+    ' >/dev/null 2>&1
+}
+
+nav_focus_session_target() {
+  local target session current_session
+  target="$1"
+  session="$(nav_target_field "$target" session)"
+  current_session="$(nav_current_session)"
+
+  if ! nav_session_exists "$session"; then
+    nav_log "session missing session=$session"
+    return "$NAV_RESULT_SESSION_MISSING"
+  fi
+
+  if [ "$session" = "$current_session" ]; then
+    return "$NAV_RESULT_NOOP"
+  fi
+
+  if zellij action switch-session "$session" 2>/dev/null; then
+    nav_log "session switch accepted session=$session confirmation=skipped reason=helper-session-observability"
+    return "$NAV_RESULT_MOVED"
+  fi
+
+  if ! nav_session_exists "$session"; then
+    nav_log "session missing session=$session"
+    return "$NAV_RESULT_SESSION_MISSING"
+  fi
+
+  nav_log "session restore failed action=switch-session session=$session"
+  return "$NAV_RESULT_FAILED"
+}
+
+nav_focus_tab_target() {
+  local target session tab_id current_session session_status
+  target="$1"
+  session="$(nav_target_field "$target" session)"
+  tab_id="$(nav_target_field "$target" tab_id)"
+  current_session="$(nav_current_session)"
+
+  if [ -z "$tab_id" ]; then
+    nav_log "tab restore failed reason=missing-tab-id session=$session"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if [ "$session" != "$current_session" ]; then
+    nav_session_exists "$session" || {
+      nav_log "session missing session=$session"
+      return "$NAV_RESULT_SESSION_MISSING"
+    }
+    nav_tab_target_exists "$session" "$tab_id" || {
+      nav_log "tab restore failed reason=missing-tab-id session=$session tab=$tab_id"
+      return "$NAV_RESULT_FAILED"
+    }
+    if zellij --session "$session" action go-to-tab-by-id "$tab_id" 2>/dev/null &&
+      zellij action switch-session "$session" 2>/dev/null; then
+      nav_log "tab switch accepted session=$session tab=$tab_id confirmation=skipped reason=helper-session-observability"
+      return "$NAV_RESULT_MOVED"
+    fi
+    nav_log "tab restore failed action=switch-session session=$session tab=$tab_id"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if nav_confirm_focus "$target" "tab"; then
+    if [ "$session" = "$current_session" ]; then
+      return "$NAV_RESULT_NOOP"
+    fi
+    return "$NAV_RESULT_MOVED"
+  fi
+
+  if zellij --session "$session" action go-to-tab-by-id "$tab_id" 2>/dev/null &&
+    nav_confirm_focus "$target" "tab"; then
+    return "$NAV_RESULT_MOVED"
+  fi
+
+  nav_log "tab restore failed action=go-to-tab-by-id session=$session tab=$tab_id"
+  return "$NAV_RESULT_FAILED"
+}
+
+nav_focus_pane_target() {
+  local target session tab_id pane_id current_session
+  target="$1"
+  session="$(nav_target_field "$target" session)"
+  tab_id="$(nav_target_field "$target" tab_id)"
+  pane_id="$(nav_target_field "$target" pane_id)"
+  current_session="$(nav_current_session)"
+
+  if [ -z "$pane_id" ]; then
+    nav_log "pane restore failed reason=missing-pane-id session=$session tab=$tab_id"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if [ "$session" != "$current_session" ]; then
+    nav_pane_target_exists "$session" "$tab_id" "$pane_id" || {
+      nav_log "pane restore failed reason=missing-pane-id session=$session tab=$tab_id pane=$pane_id"
+      return "$NAV_RESULT_FAILED"
+    }
+    if zellij action switch-session "$session" --pane-id "terminal_$pane_id" 2>/dev/null; then
+      nav_log "pane switch accepted session=$session tab=$tab_id pane=$pane_id confirmation=skipped reason=helper-session-observability"
+      return "$NAV_RESULT_MOVED"
+    fi
+    if ! nav_session_exists "$session"; then
+      nav_log "session missing session=$session"
+      return "$NAV_RESULT_SESSION_MISSING"
+    fi
+    nav_log "pane restore failed action=switch-session session=$session tab=$tab_id pane=$pane_id"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if nav_confirm_focus "$target" "pane"; then
+    return "$NAV_RESULT_NOOP"
+  fi
+
+  if ! zellij --session "$session" action go-to-tab-by-id "$tab_id" 2>/dev/null; then
+    nav_log "pane restore failed action=go-to-tab-by-id session=$session tab=$tab_id pane=$pane_id"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if zellij --session "$session" action focus-pane-id "terminal_$pane_id" 2>/dev/null &&
+    nav_confirm_focus "$target" "pane"; then
+    return "$NAV_RESULT_MOVED"
+  fi
+
+  nav_log "pane restore failed action=focus-pane-id session=$session tab=$tab_id pane=$pane_id"
+  return "$NAV_RESULT_FAILED"
+}
+
+nav_focus_target() {
+  local target kind session tab_id pane_id pane_status tab_status session_status origin
+  target="$1"
+
+  nav_target_is_valid_json "$target" || {
+    nav_log "navigation transaction aborted reason=invalid-target target_reason=$(nav_target_validation_reason "$target")"
+    return "$NAV_RESULT_FAILED"
+  }
+
+  kind="$(nav_target_field "$target" kind)"
+  session="$(nav_target_field "$target" session)"
+  tab_id="$(nav_target_field "$target" tab_id)"
+  pane_id="$(nav_target_field "$target" pane_id)"
+
+  nav_session_exists "$session" || {
+    nav_log "session missing session=$session"
+    return "$NAV_RESULT_SESSION_MISSING"
+  }
+
+  origin="$(nav_current_location || true)"
+
+  if [ "$kind" = "pane" ]; then
+    pane_status=0
+    nav_focus_pane_target "$target" || pane_status=$?
+    if [ "$pane_status" -eq "$NAV_RESULT_MOVED" ]; then
+      nav_log "focused target level=pane session=$session tab=$tab_id pane=$pane_id"
+      return 0
+    fi
+    if [ "$pane_status" -eq "$NAV_RESULT_NOOP" ]; then
+      [ -n "$origin" ] && nav_location_changed_from "$origin" && return 0
+      return "$NAV_RESULT_NOOP"
+    fi
+    [ "$pane_status" -eq "$NAV_RESULT_SESSION_MISSING" ] && return "$NAV_RESULT_SESSION_MISSING"
+    nav_log "degraded pane -> tab session=$session tab=$tab_id pane=$pane_id"
+  fi
+
+  if [ "$kind" = "pane" ] || [ "$kind" = "tab" ]; then
+    tab_status=0
+    nav_focus_tab_target "$target" || tab_status=$?
+    if [ "$tab_status" -eq "$NAV_RESULT_MOVED" ]; then
+      nav_log "focused target level=tab session=$session tab=$tab_id"
+      return 0
+    fi
+    if [ "$tab_status" -eq "$NAV_RESULT_NOOP" ]; then
+      [ -n "$origin" ] && nav_location_changed_from "$origin" && {
+        nav_log "focused target level=tab session=$session tab=$tab_id"
+        return 0
+      }
+      return "$NAV_RESULT_NOOP"
+    fi
+    [ "$tab_status" -eq "$NAV_RESULT_SESSION_MISSING" ] && return "$NAV_RESULT_SESSION_MISSING"
+    nav_log "degraded tab -> session session=$session tab=$tab_id"
+  fi
+
+  session_status=0
+  nav_focus_session_target "$target" || session_status=$?
+  if [ "$session_status" -eq "$NAV_RESULT_MOVED" ]; then
+    nav_log "focused target level=session session=$session"
+    return 0
+  fi
+  if [ "$session_status" -eq "$NAV_RESULT_NOOP" ]; then
+    [ -n "$origin" ] && nav_location_changed_from "$origin" && {
+      nav_log "focused target level=session session=$session"
+      return 0
+    }
+    return "$NAV_RESULT_NOOP"
+  fi
+  [ "$session_status" -eq "$NAV_RESULT_SESSION_MISSING" ] && return "$NAV_RESULT_SESSION_MISSING"
+
+  nav_log "navigation transaction aborted reason=focus-failed target=$(printf '%s' "$target" | jq -c '{kind, session, tab_id, pane_id}')"
+  return "$NAV_RESULT_FAILED"
+}
+
+nav_target_summary() {
+  local target
+  target="$1"
+  printf '%s' "$target" | jq -c '{kind, session, tab_id, pane_id}' 2>/dev/null || printf '{"kind":"invalid"}'
+}
+
+nav_navigate_to_target() (
+  local target current status
+  target="$1"
+
+  nav_lock_acquire || return 1
+  trap 'nav_lock_release' EXIT
+
+  current="$(nav_current_target || true)"
+  if [ -z "$current" ]; then
+    nav_log "navigation transaction aborted reason=current-target-unavailable"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if ! nav_target_is_valid_json "$target"; then
+    nav_log "navigation transaction aborted reason=invalid-target target_reason=$(nav_target_validation_reason "$target")"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  if nav_target_is_current "$target"; then
+    nav_log "navigation transaction aborted reason=target-equals-current target=$(nav_target_summary "$target")"
+    return "$NAV_RESULT_NOOP"
+  fi
+
+  status=0
+  nav_focus_target "$target" || status=$?
+  if [ "$status" -eq "$NAV_RESULT_NOOP" ]; then
+    nav_log "navigation transaction aborted reason=no-op target=$(nav_target_summary "$target")"
+    return "$NAV_RESULT_NOOP"
+  fi
+  if [ "$status" -ne "$NAV_RESULT_MOVED" ]; then
+    nav_log "navigation transaction aborted reason=focus-failed status=$status target=$(nav_target_summary "$target")"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  nav_write_previous_target "$current" || {
+    nav_log "navigation transaction partial reason=commit-failed movement=completed target=$(nav_target_summary "$target") return_target_not_committed=$(nav_target_summary "$current") previous_history_preserved=true"
+    return "$NAV_RESULT_COMMIT_FAILED"
+  }
+  nav_log "navigation transaction committed previous=$(nav_target_summary "$current") target=$(nav_target_summary "$target")"
+)
+
+nav_record_current_for_external_navigation() (
+  local reason current
+  reason="$1"
+  nav_lock_acquire || return 0
+  trap 'nav_lock_release' EXIT
+
+  current="$(nav_current_target || true)"
+
+  [ -n "$current" ] || {
+    nav_log "could not capture current target before external navigation reason=$reason"
+    return 0
+  }
+
+  if nav_write_previous_target "$current"; then
+    nav_log "session-manager best-effort state capture reason=$reason target=$(nav_target_summary "$current")"
+  else
+    nav_log "session-manager best-effort state capture failed reason=$reason target=$(nav_target_summary "$current") previous_history_preserved=true"
+  fi
+)
+
+nav_toggle_previous_target() (
+  local target current status
+  nav_lock_acquire || return 0
+  trap 'nav_lock_release' EXIT
+
+  target="$(nav_read_previous_target || true)"
+  if [ -z "$target" ]; then
+    nav_log "toggle no-op reason=no-previous-target"
+    return 0
+  fi
+
+  current="$(nav_current_target || true)"
+  if [ -z "$current" ]; then
+    nav_log "toggle no-op reason=current-target-unavailable"
+    return 0
+  fi
+
+  if nav_target_is_current "$target"; then
+    nav_clear_previous_target "target-equals-current"
+    nav_log "toggle no-op reason=target-equals-current"
+    return 0
+  fi
+
+  status=0
+  nav_focus_target "$target" || status=$?
+  if [ "$status" -eq "$NAV_RESULT_MOVED" ]; then
+    nav_write_previous_target "$current" || {
+      nav_log "toggle partial reason=commit-failed movement=completed return_target_not_committed=$(nav_target_summary "$current") previous_history_preserved=true"
+      return "$NAV_RESULT_COMMIT_FAILED"
+    }
+    nav_log "toggle swapped previous-target"
+    return 0
+  fi
+
+  if [ "$status" -eq "$NAV_RESULT_SESSION_MISSING" ]; then
+    nav_clear_previous_target "session-missing"
+    nav_log "toggle no-op reason=session-missing target=$(nav_target_summary "$target")"
+    return 0
+  fi
+
+  if [ "$status" -eq "$NAV_RESULT_NOOP" ]; then
+    nav_log "toggle no-op reason=no-movement target=$(nav_target_summary "$target")"
+    return "$NAV_RESULT_FAILED"
+  fi
+
+  nav_log "toggle no-op reason=focus-failed target=$(nav_target_summary "$target")"
+  return "$NAV_RESULT_FAILED"
+)

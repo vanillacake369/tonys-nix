@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Run Zellij navigation after the floating helper pane has had time to exit.
+
+set -euo pipefail
+
+command -v zellij >/dev/null 2>&1 || exit 127
+command -v jq >/dev/null 2>&1 || exit 127
+command -v sleep >/dev/null 2>&1 || exit 127
+
+script_dir="$(cd "$(dirname "$0")" && pwd -P)"
+# shellcheck source=/dev/null
+. "$script_dir/zellij-nav-lib"
+
+nav_init
+
+mode="${1:-}"
+delay="${ZELLIJ_NAV_DEFER_DELAY:-0.12}"
+
+sleep "$delay"
+
+case "$mode" in
+  navigate)
+    target="${ZELLIJ_NAV_DEFERRED_TARGET:-}"
+    if [ -z "$target" ]; then
+      nav_log "deferred navigation aborted reason=missing-target"
+      exit 1
+    fi
+    nav_navigate_to_target "$target"
+    ;;
+  toggle)
+    nav_toggle_previous_target
+    ;;
+  *)
+    nav_log "deferred navigation aborted reason=unknown-mode mode=${mode:-empty}"
+    exit 1
+    ;;
+esac
