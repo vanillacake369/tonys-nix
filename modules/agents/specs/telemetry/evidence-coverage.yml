@@ -1,0 +1,115 @@
+version: 1
+purpose: >
+  Map declared AgentOps/AIOps metrics and evidence requirements to emitted
+  AgentOpsEvent fields. Metrics marked partial or planned must not be presented
+  as production-grade until the listed evidence source is emitted and consumed.
+
+event_contract:
+  required_fields:
+    - schemaVersion
+    - event_id
+    - run_id
+    - timestamp
+    - event_type
+    - provider
+    - content_capture
+  runtime_fields:
+    - workflow
+    - risk_level
+    - operation_id
+    - tool_name
+    - success
+    - error_type
+    - artifact_path
+    - approval_required
+    - approval_granted
+    - approval_source
+    - sandbox_mode
+    - policy_source
+    - hook_version
+    - context_source_id
+    - context_path
+    - context_tokens_estimated
+    - trust_label
+    - waiver_reason
+  content_capture_default: false
+
+coverage:
+  aiops.tool.failure_rate:
+    status: emitted
+    event_types: [agentops.workflow_gate, agentops.security_intercept]
+    fields: [provider, surface, tool_name, risk_level, success, error_type]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+      - modules/agents/policy-path-guard.nix
+    limitation: Hook-level policy failures are covered; provider model/tool failures still depend on provider logs.
+
+  aiops.approval.rate:
+    status: partial
+    event_types: [agentops.workflow_gate]
+    fields: [provider, surface, workflow, risk_level, approval_required, approval_granted, approval_source]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+    limitation: Workflow-evidence blocks are observable; provider-native user approval prompts are not a dedicated stream yet.
+
+  aiops.retry.count:
+    status: partial
+    event_types: [agentops.workflow_gate]
+    fields: [provider, workflow, tool_name, error_type, failure_taxonomy, failure_class]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+    limitation: Verify failure and repair loops are inferable; generic retry attempts are not counted directly.
+
+  aiops.task.success_rate:
+    status: partial
+    event_types: [agentops.workflow_gate]
+    fields: [provider, surface, workflow, risk_level, phase, result, success]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+    limitation: Phase pass/fail is emitted; task start/completion root events are not emitted yet.
+
+  aiops.task.first_pass_success_rate:
+    status: partial
+    event_types: [agentops.workflow_gate]
+    fields: [workflow, phase, result, failure_taxonomy]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+    limitation: Repair-loop inference is possible from verify failures; no explicit first-pass marker exists.
+
+  aiops.context.size_tokens:
+    status: partial
+    event_types: [agentops.context.load, agentops.context.waive]
+    fields: [provider, workflow, context_source_id, context_path, context_tokens_estimated, trust_label, waiver_reason]
+    emitted_by:
+      - modules/agents/runtime/agentops-event.nix
+      - modules/agents/policy-phase-gate.nix
+    limitation: Mandatory context load/waiver evidence is enforced before mutation; token estimates are present only when the provider payload supplies them.
+
+  aiops.cost.estimated_usd:
+    status: planned
+    required_event_types: [gen_ai.model.call, agentops.model_usage]
+    required_fields: [provider, model, workflow, input_tokens, output_tokens, estimated_cost_usd]
+    limitation: Provider logs may contain usage; AgentOps workflow events do not yet connect cost to phase/workflow.
+
+  aiops.eval.score:
+    status: planned
+    required_event_types: [agentops.eval.run]
+    required_fields: [dataset, case_id, grader, provider, model, score]
+    limitation: Eval specs exist, but replayed eval result events are not emitted.
+
+  aiops.skill.activation_count:
+    status: planned
+    required_event_types: [agentops.skill.invoke]
+    required_fields: [skill_name, skill_path, skill_version, trigger, provider, workflow, outcome]
+    limitation: Claude/Codex skills are exported, but invocation usefulness is not measured yet.
+
+  aiops.rollback.count:
+    status: planned
+    required_event_types: [agentops.rollback]
+    required_fields: [provider, workflow, risk_level, rollback_status, rollback_reason]
+    limitation: Rollback policy is documented but no runtime rollback event exists.

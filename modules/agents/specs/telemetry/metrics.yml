@@ -1,0 +1,56 @@
+version: 1
+metrics:
+  - name: aiops.task.success_rate
+    type: gauge
+    unit: "1"
+    description: Completed tasks divided by attempted tasks.
+    dimensions: [provider, surface, workflow, task_tier, risk_level]
+    formula: completed_tasks / attempted_tasks
+  - name: aiops.task.first_pass_success_rate
+    type: gauge
+    unit: "1"
+    description: Tasks completed without repair loop.
+    dimensions: [provider, surface, workflow, task_tier, risk_level]
+    formula: first_pass_success_tasks / attempted_tasks
+  - name: aiops.tool.failure_rate
+    type: gauge
+    unit: "1"
+    description: Failed tool calls divided by total tool calls.
+    dimensions: [provider, surface, tool_name, risk_level]
+    formula: failed_tool_calls / total_tool_calls
+  - name: aiops.approval.rate
+    type: gauge
+    unit: "1"
+    description: Approval-required actions divided by total actions.
+    dimensions: [provider, surface, workflow, risk_level]
+    formula: approval_required_actions / total_actions
+  - name: aiops.context.size_tokens
+    type: histogram
+    unit: tokens
+    description: Estimated context size used by runs.
+    dimensions: [provider, surface, workflow, task_tier]
+  - name: aiops.cost.estimated_usd
+    type: counter
+    unit: USD
+    description: Estimated model/tool cost.
+    dimensions: [provider, model, surface, workflow]
+  - name: aiops.eval.score
+    type: histogram
+    unit: "1"
+    description: Evaluation score by dataset and rubric.
+    dimensions: [dataset, case_id, grader, provider, model]
+  - name: aiops.skill.activation_count
+    type: counter
+    unit: count
+    description: Skill activations by skill name.
+    dimensions: [skill_name, provider, workflow]
+  - name: aiops.retry.count
+    type: counter
+    unit: count
+    description: Retry attempts by tool/workflow.
+    dimensions: [provider, workflow, tool_name, retry_reason]
+  - name: aiops.rollback.count
+    type: counter
+    unit: count
+    description: Rollback attempts and completions.
+    dimensions: [provider, workflow, risk_level, rollback_status]

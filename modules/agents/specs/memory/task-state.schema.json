@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tonys-nix.local/aiops/task-state.schema.json",
+  "title": "AIOps Task State",
+  "type": "object",
+  "required": [
+    "task_id",
+    "goal",
+    "status",
+    "risk_level",
+    "updated_at",
+    "base_revision",
+    "worktree_status",
+    "completed_steps",
+    "pending_step",
+    "side_effects",
+    "next_action",
+    "stop_condition"
+  ],
+  "properties": {
+    "task_id": { "type": "string" },
+    "goal": { "type": "string" },
+    "status": { "enum": ["planned", "in_progress", "blocked", "complete", "abandoned", "rolled_back"] },
+    "risk_level": { "enum": ["R0", "R1", "R2", "R3", "R4-approval", "R4-forbidden"] },
+    "updated_at": { "type": "string" },
+    "base_revision": { "type": "string" },
+    "resumed_from_task_id": { "type": ["string", "null"] },
+    "worktree_status": {
+      "type": "object",
+      "required": ["dirty", "files"],
+      "properties": {
+        "dirty": { "type": "boolean" },
+        "files": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "file_hashes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "hash"],
+        "properties": {
+          "path": { "type": "string" },
+          "hash": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "completed_steps": { "type": "array", "items": { "type": "string" } },
+    "pending_step": { "type": "string" },
+    "checkpoint_id": { "type": ["string", "null"] },
+    "decisions": { "type": "array", "items": { "type": "string" } },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "files_changed": { "type": "array", "items": { "type": "string" } },
+    "commands_run": { "type": "array", "items": { "type": "string" } },
+    "validation_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "success", "timestamp"],
+        "properties": {
+          "command": { "type": "string" },
+          "success": { "type": "boolean" },
+          "timestamp": { "type": "string" },
+          "summary": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "failed_attempts": { "type": "array", "items": { "type": "string" } },
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["operation_id", "description", "status"],
+        "properties": {
+          "operation_id": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "enum": ["planned", "attempted", "completed", "failed", "rolled_back"] },
+          "reconciliation": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "known_risks": { "type": "array", "items": { "type": "string" } },
+    "next_action": { "type": "string" },
+    "stop_condition": { "type": "string" }
+  },
+  "additionalProperties": false
+}

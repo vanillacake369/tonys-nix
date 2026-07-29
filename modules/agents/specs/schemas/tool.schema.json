@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tonys-nix.local/aiops/tool.schema.json",
+  "title": "AIOps Tool Policy",
+  "type": "object",
+  "required": ["version", "tools"],
+  "properties": {
+    "version": { "type": "integer" },
+    "defaults": { "type": "object" },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "id",
+          "purpose",
+          "when_to_use",
+          "when_not_to_use",
+          "input_schema",
+          "output_schema",
+          "error_schema",
+          "timeout_seconds",
+          "retry_policy",
+          "idempotency",
+          "max_result_size",
+          "security_classification",
+          "side_effects",
+          "egress",
+          "approval_required",
+          "telemetry_attributes"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "purpose": { "type": "string" },
+          "when_to_use": { "type": "string" },
+          "when_not_to_use": { "type": "string" },
+          "input_schema": { "type": "object" },
+          "output_schema": { "type": "object" },
+          "error_schema": { "type": "object" },
+          "timeout_seconds": { "type": "integer", "minimum": 0 },
+          "retry_policy": { "type": "string" },
+          "idempotency": { "enum": ["idempotent", "conditionally_idempotent", "non_idempotent"] },
+          "operation_contract": {
+            "type": "object",
+            "properties": {
+              "requires_operation_id": { "type": "boolean" },
+              "requires_base_hash": { "type": "boolean" },
+              "requires_postcondition": { "type": "boolean" },
+              "reconciliation_required_before_retry": { "type": "boolean" }
+            },
+            "additionalProperties": false
+          },
+          "max_result_size": { "type": "integer", "minimum": 0 },
+          "security_classification": { "enum": ["R0", "R1", "R2", "R3", "R4-approval", "R4-forbidden"] },
+          "side_effects": { "type": "string" },
+          "egress": { "type": "string" },
+          "approval_required": { "type": "boolean" },
+          "path_policy": {
+            "type": "object",
+            "properties": {
+              "workspace_boundary": { "type": "string" },
+              "canonicalize_paths": { "type": "boolean" },
+              "follow_symlinks": { "type": "boolean" },
+              "deny_patterns_source": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "network": {
+            "type": "object",
+            "properties": {
+              "allowed_domains": { "type": "array", "items": { "type": "string" } },
+              "mcp_servers": { "type": "array", "items": { "type": "string" } },
+              "prompt_injection_quarantine": { "type": "boolean" },
+              "treat_external_text_as": { "type": "string" }
+            },
+            "additionalProperties": false
+          },
+          "telemetry_attributes": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "security_classification": { "enum": ["R3", "R4-approval"] }
+              }
+            },
+            "then": {
+              "properties": {
+                "approval_required": { "const": true }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "idempotency": { "enum": ["conditionally_idempotent", "non_idempotent"] }
+              }
+            },
+            "then": {
+              "required": ["operation_contract"]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tonys-nix.local/agent-specs/eval-result.schema.json",
+  "title": "Agent Harness Eval Result",
+  "type": "object",
+  "required": [
+    "result_id",
+    "run_id",
+    "trace_id",
+    "dataset",
+    "dataset_version",
+    "case_id",
+    "grader",
+    "grader_version",
+    "provider",
+    "model",
+    "score",
+    "pass",
+    "regression",
+    "created_at"
+  ],
+  "properties": {
+    "result_id": { "type": "string" },
+    "run_id": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "dataset": { "type": "string" },
+    "dataset_version": { "type": "integer" },
+    "case_id": { "type": "string" },
+    "grader": { "type": "string" },
+    "grader_version": { "type": "string" },
+    "provider": { "type": "string" },
+    "model": { "type": "string" },
+    "baseline_result_id": { "type": ["string", "null"] },
+    "candidate_id": { "type": ["string", "null"] },
+    "score": { "type": "number", "minimum": 0 },
+    "pass": { "type": "boolean" },
+    "regression": { "type": "boolean" },
+    "artifact_paths": { "type": "array", "items": { "type": "string" } },
+    "notes": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "additionalProperties": false
+}

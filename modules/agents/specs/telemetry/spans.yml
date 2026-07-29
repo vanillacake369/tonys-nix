@@ -1,0 +1,89 @@
+version: 1
+spans:
+  - name: aiops.session
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - aiops.session.id
+      - trace_id
+      - span_id
+      - aiops.task.id
+      - aiops.workflow.name
+      - aiops.risk.level
+      - agent.vendor
+      - agent.surface
+  - name: aiops.agent.invocation
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - agent.name
+      - agent.vendor
+      - agent.role
+      - aiops.context.sources
+  - name: gen_ai.model.call
+    kind: client
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - aiops.model_call.id
+      - gen_ai.provider.name
+      - gen_ai.request.model
+      - gen_ai.usage.input_tokens
+      - gen_ai.usage.output_tokens
+  - name: aiops.tool.execution
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - aiops.operation.id
+      - aiops.tool_call.id
+      - aiops.attempt.number
+      - aiops.checkpoint.id
+      - tool.name
+      - tool.success
+      - tool.latency
+      - aiops.risk.level
+      - aiops.approval.required
+      - aiops.approval.granted
+      - aiops.retry.reason
+      - aiops.rollback.performed
+      - aiops.command.exit_code
+      - aiops.artifact.path
+      - aiops.artifact.hash
+      - error.type
+  - name: aiops.validation
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - aiops.validation.command
+      - aiops.validation.success
+      - error.type
+  - name: aiops.review
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - aiops.review.type
+      - aiops.review.findings_count
+      - aiops.review.pass
+  - name: aiops.postmortem
+    kind: internal
+    attributes:
+      - aiops.run.id
+      - trace_id
+      - span_id
+      - parent_span_id
+      - aiops.postmortem.path
+      - aiops.followups.count

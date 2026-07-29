@@ -1,0 +1,141 @@
+version: 1
+defaults:
+  workspace_boundary: workspace_roots
+  canonicalize_paths: true
+  follow_symlinks: false
+  content_capture: summary_only
+  external_content_handling: evidence_only
+  sensitive_patterns_source: agentPolicy.global.sensitivePatterns
+tools:
+  - id: canonical.search_docs
+    name: search_docs
+    purpose: Find current documentation or repository guidance.
+    when_to_use: Need source-backed context not already loaded.
+    when_not_to_use: User explicitly forbids browsing or local files already answer.
+    input_schema: { query: string, scope: string }
+    output_schema: { results: array, source_type: string }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 30
+    retry_policy: retry once for transient network errors
+    idempotency: idempotent
+    max_result_size: 12000
+    security_classification: R0
+    side_effects: none
+    egress: limited_network_query
+    approval_required: false
+    network:
+      allowed_domains: ["official-docs", "standards", "user-approved"]
+      mcp_servers: []
+      prompt_injection_quarantine: true
+      treat_external_text_as: evidence
+    telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.source.type, aiops.operation.id]
+  - id: canonical.read_file
+    name: read_file
+    purpose: Read repository files.
+    when_to_use: Need local evidence.
+    when_not_to_use: File path matches sensitive deny patterns.
+    input_schema: { path: string }
+    output_schema: { content_summary: string, path: string }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 10
+    retry_policy: do not retry permission errors
+    idempotency: idempotent
+    max_result_size: 20000
+    security_classification: R0
+    side_effects: none
+    egress: none
+    approval_required: false
+    path_policy:
+      workspace_boundary: workspace_roots
+      canonicalize_paths: true
+      follow_symlinks: false
+      deny_patterns_source: agentPolicy.global.sensitivePatterns
+    telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.file.path, aiops.operation.id]
+  - id: canonical.edit_file
+    name: edit_file
+    purpose: Make scoped local file edits.
+    when_to_use: A concrete change is authorized and reversible.
+    when_not_to_use: Requirements are ambiguous or path is sensitive.
+    input_schema: { path: string, patch: string }
+    output_schema: { path: string, changed: boolean }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 20
+    retry_policy: retry only after re-reading changed file
+    idempotency: conditionally_idempotent
+    operation_contract:
+      requires_operation_id: true
+      requires_base_hash: true
+      requires_postcondition: true
+      reconciliation_required_before_retry: true
+    max_result_size: 8000
+    security_classification: R1
+    side_effects: local_write
+    egress: none
+    approval_required: false
+    path_policy:
+      workspace_boundary: workspace_roots
+      canonicalize_paths: true
+      follow_symlinks: false
+      deny_patterns_source: agentPolicy.global.sensitivePatterns
+    telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.diff.lines_added, aiops.diff.lines_removed, aiops.operation.id, aiops.artifact.hash]
+  - id: canonical.run_tests
+    name: run_tests
+    purpose: Run deterministic validation.
+    when_to_use: After code/policy/schema changes.
+    when_not_to_use: Test command is destructive or unavailable.
+    input_schema: { command: string, scope: string }
+    output_schema: { success: boolean, summary: string, artifact_path: string }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 300
+    retry_policy: do not retry without diagnosing failure
+    idempotency: idempotent
+    max_result_size: 12000
+    security_classification: R0
+    side_effects: local_process
+    egress: none
+    approval_required: false
+    telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.validation.success, aiops.command.exit_code, aiops.operation.id]
+  - id: canonical.create_handoff
+    name: create_handoff
+    purpose: Persist resumable state.
+    when_to_use: Long-running work, interruption, or context threshold.
+    when_not_to_use: Tiny completed task with no residual state.
+    input_schema: { goal: string, status: string, next_action: string }
+    output_schema: { path: string, complete: boolean }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 20
+    retry_policy: retry after path conflict resolution
+    idempotency: conditionally_idempotent
+    operation_contract:
+      requires_operation_id: true
+      requires_base_hash: false
+      requires_postcondition: true
+      reconciliation_required_before_retry: true
+    max_result_size: 6000
+    security_classification: R1
+    side_effects: local_write
+    egress: none
+    approval_required: false
+    telemetry_attributes: [tool.name, tool.success, aiops.handoff.path, aiops.operation.id, aiops.checkpoint.id]
+  - id: canonical.request_user_confirmation
+    name: request_user_confirmation
+    purpose: Ask for approval on R3, R4-approval, or ambiguous decisions.
+    when_to_use: Action has external, destructive, or security-sensitive impact.
+    when_not_to_use: Deterministic policy forbids the action outright.
+    input_schema: { action: string, risk: string, evidence: string }
+    output_schema: { approved: boolean, decision: string }
+    error_schema: { error_type: string, retryable: boolean, safe_next_action: string }
+    timeout_seconds: 0
+    retry_policy: do not retry
+    idempotency: non_idempotent
+    operation_contract:
+      requires_operation_id: true
+      requires_base_hash: false
+      requires_postcondition: true
+      reconciliation_required_before_retry: true
+    max_result_size: 4000
+    security_classification: R3
+    side_effects: human_decision
+    egress: none
+    approval_required: true
+    telemetry_attributes: [aiops.approval.required, aiops.approval.granted, aiops.risk.level, aiops.operation.id]

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tonys-nix.local/agent-specs/telemetry-attribute.schema.json",
+  "title": "Telemetry Attribute Contract",
+  "type": "object",
+  "required": ["name", "type", "sensitivity", "cardinality", "redaction_strategy"],
+  "properties": {
+    "name": { "type": "string" },
+    "type": { "enum": ["string", "boolean", "integer", "number"] },
+    "required": { "type": "boolean" },
+    "sensitivity": { "enum": ["public", "internal", "sensitive", "secret"] },
+    "cardinality": { "enum": ["low", "medium", "high"] },
+    "redaction_strategy": { "enum": ["none", "hash", "basename", "summary", "drop"] },
+    "allowed_values": { "type": "array", "items": { "type": "string" } },
+    "max_length": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": false
+}
