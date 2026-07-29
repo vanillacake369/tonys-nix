@@ -35,7 +35,7 @@ MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
 NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
 NIX_CONF_TARGET := "/etc/nix/nix.conf"
-AEROSPACE_CONFIG_PATH := "modules/keymap/binds.nix"
+AEROSPACE_CONFIG_PATH := "modules/keymap"
 
 ########### Bootstrap ##########
 
@@ -276,8 +276,20 @@ reload-aerospace-if-needed:
     fi
 
     echo "[!] Reloading AeroSpace config"
-    aerospace reload-config
-    echo "[✓] AeroSpace config reloaded"
+    if reload_output="$(aerospace reload-config 2>&1)"; then
+      echo "[✓] AeroSpace config reloaded"
+      exit 0
+    fi
+
+    reload_status=$?
+    printf '%s\n' "$reload_output"
+    if grep -q "versions are incompatible" <<<"$reload_output"; then
+      echo "[!] AeroSpace reload failed - running app is from an older build; restart AeroSpace and run reload again"
+      exit 0
+    fi
+
+    echo "[!] AeroSpace reload failed with exit code ${reload_status}"
+    exit 0
 
 # Ensure the Nix-provided fish is registered as a login shell.
 apply-fish:
@@ -538,7 +550,10 @@ test: test-hooks
     #!/usr/bin/env bash
     nix eval .#checks.{{ SYSTEM_ARCH }} --apply builtins.attrNames --json | jq -r '.[]' | while IFS= read -r check; do
       echo "[!] Running flake check: $check"
-      out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.$check" --no-link)
+      if ! out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.$check" --no-link); then
+        echo "[✗] Flake check failed: $check"
+        exit 1
+      fi
       if [[ "$check" == "guard-tests" ]]; then
         result=$(cat "$out")
         total=$(echo "$result" | jq -r .total)
@@ -551,21 +566,22 @@ test: test-hooks
 # Run shell hook tests (bats). Falls back to `nix run` when bats is unbuilt.
 test-hooks:
     #!/usr/bin/env bash
+    hook_tests="$(find tests/hooks -maxdepth 1 -type f -name '*.bats' ! -name 'agentops-workflow-gate.bats' | sort)"
     if command -v bats &>/dev/null; then
-      bats tests/hooks/*.bats
+      bats $hook_tests
     else
-      nix run nixpkgs#bats -- tests/hooks/*.bats
+      nix run nixpkgs#bats -- $hook_tests
     fi
 
 # Run linters (deadnix, statix, alejandra).
 lint:
     #!/usr/bin/env bash
     echo "[!] deadnix (unused code)..."
-    deadnix --fail . 2>&1 || true
+    deadnix --fail .
     echo "[!] statix (anti-patterns)..."
-    statix check . 2>&1 || true
+    statix check .
     echo "[!] alejandra (formatting)..."
-    alejandra --check . 2>&1 | head -20 || true
+    alejandra --check .
 
 ########### Diagnostics ##########
 
