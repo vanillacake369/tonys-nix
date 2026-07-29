@@ -63,7 +63,7 @@
     c = {
       extensions = ["c" "h" "cpp" "hpp" "cc"];
       packages = [
-        pkgs.gcc
+        # pkgs.gcc
         pkgs.clang-tools
         pkgs.bear
       ];
@@ -91,6 +91,11 @@
         pkgs.rustfmt
         pkgs.clippy
         pkgs.rust-analyzer
+        pkgs.cargo-nextest
+        pkgs.cargo-watch
+        pkgs.cargo-expand
+        pkgs.bacon
+        pkgs.lldb
       ];
       format = "cargo fmt --check";
       lint = "cargo clippy -- -D warnings";
@@ -115,9 +120,16 @@
         pkgs.yamllint
         pkgs.yaml-language-server
         pkgs.yamlfmt
-        pkgs.taplo
       ];
       lint = "yamllint";
+    };
+
+    toml = {
+      extensions = ["toml"];
+      packages = [
+        pkgs.taplo
+      ];
+      format = "taplo fmt --check";
     };
 
     typescript = {
