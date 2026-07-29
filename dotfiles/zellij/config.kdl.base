@@ -22,9 +22,20 @@ keybinds clear-defaults=true {
         bind "l" { MoveFocus "right"; }
         bind "n" { NewPane; SwitchToMode "normal"; }
         bind "p" { SwitchFocus; }
-        bind "Ctrl p" { SwitchToMode "normal"; }
         bind "r" { NewPane "right"; SwitchToMode "normal"; }
+        bind "s" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+                floating true
+                close_on_exit true
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
         bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
+        bind "x" { CloseFocus; SwitchToMode "normal"; }
         bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
     }
     tab {
@@ -51,7 +62,6 @@ keybinds clear-defaults=true {
         bind "n" { NewTab; SwitchToMode "normal"; }
         bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
         bind "s" { ToggleActiveSyncTab; SwitchToMode "normal"; }
-        bind "Ctrl t" { SwitchToMode "normal"; }
         bind "x" { CloseTab; SwitchToMode "normal"; }
         bind "tab" { ToggleTab; }
     }
@@ -63,15 +73,10 @@ keybinds clear-defaults=true {
         bind "+" { Resize "Increase"; }
         bind "-" { Resize "Decrease"; }
         bind "=" { Resize "Increase"; }
-        bind "h" { Resize "Decrease left"; }
-        bind "j" { Resize "Decrease down"; }
-        bind "k" { Resize "Decrease up"; }
-        bind ":" { Resize "Decrease right"; }
         bind "h" { Resize "Increase left"; }
         bind "j" { Resize "Increase down"; }
         bind "k" { Resize "Increase up"; }
         bind "l" { Resize "Increase right"; }
-        bind "Ctrl n" { SwitchToMode "normal"; }
     }
     move {
         bind "left" { MovePane "left"; }
@@ -79,7 +84,6 @@ keybinds clear-defaults=true {
         bind "up" { MovePane "up"; }
         bind "right" { MovePane "right"; }
         bind "h" { MovePane "left"; }
-        bind "Ctrl h" { SwitchToMode "normal"; }
         bind "j" { MovePane "down"; }
         bind "k" { MovePane "up"; }
         bind "l" { MovePane "right"; }
@@ -88,15 +92,7 @@ keybinds clear-defaults=true {
         bind "tab" { MovePane; }
     }
     scroll {
-        bind "Alt left" { MoveFocusOrTab "left"; SwitchToMode "normal"; }
-        bind "Alt down" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "Alt up" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "Alt right" { MoveFocusOrTab "right"; SwitchToMode "normal"; }
         bind "e" { EditScrollback; SwitchToMode "normal"; }
-        bind "Alt h" { MoveFocusOrTab "left"; SwitchToMode "normal"; }
-        bind "Alt j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "Alt k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "Alt l" { MoveFocusOrTab "right"; SwitchToMode "normal"; }
         bind "s" { SwitchToMode "entersearch"; SearchInput 0; }
     }
     search {
@@ -121,7 +117,7 @@ keybinds clear-defaults=true {
             }
             SwitchToMode "normal"
         }
-        bind "Ctrl o" { SwitchToMode "normal"; }
+        bind "d" { Detach; }
         bind "p" {
             LaunchOrFocusPlugin "plugin-manager" {
                 floating true
@@ -129,10 +125,14 @@ keybinds clear-defaults=true {
             }
             SwitchToMode "normal"
         }
+        bind "q" { Quit; }
         bind "w" {
-            LaunchOrFocusPlugin "session-manager" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
                 floating true
-                move_to_focused_tab true
+                close_on_exit true
+                borderless true
+                width "20%"
+                height "1"
             }
             SwitchToMode "normal"
         }
@@ -141,25 +141,115 @@ keybinds clear-defaults=true {
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
         bind "Alt =" { Resize "Increase"; }
-        bind "Alt [" { PreviousSwapLayout; }
-        bind "Alt ]" { NextSwapLayout; }
-        bind "Alt f" { ToggleFloatingPanes; }
         bind "Ctrl g" { SwitchToMode "locked"; }
-        bind "Alt i" { MoveTab "left"; }
-        bind "Alt n" { NewPane; }
-        bind "Alt o" { MoveTab "right"; }
-        bind "Ctrl q" { Quit; }
         unbind "Ctrl /"
         unbind "Ctrl space"
         unbind "Ctrl s"
     }
-    shared_except "locked" "move" {
-        bind "Ctrl h" { SwitchToMode "move"; }
-    }
-    shared_except "locked" "session" {
-        bind "Ctrl o" { SwitchToMode "session"; }
-    }
-    shared_except "locked" "scroll" {
+    shared_except "locked" "scroll" "search" "entersearch" "renametab" "renamepane" {
+        bind "Alt p" { SwitchToMode "pane"; }
+        bind "Alt Shift p" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+                floating true
+                close_on_exit true
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt t" { SwitchToMode "tab"; }
+        bind "Alt Shift t" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
+                floating true
+                close_on_exit true
+                width "80%"
+                height "70%"
+                x "10%"
+                y "15%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt s" { SwitchToMode "session"; }
+        bind "Alt Shift s" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
+                floating true
+                close_on_exit true
+                width "80%"
+                height "70%"
+                x "10%"
+                y "15%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt Space" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
+                floating true
+                close_on_exit true
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt /" {
+            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm" {
+                floating true
+                move_to_focused_tab true
+                "LOAD_ZELLIJ_BINDINGS" "false"
+                "Help / Keymap" "Alt /"
+                "Search / Command palette" "Alt Space"
+                "Search / Pane picker" "Alt P"
+                "Search / Tab picker" "Alt T"
+                "Search / Session picker" "Alt S"
+                "Mode / Pane mode" "Alt p"
+                "Mode / Tab mode" "Alt t"
+                "Mode / Session mode" "Alt s"
+                "Mode / Resize mode" "Alt r"
+                "Mode / Move mode" "Alt m"
+                "Mode / Scroll mode" "Alt e"
+                "Navigation / Previous pane" "Alt N"
+                "Navigation / Previous explicit context" "Alt n"
+                "Navigation / Move left" "Alt h"
+                "Navigation / Move down" "Alt j"
+                "Navigation / Move up" "Alt k"
+                "Navigation / Move right" "Alt l"
+                "Layout / Previous swap layout" "Alt ["
+                "Layout / Next swap layout" "Alt ]"
+                "Pane Mode / New pane" "p -> n"
+                "Pane Mode / Split right" "p -> r"
+                "Pane Mode / Split down" "p -> d"
+                "Pane Mode / Close pane" "p -> x"
+                "Pane Mode / Rename pane" "p -> c"
+                "Pane / Toggle fullscreen" "Alt f"
+                "Pane / Toggle floating panes" "Alt w"
+                "Session Mode / Detach" "s -> d"
+                "Session Mode / Configuration" "s -> c"
+                "Session Mode / Plugin manager" "s -> p"
+                "Session Mode / Session manager" "s -> w"
+                "Session Mode / Quit" "s -> q"
+                "System / Lock" "Ctrl g"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt N" { FocusPreviousPane; }
+        bind "Alt n" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
+                floating true
+                close_on_exit true
+                borderless true
+                width "20%"
+                height "1"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt r" { SwitchToMode "resize"; }
+        bind "Alt m" { SwitchToMode "move"; }
+        bind "Alt e" { SwitchToMode "scroll"; }
         bind "Alt left" { MoveFocusOrTab "left"; }
         bind "Alt down" { MoveFocus "down"; }
         bind "Alt up" { MoveFocus "up"; }
@@ -168,30 +258,14 @@ keybinds clear-defaults=true {
         bind "Alt j" { MoveFocus "down"; }
         bind "Alt k" { MoveFocus "up"; }
         bind "Alt l" { MoveFocusOrTab "right"; }
-    }
-    shared_except "locked" "scroll" "search" "tmux" {
-        bind "Ctrl b" { SwitchToMode "tmux"; }
-    }
-    shared_except "locked" "scroll" "search" {
-        bind "Ctrl s" { SwitchToMode "scroll"; }
-    }
-    shared_except "locked" "tab" {
-        bind "Ctrl t" { SwitchToMode "tab"; }
-    }
-    shared_except "locked" "pane" {
-        bind "Ctrl p" { SwitchToMode "pane"; }
-    }
-    shared_except "locked" "resize" {
-        bind "Ctrl n" { SwitchToMode "resize"; }
+        bind "Alt f" { ToggleFocusFullscreen; }
+        bind "Alt w" { ToggleFloatingPanes; }
     }
     shared_except "normal" "locked" "entersearch" {
         bind "enter" { SwitchToMode "normal"; }
     }
     shared_except "normal" "locked" "entersearch" "renametab" "renamepane" {
         bind "esc" { SwitchToMode "normal"; }
-    }
-    shared_among "pane" "tmux" {
-        bind "x" { CloseFocus; SwitchToMode "normal"; }
     }
     shared_among "scroll" "search" {
         bind "PageDown" { PageScrollDown; }
@@ -225,46 +299,19 @@ keybinds clear-defaults=true {
     renamepane {
         bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
     }
-    shared_among "session" "tmux" {
-        bind "d" { Detach; }
-    }
-    tmux {
-        bind "left" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "down" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "up" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "right" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "space" { NextSwapLayout; }
-        bind "\"" { NewPane "down"; SwitchToMode "normal"; }
-        bind "%" { NewPane "right"; SwitchToMode "normal"; }
-        bind "," { SwitchToMode "renametab"; }
-        bind "[" { SwitchToMode "scroll"; }
-        bind "Ctrl b" { Write 2; SwitchToMode "normal"; }
-        bind "c" { NewTab; SwitchToMode "normal"; }
-        bind "h" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "l" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "n" { GoToNextTab; SwitchToMode "normal"; }
-        bind "o" { FocusNextPane; }
-        bind "p" { GoToPreviousTab; SwitchToMode "normal"; }
-        bind "z" { ToggleFocusFullscreen; SwitchToMode "normal"; }
-    }
 }
 
 // Plugin aliases - can be used to change the implementation of Zellij
 // changing these requires a restart to take effect
 plugins {
     about location="zellij:about"
-    compact-bar location="zellij:compact-bar"
     configuration location="zellij:configuration"
     filepicker location="zellij:strider" {
         cwd "/"
     }
     plugin-manager location="zellij:plugin-manager"
     session-manager location="zellij:session-manager"
-    status-bar location="zellij:status-bar"
     strider location="zellij:strider"
-    tab-bar location="zellij:tab-bar"
     welcome-screen location="zellij:session-manager" {
         welcome_screen true
     }
@@ -297,6 +344,10 @@ default_mode "normal"
 // Default: $SHELL
 // 
 default_shell "fish"
+
+env {
+    fish_features "no-query-term"
+}
  
 // Choose the path to override cwd that zellij will use for opening new panes
 // 
@@ -305,7 +356,7 @@ default_shell "fish"
 // The name of the default layout to load on startup
 // Default: "default"
 // 
-// default_layout "compact"
+default_layout "compact"
  
 // The folder in which Zellij will look for layouts
 // (Requires restart)
