@@ -21,6 +21,8 @@
       kap = "kubectl apply -f ";
       zj = "zellij";
       hm = "home-manager";
+      cdx = "codex -s danger-full-access -a never";
+      gmni = "agy --dangerously-skip-permissions";
     };
 
     shellAbbrs = {
@@ -100,14 +102,13 @@
     '';
 
     interactiveShellInit = ''
-      if test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
+      if not set -q NIX_PROFILES; and test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
           bass source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
       end
 
       fish_add_path --move --prepend $HOME/.cargo/bin
 
       set -g fish_greeting
-      ${pkgs.zellij}/bin/zellij setup --generate-completion fish | source
 
       bind \e\[H beginning-of-line
       bind \e\[F end-of-line
@@ -141,5 +142,9 @@
     if ! ${lib.getExe pkgs.fish} -lc 'set -q tide_left_prompt_items' >/dev/null 2>&1; then
       ${lib.getExe pkgs.fish} -lc 'tide configure --auto --style=Lean --prompt_colors="True color" --prompt_connection=Disconnected --prompt_spacing=Compact --show_time=No --icons="Few icons" --transient=No --lean_prompt_height="One line" --finish="Overwrite your current tide config"'
     fi
+  '';
+
+  home.file.".config/fish/completions/zellij.fish".source = pkgs.runCommand "zellij-fish-completion" {} ''
+    ${pkgs.zellij}/bin/zellij setup --generate-completion fish > "$out"
   '';
 }

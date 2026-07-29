@@ -16,7 +16,7 @@
       # Core utilities
       bat
       jq
-      moreutils # sponge for safe file writes
+      moreutils
       ripgrep
       fd
       tree

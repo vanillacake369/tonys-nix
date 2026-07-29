@@ -16,6 +16,10 @@
       htop
       btop
 
+      # Storage monitoring
+      dust
+      ncdu
+
       # Monitoring and debugging
       lsof
       smartmontools

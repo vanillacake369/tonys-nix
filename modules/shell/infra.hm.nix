@@ -18,7 +18,7 @@
       /*
       Cloud tools
       */
-      awscli
+      # awscli
       # ssm-session-manager-plugin
 
       /*
@@ -28,20 +28,38 @@
       nuclei
 
       /*
-      Infrastructure tools
+      Kubernetes tools
       */
-      # kubectl
+      kubectl
       # kubectx
       # k9s
-      # kubernetes-helm
       # kubectl-tree
       # ngrok
-      # terraform
+      kubernetes-helm
+      kustomize
+      kubeconform
+      kube-linter
+      kube-score
+      kube-state-metrics
+      kubectl-ai
+      skaffold
+      gitleaks
+      crane
+      buildah
+      skopeo
+
+      /*
+      Infrastructure tools
+      */
+      conftest
+      trivy
+      actionlint
+      shellcheck
 
       /*
       Networking tools
       */
-      v2ray
+      # v2ray
     ]
     ++ lib.optionals isDarwin [
       /*
