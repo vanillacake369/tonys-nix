@@ -5,25 +5,25 @@ This directory contains Claude Code configuration that is automatically synced v
 ## Directory Structure
 
 ```
-dotfiles/claude/
+modules/agents/providers/claude/
 ├── README.md              # This file
-├── AGENTS.md              # Provider-agnostic agent guide (agents.md standard)
+├── AGENTS.md              # Symlink to ../../shared/AGENTS.md
 ├── settings.json          # Claude Code permissions
-├── mcp-servers.json       # MCP server configurations
 ├── commands/              # Custom slash commands (/commit, /pr, /blog, etc.)
 ├── agents/                # Custom AI agents (architect, implementer, etc.)
+├── hooks/                 # Claude hook scripts
 └── skills/                # Custom skills (architectural-planning, etc.)
 ```
 
 ## AGENTS.md
 
-`AGENTS.md` follows the [agents.md](https://agents.md/) standard — a provider-agnostic file that any AI coding agent (Claude Code, Cursor, Amp, Copilot, etc.) can read. It contains guardrails, orchestration rules, and commit/PR conventions.
+`AGENTS.md` is a symlink to `modules/agents/shared/AGENTS.md`, the canonical provider-neutral instruction source. Keep behavioral policy there; Claude-specific files should only adapt tools, permissions, hooks, and native commands.
 
 ## How Configuration Sync Works
 
 ### Automatic Sync via Home-Manager
 
-When you run `just install-pckgs`, home-manager:
+When you run `just apply`, home-manager:
 
 1. **Symlinks static files** to `~/.claude/`:
    - `commands/` → `~/.claude/commands/`
@@ -31,9 +31,9 @@ When you run `just install-pckgs`, home-manager:
    - `skills/` → `~/.claude/skills/`
    - `AGENTS.md` → `~/.claude/AGENTS.md`
 
-2. **Merges dynamic settings** into `~/.claude.json`:
-   - Permissions from `settings.json`
-   - MCP servers from `mcp-servers.json`
+2. **Merges dynamic settings**:
+   - `settings.json` plus policy hooks → `~/.claude/settings.json`
+   - MCP servers from `modules/agents/agents-mcp.nix` → `~/.claude.json`
    - Preserves runtime data (projects, tips history, etc.)
    - Creates timestamped backup before modification
 
@@ -48,16 +48,16 @@ When you run `just install-pckgs`, home-manager:
 
 ### Add New MCP Server
 
-Add to `mcp-servers.json` and apply:
+Add to `modules/agents/agents-mcp.nix` and apply:
 ```bash
-just install-pckgs
+just apply
 ```
 
 ### Troubleshooting
 
 ```bash
 # Manually trigger sync
-just install-pckgs
+just apply
 
 # Check Claude config
 cat ~/.claude.json | jq '.mcpServers'
