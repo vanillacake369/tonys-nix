@@ -4,18 +4,10 @@
   isWsl,
   isDarwin,
   isLinux,
-  userProfile,
   ...
-}: let
-  keymaps = import ../keymap/pipeline.nix {inherit lib userProfile;};
-in {
+}: {
   home.packages = with pkgs;
-    [
-      claude-code
-      antigravity-cli
-      codex
-    ]
-    ++ lib.optionals (isLinux && !isWsl) [
+    lib.optionals (isLinux && !isWsl) [
       firefox
       slack
       ticktick
@@ -33,21 +25,5 @@ in {
       wezterm
       aerospace
       hidden-bar
-      telegram-desktop
     ];
-
-  home.file =
-    {
-      ".wezterm.lua".source = ../../dotfiles/wezterm/wezterm.lua;
-    }
-    // lib.optionalAttrs isDarwin {
-      ".config/karabiner/karabiner.json" = {
-        text = keymaps.karabinerJson;
-        force = true;
-      };
-      ".config/aerospace/aerospace.toml" = {
-        text = keymaps.aerospaceToml;
-        force = true;
-      };
-    };
 }

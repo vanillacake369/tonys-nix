@@ -1,5 +1,4 @@
 # JetBrains IDE integration: packages + keymap linking (all platforms)
-# SSoT: userProfile.jetbrains provides IDE list and bundle IDs.
 {
   config,
   lib,
@@ -10,14 +9,34 @@
   userProfile,
   ...
 }: let
-  ideGlob = lib.concatStringsSep "," userProfile.jetbrains.ides;
+  ideNames = [
+    "IntelliJIdea"
+    "GoLand"
+    "DataGrip"
+    "WebStorm"
+    "PhpStorm"
+    "PyCharm"
+    "RubyMine"
+    "CLion"
+    "Rider"
+    "AndroidStudio"
+  ];
+  ideGlob = lib.concatStringsSep "," ideNames;
 in {
-  home.packages = lib.optionals (isLinux && !isWsl) (with pkgs; [
-    jetbrains.idea
-    jetbrains.goland
-    jetbrains.datagrip
-  ]);
+  home.packages =
+    lib.optionals (isLinux && !isWsl) (with pkgs; [
+      jetbrains.idea
+      jetbrains.goland
+      jetbrains.datagrip
+    ])
+    ++ lib.optionals isDarwin (with pkgs; [
+      jetbrains.datagrip
+    ]);
 
+  # NOTE:
+  # JetBrains settings 디렉터리 이름은 IDE family contract에 가깝고 개인
+  # identity가 아니다. userProfile에는 Windows home 같은 host-specific
+  # 경로만 남기고, IDE 목록과 keymap link 정책은 이 integration이 소유한다.
   home.activation.linkJetBrainsKeymaps = let
     keymapFile =
       if isDarwin

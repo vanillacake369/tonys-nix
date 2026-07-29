@@ -5,7 +5,11 @@ local config = wezterm.config_builder()
 -- 폰트 및 렌더링
 ----------------------------------------------------------------
 -- font_with_fallback을 하나로 합쳐 무시되는 설정을 방지
+config.font_dirs = {
+    -- @JETENDARD_FONT_DIRS@
+}
 config.font = wezterm.font_with_fallback({
+    -- @JETENDARD_FAMILY@
     "JetBrains Mono",
     "Roboto",
 })
