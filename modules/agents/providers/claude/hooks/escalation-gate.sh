@@ -16,7 +16,13 @@ set -euo pipefail
 INPUT=$(cat)
 TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
 TOOL_INPUT=$(echo "$INPUT" | jq -r '.tool_input // empty' 2>/dev/null)
-TOOL_OUTPUT=$(echo "$INPUT" | jq -r '.tool_output // empty' 2>/dev/null)
+TOOL_OUTPUT=$(echo "$INPUT" | jq -r '
+  .tool_output
+  // .tool_response.output
+  // ((.tool_response.stdout // "") + "\n" + (.tool_response.stderr // ""))
+  // .output
+  // empty
+' 2>/dev/null)
 
 # Only gate execution tools (Bash, Write, Edit)
 case "$TOOL_NAME" in
@@ -36,7 +42,7 @@ if [[ "$TOOL_NAME" == "Bash" ]]; then
 fi
 
 # State tracking
-STATE_DIR="/tmp/claude-escalation"
+STATE_DIR="${CLAUDE_ESCALATION_STATE_DIR:-/tmp/claude-escalation}"
 mkdir -p "$STATE_DIR"
 # Use parent PID (Claude Code process) for session scoping
 SESSION_PID=$(ps -o ppid= -p $$ 2>/dev/null | tr -d ' ' || echo "$$")
@@ -49,7 +55,7 @@ fi
 
 # Detect failure: prefer exit code, fallback to output grep
 IS_FAILURE=false
-TOOL_EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_exit_code // "0"' 2>/dev/null)
+TOOL_EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_exit_code // .tool_response.exit_code // .exit_code // "0"' 2>/dev/null)
 
 if [[ "$TOOL_EXIT_CODE" != "0" && "$TOOL_EXIT_CODE" != "null" && -n "$TOOL_EXIT_CODE" ]]; then
   # Non-zero exit code is the most reliable failure signal

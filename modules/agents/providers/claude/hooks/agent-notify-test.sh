@@ -101,6 +101,23 @@ assert_contains "empty stdin: cwd=unknown" "cwd=unknown" "$result"
 result=$(echo 'not-json' | bash "$NOTIFY_SCRIPT" --parse-test claude)
 assert_contains "invalid json: session_id=unknown" "session_id=unknown" "$result"
 
+# 1-8. JSON parsing quotes shell metacharacters safely
+INJECT_DIR=$(mktemp -d)
+INJECT_MARK="$INJECT_DIR/marker"
+inject_prompt='$(touch '"$INJECT_MARK"')'
+inject_json=$(printf '{"session_id":"safe-1","cwd":"/tmp","prompt":"%s"}' "$inject_prompt")
+result=$(echo "$inject_json" | bash "$NOTIFY_SCRIPT" --parse-test claude)
+assert_contains "shell metacharacters: prompt is parsed" "prompt=$inject_prompt" "$result"
+TOTAL=$((TOTAL + 1))
+if [[ ! -e "$INJECT_MARK" ]]; then
+  echo "  PASS: shell metacharacters are not executed"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: shell metacharacters executed unexpectedly"
+  FAIL=$((FAIL + 1))
+fi
+rm -rf "$INJECT_DIR"
+
 echo ""
 
 # ===========================================================================
@@ -191,6 +208,13 @@ assert_contains "ask: message shows the question" "Which auth method should we u
 result=$(echo '{"session_id":"s-1","cwd":"/dev/app"}' \
   | bash "$NOTIFY_SCRIPT" --parse-test claude)
 assert_contains "stop: question is empty" "question=" "$result"
+
+# 2b-4. Questions are attention-required and are not suppressed by focus
+result=$(echo "$ASK_JSON" \
+  | AGENT_NOTIFY_DRY_RUN=1 _TEST_CLIENT_COUNT=1 _TEST_FOCUSED_APP=WezTerm \
+    ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude)
+assert_not_contains "ask: focused session still notifies" "skipped" "$result"
+assert_contains "ask: dry run shows question" "Which auth method should we use?" "$result"
 
 echo ""
 
@@ -435,6 +459,16 @@ if [[ -f "$LOG_FILE" ]]; then
   assert_not_contains "skipped notification not logged" "Skipped task" "$log_content"
 fi
 
+# 8-5. Question notifications are logged with the question kind
+echo "$ASK_JSON" \
+  | AGENT_NOTIFY_DRY_RUN=1 AGENT_NOTIFY_LOG="$LOG_FILE" _TEST_CLIENT_COUNT=1 \
+    _TEST_FOCUSED_APP=WezTerm ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" claude >/dev/null
+if [[ -f "$LOG_FILE" ]]; then
+  log_content=$(cat "$LOG_FILE")
+  assert_contains "question log has kind" "question" "$log_content"
+  assert_contains "question log has question text" "Which auth method should we use?" "$log_content"
+fi
+
 # Cleanup
 rm -rf "$LOG_DIR"
 
@@ -498,7 +532,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   # 10-3. Custom terminal passed through execute
   result=$(echo '{"session_id":"x","cwd":"/tmp"}' \
     | ZELLIJ_SESSION_NAME=sess AGENT_NOTIFY_TERMINAL=Ghostty bash "$NOTIFY_SCRIPT" --notify-args-test claude)
-  assert_contains "execute has custom terminal" "AGENT_NOTIFY_TERMINAL=Ghostty" "$result"
+  assert_contains "execute has custom terminal" 'AGENT_NOTIFY_TERMINAL="Ghostty"' "$result"
 fi
 
 echo ""
@@ -551,38 +585,38 @@ result=$(AGENT_NOTIFY_TERMINAL=iTerm2 bash "$OPEN_SCRIPT" --detect-terminal-test
 assert_eq "detect: env override unknown falls to generic" "terminal=iterm2" "$result"
 
 # 13-2. Current session detection from WezTerm title
-result=$(_TEST_WEZTERM_TITLE="tonys-nix | some task" bash "$OPEN_SCRIPT" --detect-session-test)
+result=$(_TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="tonys-nix | some task" bash "$OPEN_SCRIPT" --detect-session-test)
 assert_eq "session detect: parses 'name | task'" "session=tonys-nix" "$result"
 
-result=$(_TEST_WEZTERM_TITLE="valkey | ~/d/ossca" bash "$OPEN_SCRIPT" --detect-session-test)
+result=$(_TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="valkey | ~/d/ossca" bash "$OPEN_SCRIPT" --detect-session-test)
 assert_eq "session detect: parses 'valkey | path'" "session=valkey" "$result"
 
-result=$(_TEST_WEZTERM_TITLE="" bash "$OPEN_SCRIPT" --detect-session-test)
+result=$(_TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="" bash "$OPEN_SCRIPT" --detect-session-test)
 assert_eq "session detect: empty title → unknown" "session=" "$result"
 
 # 13-3. Strategy selection: WezTerm + target != current
-result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_WEZTERM_TITLE="valkey | task" \
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="valkey | task" \
   _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
-assert_contains "wezterm switch: strategy=wezterm" "strategy=wezterm" "$result"
-assert_contains "wezterm switch: sends switch command" "send-text" "$result"
+assert_contains "wezterm switch: strategy=fallback" "strategy=fallback" "$result"
+assert_contains "wezterm switch: focuses only" "focus-only" "$result"
 assert_contains "wezterm switch: target session" "tonys-nix" "$result"
 
 # 13-4. Strategy selection: WezTerm + target == current → skip
-result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_WEZTERM_TITLE="tonys-nix | task" \
+result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="tonys-nix | task" \
   _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
-assert_contains "wezterm same session: skip" "skip" "$result"
+assert_contains "wezterm same session: fallback" "strategy=fallback" "$result"
 
 # 13-5. Strategy selection: WezTerm + no target → focus only
 result=$(AGENT_NOTIFY_TERMINAL=WezTerm _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test "")
 assert_contains "wezterm no target: focus-only" "focus-only" "$result"
 
 # 13-6. Strategy selection: Ghostty + target
-result=$(AGENT_NOTIFY_TERMINAL=Ghostty _TEST_WEZTERM_TITLE="" \
+result=$(AGENT_NOTIFY_TERMINAL=Ghostty _TEST_NO_ZELLIJ=1 _TEST_WEZTERM_TITLE="" \
   _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
 assert_contains "ghostty: strategy=ghostty" "strategy=ghostty" "$result"
 
 # 13-7. Strategy selection: Unknown terminal → fallback
-result=$(AGENT_NOTIFY_TERMINAL=iTerm2 _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
+result=$(AGENT_NOTIFY_TERMINAL=iTerm2 _TEST_NO_ZELLIJ=1 _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --switch-test tonys-nix)
 assert_contains "unknown terminal: strategy=fallback" "strategy=fallback" "$result"
 
 # 13-8. Transcript gating: Claude opens, Gemini/Codex skip
@@ -594,6 +628,28 @@ assert_contains "gemini: skips transcript" "open=false" "$result"
 
 result=$(AGENT_NOTIFY_PROVIDER=codex _TEST_DRY_RUN=1 bash "$OPEN_SCRIPT" --transcript-test /tmp/t.jsonl)
 assert_contains "codex: skips transcript" "open=false" "$result"
+
+echo ""
+
+# ===========================================================================
+# 14. Codex Stop Hook Timeout Guard
+# ===========================================================================
+
+echo "=== 14. Codex Stop Hook Timeout Guard ==="
+
+start_ts=$(date +%s)
+result=$(echo '{"session_id":"fast-1","cwd":"/workspace","last_assistant_message":"Done"}' \
+  | AGENT_NOTIFY_DRY_RUN=1 ZELLIJ_SESSION_NAME=test bash "$NOTIFY_SCRIPT" codex 2>/dev/null)
+elapsed=$(( $(date +%s) - start_ts ))
+assert_eq "codex stop: stdout is immediate Stop JSON" '{"continue":true}' "$result"
+TOTAL=$((TOTAL + 1))
+if [[ $elapsed -le 2 ]]; then
+  echo "  PASS: codex stop: dry-run avoids blocking focus checks (${elapsed}s)"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: codex stop: dry-run took ${elapsed}s"
+  FAIL=$((FAIL + 1))
+fi
 
 echo ""
 

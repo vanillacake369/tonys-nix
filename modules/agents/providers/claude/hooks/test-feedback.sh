@@ -14,8 +14,14 @@ TOOL_NAME=$(echo "$INPUT" | jq -r '.tool_name // empty' 2>/dev/null)
 [[ "$TOOL_NAME" != "Bash" ]] && exit 0
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
-TOOL_OUTPUT=$(echo "$INPUT" | jq -r '.tool_output // empty' 2>/dev/null)
-EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_exit_code // 0' 2>/dev/null)
+TOOL_OUTPUT=$(echo "$INPUT" | jq -r '
+  .tool_output
+  // .tool_response.output
+  // ((.tool_response.stdout // "") + "\n" + (.tool_response.stderr // ""))
+  // .output
+  // empty
+' 2>/dev/null)
+EXIT_CODE=$(echo "$INPUT" | jq -r '.tool_exit_code // .tool_response.exit_code // .exit_code // 0' 2>/dev/null)
 
 [[ -z "$COMMAND" ]] && exit 0
 

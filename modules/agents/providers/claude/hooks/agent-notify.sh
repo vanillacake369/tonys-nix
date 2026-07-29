@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Unified agent completion notification script
-# Shared by Claude Code (Stop), Codex (Stop), Gemini (AfterAgent)
+# Unified agent attention notification script.
+# Shared by Claude Code (Stop/AskUserQuestion), Codex (Stop), Gemini (AfterAgent).
 #
 # Usage:  echo '<hook-json>' | agent-notify.sh <provider>
 # Env:    AGENT_NOTIFY_BACKEND  - force backend (terminal-notifier|noti|osascript|notify-send|bell)
 #         AGENT_NOTIFY_DRY_RUN  - if set, print what would happen instead of sending
+#         AGENT_NOTIFY_SUPPRESS_ATTENTION_WHEN_FOCUSED
+#                                if set, focused sessions may suppress question/human alerts
 #
 # This script NEVER exits non-zero — hooks must not block the agent.
 set -uo pipefail
@@ -26,18 +28,34 @@ _parse_input() {
 
   _SESSION_ID="unknown" _CWD="unknown" _PROMPT="" _SUMMARY="" _TRANSCRIPT_PATH="" _QUESTION=""
 
-  if [[ -n "$input" ]] && echo "$input" | jq empty 2>/dev/null; then
-    _SESSION_ID=$(echo "$input" | jq -r '.session_id // "unknown"')
-    _CWD=$(echo "$input" | jq -r '.cwd // "unknown"')
-    _PROMPT=$(echo "$input" | jq -r '.prompt // ""')
-    _SUMMARY=$(echo "$input" | jq -r '(.prompt_response // .last_assistant_message) // ""')
-    _TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""')
-    # AskUserQuestion (PreToolUse): the first question Claude is asking the user
-    _QUESTION=$(echo "$input" | jq -r '(.tool_input.questions[0].question) // ""')
-  else
-    # Fallback to positional arguments if stdin is empty or not JSON
-    _PROMPT="${2:-}"
-    _SUMMARY="${3:-}"
+  if [[ -z "${_TEST_NO_JQ:-}" ]] && command -v jq &>/dev/null && [[ -n "$input" ]]; then
+    local parsed
+    if parsed=$(jq -r '
+      def sh($value; $fallback): (($value // $fallback) | tostring | @sh);
+      def first_question:
+        if (.tool_input.questions | type) == "array" then
+          (.tool_input.questions[0].question // "")
+        else
+          ""
+        end;
+      [
+        "_SESSION_ID=" + sh(.session_id; "unknown"),
+        "_CWD=" + sh(.cwd; "unknown"),
+        "_PROMPT=" + sh(.prompt; ""),
+        "_SUMMARY=" + sh((.prompt_response // .last_assistant_message); ""),
+        "_TRANSCRIPT_PATH=" + sh(.transcript_path; ""),
+        "_QUESTION=" + sh(first_question; "")
+      ] | .[]
+    ' <<< "$input" 2>/dev/null); then
+      eval "$parsed"
+      return
+    fi
+  fi
+
+  # Fallback to positional arguments if stdin is empty or not JSON.
+  _PROMPT="${2:-}"
+  _SUMMARY="${3:-}"
+  if [[ -n "$_PROMPT" || -n "$_SUMMARY" ]]; then
     _CWD="$(pwd)"
     _SESSION_ID="${ZELLIJ_SESSION_NAME:-unknown}"
   fi
@@ -65,6 +83,12 @@ _truncate() {
   fi
 }
 
+_basename() {
+  local path="${1%/}"
+  [[ -n "$path" ]] || path="$1"
+  printf '%s\n' "${path##*/}"
+}
+
 # ===========================================================================
 # Build notification args → globals
 # ===========================================================================
@@ -83,7 +107,7 @@ _build_notify_args() {
     _TITLE="$(echo "${_PROVIDER:0:1}" | tr '[:lower:]' '[:upper:]')${_PROVIDER:1}"
   fi
 
-  _SUBTITLE="$(basename "$_CWD")"
+  _SUBTITLE="$(_basename "$_CWD")"
   _GROUP="${_PROVIDER}-${_SESSION_ID}"
 
   if [[ -n "$_QUESTION" ]]; then
@@ -190,15 +214,23 @@ _is_session_focused() {
     # If we couldn't get the focused app, assume not focused to be safe
     [[ -n "$focused_app" ]] || return 1
 
-    # Check if the focused app is a terminal.
-    # We include common terminal names to be more robust.
-    case "$focused_app" in
-      "$terminal_app" | "WezTerm" | "wezterm-gui" | "iTerm2" | "Alacritty" | "Terminal" | "Ghostty" | "warp")
-        ;;
-      *)
-        return 1 # Not focused on terminal → notify
-        ;;
-    esac
+    if [[ -n "${AGENT_NOTIFY_TERMINAL:-}" ]]; then
+      [[ "$focused_app" == "$terminal_app" ]] || return 1
+    else
+      # Check if the focused app is a terminal.
+      case "$focused_app" in
+        "WezTerm" | "wezterm-gui" | "iTerm2" | "Alacritty" | "Terminal" | "Ghostty" | "warp")
+          ;;
+        *)
+          return 1 # Not focused on terminal → notify
+          ;;
+      esac
+    fi
+  fi
+
+  if [[ -n "${_TEST_CLIENT_COUNT:-}" ]]; then
+    [[ "$_TEST_CLIENT_COUNT" -gt 0 ]]
+    return
   fi
 
   # Step 2: Zellij client check (is any client focusing the current pane?)
@@ -217,11 +249,21 @@ _is_session_focused() {
   fi
 
   # Fallback for Step 2 if zellij command fails or PANE_ID is missing
-  local count="${_TEST_CLIENT_COUNT:-}"
-  if [[ -z "$count" ]]; then
-    count=$(zellij action list-clients 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
-  fi
+  local count
+  count=$(zellij action list-clients 2>/dev/null | tail -n +2 | wc -l | tr -d ' ')
   [[ "$count" -gt 0 ]]
+}
+
+_is_attention_required() {
+  [[ -n "$_QUESTION" || "$_PROVIDER" == "human" ]]
+}
+
+_should_skip_notification() {
+  if _is_attention_required && [[ -z "${AGENT_NOTIFY_SUPPRESS_ATTENTION_WHEN_FOCUSED:-}" ]]; then
+    return 1
+  fi
+
+  _is_session_focused
 }
 
 # ===========================================================================
@@ -274,11 +316,28 @@ esac
 # ===========================================================================
 _log_notification() {
   local log_file="${AGENT_NOTIFY_LOG:-$HOME/.agent-notify.log}"
-  local ts
+  local ts kind
   ts=$(date '+%Y-%m-%d %H:%M:%S')
-  printf '%s\t%s\t%s\t%s\t%s\n' \
-    "$ts" "$_PROVIDER" "$(basename "$_CWD")" "$_PROMPT" "$_SUMMARY" \
+  kind="completion"
+  [[ -n "$_QUESTION" ]] && kind="question"
+  [[ "$_PROVIDER" == "human" ]] && kind="human-required"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$ts" "$_PROVIDER" "$kind" "$(_basename "$_CWD")" "$_PROMPT" "$_SUMMARY" "$_QUESTION" \
     >> "$log_file" 2>/dev/null || true
+}
+
+_codex_notify_background() {
+  (
+    local backend
+    backend=$(_select_backend)
+
+    if _should_skip_notification; then
+      exit 0
+    fi
+
+    _log_notification
+    _send "$backend" >/dev/null
+  ) >/dev/null 2>&1 &
 }
 
 # ===========================================================================
@@ -288,42 +347,38 @@ main() {
   _parse_input "${1:-agent}"
   _build_notify_args
 
+  if [[ "$_PROVIDER" == "codex" ]]; then
+    if [[ -n "${AGENT_NOTIFY_DRY_RUN:-}" ]]; then
+      _print_notify_args >&2
+      echo "backend=$(_select_backend)" >&2
+      _print_codex_stop_json
+      exit 0
+    fi
+
+    _print_codex_stop_json
+    _codex_notify_background
+    exit 0
+  fi
+
   local backend
   backend=$(_select_backend)
 
   if [[ -n "${AGENT_NOTIFY_DRY_RUN:-}" ]]; then
-    if _is_session_focused; then
-      if [[ "$_PROVIDER" == "codex" ]]; then
-        echo "skipped (terminal focused)" >&2
-        _print_codex_stop_json
-      else
-        echo "skipped (terminal focused)"
-      fi
+    if _should_skip_notification; then
+      echo "skipped (terminal focused)"
     else
       _log_notification
-      if [[ "$_PROVIDER" == "codex" ]]; then
-        _print_notify_args >&2
-        echo "backend=$backend" >&2
-        _print_codex_stop_json
-      else
-        _print_notify_args
-        echo "backend=$backend"
-      fi
+      _print_notify_args
+      echo "backend=$backend"
     fi
     exit 0
   fi
 
-  if _is_session_focused; then
-    [[ "$_PROVIDER" == "codex" ]] && _print_codex_stop_json
+  if _should_skip_notification; then
     exit 0
   fi
   _log_notification
-  if [[ "$_PROVIDER" == "codex" ]]; then
-    _send "$backend" >/dev/null
-    _print_codex_stop_json
-  else
-    _send "$backend"
-  fi
+  _send "$backend"
 }
 
 main "$@" || exit 0
