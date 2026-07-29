@@ -5,9 +5,9 @@
   imports = [
     ./policy-assembler.nix
     ./agents-mcp.nix
-    ./claude.nix
-    ./codex.nix
-    ./gemini.nix
+    ./providers/claude/module.nix
+    ./providers/codex/module.nix
+    ./providers/gemini/module.nix
     ./agents-proxy.nix
   ];
 }

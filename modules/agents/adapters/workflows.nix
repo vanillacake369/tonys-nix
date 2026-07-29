@@ -5,7 +5,7 @@
 # native slash commands, Codex gets lazy-loaded skills, and Gemini/agy get a
 # concise context guide.
 {lib}: let
-  commandDir = ../../dotfiles/claude/commands;
+  commandDir = ../providers/claude/commands;
   join = lib.concatStringsSep;
 
   mkWorkflow = {
@@ -29,7 +29,7 @@
     commit = mkWorkflow {
       name = "commit";
       file = "commit.md";
-      description = "SRP 기준으로 변경사항을 분리하여 커밋한다";
+      description = "PR 리뷰가 쉽도록 변경사항을 파일 변화 단위로 분석하고 커밋한다";
       role = "implementer";
       mutatesFiles = true;
       argumentHint = "commit scope or constraints";
@@ -57,6 +57,14 @@
       role = "tester";
       mutatesFiles = true;
       argumentHint = "bug report, failure log, or reproduction steps";
+    };
+    evidence-debug = mkWorkflow {
+      name = "evidence-debug";
+      file = "evidence-debug.md";
+      description = "Evidence-first debugging workflow for repeated hook/runtime failures, policy or guardrail regressions, stale state/config problems, and explicit preferred review loops";
+      role = "tester";
+      mutatesFiles = true;
+      argumentHint = "hook failure, stale state, guardrail regression, or repeated debug failure";
     };
     scaffold = mkWorkflow {
       name = "scaffold";

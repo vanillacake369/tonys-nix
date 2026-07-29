@@ -8,8 +8,8 @@
     toml = pkgs.formats.toml {};
   };
   settingsSync = import ./mutable-settings-sync.nix {inherit lib pkgs;};
-  mcpAdapt = import ./mcp-adapters.nix {inherit lib;} config.programs.mcp.servers;
-  providerHooks = import ./policy-provider-hooks.nix {inherit lib;};
+  mcpAdapt = import ../adapters/mcp.nix {inherit lib;} config.programs.mcp.servers;
+  providerHooks = import ./provider-hooks.nix {inherit lib;};
 
   # Combine generated policy hooks with each provider's native hook shape.
   # Provider modules pass only their base settings; this layer attaches MCP and

@@ -7,9 +7,9 @@
   ...
 }: let
   toml = pkgs.formats.toml {};
-  providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
-  codexBindings = import ./codex-bindings.nix {inherit lib;};
-  sharedContext = builtins.readFile ../../dotfiles/shared/AGENTS.md;
+  providerSettings = import ../../runtime/provider-settings.nix {inherit config lib pkgs;};
+  codexBindings = import ./bindings.nix {inherit lib;};
+  sharedContext = builtins.readFile ../../shared/AGENTS.md;
   model = "gpt-5.5";
   tuiSettings = {
     status_line = [
@@ -42,7 +42,7 @@ in {
     enable = true;
     enableMcpIntegration = false;
     context = codexBindings.mkContext sharedContext;
-    skills = codexBindings.skills;
+    inherit (codexBindings) skills;
     rules.default = ''
       prefix_rule(pattern=["nix", "fmt"], decision="allow")
       prefix_rule(pattern=["nix", "flake", "check"], decision="allow")

@@ -1,5 +1,5 @@
 # Adapts generated hook definitions to each provider's hook configuration format.
-# SSoT pattern — mirrors modules/agents/mcp-adapters.nix for hooks.
+# SSoT pattern — mirrors modules/agents/adapters/mcp.nix for hooks.
 #
 # Input: attrset of { <mixin-name>.<provider-name> = { event, matcher, script }; }
 # Output: provider-specific hook config ready for settings injection.
@@ -66,22 +66,25 @@ in {
     byEvent;
 
   # Codex: config.toml hooks format
-  # { "Stop": [{ "hooks": [{ "type": "command", "command": "...", "timeout": N }] }] }
+  # { "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "...", "timeout": N }] }] }
   codex = allHooks: timeout: let
     providerHooks = (groupByProvider allHooks).codex or [];
     byEvent = groupByEvent providerHooks;
   in
-    lib.mapAttrs (_event: entries: [
-      {
+    lib.mapAttrs (_event: entries: let
+      byMatcher = lib.groupBy (x: x.hook.matcher) entries;
+    in
+      lib.mapAttrsToList (matcher: matcherEntries: {
+        inherit matcher;
         hooks =
           map (x: {
             type = "command";
             command = toString x.hook.script;
             inherit timeout;
           })
-          entries;
-      }
-    ])
+          matcherEntries;
+      })
+      byMatcher)
     byEvent;
 
   inherit groupByProvider groupByEvent;

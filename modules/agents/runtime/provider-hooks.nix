@@ -1,5 +1,5 @@
 # Base hooks SSoT — provider-specific manually-defined hooks + shared merge logic.
-# Claude's base hooks live in dotfiles/claude/settings.json (full settings file);
+# Claude's base hooks live in modules/agents/providers/claude/settings.json (full settings file);
 # Gemini and Codex base hooks are defined here as the single source of truth.
 {lib}: {
   gemini = {

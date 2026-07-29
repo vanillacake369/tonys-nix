@@ -6,8 +6,8 @@
   pkgs,
   ...
 }: let
-  providerSettings = import ./provider-settings.nix {inherit config lib pkgs;};
-  workflowBindings = import ./workflow-bindings.nix {inherit lib;};
+  providerSettings = import ../../runtime/provider-settings.nix {inherit config lib pkgs;};
+  workflowBindings = import ../../adapters/workflows.nix {inherit lib;};
 
   mcpSourceFile = providerSettings.mkFile {
     format = "json";
@@ -17,7 +17,7 @@
     };
   };
 
-  baseSettings = builtins.fromJSON (builtins.readFile ../../dotfiles/claude/settings.json);
+  baseSettings = builtins.fromJSON (builtins.readFile ./settings.json);
 in {
   # Contract: Claude is the orchestrator — full policy suite
   agentPolicy.providers.claude = {
@@ -56,12 +56,12 @@ in {
   };
 
   home.file = {
-    ".claude/commands".source = ../../dotfiles/claude/commands;
+    ".claude/commands".source = ./commands;
     ".claude/WORKFLOWS.md".text = workflowBindings.sharedGuide;
-    ".claude/AGENTS.md".source = ../../dotfiles/shared/AGENTS.md;
-    ".claude/agents".source = ../../dotfiles/claude/agents;
-    ".claude/skills".source = ../../dotfiles/claude/skills;
-    ".claude/hooks".source = ../../dotfiles/claude/hooks;
+    ".claude/AGENTS.md".source = ../../shared/AGENTS.md;
+    ".claude/agents".source = ./agents;
+    ".claude/skills".source = ./skills;
+    ".claude/hooks".source = ./hooks;
   };
 
   home.activation.syncClaudeMcp = providerSettings.mkSync {
