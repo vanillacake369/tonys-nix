@@ -1,0 +1,878 @@
+# NOTE:
+# 이 TOML이 keybind 및 target 정책을 종합한 유일한 SSoT이다.
+# 모든 workspace/monitor 이동, app rule, mode binding을 여기서 명시한다.
+# to-*.nix는 키 표기 변환과 target 포맷 직렬화만 수행한다.
+
+# =============================================================================
+# AeroSpace
+# =============================================================================
+
+[aerospace.settings]
+config_version = 2
+start_at_login = true
+enable_normalization_flatten_containers = false
+enable_normalization_opposite_orientation_for_nested_containers = true
+accordion_padding = 30
+default_root_container_layout = "tiles"
+default_root_container_orientation = "auto"
+on_focused_monitor_changed = ["move-mouse monitor-lazy-center"]
+automatically_unhide_macos_hidden_apps = false
+persistent_workspaces = [
+  "Docs",
+  "Code",
+  "Browser",
+  "Terminal",
+  "Music",
+  "Schedule",
+]
+
+[aerospace.key_mapping]
+preset = "qwerty"
+
+[aerospace.gaps]
+inner_horizontal = 9
+inner_vertical = 9
+outer_left = 9
+outer_bottom = 9
+outer_top = 9
+outer_right = 9
+
+[[aerospace.bindings]]
+bind = "caps+cmd+h"
+exec = "focus left"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+j"
+exec = "focus down"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+k"
+exec = "focus up"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+l"
+exec = "focus right"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+left_arrow"
+exec = "focus left"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+down_arrow"
+exec = "focus down"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+up_arrow"
+exec = "focus up"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+right_arrow"
+exec = "focus right"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+h"
+exec = "move left"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+j"
+exec = "move down"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+k"
+exec = "move up"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+l"
+exec = "move right"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+left_arrow"
+exec = "move left"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+down_arrow"
+exec = "move down"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+up_arrow"
+exec = "move up"
+
+[[aerospace.bindings]]
+bind = "caps+cmd+shift+right_arrow"
+exec = "move right"
+
+[[aerospace.bindings]]
+bind = "caps+c"
+exec = "workspace Code"
+
+[[aerospace.bindings]]
+bind = "caps+d"
+exec = "workspace Docs"
+
+[[aerospace.bindings]]
+bind = "caps+m"
+exec = "workspace Music"
+
+[[aerospace.bindings]]
+bind = "caps+s"
+exec = "workspace Schedule"
+
+[[aerospace.bindings]]
+bind = "caps+t"
+exec = "workspace Terminal"
+
+[[aerospace.bindings]]
+bind = "caps+b"
+exec = "workspace Browser"
+
+[[aerospace.bindings]]
+bind = "caps+shift+c"
+exec = ["move-node-to-workspace Code", "workspace Code"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+d"
+exec = ["move-node-to-workspace Docs", "workspace Docs"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+m"
+exec = ["move-node-to-workspace Music", "workspace Music"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+s"
+exec = ["move-node-to-workspace Schedule", "workspace Schedule"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+t"
+exec = ["move-node-to-workspace Terminal", "workspace Terminal"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+b"
+exec = ["move-node-to-workspace Browser", "workspace Browser"]
+
+[[aerospace.bindings]]
+bind = "caps+1"
+exec = "focus-monitor 1"
+
+[[aerospace.bindings]]
+bind = "caps+2"
+exec = "focus-monitor 2"
+
+[[aerospace.bindings]]
+bind = "caps+3"
+exec = "focus-monitor 3"
+
+[[aerospace.bindings]]
+bind = "caps+shift+1"
+exec = ["move-node-to-monitor 1", "focus-monitor 1"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+2"
+exec = ["move-node-to-monitor 2", "focus-monitor 2"]
+
+[[aerospace.bindings]]
+bind = "caps+shift+3"
+exec = ["move-node-to-monitor 3", "focus-monitor 3"]
+
+[[aerospace.bindings]]
+bind = "caps+tab"
+exec = "workspace-back-and-forth"
+
+[[aerospace.bindings]]
+bind = "caps+spacebar"
+exec = "fullscreen"
+
+[[aerospace.bindings]]
+bind = "caps+hyphen"
+exec = "resize smart -50"
+
+[[aerospace.bindings]]
+bind = "caps+equal_sign"
+exec = "resize smart +50"
+
+[[aerospace.bindings]]
+bind = "caps+slash"
+exec = "layout tiles horizontal vertical"
+
+[[aerospace.bindings]]
+bind = "caps+comma"
+exec = "layout accordion horizontal vertical"
+
+[[aerospace.bindings]]
+bind = "caps+period"
+exec = "mode service"
+
+[[aerospace.workspace_assignments]]
+workspace = "Docs"
+monitor = 1
+
+[[aerospace.workspace_assignments]]
+workspace = "Code"
+monitor = 2
+
+[[aerospace.workspace_assignments]]
+workspace = "Browser"
+monitor = 2
+
+[[aerospace.workspace_assignments]]
+workspace = "Terminal"
+monitor = 2
+
+[[aerospace.workspace_assignments]]
+workspace = "Music"
+monitor = 3
+
+[[aerospace.workspace_assignments]]
+workspace = "Schedule"
+monitor = 3
+
+[[aerospace.window_rules]]
+app_name_regex = "Obsidian"
+run = "move-node-to-workspace Docs"
+
+[[aerospace.window_rules]]
+app_name_regex = "Music"
+run = "move-node-to-workspace Music"
+
+[[aerospace.window_rules]]
+app_name_regex = "TickTick"
+run = "move-node-to-workspace Schedule"
+
+[[aerospace.window_rules]]
+app_name_regex = "System Settings"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Finder"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Karabiner"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Photos"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "App Store"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Preview"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Horo"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Notes"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "FaceTime"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "AppCleaner"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Shottr"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Discord"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Opal"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "KakaoTalk"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Activity Monitor"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+app_name_regex = "Telegram"
+run = "layout floating"
+
+[[aerospace.window_rules]]
+check_further_callbacks = true
+run = "split opposite"
+
+[[aerospace.service_bindings]]
+bind = "esc"
+exec = ["reload-config", "mode main"]
+
+[[aerospace.service_bindings]]
+bind = "f"
+exec = ["layout floating tiling", "mode main"]
+
+[[aerospace.service_bindings]]
+bind = "h"
+exec = ["join-with left", "mode main"]
+
+[[aerospace.service_bindings]]
+bind = "j"
+exec = ["join-with down", "mode main"]
+
+[[aerospace.service_bindings]]
+bind = "k"
+exec = ["join-with up", "mode main"]
+
+[[aerospace.service_bindings]]
+bind = "l"
+exec = ["join-with right", "mode main"]
+
+# =============================================================================
+# Karabiner
+# =============================================================================
+
+[karabiner.caps]
+trigger = "caps_lock"
+to_modifiers = ["ctrl", "option"]
+to_if_alone = ["escape", { select_input_source = "en" }]
+description = "Capslock to Ctrl+Option / Esc + En when alone"
+
+[karabiner.parameters]
+simultaneous_threshold_milliseconds = 50
+to_if_alone_timeout_milliseconds = 250
+to_if_held_down_threshold_milliseconds = 500
+
+[karabiner.contexts.browsers]
+bundle_identifiers = ["^com\\.google\\.Chrome$", "^com\\.brave\\.Browser$"]
+
+[karabiner.contexts.terminal_and_ide]
+bundle_identifiers = [
+  "^com\\.apple\\.Terminal$",
+  "^com\\.googlecode\\.iterm2$",
+  "^com\\.github\\.wez\\.wezterm$",
+  "^io\\.alacritty$",
+  "^net\\.kovidgoyal\\.kitty$",
+  "^com\\.jetbrains\\..*$",
+  "^com\\.knollsoft\\.Rectangle$",
+]
+
+[karabiner.contexts.korean_input]
+type = "input_source_if"
+input_sources = [
+  { language = "ko" },
+  { input_source_id = "^com\\.apple\\.inputmethod\\.Korean$" },
+  { input_mode_id = "^com\\.apple\\.inputmethod\\.Korean\\..*$" },
+]
+
+[[karabiner.rules]]
+bind = "shift+grave_accent_and_tilde"
+to = "shift+option+grave_accent_and_tilde"
+optional = ["any"]
+condition = "korean_input"
+description = "Force tilde when Korean input active"
+
+[[karabiner.rules]]
+bind = "grave_accent_and_tilde"
+to = "option+grave_accent_and_tilde"
+optional = ["any"]
+condition = "korean_input"
+description = "Force backtick when Korean input active"
+
+[[karabiner.rules]]
+bind = "right_command"
+to = "f18"
+
+[[karabiner.rules]]
+bind = "cmd+l"
+to = "cmd+ctrl+q"
+
+[[karabiner.rules]]
+bind = "cmd+m"
+to = []
+disable = true
+
+[[karabiner.rules]]
+bind = "cmd+spacebar"
+shell = "open -a 'Raycast'"
+
+[[karabiner.rules]]
+to_consumer_key = "display_brightness_decrement"
+to_modifiers = ["option", "shift"]
+bind = "fn+f1"
+
+[[karabiner.rules]]
+to_consumer_key = "display_brightness_increment"
+to_modifiers = ["option", "shift"]
+bind = "fn+f2"
+
+[[karabiner.rules]]
+to_consumer_key = "display_brightness_decrement"
+to_modifiers = ["option", "shift"]
+from_consumer_key = "display_brightness_decrement"
+
+[[karabiner.rules]]
+to_consumer_key = "display_brightness_increment"
+to_modifiers = ["option", "shift"]
+from_consumer_key = "display_brightness_increment"
+
+[[karabiner.rules]]
+to_consumer_key = "volume_decrement"
+to_modifiers = ["option", "shift"]
+bind = "fn+f11"
+
+[[karabiner.rules]]
+to_consumer_key = "volume_increment"
+to_modifiers = ["option", "shift"]
+bind = "fn+f12"
+
+[[karabiner.rules]]
+to_consumer_key = "volume_decrement"
+to_modifiers = ["option", "shift"]
+from_consumer_key = "volume_decrement"
+
+[[karabiner.rules]]
+to_consumer_key = "volume_increment"
+to_modifiers = ["option", "shift"]
+from_consumer_key = "volume_increment"
+
+[[karabiner.rules]]
+bind = "caps+h"
+to = "left_arrow"
+
+[[karabiner.rules]]
+bind = "caps+j"
+to = "down_arrow"
+
+[[karabiner.rules]]
+bind = "caps+k"
+to = "up_arrow"
+
+[[karabiner.rules]]
+bind = "caps+l"
+to = "right_arrow"
+
+[[karabiner.rules]]
+bind = "caps+shift+h"
+to = "shift+left_arrow"
+
+[[karabiner.rules]]
+bind = "caps+shift+j"
+to = "shift+down_arrow"
+
+[[karabiner.rules]]
+bind = "caps+shift+k"
+to = "shift+up_arrow"
+
+[[karabiner.rules]]
+bind = "caps+shift+l"
+to = "shift+right_arrow"
+
+[[karabiner.rules]]
+bind = "caps+a"
+to = "cmd+left_arrow"
+
+[[karabiner.rules]]
+bind = "caps+e"
+to = "cmd+right_arrow"
+
+[[karabiner.rules]]
+bind = "caps+g"
+to = "cmd+up_arrow"
+
+[[karabiner.rules]]
+bind = "caps+shift+g"
+to = "cmd+down_arrow"
+
+[[karabiner.rules]]
+bind = "caps+x"
+to = "delete_forward"
+
+[[karabiner.rules]]
+bind = "caps+delete_or_backspace"
+to = "option+delete_or_backspace"
+
+[[karabiner.rules]]
+bind = "ctrl+a"
+to = "cmd+a"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+c"
+to = "cmd+c"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+x"
+to = "cmd+x"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+z"
+to = "cmd+z"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+s"
+to = "cmd+s"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+f"
+to = "cmd+f"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+t"
+to = "cmd+t"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+w"
+to = "cmd+w"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+y"
+to = "cmd+y"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+o"
+to = "cmd+o"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+p"
+to = "cmd+p"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+g"
+to = "cmd+g"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+l"
+to = "cmd+l"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+q"
+to = "cmd+q"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+slash"
+to = "cmd+slash"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+left_arrow"
+to = "option+left_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+right_arrow"
+to = "option+right_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+left_arrow"
+to = "option+shift+left_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+right_arrow"
+to = "option+shift+right_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+delete_or_backspace"
+to = "option+delete_or_backspace"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "ctrl+delete_forward"
+to = "option+delete_forward"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "home"
+to = "cmd+left_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "end"
+to = "cmd+right_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "shift+home"
+to = "cmd+shift+left_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "shift+end"
+to = "cmd+shift+right_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+home"
+to = "cmd+up_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+end"
+to = "cmd+down_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+insert"
+to = "cmd+c"
+optional = ["any"]
+
+[[karabiner.rules]]
+bind = "shift+insert"
+to = "cmd+v"
+optional = ["any"]
+
+[[karabiner.rules]]
+bind = "fn+left_arrow"
+to = "cmd+left_arrow"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "fn+right_arrow"
+to = "cmd+right_arrow"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "fn+shift+left_arrow"
+to = "cmd+shift+left_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "fn+shift+right_arrow"
+to = "cmd+shift+right_arrow"
+unless = "terminal_and_ide"
+
+[[karabiner.rules]]
+bind = "cmd+ctrl+left_arrow"
+to = "cmd+left_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "cmd+ctrl+right_arrow"
+to = "cmd+right_arrow"
+unless = "browsers"
+
+[[karabiner.rules]]
+bind = "cmd+e"
+to = "cmd+l"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+e"
+to = "cmd+l"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+h"
+to = "cmd+h"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+w"
+to = "cmd+shift+w"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+t"
+to = "cmd+shift+t"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+n"
+to = "cmd+n"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+n"
+to = "cmd+shift+n"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+k"
+to = "cmd+k"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+j"
+to = "cmd+j"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+d"
+to = "cmd+d"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+d"
+to = "cmd+shift+d"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+r"
+to = "cmd+shift+r"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+u"
+to = "cmd+u"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+c"
+to = "cmd+shift+c"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+b"
+to = "cmd+b"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+i"
+to = "cmd+i"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+u"
+to = "cmd+u"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+s"
+to = "cmd+shift+s"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+l"
+to = "cmd+l"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+0"
+to = "cmd+0"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+equal_sign"
+to = "cmd+equal_sign"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+hyphen"
+to = "cmd+hyphen"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+shift+delete_forward"
+to = "cmd+shift+delete_forward"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "f5"
+to = "cmd+r"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+f5"
+to = "cmd+shift+r"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "caps+open_bracket"
+to = "cmd+shift+open_bracket"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "caps+close_bracket"
+to = "cmd+shift+close_bracket"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+1"
+to = "cmd+1"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+2"
+to = "cmd+2"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+3"
+to = "cmd+3"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+4"
+to = "cmd+4"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+5"
+to = "cmd+5"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+6"
+to = "cmd+6"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+7"
+to = "cmd+7"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+8"
+to = "cmd+8"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+9"
+to = "cmd+9"
+only = "browsers"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+t"
+shell = "open -a 'WezTerm'"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+m"
+shell = "open -a 'Music'"
+unless_apps = ["^com\\.jetbrains\\..*$", "^com\\.knollsoft\\.Rectangle$"]
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+b"
+shell = "open -a 'Brave Browser'"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+i"
+shell = "open -a 'IntelliJ IDEA'"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+g"
+shell = "open -a 'GoLand'"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+s"
+shell = "open -a 'TickTick'"
+
+[[karabiner.rules]]
+bind = "ctrl+cmd+d"
+shell = "open -a 'Obsidian'"

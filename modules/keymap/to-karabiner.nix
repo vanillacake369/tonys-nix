@@ -1,138 +1,139 @@
 {
   lib,
-  keybinds,
+  spec,
 }: let
-  maps = builtins.filter (m: builtins.elem "karabiner" m.tags) keybinds.keymaps;
+  cfg = spec.karabiner;
 
-  # "cmd+ctrl+q" -> { key_code = "q"; modifiers = ["left_command" "left_control"]; }
-  parseExpression = expr: let
-    parts = lib.splitString "+" expr;
-    rawKey = lib.last parts;
-    mods = lib.init parts;
-    mapMod = m:
-      if m == "cmd" || m == "command"
-      then "left_command"
-      else if m == "ctrl" || m == "control"
-      then "left_control"
-      else if m == "alt" || m == "option"
-      then "left_option"
-      else if m == "shift"
-      then "left_shift"
-      else m;
-    parsedMods = map mapMod mods;
-  in
-    {key_code = rawKey;}
-    // lib.optionalAttrs (parsedMods != []) {modifiers = parsedMods;};
-
-  # from clause: mandatory + optional modifiers
-  mkFrom = m: let
-    parts = lib.splitString "+" m.bind;
-    rawKey = lib.last parts;
-    mods = lib.init parts;
-    mapMod = mod:
-      if mod == "hyper"
-      then ["left_control" "left_shift" "left_option"]
-      else if mod == "cmd"
-      then ["left_command"]
-      else if mod == "ctrl"
-      then ["left_control"]
-      else if mod == "option" || mod == "alt"
-      then ["left_option"]
-      else if mod == "shift"
-      then ["left_shift"]
-      else [mod];
-    parsedMods = lib.flatten (map mapMod mods);
-  in {
-    key_code = rawKey;
-    modifiers =
-      {mandatory = parsedMods;}
-      // lib.optionalAttrs (m ? optional) {inherit (m) optional;};
+  modifierCodes = {
+    cmd = "left_command";
+    command = "left_command";
+    ctrl = "left_control";
+    control = "left_control";
+    option = "left_option";
+    alt = "left_option";
+    shift = "left_shift";
+    fn = "fn";
   };
 
-  # to action: shell_command / key remap / disable(vk_none)
-  mkTo = m:
-    if m ? shell
-    then [{shell_command = m.shell;}]
-    else if !(m ? to)
-    then null
-    else if builtins.isList m.to && m.to == []
-    then [{key_code = "vk_none";}]
-    else if builtins.isList m.to
-    then
-      map (
-        x:
-          if builtins.isString x
-          then parseExpression x
-          else x
-      )
-      m.to
-    else if builtins.isString m.to
-    then [(parseExpression m.to)]
-    else null;
+  mapModifier = modifier:
+    modifierCodes.${modifier} or modifier;
 
-  # complete manipulator
-  mkRule = m: let
-    toAction = mkTo m;
+  parseExpression = expression: let
+    parts = lib.splitString "+" expression;
+    key = lib.last parts;
+    rawModifiers = lib.init parts;
+    modifiers = lib.unique (lib.flatten (map (
+        modifier:
+          if modifier == "caps"
+          then map mapModifier cfg.caps.to_modifiers
+          else [(mapModifier modifier)]
+      )
+      rawModifiers));
+  in
+    {key_code = key;}
+    // lib.optionalAttrs (modifiers != []) {inherit modifiers;};
+
+  resolveContext = name:
+    if builtins.hasAttr name cfg.contexts
+    then cfg.contexts.${name}
+    else throw "Karabiner exporter: unknown context '${name}'";
+
+  contextCondition = kind: name: let
+    context = resolveContext name;
+  in
+    if context.type or null == "input_source_if"
+    then context
+    else {
+      type =
+        if kind == "only"
+        then "frontmost_application_if"
+        else "frontmost_application_unless";
+      inherit (context) bundle_identifiers;
+    };
+
+  renderConditions = rule:
+    (lib.optional (rule ? only) (contextCondition "only" rule.only))
+    ++ (lib.optional (rule ? unless) (contextCondition "unless" rule.unless))
+    ++ (lib.optional (rule ? condition) (resolveContext rule.condition));
+
+  renderFrom = rule:
+    if rule ? from_consumer_key
+    then {
+      consumer_key_code = rule.from_consumer_key;
+      modifiers = {mandatory = [];};
+    }
+    else let
+      parsed = parseExpression rule.bind;
+    in {
+      inherit (parsed) key_code;
+      modifiers =
+        {
+          mandatory = parsed.modifiers or [];
+        }
+        // lib.optionalAttrs (rule ? optional) {
+          inherit (rule) optional;
+        };
+    };
+
+  renderToItem = value:
+    if builtins.isString value
+    then parseExpression value
+    else value;
+
+  renderTo = rule:
+    if rule ? shell
+    then [{shell_command = rule.shell;}]
+    else if rule ? to_consumer_key
+    then [
+      {
+        consumer_key_code = rule.to_consumer_key;
+        modifiers = map mapModifier (rule.to_modifiers or []);
+      }
+    ]
+    else if rule ? disable && rule.disable
+    then [{key_code = "vk_none";}]
+    else if builtins.isList rule.to
+    then map renderToItem rule.to
+    else [(renderToItem rule.to)];
+
+  renderRule = rule: let
+    conditions = renderConditions rule;
   in
     {
       type = "basic";
-      from = mkFrom m;
+      from = renderFrom rule;
+      to = renderTo rule;
     }
-    // lib.optionalAttrs (toAction != null) {to = toAction;}
-    // lib.optionalAttrs (m ? to_if_alone) {
-      to_if_alone =
-        map (
-          x:
-            if builtins.isString x
-            then {key_code = x;}
-            else if x ? select_input_source
-            then {select_input_source = {language = x.select_input_source;};}
-            else x
-        )
-        m.to_if_alone;
+    // lib.optionalAttrs (conditions != []) {inherit conditions;};
+
+  renderAlone = action:
+    if builtins.isString action
+    then {key_code = action;}
+    else if action ? select_input_source
+    then {
+      select_input_source = {
+        language = action.select_input_source;
+      };
     }
-    // lib.optionalAttrs (m ? to_if_held && builtins.elem "hyper" m.to_if_held) {
-      to = [
-        {
-          set_variable = {
-            name = "capslock_held";
-            value = 1;
-          };
-        }
-        {
-          key_code = "left_shift";
-          modifiers = ["left_control" "left_option"];
-        }
-      ];
-      to_after_key_up = [
-        {
-          set_variable = {
-            name = "capslock_held";
-            value = 0;
-          };
-        }
-      ];
-    }
-    // lib.optionalAttrs (m ? unless || m ? only || m ? condition) {
-      conditions =
-        (lib.optional (m ? unless) {
-          type = "frontmost_application_unless";
-          bundle_identifiers = m.unless;
-        })
-        ++ (lib.optional (m ? only) {
-          type = "frontmost_application_if";
-          bundle_identifiers = m.only;
-        })
-        ++ (lib.optional (m ? condition) (
-          if m.condition.type == "variable_unless"
-          then {
-            type = "variable_unless";
-            name = m.condition.name;
-            value = m.condition.value;
-          }
-          else m.condition
-        ));
+    else action;
+
+  capsModifiers = map mapModifier cfg.caps.to_modifiers;
+  capsRule = {
+    type = "basic";
+    description = cfg.caps.description;
+    from = {
+      key_code = cfg.caps.trigger;
+      modifiers = {optional = ["any"];};
     };
+    to = [
+      {
+        key_code = lib.head capsModifiers;
+        modifiers = lib.tail capsModifiers;
+        lazy = true;
+      }
+    ];
+    to_if_alone = map renderAlone cfg.caps.to_if_alone;
+  };
 in
   builtins.toJSON {
     profiles = [
@@ -141,14 +142,17 @@ in
         selected = true;
         complex_modifications = {
           parameters = {
-            "basic.simultaneous_threshold_milliseconds" = 50;
-            "basic.to_if_alone_timeout_milliseconds" = 250;
-            "basic.to_if_held_down_threshold_milliseconds" = 500;
+            "basic.simultaneous_threshold_milliseconds" =
+              cfg.parameters.simultaneous_threshold_milliseconds;
+            "basic.to_if_alone_timeout_milliseconds" =
+              cfg.parameters.to_if_alone_timeout_milliseconds;
+            "basic.to_if_held_down_threshold_milliseconds" =
+              cfg.parameters.to_if_held_down_threshold_milliseconds;
           };
           rules = [
             {
-              description = "Nix SSOT Generated Rules";
-              manipulators = map mkRule maps;
+              description = "Generated from binds.toml by Nix";
+              manipulators = [capsRule] ++ map renderRule cfg.rules;
             }
           ];
         };
