@@ -40,19 +40,35 @@
       # Only activate for Agent tool completions
       [[ "$TOOL_NAME" != "Agent" ]] && exit 0
 
-      FIFO_DIR="${prov.async.fifoDir}/${name}"
-      RESULT_DIR="${prov.async.fifoDir}/${name}/results"
+      FIFO_DIR="''${AGENT_ASYNC_FIFO_DIR:-${prov.async.fifoDir}}/${name}"
+      RESULT_DIR="$FIFO_DIR/results"
       mkdir -p "$RESULT_DIR"
 
-      TOOL_OUTPUT=$(echo "$INPUT" | $JQ -r '.tool_output // empty' 2>/dev/null)
+      TOOL_OUTPUT=$(echo "$INPUT" | $JQ -r '
+        .tool_output
+        // .tool_response.output
+        // .tool_response.aggregated_output
+        // .tool_result.output
+        // .tool_result.aggregated_output
+        // .item.aggregated_output
+        // .aggregated_output
+        // .output
+        // (
+          if ((.tool_response.stdout? // null) != null or (.tool_response.stderr? // null) != null)
+          then ((.tool_response.stdout // "") + "\n" + (.tool_response.stderr // ""))
+          else empty
+          end
+        )
+        // empty
+      ' 2>/dev/null)
 
       # Write result to completion file (non-blocking alternative to FIFO)
       RESULT_FILE="$RESULT_DIR/''${SESSION_ID}-$(date +%s).json"
-      echo "$INPUT" | $JQ '{
+      echo "$INPUT" | $JQ --arg output "$TOOL_OUTPUT" '{
         session_id: .session_id,
         tool_name: .tool_name,
         completed_at: now | todate,
-        output_length: (.tool_output | length)
+        output_length: ($output | length)
       }' > "$RESULT_FILE" 2>/dev/null || true
 
       echo "[ASYNC-HANDSHAKE:${name}] Task result captured: $RESULT_FILE"

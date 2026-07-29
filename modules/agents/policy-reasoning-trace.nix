@@ -17,12 +17,28 @@
       JQ="${lib.getExe' pkgs.jq "jq"}"
 
       INPUT=$(cat)
-      TOOL_OUTPUT=$(echo "$INPUT" | $JQ -r '.tool_output // empty' 2>/dev/null)
+      TOOL_OUTPUT=$(echo "$INPUT" | $JQ -r '
+        .tool_output
+        // .tool_response.output
+        // .tool_response.aggregated_output
+        // .tool_result.output
+        // .tool_result.aggregated_output
+        // .item.aggregated_output
+        // .aggregated_output
+        // .output
+        // (
+          if ((.tool_response.stdout? // null) != null or (.tool_response.stderr? // null) != null)
+          then ((.tool_response.stdout // "") + "\n" + (.tool_response.stderr // ""))
+          else empty
+          end
+        )
+        // empty
+      ' 2>/dev/null)
       SESSION_ID=$(echo "$INPUT" | $JQ -r '.session_id // "default"' 2>/dev/null)
 
       [[ -z "$TOOL_OUTPUT" ]] && exit 0
 
-      TRACE_DIR="${prov.reasoning.traceDir}/${name}"
+      TRACE_DIR="''${AGENT_TRACE_DIR:-${prov.reasoning.traceDir}}/${name}"
       mkdir -p "$TRACE_DIR"
       TRACE_FILE="$TRACE_DIR/''${SESSION_ID}.log"
 

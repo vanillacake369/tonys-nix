@@ -8,7 +8,7 @@
   lib,
   ...
 }: let
-  hookAdapt = import ./policy-hook-adapters.nix {inherit lib;};
+  hookAdapt = import ./adapters/hooks.nix {inherit lib;};
   allHooks = config.agentPolicy._hooks;
   providers = config.agentPolicy.providers;
   providerRuntime = config.agentPolicy._providerRuntime;
@@ -25,6 +25,7 @@
 in {
   imports = [
     ./policy-contract.nix
+    ./policy-agentops-registry.nix
     ./policy-assertions.nix
     ./policy-phase-gate.nix
     ./policy-path-guard.nix
@@ -69,6 +70,12 @@ in {
   config.home.activation.agentPolicyDirs = lib.mkIf (enabledProviders != {}) (
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       mkdir -p "${config.agentPolicy.global.stateRoot}"
+      ${lib.optionalString config.agentPolicy.workflow.enabled ''
+        mkdir -p "${config.agentPolicy.workflow.stateDir}"
+      ''}
+      ${lib.optionalString config.agentPolicy.telemetry.enabled ''
+        mkdir -p "$(dirname "${config.agentPolicy.telemetry.eventLog}")"
+      ''}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: prov: ''
           ${lib.optionalString prov.phases.enforced ''
             mkdir -p "${prov.phases.stateDir}"

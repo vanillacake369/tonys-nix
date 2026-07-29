@@ -54,17 +54,17 @@
       ${sectionChecks}
 
       if [[ ''${#MISSING[@]} -gt 0 ]]; then
-        echo "[STRATEGY-LINT:${name}] Missing required sections: ''${MISSING[*]}"
-        echo "Add these sections to $STRATEGY_FILE before proceeding."
+        echo "[STRATEGY-LINT:${name}] Missing required sections: ''${MISSING[*]}" >&2
+        echo "Add these sections to $STRATEGY_FILE before proceeding." >&2
         exit 2
       fi
 
       ${lib.optionalString (reviewer != null) ''
         # Peer review gate: require review file to exist
         if [[ ! -f "$REVIEW_FILE" ]]; then
-          echo "[STRATEGY-LINT:${name}] Peer review from '${reviewer}' not found."
-          echo "Expected: $REVIEW_FILE"
-          echo "Run peer review before proceeding to execution."
+          echo "[STRATEGY-LINT:${name}] Peer review from '${reviewer}' not found." >&2
+          echo "Expected: $REVIEW_FILE" >&2
+          echo "Run peer review before proceeding to execution." >&2
           exit 2
         fi
       ''}
