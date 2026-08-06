@@ -39,8 +39,16 @@
     version = "0.1.0";
     src = cleanZellijSource zellijNavSwitcherRoot ["target/"];
     cargoLock.lockFile = ../../dotfiles/zellij/nav/wasm/switcher/Cargo.lock;
-    cargoBuildFlags = ["--target" "wasm32-wasip1"];
+    nativeBuildInputs = [pkgs.pkg-config];
+    buildInputs = [pkgs.openssl];
+    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
+    OPENSSL_LIB_DIR = "${pkgs.openssl.out}/lib";
     doCheck = false;
+    buildPhase = ''
+      runHook preBuild
+      cargo build --offline --release --target wasm32-wasip1
+      runHook postBuild
+    '';
     installPhase = ''
       runHook preInstall
       install -Dm644 target/wasm32-wasip1/release/zellij_nav_switcher.wasm "$out/share/zellij/plugins/zellij-nav-switcher.wasm"
