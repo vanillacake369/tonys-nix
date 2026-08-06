@@ -154,7 +154,9 @@ impl CliCommand {
                 println!("{output}");
                 Ok(0)
             }
-            Self::PickerCommand { command_id } => feature::picker::command(&runtime, &command_id),
+            Self::PickerCommand { command_id } => {
+                feature::picker::run_command(&runtime, &command_id)
+            }
             Self::PickerPreview(args) => {
                 print!(
                     "{}",
@@ -259,7 +261,7 @@ fn picker_alias(runtime: &outbound::Runtime, argv0: &str, args: &[String]) -> Re
     }
 
     if mode == "--session-manager" {
-        return feature::picker::command(runtime, "session-manager");
+        return feature::picker::run_command(runtime, "session-manager");
     }
 
     feature::picker::run(runtime, mode, argv0)
