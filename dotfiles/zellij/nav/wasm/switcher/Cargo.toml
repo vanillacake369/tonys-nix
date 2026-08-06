@@ -1,0 +1,11 @@
+[package]
+name = "zellij-nav-switcher"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+zellij-tile = "0.44.3"
