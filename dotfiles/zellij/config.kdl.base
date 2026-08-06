@@ -24,7 +24,7 @@ keybinds clear-defaults=true {
         bind "p" { SwitchFocus; }
         bind "r" { NewPane "right"; SwitchToMode "normal"; }
         bind "s" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
                 floating true
                 close_on_exit false
                 width "90%"
@@ -127,7 +127,7 @@ keybinds clear-defaults=true {
         }
         bind "q" { Quit; }
         bind "w" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
                 floating true
                 close_on_exit false
                 borderless true
@@ -149,7 +149,7 @@ keybinds clear-defaults=true {
     shared_except "locked" "scroll" "search" "entersearch" "renametab" "renamepane" {
         bind "Alt p" { SwitchToMode "pane"; }
         bind "Alt Shift p" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
                 floating true
                 close_on_exit false
                 width "90%"
@@ -161,7 +161,7 @@ keybinds clear-defaults=true {
         }
         bind "Alt t" { SwitchToMode "tab"; }
         bind "Alt Shift t" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
                 floating true
                 close_on_exit false
                 width "80%"
@@ -173,7 +173,7 @@ keybinds clear-defaults=true {
         }
         bind "Alt s" { SwitchToMode "session"; }
         bind "Alt Shift s" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
                 floating true
                 close_on_exit false
                 width "80%"
@@ -184,7 +184,7 @@ keybinds clear-defaults=true {
             SwitchToMode "normal"
         }
         bind "Alt Space" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
                 floating true
                 close_on_exit false
                 width "90%"
@@ -238,7 +238,7 @@ keybinds clear-defaults=true {
         bind "Alt ]" { NextSwapLayout; }
         bind "Alt N" { FocusPreviousPane; }
         bind "Alt n" {
-            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
                 floating true
                 close_on_exit false
                 borderless true
