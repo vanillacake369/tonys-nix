@@ -1,61 +1,7 @@
 #!/usr/bin/env bash
-# Toggle to the previously recorded Zellij navigation target.
-#
-# Responsibilities:
-# - implement the `Alt n` explicit session/context toggle
-# - consume exactly one state file: previous-target.json
-# - validate the stored target before focusing it
-# - replace previous-target with the context we just left after a successful move
-# - acquire a narrow state lock for the read/focus/swap transaction
-#
-# Strict UX contract:
-# - `Alt \`` is native Zellij `FocusPreviousPane` and is not implemented here
-# - if previous-target is valid, focus it with graceful degradation:
-#     Pane -> Tab -> Session
-# - if previous-target is invalid, delete it and no-op
-# - if previous-target is missing, no-op
-# - if focus fails completely, preserve previous-target unless its session is
-#   proven missing
-# - if movement succeeds but previous-target commit fails, stay at the moved
-#   target and preserve the old history; the next toggle clears self-reference
-#   if the old target is now current
-# - never infer history from session list ordering
-#
-# Assumptions:
-# - Zellij 0.44.x supports `list-sessions --no-formatting`
-# - `zellij --session <name> action list-panes --json ...` can inspect active sessions
-# - Zellij itself owns native pane focus history
-
 set -euo pipefail
 
-command -v zellij >/dev/null 2>&1 || exit 127
-command -v jq >/dev/null 2>&1 || exit 127
-
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"
-# shellcheck source=/dev/null
-. "$script_dir/zellij-nav-lib"
+nav_command="${ZELLIJ_NAV_COMMAND:-$script_dir/zellij-nav}"
 
-nav_init
-
-is_helper="${ZELLIJ_NAV_HELPER:-0}"
-helper_session="$(nav_current_session || true)"
-close_helper_pane_on_exit() {
-  nav_close_pane_by_id "$helper_session" "${ZELLIJ_PANE_ID:-}" || true
-}
-[ "$is_helper" = "1" ] && trap close_helper_pane_on_exit EXIT
-
-if [ "$is_helper" = "1" ] && [ -n "${ZELLIJ_PANE_ID:-}" ]; then
-  nav_defer_context_toggle || {
-    nav_log "toggle no-op reason=defer-failed"
-    exit 1
-  }
-  exit 0
-fi
-
-if [ "${ZELLIJ_NAV_FOCUS_UNDERLYING:-0}" = "1" ]; then
-  nav_focus_underlying_pane_for_capture || {
-    nav_log "toggle continuing with degraded current-context capture"
-  }
-fi
-
-nav_toggle_previous_target
+exec "$nav_command" context-toggle-run
