@@ -562,6 +562,23 @@ EOF
   [ "$status" -ne 0 ]
 }
 
+@test "session manager helper command closes its floating launcher pane" {
+  run env \
+    ZELLIJ_PANE_ID=42 \
+    ZELLIJ_NAV_HELPER=1 \
+    ZELLIJ_STUB_HELPER_SELF=1 \
+    bash "$PICKER" --session-manager
+  [ "$status" -eq 0 ]
+
+  wait_for_log "command executed command_id=session-manager"
+  wait_for_log "closing helper pane session=current pane=terminal_42"
+  wait_for_log "closed helper pane session=current pane=terminal_42"
+  run grep -q "zellij action launch-or-focus-plugin --floating --move-to-focused-tab zellij:session-manager" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q "zellij --session current action close-pane --pane-id terminal_42" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+}
+
 @test "diagnose context uses installed rust command when available" {
   cat >"$WORK/bin/zellij-nav" <<'EOF'
 #!/usr/bin/env bash
