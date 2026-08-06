@@ -26,7 +26,7 @@ keybinds clear-defaults=true {
         bind "s" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 width "90%"
                 height "80%"
                 x "5%"
@@ -129,7 +129,7 @@ keybinds clear-defaults=true {
         bind "w" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 borderless true
                 width "20%"
                 height "1"
@@ -151,7 +151,7 @@ keybinds clear-defaults=true {
         bind "Alt Shift p" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 width "90%"
                 height "80%"
                 x "5%"
@@ -163,7 +163,7 @@ keybinds clear-defaults=true {
         bind "Alt Shift t" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 width "80%"
                 height "70%"
                 x "10%"
@@ -175,7 +175,7 @@ keybinds clear-defaults=true {
         bind "Alt Shift s" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 width "80%"
                 height "70%"
                 x "10%"
@@ -186,7 +186,7 @@ keybinds clear-defaults=true {
         bind "Alt Space" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 width "90%"
                 height "80%"
                 x "5%"
@@ -240,7 +240,7 @@ keybinds clear-defaults=true {
         bind "Alt n" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
                 floating true
-                close_on_exit true
+                close_on_exit false
                 borderless true
                 width "20%"
                 height "1"
@@ -322,7 +322,7 @@ plugins {
 // eg. "https://example.com/my-plugin.wasm"
 load_plugins {
 }
- 
+
 // Use a simplified UI without special fonts (arrow glyphs)
 // Options:
 //   - true
