@@ -11,6 +11,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE:
     # neovim-unwrapped는 editor overlay에서 직접 치환되는 runtime core다.
     # nixos-unstable을 그대로 따라가면 plugin ABI, treesitter parser, LSP
@@ -24,6 +28,7 @@
     nixpkgs-neovim,
     home-manager,
     llm-agents,
+    rust-overlay,
     ...
   }: let
     inherit (nixpkgs) lib;
@@ -38,7 +43,7 @@
     # 이 파일은 입력을 연결하는 조합 계층으로만 유지한다.
     overlays =
       (import ./lib/collect-flake-overlays.nix {
-        inherit lib llm-agents nixpkgs-neovim;
+        inherit lib llm-agents nixpkgs-neovim rust-overlay;
       })
       ./modules;
 
