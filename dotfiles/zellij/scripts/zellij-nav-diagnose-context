@@ -1,59 +1,7 @@
 #!/usr/bin/env bash
-# Diagnose the public Zellij state used by zellij-nav-lib context capture.
-#
-# Responsibilities:
-# - print only the Zellij session/pane identifiers needed for navigation debug
-# - show the pane fields that nav_current_target/nav_current_location can see
-# - show the exact target/location selected by the current capture logic
-#
-# Assumptions:
-# - run this inside the Zellij session being diagnosed
-# - run it once from a normal pane and once through `zellij run --floating`
-#
-# Failure handling:
-# - if Zellij or jq is unavailable, fail clearly
-# - if capture falls back to session-level, print that result as data rather
-#   than guessing an underlying pane
-
 set -euo pipefail
 
-command -v zellij >/dev/null 2>&1 || {
-  printf 'zellij not found\n' >&2
-  exit 127
-}
-command -v jq >/dev/null 2>&1 || {
-  printf 'jq not found\n' >&2
-  exit 127
-}
-
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"
-# shellcheck source=/dev/null
-. "$script_dir/zellij-nav-lib"
+nav_command="${ZELLIJ_NAV_COMMAND:-$script_dir/zellij-nav}"
 
-nav_init
-
-printf 'timestamp=%s\n' "$(date '+%Y-%m-%dT%H:%M:%S%z')"
-printf 'ZELLIJ_SESSION_NAME=%s\n' "${ZELLIJ_SESSION_NAME:-}"
-printf 'ZELLIJ_PANE_ID=%s\n' "${ZELLIJ_PANE_ID:-}"
-printf 'current_session=%s\n' "$(nav_current_session)"
-
-printf '\nall_pane_state=\n'
-zellij action list-panes --json --all --tab --state --command |
-  jq '.[] | {
-    id,
-    tab_id,
-    title,
-    pane_command,
-    pane_cwd,
-    is_focused,
-    is_selectable,
-    is_plugin,
-    is_floating,
-    exited
-  }'
-
-printf '\nnav_current_target=\n'
-nav_current_target | jq '.'
-
-printf '\nnav_current_location=\n'
-nav_current_location | jq '.'
+exec "$nav_command" diagnose
