@@ -142,6 +142,13 @@ pub fn command(port: &impl PickerPort, command_id: &str) -> Result<u8, String> {
     Ok(1)
 }
 
+pub fn run_command(port: &impl PickerPort, command_id: &str) -> Result<u8, String> {
+    let helper_session = helper_session(port);
+    let status = command(port, command_id);
+    close_helper(port, helper_session);
+    status
+}
+
 pub fn preview(
     port: &impl PickerPort,
     kind: &str,
