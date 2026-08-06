@@ -160,6 +160,10 @@ in {
       && lib.hasInfix ''zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher'' zellijModule
       && lib.hasInfix ''src = cleanZellijSource zellijNavRoot ["target/" "wasm/"]'' zellijModule
       && lib.hasInfix ''src = cleanZellijSource zellijNavSwitcherRoot ["target/"]'' zellijModule
+      && lib.hasInfix ''nativeBuildInputs = [pkgs.pkg-config]'' zellijModule
+      && lib.hasInfix ''OPENSSL_INCLUDE_DIR = "''${pkgs.openssl.dev}/include"'' zellijModule
+      && lib.hasInfix ''OPENSSL_LIB_DIR = "''${pkgs.openssl.out}/lib"'' zellijModule
+      && lib.hasInfix ''cargo build --offline --release --target wasm32-wasip1'' zellijModule
       && !(builtins.pathExists ../dotfiles/zellij/plugins)
       && lib.hasInfix ''zellij-tile = "0.44.3"'' navPluginCargo
       && lib.hasInfix ''switch_session_with_focus'' navPluginRust
