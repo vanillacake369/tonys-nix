@@ -76,13 +76,19 @@ in {
       builtins.all (binding: lib.hasInfix binding directSectionBody) [
         ''zellij-pane-picker --panes''
         ''zellij-pane-picker --tabs''
-        ''ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions''
+        ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --sessions''
         ''zellij-pane-picker --all''
-        ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
+        ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
         ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
       ]
       && !(lib.hasInfix ''bind "Alt 6"'' darwinConfig)
       && !(lib.hasInfix ''bind "Alt g"'' darwinConfig)
+    ))
+    (assert' "zellij-config: picker shortcuts opt into protected plugin routing" (
+      lib.count
+      (command: command == ''ZELLIJ_NAV_PROTECTED_STRATEGY=plugin'')
+      (lib.splitString " " directSectionBody)
+      >= 5
     ))
     (assert' "zellij-config: removed custom leader and layout wiring" (
       !(lib.hasInfix "zellij-autolock" darwinConfig)
