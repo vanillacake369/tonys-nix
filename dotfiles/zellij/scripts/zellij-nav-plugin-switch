@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "$0")" && pwd -P)"
+nav_command="${ZELLIJ_NAV_COMMAND:-$script_dir/zellij-nav}"
+
+exec "$nav_command" plugin-switch "${1:-}" "${2:-session}" "${3:-}" "${4:-}"
