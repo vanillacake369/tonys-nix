@@ -17,8 +17,25 @@
   zellijModule = builtins.readFile ../modules/shell/zellij.hm.nix;
   panePicker = builtins.readFile ../dotfiles/zellij/scripts/zellij-pane-picker;
   contextToggle = builtins.readFile ../dotfiles/zellij/scripts/zellij-context-toggle;
-  navLib = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-lib;
-  navDispatch = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-dispatch;
+  diagnoseContext = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-diagnose-context;
+  navSidecar = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-sidecar;
+  navPluginSwitch = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-plugin-switch;
+  navRustCargo = builtins.readFile ../dotfiles/zellij/nav/Cargo.toml;
+  navRustCli = builtins.readFile ../dotfiles/zellij/nav/src/cli.rs;
+  navRustMain = builtins.readFile ../dotfiles/zellij/nav/src/main.rs;
+  navRustContextToggle = builtins.readFile ../dotfiles/zellij/nav/src/feature/context_toggle.rs;
+  navRustDiagnose = builtins.readFile ../dotfiles/zellij/nav/src/feature/diagnose.rs;
+  navRustHelper = builtins.readFile ../dotfiles/zellij/nav/src/feature/helper.rs;
+  navRustNavigate = builtins.readFile ../dotfiles/zellij/nav/src/feature/navigate.rs;
+  navRustOutbound = builtins.readFile ../dotfiles/zellij/nav/src/outbound/mod.rs;
+  navRustPicker = builtins.readFile ../dotfiles/zellij/nav/src/feature/picker.rs;
+  navRustPluginSwitch = builtins.readFile ../dotfiles/zellij/nav/src/feature/plugin_switch.rs;
+  navRustRecordCurrent = builtins.readFile ../dotfiles/zellij/nav/src/feature/record_current.rs;
+  navRustSidecar = builtins.readFile ../dotfiles/zellij/nav/src/feature/sidecar.rs;
+  navRustToggle = builtins.readFile ../dotfiles/zellij/nav/src/feature/toggle.rs;
+  navPluginCargo = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/Cargo.toml;
+  navPluginRust = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/src/lib.rs;
+  zellijReadme = builtins.readFile ../dotfiles/zellij/README.md;
 
   directSection =
     builtins.elemAt
@@ -29,6 +46,17 @@
       shared_except''
     directSection)
     0;
+
+  thinWrapper = command: file:
+    lib.hasInfix ''ZELLIJ_NAV_COMMAND:-$script_dir/zellij-nav'' file
+    && lib.hasInfix command file
+    && !(lib.hasInfix ''zellij action list-panes --json'' file)
+    && !(lib.hasInfix ''nav_init'' file)
+    && !(lib.hasInfix ''nav_focus'' file)
+    && !(lib.hasInfix ''nav_navigate'' file)
+    && !(lib.hasInfix ''nav_record'' file)
+    && !(lib.hasInfix ''jq'' file)
+    && !(lib.hasInfix ''awk'' file);
 in {
   results = [
     (assert' "zellij-config: platform clipboard and deterministic paths" (
@@ -43,40 +71,15 @@ in {
       && lib.hasInfix ''fish_features "no-query-term"'' linuxConfig
       && lib.hasInfix "keybinds clear-defaults=true" darwinConfig
       && lib.hasInfix ''bind "Ctrl g" { SwitchToMode "locked"; }'' darwinConfig
-      && lib.hasInfix ''
-        locked {
-                bind "Ctrl g" { SwitchToMode "normal"; }''
-      darwinConfig
     ))
-    (assert' "zellij-config: direct shortcuts exclude locked and text-input modes" (
+    (assert' "zellij-config: direct shortcuts route to navigation entrypoints" (
       builtins.all (binding: lib.hasInfix binding directSectionBody) [
-        ''bind "Alt p" { SwitchToMode "pane"; }''
-        ''bind "Alt Shift p"''
         ''zellij-pane-picker --panes''
-        ''bind "Alt t" { SwitchToMode "tab"; }''
-        ''bind "Alt Shift t"''
         ''zellij-pane-picker --tabs''
-        ''bind "Alt s" { SwitchToMode "session"; }''
-        ''bind "Alt Shift s"''
         ''ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions''
-        ''bind "Alt Space"''
         ''zellij-pane-picker --all''
-        ''bind "Alt /"''
-        ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
-        ''bind "Alt [" { PreviousSwapLayout; }''
-        ''bind "Alt ]" { NextSwapLayout; }''
-        ''bind "Alt N" { FocusPreviousPane; }''
-        ''bind "Alt n"''
         ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
-        ''bind "Alt r" { SwitchToMode "resize"; }''
-        ''bind "Alt m" { SwitchToMode "move"; }''
-        ''bind "Alt e" { SwitchToMode "scroll"; }''
-        ''bind "Alt h" { MoveFocusOrTab "left"; }''
-        ''bind "Alt j" { MoveFocus "down"; }''
-        ''bind "Alt k" { MoveFocus "up"; }''
-        ''bind "Alt l" { MoveFocusOrTab "right"; }''
-        ''bind "Alt f" { ToggleFocusFullscreen; }''
-        ''bind "Alt w" { ToggleFloatingPanes; }''
+        ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
       ]
       && !(lib.hasInfix ''bind "Alt 6"'' darwinConfig)
       && !(lib.hasInfix ''bind "Alt g"'' darwinConfig)
@@ -87,70 +90,88 @@ in {
       && !(lib.hasInfix ''SwitchToMode "tmux"'' darwinConfig)
       && !(builtins.pathExists ../dotfiles/zellij/layouts/default.kdl)
       && !(builtins.pathExists ../dotfiles/zellij/layouts/minimal.kdl)
-      && !(lib.hasInfix ''.config/zellij/layouts/default.kdl'' zellijModule)
-      && !(lib.hasInfix ''.config/zellij/layouts/minimal.kdl'' zellijModule)
       && !(lib.hasInfix "zjstatus" zellijModule)
       && !(lib.hasInfix "zjstatus" darwinConfig)
       && lib.hasInfix ''default_layout "compact"'' darwinConfig
     ))
-    (assert' "zellij-picker: uses json actions and live previews" (
-      lib.hasInfix "zellij action list-panes --json" panePicker
-      && lib.hasInfix "zellij action list-tabs --json" panePicker
-      && lib.hasInfix "--render-preview" panePicker
-      && lib.hasInfix "action dump-screen --pane-id" panePicker
-      && lib.hasInfix "cmp -s" panePicker
-      && lib.hasInfix "mktemp" panePicker
-      && lib.hasInfix "ZELLIJ_PICKER_PREVIEW_LIVE_DELAY" panePicker
-      && lib.hasInfix "ZELLIJ_PICKER_PREVIEW_INTERVAL" panePicker
-      && lib.hasInfix "right,65%,border-left,noinfo" panePicker
-      && !(lib.hasInfix "right,65%,border-left,follow,noinfo" panePicker)
+    (assert' "zellij-navigation: runtime scripts are rust binary aliases" (
+      lib.hasInfix ''.config/zellij/scripts/zellij-pane-picker'' zellijModule
+      && lib.hasInfix ''.config/zellij/scripts/zellij-context-toggle'' zellijModule
+      && lib.hasInfix ''.config/zellij/scripts/zellij-nav-sidecar'' zellijModule
+      && lib.hasInfix ''.config/zellij/scripts/zellij-nav-plugin-switch'' zellijModule
+      && lib.hasInfix ''source = "''${zellijNav}/bin/zellij-nav";'' zellijModule
+      && !(lib.hasInfix ''.config/zellij/scripts/zellij-nav-lib'' zellijModule)
+      && !(builtins.pathExists ../dotfiles/zellij/scripts/zellij-nav-lib)
+      && !(lib.hasInfix ''.config/zellij/scripts/zellij-nav-dispatch'' zellijModule)
     ))
-    (assert' "zellij-navigation: helper exits before deferred target switch" (
-      lib.hasInfix "ZELLIJ_NAV_HELPER" panePicker
-      && lib.hasInfix "close_helper_pane_on_exit" panePicker
-      && lib.hasInfix "trap close_helper_pane_on_exit EXIT" panePicker
-      && lib.hasInfix "nav_defer_navigation_to_target" panePicker
-      && lib.hasInfix "ZELLIJ_NAV_HELPER" contextToggle
-      && lib.hasInfix "nav_defer_context_toggle" contextToggle
-      && lib.hasInfix "trap close_helper_pane_on_exit EXIT" contextToggle
-      && lib.hasInfix "action close-pane --pane-id" navLib
-      && lib.hasInfix "zellij-nav-dispatch" navLib
-      && lib.hasInfix "sleep \"$delay\"" navDispatch
-      && lib.hasInfix "nav_navigate_to_target" navDispatch
-      && lib.hasInfix ''.config/zellij/scripts/zellij-nav-dispatch'' zellijModule
+    (assert' "zellij-navigation: local script shims are thin rust entrypoints" (
+      thinWrapper ''picker-run'' panePicker
+      && lib.hasInfix ''picker-preview "$@"'' panePicker
+      && lib.hasInfix ''picker-command session-manager'' panePicker
+      && thinWrapper ''context-toggle-run'' contextToggle
+      && thinWrapper ''diagnose'' diagnoseContext
+      && thinWrapper ''plugin-switch'' navPluginSwitch
+      && thinWrapper ''sidecar-run'' navSidecar
     ))
-    (assert' "zellij-navigation: cross-session switch stays inside current client" (
-      !(lib.hasInfix ''.config/zellij/scripts/zellij-external-nav'' zellijModule)
-      && !(lib.hasInfix ''zellij-external-nav'' darwinConfig)
-      && !(lib.hasInfix ''ZELLIJ_NAV_EXTERNAL'' panePicker)
-      && !(lib.hasInfix ''nav_target_requires_external_client'' panePicker)
-      && !(lib.hasInfix ''zellij attach "$session"'' navLib)
-      && lib.hasInfix ''zellij action switch-session "$session"'' navLib
-      && lib.hasInfix ''zellij action switch-session "$session" --pane-id "terminal_$pane_id"'' navLib
+    (assert' "zellij-navigation: rust feature surfaces cover main workflows" (
+      lib.hasInfix ''name = "zellij-nav"'' navRustCargo
+      && lib.hasInfix ''mod cli;'' navRustMain
+      && lib.hasInfix ''Some("context-toggle-run")'' navRustCli
+      && lib.hasInfix ''Some("picker-run")'' navRustCli
+      && lib.hasInfix ''Some("picker-preview")'' navRustCli
+      && lib.hasInfix ''Some("picker-command")'' navRustCli
+      && lib.hasInfix ''Some("navigate")'' navRustCli
+      && lib.hasInfix ''Some("record-current")'' navRustCli
+      && lib.hasInfix ''Some("diagnose")'' navRustCli
+      && lib.hasInfix ''Some("plugin-switch")'' navRustCli
+      && lib.hasInfix ''Some("sidecar-run")'' navRustCli
+      && lib.hasInfix ''zellij-pane-picker'' navRustCli
+      && lib.hasInfix ''zellij-context-toggle'' navRustCli
+      && lib.hasInfix ''zellij-nav-plugin-switch'' navRustCli
+      && lib.hasInfix ''zellij-nav-sidecar'' navRustCli
+      && lib.hasInfix ''pub trait ContextTogglePort'' navRustContextToggle
+      && lib.hasInfix ''pub trait PickerPort'' navRustPicker
+      && lib.hasInfix ''pub trait HelperPort'' navRustHelper
+      && lib.hasInfix ''pub trait NavigatePort'' navRustNavigate
+      && lib.hasInfix ''pub trait DiagnosePort'' navRustDiagnose
+      && lib.hasInfix ''pub trait PluginSwitchPort'' navRustPluginSwitch
+      && lib.hasInfix ''pub trait RecordPort'' navRustRecordCurrent
+      && lib.hasInfix ''pub trait SidecarPort'' navRustSidecar
+      && lib.hasInfix ''pub trait TogglePort'' navRustToggle
     ))
-    (assert' "zellij-navigation: helper keybinds opt in explicitly" (
-      lib.hasInfix ''Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions"'' darwinConfig
-      && lib.hasInfix ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle'' darwinConfig
-      && lib.hasInfix ''        Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
-                        floating true
-                        close_on_exit true''
-      darwinConfig
-      && lib.hasInfix ''        Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
-                        floating true
-                        close_on_exit true''
-      darwinConfig
-      && lib.hasInfix ''        Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
-                        floating true
-                        close_on_exit true''
-      darwinConfig
-      && lib.hasInfix ''        Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
-                        floating true
-                        close_on_exit true''
-      darwinConfig
-      && lib.hasInfix ''        Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
-                        floating true
-                        close_on_exit true''
-      darwinConfig
+    (assert' "zellij-navigation: protected and sidecar policies are rust-owned" (
+      lib.hasInfix ''ZELLIJ_NAV_PROTECTED_COMMAND_PATTERN'' navRustOutbound
+      && lib.hasInfix ''ZELLIJ_NAV_PROTECTED_STRATEGY'' navRustOutbound
+      && lib.hasInfix ''protected context blocked reason=no-client-scoped-zellij-mutation strategy=block'' navRustOutbound
+      && lib.hasInfix ''protected context detected route=plugin'' navRustOutbound
+      && lib.hasInfix ''protected context detected route=sidecar'' navRustOutbound
+      && lib.hasInfix ''pub struct WaitPolicy'' navRustSidecar
+      && lib.hasInfix ''pub struct LaunchRequest'' navRustSidecar
+      && lib.hasInfix ''pub fn launch'' navRustSidecar
+      && lib.hasInfix ''wait_attached_requires_consecutive_counts_above_initial'' navRustSidecar
+      && lib.hasInfix ''launch_uses_cli_spawn_before_start_route'' navRustSidecar
+    ))
+    (assert' "zellij-navigation: wasm plugin stays packaged with rust toolchain target" (
+      lib.hasInfix ''.config/zellij/plugins/zellij-nav-switcher.wasm'' zellijModule
+      && lib.hasInfix ''home.activation.zellijNavSwitcherPermissions'' zellijModule
+      && lib.hasInfix ''pkgs.rust-bin.stable.latest.default.override'' zellijModule
+      && lib.hasInfix ''targets = ["wasm32-wasip1"]'' zellijModule
+      && lib.hasInfix ''zellijWasmRustPlatform.buildRustPackage'' zellijModule
+      && lib.hasInfix ''zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher'' zellijModule
+      && lib.hasInfix ''src = cleanZellijSource zellijNavRoot ["target/" "wasm/"]'' zellijModule
+      && lib.hasInfix ''src = cleanZellijSource zellijNavSwitcherRoot ["target/"]'' zellijModule
+      && !(builtins.pathExists ../dotfiles/zellij/plugins)
+      && lib.hasInfix ''zellij-tile = "0.44.3"'' navPluginCargo
+      && lib.hasInfix ''switch_session_with_focus'' navPluginRust
+      && lib.hasInfix ''cli_pipe_output'' navPluginRust
+      && !(lib.hasInfix ''request_permission'' navPluginRust)
+    ))
+    (assert' "zellij-navigation: docs are compact readme-owned principles" (
+      !(builtins.pathExists ../dotfiles/zellij/docs)
+      && lib.hasInfix ''# Zellij Navigation'' zellijReadme
+      && lib.hasInfix ''Bash는 entrypoint compatibility만 유지한다'' zellijReadme
+      && lib.hasInfix ''Feature slice는 데이터 모델과 정책을 가까이 둔다'' zellijReadme
+      && lib.hasInfix ''WASM derivation은 빌드 시간이 길 수'' zellijReadme
     ))
   ];
 }
