@@ -239,6 +239,99 @@ JSON
     exit 0
   fi
 
+  if [ "${ZELLIJ_STUB_HELPER_FOCUS_WITH_UNFOCUSED_CDX:-0}" = "1" ]; then
+    if grep -q "zellij action focus-previous-pane" "${ZELLIJ_STUB_LOG:?}" 2>/dev/null; then
+      cat <<JSON
+[
+  {
+    "id": 42,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "helper",
+    "pane_command": "zellij-context-toggle",
+    "terminal_command": "zellij-context-toggle",
+    "pane_cwd": "/tmp",
+    "is_focused": false,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  },
+  {
+    "id": 7,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "underlying",
+    "pane_command": "bash",
+    "terminal_command": "bash",
+    "pane_cwd": "/work",
+    "is_focused": true,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  },
+  {
+    "id": 9,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "cdx",
+    "pane_command": "cdx",
+    "terminal_command": "cdx",
+    "pane_cwd": "/work",
+    "is_focused": false,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  }
+]
+JSON
+    else
+      cat <<JSON
+[
+  {
+    "id": 42,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "helper",
+    "pane_command": "zellij-context-toggle",
+    "terminal_command": "zellij-context-toggle",
+    "pane_cwd": "/tmp",
+    "is_focused": true,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  },
+  {
+    "id": 7,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "underlying",
+    "pane_command": "bash",
+    "terminal_command": "bash",
+    "pane_cwd": "/work",
+    "is_focused": false,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  },
+  {
+    "id": 9,
+    "tab_id": 0,
+    "tab_name": "Main",
+    "title": "cdx",
+    "pane_command": "cdx",
+    "terminal_command": "cdx",
+    "pane_cwd": "/work",
+    "is_focused": false,
+    "is_plugin": false,
+    "is_selectable": true,
+    "exited": false
+  }
+]
+JSON
+    fi
+    exit 0
+  fi
+
   floating_self=false
   [ "${ZELLIJ_STUB_FLOATING_SELF:-0}" = "1" ] && floating_self=true
   cat <<JSON
@@ -302,6 +395,10 @@ fi
 
 if [ "${1:-}" = "action" ]; then
   if [ "${2:-}" = "start-or-reload-plugin" ]; then
+    if [ "${ZELLIJ_STUB_PLUGIN_FAIL:-0}" = "1" ]; then
+      printf 'stub plugin failed\n' >&2
+      exit 1
+    fi
     printf 'plugin_55\n'
   fi
   exit 0
@@ -704,6 +801,68 @@ EOF
   [ "$status" -eq 0 ]
 }
 
+@test "helper context toggle ignores unfocused cdx panes in same session" {
+  write_previous_target
+
+  run env \
+    ZELLIJ_PANE_ID=42 \
+    ZELLIJ_NAV_HELPER=1 \
+    ZELLIJ_NAV_FOCUS_UNDERLYING=1 \
+    ZELLIJ_NAV_PROTECTED_STRATEGY=plugin \
+    ZELLIJ_STUB_HELPER_FOCUS_WITH_UNFOCUSED_CDX=1 \
+    bash "$TOGGLE"
+  [ "$status" -eq 0 ]
+
+  wait_for_log "underlying pane focused for capture self_pane=42"
+  wait_for_log "toggle swapped previous-target"
+  run grep -q "protected context detected route=plugin" "$ZELLIJ_NAV_STATE_DIR/zellij-navigation.log"
+  [ "$status" -ne 0 ]
+  run grep -q "zellij action switch-session target" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q "zellij action start-or-reload-plugin" "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "protected helper context toggle falls back from plugin to sidecar" {
+  write_previous_target
+
+  run env \
+    ZELLIJ_PANE_ID=1 \
+    ZELLIJ_NAV_HELPER=1 \
+    ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar \
+    ZELLIJ_NAV_PLUGIN_SWITCH_COMMAND="$PLUGIN_SWITCH" \
+    ZELLIJ_NAV_SIDECAR_COMMAND="$SIDECAR" \
+    ZELLIJ_STUB_PROTECTED_SELF=1 \
+    ZELLIJ_STUB_PLUGIN_FAIL=1 \
+    bash "$TOGGLE"
+  [ "$status" -eq 0 ]
+
+  wait_for_log "protected context detected route=plugin-sidecar"
+  wait_for_log "plugin navigation failed reason=command-failed"
+  wait_for_log "protected fallback starting from=plugin to=sidecar"
+  wait_for_log "sidecar navigation accepted session=target"
+  wait_for_log "protected fallback completed route=sidecar"
+  wait_for_log "toggle swapped previous-target"
+  run grep -q "wezterm cli spawn" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+}
+
+@test "navigation log rotates when threshold is exceeded" {
+  printf 'already too large\n' > "$ZELLIJ_NAV_STATE_DIR/zellij-navigation.log"
+
+  run env \
+    ZELLIJ_NAV_LOG_ROTATE_BYTES=8 \
+    ZELLIJ_NAV_LOG_ROTATE_FILES=2 \
+    ZELLIJ_PANE_ID=1 \
+    bash "$PICKER" --sessions
+  [ "$status" -eq 0 ]
+
+  [ -f "$ZELLIJ_NAV_STATE_DIR/zellij-navigation.log.1" ]
+  run grep -q "already too large" "$ZELLIJ_NAV_STATE_DIR"/zellij-navigation.log.*
+  [ "$status" -eq 0 ]
+  wait_for_log "picker navigation completed"
+}
+
 @test "non-helper picker keeps synchronous navigation path" {
   run env ZELLIJ_PANE_ID=1 bash "$PICKER" --sessions
   [ "$status" -eq 0 ]
@@ -739,15 +898,15 @@ EOF
   [ "$status" -ne 0 ]
 }
 
-@test "protected cdx context is detected when pane_command is a child process" {
+@test "unfocused cdx pane does not make helper context protected" {
   run env ZELLIJ_PANE_ID=2 ZELLIJ_STUB_PROTECTED_TERMINAL_COMMAND=1 bash "$PICKER" --sessions
   [ "$status" -eq 0 ]
 
-  wait_for_log "protected context blocked reason=no-client-scoped-zellij-mutation"
-  wait_for_log "navigation transaction aborted reason=focus-failed"
-  wait_for_log "picker navigation failed"
-  run grep -q "zellij action switch-session target" "$ZELLIJ_STUB_LOG"
+  wait_for_log "picker navigation completed"
+  run grep -q "protected context blocked reason=no-client-scoped-zellij-mutation" "$ZELLIJ_NAV_STATE_DIR/zellij-navigation.log"
   [ "$status" -ne 0 ]
+  run grep -q "zellij action switch-session target" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
 }
 
 @test "protected codex context can explicitly try plugin strategy but requires confirmation" {
