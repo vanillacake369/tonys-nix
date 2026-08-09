@@ -6,34 +6,15 @@
   pkgs,
   ...
 }: let
-  providerSettings = import ../../runtime/provider-settings.nix {inherit config lib pkgs;};
-  workflowBindings = import ../../adapters/workflows.nix {inherit lib;};
+  providerSettings = import ../../outporters/provider-settings.nix {inherit config lib pkgs;};
+  source = import ../../source-of-truth {inherit lib;};
 in {
-  # Contract: Gemini is the async research/critic agent
-  agentPolicy.providers.gemini = {
-    enable = lib.mkDefault config.programs.antigravity-cli.enable;
-
-    # (A) Verbose reasoning — research results fully visible
-    reasoning.mode = "verbose";
-
-    # (B) Async handshake — background strategy review
-    async.enabled = true;
-    async.handshakeProtocol = "fifo";
-    async.backgroundTasks = ["strategy-review" "blindspot-audit" "impact-analysis"];
-    async.fifoDir = "/tmp/agent-handshake";
-  };
-
-  agentPolicy._providerRuntime.gemini.hooks = {
-    format = "gemini";
-    timeout = 5;
-  };
-
   programs.antigravity-cli = {
     enable = true;
     settings = {};
     context = {
-      "GEMINI" = ../../shared/AGENTS.md;
-      "AGENT_WORKFLOWS" = workflowBindings.sharedGuide;
+      "GEMINI" = source.sharedGuidePath;
+      "AGENT_WORKFLOWS" = source.workflows.sharedGuide;
     };
   };
 
@@ -43,7 +24,7 @@ in {
     fileName = "antigravity-cli-settings.json";
     syncName = "gemini-settings";
     target = "$HOME/.gemini/settings.json";
-    baseHooks = providerSettings.providerHooks.gemini;
+    baseHooks = source.providerHooks.gemini;
     render = {
       hooks,
       mcp,
