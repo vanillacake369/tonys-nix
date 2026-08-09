@@ -60,10 +60,7 @@ in {
     grep -F "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]" "$HOME/.codex/config.toml"
     grep -F 'sha256:valid' "$HOME/.codex/config.toml"
     grep -F '/tmp/stale:post_tool_use:0:1' "$HOME/.codex/config.toml"
-    grep -F 'reasoning-trace-codex.sh' "$HOME/.codex/config.toml"
-    grep -F 'path-guard-codex.sh' "$HOME/.codex/config.toml"
-    ! grep -F 'agentops-workflow-gate-pre-codex.sh' "$HOME/.codex/config.toml"
-    ! grep -F 'agentops-workflow-gate-post-codex.sh' "$HOME/.codex/config.toml"
+    grep -F 'agent-notify.sh codex' "$HOME/.codex/config.toml"
     ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
     test ${toString (builtins.length codexAgentFiles)} -ge 7
     ${agentFileChecks}
