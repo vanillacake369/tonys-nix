@@ -1,9 +1,4 @@
-# Provider-neutral command workflow bindings.
-#
-# These promote curated Claude slash-command prompts into a shared workflow
-# registry. Provider modules decide how to expose the registry: Claude keeps
-# native slash commands, Codex gets lazy-loaded skills, and Gemini/agy get a
-# concise context guide.
+# Provider-neutral workflow prompts rendered from Claude command sources.
 {lib}: let
   commandDir = ../providers/claude/commands;
   join = lib.concatStringsSep;
@@ -98,7 +93,6 @@
       description = "테스트 문서를 한국어로 작성한다";
       role = "tester";
       mutatesFiles = true;
-      needsMcp = ["context7"];
       argumentHint = "test target, source files, or documentation scope";
     };
   };
