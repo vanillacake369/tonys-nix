@@ -1,6 +1,4 @@
-# Sync Nix-generated settings into mutable CLI config files.
-# Provider tools write auth, trust, and UI state at runtime; activation keeps the
-# generated policy authoritative without deleting that mutable state.
+# Sync Nix-generated provider settings into mutable CLI config files.
 {
   lib,
   pkgs,
@@ -15,10 +13,10 @@
   pythonToml = pkgs.python3.withPackages (ps: [ps.tomli-w]);
   python = lib.getExe pythonToml;
   tomlMerge = pkgs.writeText "merge-preserved-toml.py" ''
-    import os
     import pathlib
     import tomllib
     import tomli_w
+    import os
 
     preserve_paths = os.environ["PRESERVE_KEYS"].splitlines()
     target_path = pathlib.Path(os.environ["TARGET"])
@@ -43,7 +41,6 @@
         except (FileNotFoundError, tomllib.TOMLDecodeError):
             backup_existing = {}
 
-
     def get_path(data, dotted):
         current = data
         for part in dotted.split("."):
@@ -51,7 +48,6 @@
                 return None
             current = current[part]
         return current
-
 
     def set_path(data, dotted, value):
         current = data
@@ -64,7 +60,6 @@
             current = next_value
         current[parts[-1]] = value
 
-
     for path in preserve_paths:
         value = get_path(existing, path)
         if value is None:
@@ -75,9 +70,6 @@
     target_path.write_text(tomli_w.dumps(merged), encoding="utf-8")
   '';
 in {
-  # Deep-merge generated JSON into the mutable target.
-  # Existing target keys win where they overlap; every activation leaves a backup
-  # so provider-owned runtime state can be recovered if parsing fails later.
   mkJsonSync = {
     target,
     source,
@@ -103,9 +95,6 @@ in {
       ${chmod} u+w "$TARGET"
     '';
 
-  # Copy generated settings over a mutable target.
-  # Symlinks from older Home Manager generations are removed first so the CLI can
-  # write to the file after activation.
   mkFileCopy = {
     target,
     source,
@@ -129,9 +118,6 @@ in {
       ${chmod} u+w "$TARGET"
     '';
 
-  # Merge selected TOML paths from the mutable target into generated settings.
-  # Codex writes hook trust, project trust, and TUI state into config.toml; those
-  # paths survive activation while generated policy remains authoritative.
   mkTomlSync = {
     target,
     source,
@@ -139,35 +125,35 @@ in {
     ...
   }:
     lib.hm.dag.entryAfter ["writeBoundary"] ''
-            TARGET="${target}"
-            SOURCE="${source}"
+      TARGET="${target}"
+      SOURCE="${source}"
 
-            ${mkdir} -p "$(${dirname} "$TARGET")"
+      ${mkdir} -p "$(${dirname} "$TARGET")"
 
-            EXISTING="$TARGET"
-            if [[ -f "$TARGET" || -L "$TARGET" ]]; then
-              OLD_BACKUP=""
-              if [[ -f "''${TARGET}.backup" ]]; then
-                OLD_BACKUP="''${TARGET}.backup.previous"
-                ${cp} "''${TARGET}.backup" "$OLD_BACKUP"
-              fi
-              ${cp} "$TARGET" "''${TARGET}.backup"
-              EXISTING="''${TARGET}.backup"
-            fi
+      EXISTING="$TARGET"
+      if [[ -f "$TARGET" || -L "$TARGET" ]]; then
+        OLD_BACKUP=""
+        if [[ -f "''${TARGET}.backup" ]]; then
+          OLD_BACKUP="''${TARGET}.backup.previous"
+          ${cp} "''${TARGET}.backup" "$OLD_BACKUP"
+        fi
+        ${cp} "$TARGET" "''${TARGET}.backup"
+        EXISTING="''${TARGET}.backup"
+      fi
 
-            if [[ -L "$TARGET" ]]; then
-              ${rm} "$TARGET"
-            fi
+      if [[ -L "$TARGET" ]]; then
+        ${rm} "$TARGET"
+      fi
 
       if [[ -f "$EXISTING" ]]; then
         PRESERVE_KEYS="${lib.concatStringsSep "\n" preserveKeys}" TARGET="$TARGET" SOURCE="$SOURCE" EXISTING="$EXISTING" OLD_BACKUP="$OLD_BACKUP" ${python} ${tomlMerge}
         if [[ -n "$OLD_BACKUP" ]]; then
           ${rm} "$OLD_BACKUP"
         fi
-            else
-              ${cp} "$SOURCE" "$TARGET"
-            fi
+      else
+        ${cp} "$SOURCE" "$TARGET"
+      fi
 
-            ${chmod} u+w "$TARGET"
+      ${chmod} u+w "$TARGET"
     '';
 }
