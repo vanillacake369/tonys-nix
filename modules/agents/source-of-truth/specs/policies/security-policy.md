@@ -25,9 +25,10 @@ Do not read or emit:
 
 ## Sensitive Path Contract
 
-The executable source for sensitive file patterns is `agentPolicy.global.sensitivePatterns` in `modules/agents/policy-contract.nix`.
+Sensitive file handling is defined by this policy and enforced by provider
+permission profiles or static hook assets where the provider supports it.
 
-Adapters must enforce sensitive path checks with:
+Provider exports must enforce sensitive path checks with:
 
 - canonical path resolution before matching;
 - workspace-boundary checks;
