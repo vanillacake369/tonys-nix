@@ -32,8 +32,9 @@
     ...
   }: let
     inherit (nixpkgs) lib;
-    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
-    homeActivationCheckSystems = ["x86_64-linux" "x86_64-darwin" "aarch64-darwin"];
+    # NOTE: macOS는 Apple Silicon만 지원한다. nixpkgs 26.11부터 x86_64-darwin은 평가 불가.
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin"];
+    homeActivationCheckSystems = ["x86_64-linux" "aarch64-darwin"];
     forAllSystems = lib.genAttrs supportedSystems;
 
     # NOTE:
