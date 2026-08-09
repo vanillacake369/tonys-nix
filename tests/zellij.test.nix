@@ -78,7 +78,7 @@ in {
         ''zellij-pane-picker --tabs''
         ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --sessions''
         ''zellij-pane-picker --all''
-        ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
+        ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
         ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
       ]
       && !(lib.hasInfix ''bind "Alt 6"'' darwinConfig)
@@ -88,7 +88,8 @@ in {
       lib.count
       (command: command == ''ZELLIJ_NAV_PROTECTED_STRATEGY=plugin'')
       (lib.splitString " " directSectionBody)
-      >= 5
+      >= 4
+      && lib.hasInfix ''ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle'' directSectionBody
     ))
     (assert' "zellij-config: removed custom leader and layout wiring" (
       !(lib.hasInfix "zellij-autolock" darwinConfig)
