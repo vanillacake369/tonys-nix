@@ -7,41 +7,14 @@
   ...
 }: let
   toml = pkgs.formats.toml {};
-  providerSettings = import ../../runtime/provider-settings.nix {inherit config lib pkgs;};
+  providerSettings = import ../../outporters/provider-settings.nix {inherit config lib pkgs;};
   codexBindings = import ./bindings.nix {inherit lib;};
-  sharedContext = builtins.readFile ../../shared/AGENTS.md;
-  model = "gpt-5.5";
-  tuiSettings = {
-    status_line = [
-      "model-with-reasoning"
-      "current-dir"
-      "git-branch"
-      "permissions"
-      "five-hour-limit"
-      "weekly-limit"
-      "task-progress"
-    ];
-    status_line_use_colors = true;
-  };
+  source = import ../../source-of-truth {inherit lib;};
 in {
-  # Contract: Codex is the logic verifier — log-only reasoning
-  agentPolicy.providers.codex = {
-    enable = lib.mkDefault config.programs.codex.enable;
-
-    # (A) Log-only reasoning — verification traces saved, not shown
-    reasoning.mode = "log-only";
-    reasoning.traceDir = "/tmp/agent-traces";
-  };
-
-  agentPolicy._providerRuntime.codex.hooks = {
-    format = "codex";
-    timeout = 5;
-  };
-
   programs.codex = {
     enable = true;
     enableMcpIntegration = false;
-    context = codexBindings.mkContext sharedContext;
+    context = codexBindings.mkContext source.sharedGuide;
     inherit (codexBindings) skills;
     rules.default = ''
       prefix_rule(pattern=["nix", "fmt"], decision="allow")
@@ -65,7 +38,7 @@ in {
     syncName = "codex-config";
     target = "$HOME/.codex/config.toml";
     type = "toml";
-    baseHooks = providerSettings.providerHooks.codex;
+    baseHooks = source.providerHooks.codex;
     preserveTomlKeys = [
       "hooks.state"
       "projects"
@@ -76,8 +49,8 @@ in {
     }:
       codexBindings.mkSettings {inherit hooks mcp;}
       // {
-        inherit model;
-        tui = tuiSettings;
+        model = source.codexModel;
+        tui = source.codexTui;
       };
   };
 }
