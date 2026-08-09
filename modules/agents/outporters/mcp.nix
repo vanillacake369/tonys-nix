@@ -1,5 +1,4 @@
-# Adapts the canonical MCP server definitions (from mcp.nix) to each agent's format.
-# SSoT: programs.mcp.servers → agent-specific config shape.
+# Provider-native MCP shapes rendered from programs.mcp.servers.
 {lib}: servers: let
   removeNulls = value:
     if builtins.isAttrs value
@@ -11,7 +10,6 @@
     then map removeNulls value
     else value;
 in {
-  # Codex: renames headers→http_headers, adds enabled flag, strips unknown fields
   codex =
     lib.mapAttrs (
       _: srv: let
@@ -26,7 +24,6 @@ in {
     )
     servers;
 
-  # Gemini: only keeps command + args
   gemini =
     lib.mapAttrs (_: srv: {
       inherit (srv) command;
@@ -34,6 +31,5 @@ in {
     })
     servers;
 
-  # Claude: passes through as-is (deep-merged into ~/.claude.json)
   claude = servers;
 }
