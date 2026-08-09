@@ -77,7 +77,7 @@ run_test() {
 
 usage() {
   cat <<'USAGE'
-Usage: modules/agents/skills/a2a-workflow/scripts/verify.sh [all|format|lint|typecheck|test]
+Usage: modules/agents/source-of-truth/skills/a2a-workflow/scripts/verify.sh [all|format|lint|typecheck|test]
 
 Runs only repository-supported validation steps. It does not install tools or run destructive commands.
 USAGE
