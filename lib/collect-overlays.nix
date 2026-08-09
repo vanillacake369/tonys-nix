@@ -3,13 +3,30 @@
 # foo.nix's packages need. Symlinked dirs are not followed (readDir reports
 # them as "symlink"), keeping recursion cycle-safe.
 # Usage: (import ./collect-overlays.nix {inherit lib;}) ./modules → [ overlay ... ]
-{lib}: let
+{
+  lib,
+  overlayArgs ? {},
+}: let
+  importOverlay = path: let
+    imported = import path;
+    args = builtins.functionArgs imported;
+    missingRequiredArgs = lib.filter (
+      name: args.${name} == false && !(builtins.hasAttr name overlayArgs)
+    ) (builtins.attrNames args);
+  in
+    if args == {}
+    then imported
+    else if missingRequiredArgs == []
+    then imported overlayArgs
+    else null;
+
   go = path: let
     entries = builtins.readDir path;
     files = lib.pipe entries [
       (lib.filterAttrs (n: t: t == "regular" && lib.hasSuffix ".overlay.nix" n))
       builtins.attrNames
-      (map (n: import (path + "/${n}")))
+      (map (n: importOverlay (path + "/${n}")))
+      (lib.filter (overlay: overlay != null))
     ];
     subdirs = lib.pipe entries [
       (lib.filterAttrs (_: t: t == "directory"))
