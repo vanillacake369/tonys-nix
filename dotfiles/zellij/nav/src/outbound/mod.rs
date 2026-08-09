@@ -34,6 +34,9 @@ pub struct Runtime {
 impl Runtime {
     pub fn from_env() -> Self {
         let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+        let config_dir = std::env::var("XDG_CONFIG_HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| PathBuf::from(&home).join(".config"));
         let state_dir = std::env::var("ZELLIJ_NAV_STATE_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| {
@@ -42,6 +45,15 @@ impl Runtime {
                     .unwrap_or_else(|_| PathBuf::from(home).join(".local/state"));
                 base.join("zellij-workspace")
             });
+        let log_file = std::env::var("ZELLIJ_NAV_LOG_FILE")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| {
+                std::env::var("ZELLIJ_NAV_LOG_DIR")
+                    .map(PathBuf::from)
+                    .or_else(|_| std::env::var("ZELLIJ_NAV_STATE_DIR").map(|_| state_dir.clone()))
+                    .unwrap_or_else(|_| config_dir.join("zellij").join("log"))
+                    .join("zellij-navigation.log")
+            });
         let script_dir = std::env::current_exe()
             .ok()
             .and_then(|path| path.parent().map(Path::to_path_buf))
@@ -49,7 +61,7 @@ impl Runtime {
 
         Self {
             previous_file: state_dir.join("previous-target.json"),
-            log_file: state_dir.join("zellij-navigation.log"),
+            log_file,
             lock_dir: state_dir.join(".navigation.lock"),
             state_dir,
             protected_pattern: std::env::var("ZELLIJ_NAV_PROTECTED_COMMAND_PATTERN")
@@ -78,7 +90,10 @@ impl Runtime {
     }
 
     fn log(&self, message: &str) {
-        let _ = fs::create_dir_all(&self.state_dir);
+        if let Some(parent) = self.log_file.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        rotate_log_if_needed(&self.log_file);
         let stamp = chrono_like_stamp();
         let _ = fs::OpenOptions::new()
             .create(true)
@@ -239,19 +254,26 @@ impl Runtime {
             return false;
         };
 
+        let self_pane = std::env::var("ZELLIJ_PANE_ID").ok();
+        let helper = std::env::var("ZELLIJ_NAV_HELPER").ok().as_deref() == Some("1");
+
         self.panes(&session).iter().any(|pane| {
-            if pane.get("is_plugin").and_then(Value::as_bool) != Some(false) {
+            if !selectable_terminal(pane) {
                 return false;
             }
-            if pane.get("exited").and_then(Value::as_bool) == Some(true) {
-                return false;
-            }
-            let text = ["pane_command", "terminal_command", "title"]
-                .iter()
-                .filter_map(|key| pane.get(*key).and_then(Value::as_str))
-                .collect::<Vec<_>>()
-                .join(" ");
-            protected_match(&text, &self.protected_pattern)
+
+            let id = pane
+                .get("id")
+                .and_then(Value::as_u64)
+                .map(|id| id.to_string());
+            let focused = pane.get("is_focused").and_then(Value::as_bool) == Some(true);
+            let current_context = if helper {
+                focused && id != self_pane
+            } else {
+                id == self_pane || (self_pane.is_none() && focused)
+            };
+
+            current_context && pane_is_protected(pane, &self.protected_pattern)
         })
     }
 
@@ -445,6 +467,9 @@ impl TogglePort for Runtime {
 
         match self.protected_strategy.as_str() {
             "plugin" => Route::Plugin,
+            "plugin-sidecar" | "plugin_then_sidecar" | "plugin-then-sidecar" => {
+                Route::PluginThenSidecar
+            }
             "sidecar" => Route::Sidecar,
             _ => Route::Block,
         }
@@ -465,6 +490,7 @@ impl TogglePort for Runtime {
             }
             Route::Cli => Ok(self.focus_target(target)),
             Route::Plugin => Ok(self.focus_with_plugin(target)),
+            Route::PluginThenSidecar => Ok(self.focus_with_plugin_then_sidecar(target)),
             Route::Sidecar => Ok(self.focus_with_sidecar(target)),
         }
     }
@@ -1045,6 +1071,35 @@ impl Runtime {
         ApplyResult::Failed
     }
 
+    fn focus_with_plugin_then_sidecar(&self, target: &Target) -> ApplyResult {
+        self.log(&format!(
+            "protected context detected route=plugin-sidecar target={}",
+            target.summary()
+        ));
+
+        let plugin = self.focus_with_plugin(target);
+        if plugin == ApplyResult::Moved {
+            self.log("protected fallback skipped reason=plugin-moved");
+            return ApplyResult::Moved;
+        }
+
+        self.log(&format!(
+            "protected fallback starting from=plugin to=sidecar plugin_result={plugin:?} target={}",
+            target.summary()
+        ));
+        let sidecar = self.focus_with_sidecar(target);
+        if sidecar == ApplyResult::Moved {
+            self.log("protected fallback completed route=sidecar");
+            return ApplyResult::Moved;
+        }
+
+        self.log(&format!(
+            "protected navigation failed route=plugin-sidecar plugin_result={plugin:?} sidecar_result={sidecar:?} target={}",
+            target.summary()
+        ));
+        ApplyResult::Failed
+    }
+
     fn focus_with_sidecar(&self, target: &Target) -> ApplyResult {
         self.log(&format!(
             "protected context detected route=sidecar target={}",
@@ -1058,26 +1113,33 @@ impl Runtime {
         let kind = kind_arg(target);
         let tab = opt_arg(target.tab_id);
         let pane = opt_arg(target.pane_id);
-        let output = run_capture(
+        match run_capture(
             Command::new(&self.sidecar_command)
                 .arg(&target.session)
                 .arg(kind)
                 .arg(&tab)
                 .arg(&pane),
-        );
-        if let Ok(output) = output {
-            let output = compact_output(&output);
-            if !output.is_empty() {
-                self.log(&format!("sidecar navigation output {output}"));
+        ) {
+            Ok(output) => {
+                let output = compact_output(&output);
+                if !output.is_empty() {
+                    self.log(&format!("sidecar navigation output {output}"));
+                }
+                self.log(&format!(
+                    "sidecar navigation accepted session={}",
+                    target.session
+                ));
+                ApplyResult::Moved
             }
-            self.log(&format!(
-                "sidecar navigation accepted session={}",
-                target.session
-            ));
-            return ApplyResult::Moved;
+            Err(output) => {
+                let output = compact_output(&output);
+                self.log(&format!(
+                    "sidecar navigation failed reason=command-failed output={}",
+                    non_empty_or_placeholder(&output)
+                ));
+                ApplyResult::Failed
+            }
         }
-        self.log("sidecar navigation failed reason=command-failed");
-        ApplyResult::Failed
     }
 }
 
@@ -1185,6 +1247,55 @@ fn pane_label(pane: &Value) -> String {
     format!("{tab} / {title}")
 }
 
+fn pane_is_protected(pane: &Value, pattern: &str) -> bool {
+    let text = ["pane_command", "terminal_command", "title"]
+        .iter()
+        .filter_map(|key| pane.get(*key).and_then(Value::as_str))
+        .collect::<Vec<_>>()
+        .join(" ");
+    protected_match(&text, pattern)
+}
+
+fn rotate_log_if_needed(log_file: &Path) {
+    let max_bytes = std::env::var("ZELLIJ_NAV_LOG_ROTATE_BYTES")
+        .ok()
+        .and_then(|value| value.parse::<u64>().ok())
+        .unwrap_or(1024 * 1024);
+    if max_bytes == 0 {
+        return;
+    }
+    let rotate_files = std::env::var("ZELLIJ_NAV_LOG_ROTATE_FILES")
+        .ok()
+        .and_then(|value| value.parse::<u8>().ok())
+        .unwrap_or(3);
+    if rotate_files == 0 {
+        return;
+    }
+    let Ok(metadata) = fs::metadata(log_file) else {
+        return;
+    };
+    if metadata.len() < max_bytes {
+        return;
+    }
+
+    for index in (1..=rotate_files).rev() {
+        let source = rotated_log_path(log_file, index);
+        if index == rotate_files {
+            let _ = fs::remove_file(source);
+            continue;
+        }
+        let target = rotated_log_path(log_file, index + 1);
+        let _ = fs::rename(source, target);
+    }
+    let _ = fs::rename(log_file, rotated_log_path(log_file, 1));
+}
+
+fn rotated_log_path(log_file: &Path, index: u8) -> PathBuf {
+    let mut path = log_file.as_os_str().to_os_string();
+    path.push(format!(".{index}"));
+    PathBuf::from(path)
+}
+
 fn protected_match(text: &str, pattern: &str) -> bool {
     Command::new("sh")
         .arg("-c")
@@ -1238,6 +1349,13 @@ fn run_capture(command: &mut Command) -> Result<String, String> {
 
 fn compact_output(output: &str) -> String {
     output.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
+fn non_empty_or_placeholder(value: &str) -> &str {
+    if value.is_empty() {
+        return "<empty>";
+    }
+    value
 }
 
 fn run_launch(command: &mut Command) -> Result<String, LaunchFailure> {
