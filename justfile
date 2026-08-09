@@ -18,7 +18,7 @@ OS_TYPE := `case "$(uname -s)" in
 esac`
 SYSTEM_ARCH := `case "$(uname -s):$(uname -m)" in
   Darwin:arm64) echo aarch64-darwin ;;
-  Darwin:*) echo x86_64-darwin ;;
+  Darwin:*) echo unsupported ;;
   Linux:aarch64) echo aarch64-linux ;;
   Linux:x86_64) echo x86_64-linux ;;
   Linux:amd64) echo x86_64-linux ;;
@@ -156,7 +156,7 @@ apply-validate target:
     esac
 
     case "{{ target }}" in
-      x86_64-linux|aarch64-linux|x86_64-darwin|aarch64-darwin)
+      x86_64-linux|aarch64-linux|aarch64-darwin)
     echo "[✓] Apply target validated: {{ target }}"
     ;;
       unsupported)
@@ -566,7 +566,7 @@ test: test-hooks
 # Run shell hook tests (bats). Falls back to `nix run` when bats is unbuilt.
 test-hooks:
     #!/usr/bin/env bash
-    hook_tests="$(find tests/hooks -maxdepth 1 -type f -name '*.bats' ! -name 'agentops-workflow-gate.bats' | sort)"
+    hook_tests="$(find tests/hooks -maxdepth 1 -type f -name '*.bats' | sort)"
     if command -v bats &>/dev/null; then
       bats $hook_tests
     else
