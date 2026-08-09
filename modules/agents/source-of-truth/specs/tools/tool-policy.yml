@@ -5,7 +5,7 @@ defaults:
   follow_symlinks: false
   content_capture: summary_only
   external_content_handling: evidence_only
-  sensitive_patterns_source: agentPolicy.global.sensitivePatterns
+  sensitive_patterns_source: modules/agents/source-of-truth/specs/policies/security-policy.md
 tools:
   - id: canonical.search_docs
     name: search_docs
@@ -49,7 +49,7 @@ tools:
       workspace_boundary: workspace_roots
       canonicalize_paths: true
       follow_symlinks: false
-      deny_patterns_source: agentPolicy.global.sensitivePatterns
+      deny_patterns_source: modules/agents/source-of-truth/specs/policies/security-policy.md
     telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.file.path, aiops.operation.id]
   - id: canonical.edit_file
     name: edit_file
@@ -76,7 +76,7 @@ tools:
       workspace_boundary: workspace_roots
       canonicalize_paths: true
       follow_symlinks: false
-      deny_patterns_source: agentPolicy.global.sensitivePatterns
+      deny_patterns_source: modules/agents/source-of-truth/specs/policies/security-policy.md
     telemetry_attributes: [tool.name, tool.success, tool.latency, aiops.diff.lines_added, aiops.diff.lines_removed, aiops.operation.id, aiops.artifact.hash]
   - id: canonical.run_tests
     name: run_tests
