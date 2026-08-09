@@ -3,8 +3,8 @@
 # evaluating a full home-manager configuration.
 {lib}: let
   join = lib.concatStringsSep;
-  workflowBindings = import ../../adapters/workflows.nix {inherit lib;};
-  a2aWorkflowDir = ../../skills/a2a-workflow;
+  workflowBindings = import ../../outporters/workflows.nix {inherit lib;};
+  a2aWorkflowDir = ../../source-of-truth/skills/a2a-workflow;
   a2aWorkflowSkill = builtins.readFile (a2aWorkflowDir + "/SKILL.md");
   a2aWorkflowReferences = {
     routing = builtins.readFile (a2aWorkflowDir + "/references/routing.md");
@@ -145,7 +145,7 @@
 
       ## Generated Reference Bundle
 
-      This Codex skill is generated from `modules/agents/skills/a2a-workflow/`.
+      This Codex skill is generated from `modules/agents/source-of-truth/skills/a2a-workflow/`.
       The source directory is the repository-owned SSoT; this generated bundle
       inlines the referenced workflow material so the skill is reproducible
       anywhere this Nix configuration is evaluated.
@@ -173,7 +173,7 @@
 
     The shared agent guide below is the canonical provider-neutral instruction
     source for the executable `modules/agents` contract and portable specs under
-    `modules/agents/specs`. In Codex, map Claude-oriented sub-agent references
+    `modules/agents/source-of-truth/specs`. In Codex, map Claude-oriented sub-agent references
     to Codex skills:
 
     ${join "\n" (lib.mapAttrsToList (name: role: "- `${name}` -> `agent-${name}` / permission profile `${role.permissionProfile}`") roles)}
