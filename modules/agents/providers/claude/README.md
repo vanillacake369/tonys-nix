@@ -1,68 +1,28 @@
 # Claude Code Configuration
 
-This directory contains Claude Code configuration that is automatically synced via home-manager.
+This provider exports Claude Code assets from the shared agent harness.
 
-## Directory Structure
+## Role
 
-```
-modules/agents/providers/claude/
-├── README.md              # This file
-├── AGENTS.md              # Symlink to ../../shared/AGENTS.md
-├── settings.json          # Claude Code permissions
-├── commands/              # Custom slash commands (/commit, /pr, /blog, etc.)
-├── agents/                # Custom AI agents (architect, implementer, etc.)
-├── hooks/                 # Claude hook scripts
-└── skills/                # Custom skills (architectural-planning, etc.)
-```
+- Publish provider-neutral instructions to Claude's native context surface.
+- Keep Claude-specific commands, hooks, agents, and skills in provider-owned
+  assets.
+- Merge generated settings with mutable runtime state without replacing user
+  state unnecessarily.
 
-## AGENTS.md
+## Boundary
 
-`AGENTS.md` is a symlink to `modules/agents/shared/AGENTS.md`, the canonical provider-neutral instruction source. Keep behavioral policy there; Claude-specific files should only adapt tools, permissions, hooks, and native commands.
+Shared behavior belongs in the source of truth. This provider may adapt that
+behavior to Claude's file formats, but it should not fork the behavioral policy.
 
-## How Configuration Sync Works
+## Sync Model
 
-### Automatic Sync via Home-Manager
+Home Manager exports static assets and merges dynamic settings. Runtime state
+should be preserved where possible, because provider CLIs often write local
+trust, project, or history data.
 
-When you run `just apply`, home-manager:
+## Changing Claude Support
 
-1. **Symlinks static files** to `~/.claude/`:
-   - `commands/` → `~/.claude/commands/`
-   - `agents/` → `~/.claude/agents/`
-   - `skills/` → `~/.claude/skills/`
-   - `AGENTS.md` → `~/.claude/AGENTS.md`
-
-2. **Merges dynamic settings**:
-   - `settings.json` plus policy hooks → `~/.claude/settings.json`
-   - MCP servers from `modules/agents/agents-mcp.nix` → `~/.claude.json`
-   - Preserves runtime data (projects, tips history, etc.)
-   - Creates timestamped backup before modification
-
-## Available MCP Servers
-
-| Server | Package | Description |
-|--------|---------|-------------|
-| context7 | `@upstash/context7-mcp@latest` | 최신 오픈소스 문서 조회 |
-| playwright | `@executeautomation/playwright-mcp-server` | 브라우저 제어 및 시각 검증 |
-
-## Modifying Configuration
-
-### Add New MCP Server
-
-Add to `modules/agents/agents-mcp.nix` and apply:
-```bash
-just apply
-```
-
-### Troubleshooting
-
-```bash
-# Manually trigger sync
-just apply
-
-# Check Claude config
-cat ~/.claude.json | jq '.mcpServers'
-
-# Restore from backup
-ls -lt ~/.claude.json.backup.*
-cp ~/.claude.json.backup.YYYYMMDD_HHMMSS ~/.claude.json
-```
+Prefer changing shared policy first when the behavior should apply across
+providers. Change Claude-owned assets only for Claude-native presentation,
+compatibility, or ergonomics.
