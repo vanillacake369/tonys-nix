@@ -13,7 +13,7 @@ config.font = wezterm.font_with_fallback({
     "JetBrains Mono",
     "Roboto",
 })
-config.font_size = 10
+config.font_size = 12
 -- 가장 빠르고 검증된 Harfbuzz 셰이퍼 사용 (기본값이지만 명시)
 config.font_shaper = "Harfbuzz"
 
