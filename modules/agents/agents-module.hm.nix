@@ -1,9 +1,6 @@
-# Multi-provider AI agent orchestration
-# Claude Code (orchestrator) + Codex + Gemini via cli-proxy-api
-# Agent Policy Contract: modules/agents/policy-assembler.nix provides the IoC assembler
+# Multi-provider AI provider exports.
 {
   imports = [
-    ./policy-assembler.nix
     ./agents-mcp.nix
     ./providers/claude/module.nix
     ./providers/codex/module.nix
