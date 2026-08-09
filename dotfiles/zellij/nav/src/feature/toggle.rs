@@ -9,6 +9,7 @@ pub enum Route {
     Block,
     Cli,
     Plugin,
+    PluginThenSidecar,
     Sidecar,
 }
 
