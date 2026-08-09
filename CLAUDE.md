@@ -1,1 +1,1 @@
-modules/agents/shared/AGENTS.md
+modules/agents/source-of-truth/shared/AGENTS.md
