@@ -36,59 +36,46 @@ event_contract:
 
 coverage:
   aiops.tool.failure_rate:
-    status: emitted
+    status: planned
     event_types: [agentops.workflow_gate, agentops.security_intercept]
     fields: [provider, surface, tool_name, risk_level, success, error_type]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-      - modules/agents/policy-path-guard.nix
-    limitation: Hook-level policy failures are covered; provider model/tool failures still depend on provider logs.
+    emitted_by: []
+    limitation: The provider exporter no longer owns generated telemetry hooks; provider model/tool failures depend on provider logs or future static hook emitters.
 
   aiops.approval.rate:
-    status: partial
+    status: planned
     event_types: [agentops.workflow_gate]
     fields: [provider, surface, workflow, risk_level, approval_required, approval_granted, approval_source]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-    limitation: Workflow-evidence blocks are observable; provider-native user approval prompts are not a dedicated stream yet.
+    emitted_by: []
+    limitation: Provider-native user approval prompts are not a dedicated event stream yet.
 
   aiops.retry.count:
-    status: partial
+    status: planned
     event_types: [agentops.workflow_gate]
     fields: [provider, workflow, tool_name, error_type, failure_taxonomy, failure_class]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-    limitation: Verify failure and repair loops are inferable; generic retry attempts are not counted directly.
+    emitted_by: []
+    limitation: Generic retry attempts are not counted directly.
 
   aiops.task.success_rate:
-    status: partial
+    status: planned
     event_types: [agentops.workflow_gate]
     fields: [provider, surface, workflow, risk_level, phase, result, success]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-    limitation: Phase pass/fail is emitted; task start/completion root events are not emitted yet.
+    emitted_by: []
+    limitation: Task start/completion root events are not emitted yet.
 
   aiops.task.first_pass_success_rate:
-    status: partial
+    status: planned
     event_types: [agentops.workflow_gate]
     fields: [workflow, phase, result, failure_taxonomy]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-    limitation: Repair-loop inference is possible from verify failures; no explicit first-pass marker exists.
+    emitted_by: []
+    limitation: No explicit first-pass marker exists.
 
   aiops.context.size_tokens:
-    status: partial
+    status: planned
     event_types: [agentops.context.load, agentops.context.waive]
     fields: [provider, workflow, context_source_id, context_path, context_tokens_estimated, trust_label, waiver_reason]
-    emitted_by:
-      - modules/agents/runtime/agentops-event.nix
-      - modules/agents/policy-phase-gate.nix
-    limitation: Mandatory context load/waiver evidence is enforced before mutation; token estimates are present only when the provider payload supplies them.
+    emitted_by: []
+    limitation: Token estimates depend on future provider payload or hook support.
 
   aiops.cost.estimated_usd:
     status: planned
