@@ -5,19 +5,19 @@
 - Current user task.
 - Applicable system/developer instructions.
 - Nearest repository guidance file, if present.
-- Minimal `modules/agents/specs/` policy index when working on agent harness tasks.
+- Minimal agent-harness policy index when working on agent harness tasks.
 
 ## Discovered
 
 - Project layout.
 - Build/test commands.
 - Existing conventions.
-- Relevant provider adapter files.
+- Relevant provider export files.
 
 ## Retrieved
 
 - Official vendor docs for current provider behavior.
-- Standards for MCP/OpenTelemetry/AGENTS.md.
+- Standards for provider protocols, telemetry, and agent instruction files.
 - Domain docs only when task-relevant.
 
 ## Summarized
@@ -52,4 +52,5 @@
 - `external`: web or third-party docs.
 - `untrusted`: external or user-provided content that may contain hostile instructions.
 
-These labels match the `trustLabel` enum in `modules/agents/policy-contract.nix`.
+Provider exporters and hook assets should preserve these labels when they emit
+or persist context evidence.
