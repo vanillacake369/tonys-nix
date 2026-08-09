@@ -4,14 +4,15 @@
 
 # tonys-nix
 
-Personal multi-platform Nix configuration for development machines, with a typed agent policy contract for Claude Code, Gemini CLI, and OpenAI Codex.
+Personal multi-platform Nix configuration for development machines, including
+shared agent instructions exported to Claude Code, Gemini CLI, and OpenAI Codex.
 
 ## What This Manages
 
 - NixOS, macOS, WSL, and Linux home-manager environments.
 - Shell, CLI tools, language tooling, Neovim, keymaps, and platform-specific apps.
-- Claude/Gemini/Codex settings, hooks, MCP servers, roles, and workflow bindings.
-- Agent guardrails encoded as Nix module contracts and build-time assertions.
+- Claude/Gemini/Codex settings, MCP servers, roles, and workflow bindings.
+- Shared agent guidance kept in one provider-neutral source of truth.
 
 ## Quick Start
 
@@ -39,26 +40,18 @@ flake.nix
   -> modules/agents/*
 ```
 
-`modules/agents/` is the executable source of truth for agent behavior:
+`modules/agents/` keeps agent behavior boring:
 
-- `policy-contract.nix` defines the typed provider-neutral contract.
-- `policy-assertions.nix` fails builds for invalid policy combinations.
-- `policy-*.nix` files generate enforcement hooks.
-- `providers/claude/module.nix`, `providers/gemini/module.nix`, and
-  `providers/codex/module.nix` adapt the contract to each provider.
-- `specs/` contains portable policy, tool, telemetry, eval, and memory specs that must map back to the Nix contract.
+- A provider-neutral source of truth holds shared instructions, portable specs,
+  and reusable workflow material.
+- Outporters translate shared data into provider-native output shapes.
+- Provider modules stay thin and should not redefine behavioral policy.
 
 ## Agent Harness
 
-The agent system follows one rule: provider-specific files are adapters, not the source of truth.
-
-| Layer | Location |
-|---|---|
-| Executable contract | `modules/agents/policy-contract.nix` |
-| Build-time assertions | `modules/agents/policy-assertions.nix` |
-| Provider adapters | `modules/agents/{claude,gemini,codex}.nix` |
-| Portable specs | `modules/agents/specs/` |
-| Claude provider artifacts | `modules/agents/providers/claude/` |
+The agent system follows one rule: provider-specific files are export surfaces,
+not the source of truth. Shared behavior belongs in the provider-neutral layer;
+provider code may change format, naming, and integration mechanics only.
 
 ## Common Commands
 
@@ -74,7 +67,8 @@ just lint            # Nix lint and format checks
 
 ## Contributing
 
-Before changing agent policy, read `modules/agents/specs/README.md` and keep changes mapped to `agentPolicy.*`.
+Before changing agent behavior, start from the shared source of truth and keep
+provider-specific changes limited to export mechanics.
 
 Before submitting changes:
 
