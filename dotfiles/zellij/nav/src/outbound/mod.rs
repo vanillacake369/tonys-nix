@@ -6,6 +6,7 @@ use crate::feature::navigate::{ApplyResult as NavigateApplyResult, NavigatePort}
 use crate::feature::picker::{PickerAction, PickerPort};
 use crate::feature::plugin_switch::PluginSwitchPort;
 use crate::feature::record_current::RecordPort;
+use crate::feature::repo::RepoPort;
 use crate::feature::sidecar::{LaunchFailure, LaunchRequest, RunnerStatus, SidecarPort};
 use crate::feature::toggle::{ApplyResult, LockGuard, Route, TogglePort};
 use serde_json::Value;
@@ -570,6 +571,77 @@ impl RecordPort for Runtime {
 
     fn observe_record(&self, message: &str) {
         <Self as TogglePort>::log(self, message);
+    }
+}
+
+impl RepoPort for Runtime {
+    fn repo_dirs(&self) -> Result<Vec<PathBuf>, String> {
+        let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
+        let roots = std::env::var("ZELLIJ_REPO_ROOTS")
+            .ok()
+            .map(|value| {
+                value
+                    .split(':')
+                    .filter(|part| !part.is_empty())
+                    .map(PathBuf::from)
+                    .collect::<Vec<_>>()
+            })
+            .filter(|roots| !roots.is_empty())
+            .unwrap_or_else(|| vec![PathBuf::from(home).join("dev")]);
+
+        let mut dirs = Vec::new();
+        for root in roots {
+            let Ok(entries) = fs::read_dir(&root) else {
+                continue;
+            };
+            for entry in entries.flatten() {
+                let path = entry.path();
+                let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+                    continue;
+                };
+                if name.starts_with('.') || !path.is_dir() {
+                    continue;
+                }
+                dirs.push(path);
+            }
+        }
+        Ok(dirs)
+    }
+
+    fn select_repo(&self, candidates: &str) -> Result<Option<String>, String> {
+        let mut child = Command::new("fzf")
+            .args(["--prompt=Zellij repo > "])
+            .args(["--height=60%"])
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .map_err(|err| err.to_string())?;
+
+        if let Some(stdin) = child.stdin.as_mut() {
+            stdin
+                .write_all(candidates.as_bytes())
+                .map_err(|err| err.to_string())?;
+        }
+
+        let output = child.wait_with_output().map_err(|err| err.to_string())?;
+        if !output.status.success() {
+            return Ok(None);
+        }
+        let selection = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        Ok((!selection.is_empty()).then_some(selection))
+    }
+
+    fn attach_session(&self, dir: &PathBuf, session: &str) -> Result<u8, String> {
+        let status = Command::new("zellij")
+            .args(["attach", "--create", session])
+            .current_dir(dir)
+            .status()
+            .map_err(|err| err.to_string())?;
+        Ok(status.code().unwrap_or(1) as u8)
+    }
+
+    fn log(&self, message: &str) {
+        Runtime::log(self, message);
     }
 }
 
