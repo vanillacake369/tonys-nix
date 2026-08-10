@@ -20,6 +20,7 @@
       ks = "kubectl get services -o wide";
       kap = "kubectl apply -f ";
       zj = "zellij";
+      zr = "zellij-nav repo";
       hm = "home-manager";
       cdx = "codex -s danger-full-access -a never";
       gmni = "agy --dangerously-skip-permissions";
