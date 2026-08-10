@@ -5,5 +5,6 @@ pub mod navigate;
 pub mod picker;
 pub mod plugin_switch;
 pub mod record_current;
+pub mod repo;
 pub mod sidecar;
 pub mod toggle;
