@@ -20,6 +20,10 @@ enum CliCommand {
     RecordCurrent {
         reason: String,
     },
+    Repo,
+    RepoTo {
+        repo: String,
+    },
     Diagnose,
     PickerCandidates {
         mode: String,
@@ -86,6 +90,13 @@ impl CliCommand {
             Some("record-current") => Ok(Self::RecordCurrent {
                 reason: args.next().unwrap_or_else(|| "external".to_string()),
             }),
+            Some("repo") => match args.next() {
+                Some(repo) => Ok(Self::RepoTo { repo }),
+                None => Ok(Self::Repo),
+            },
+            Some("repo-to") => Ok(Self::RepoTo {
+                repo: args.next().unwrap_or_default(),
+            }),
             Some("toggle") => Ok(Self::Toggle),
             Some("context-toggle-run") => Ok(Self::ContextToggleRun),
             Some("diagnose") => Ok(Self::Diagnose),
@@ -145,6 +156,8 @@ impl CliCommand {
             Self::ContextToggleRun => feature::context_toggle::run(&runtime),
             Self::Navigate { target_json } => feature::navigate::run(&runtime, &target_json),
             Self::RecordCurrent { reason } => feature::record_current::run(&runtime, &reason),
+            Self::Repo => feature::repo::run(&runtime),
+            Self::RepoTo { repo } => feature::repo::run_to(&runtime, &repo),
             Self::Diagnose => print_output(feature::diagnose::run(&runtime)),
             Self::PickerCandidates { mode } => {
                 print_output(feature::picker::candidates(&runtime, &mode))
@@ -374,5 +387,5 @@ fn exit(result: Result<u8, String>) -> ExitCode {
 }
 
 fn usage() -> String {
-    "usage: zellij-nav <toggle|context-toggle-run|navigate TARGET_JSON|record-current REASON|diagnose|picker-candidates MODE|picker-target SELECTION|picker-command COMMAND_ID|picker-preview KIND SESSION TAB_ID PANE_ID COMMAND_ID LABEL|picker-run MODE PREVIEW_PROGRAM|helper-focus-underlying|helper-close SESSION PANE_ID|plugin-switch SESSION KIND TAB_ID PANE_ID|sidecar-plan SESSION KIND TAB_ID PANE_ID|sidecar-prepare SESSION KIND TAB_ID PANE_ID|sidecar-wait-attached SESSION PREVIOUS_CLIENT_COUNT|sidecar-run SESSION KIND TAB_ID PANE_ID>".to_string()
+    "usage: zellij-nav <toggle|context-toggle-run|navigate TARGET_JSON|record-current REASON|repo [REPO]|repo-to REPO|diagnose|picker-candidates MODE|picker-target SELECTION|picker-command COMMAND_ID|picker-preview KIND SESSION TAB_ID PANE_ID COMMAND_ID LABEL|picker-run MODE PREVIEW_PROGRAM|helper-focus-underlying|helper-close SESSION PANE_ID|plugin-switch SESSION KIND TAB_ID PANE_ID|sidecar-plan SESSION KIND TAB_ID PANE_ID|sidecar-prepare SESSION KIND TAB_ID PANE_ID|sidecar-wait-attached SESSION PREVIOUS_CLIENT_COUNT|sidecar-run SESSION KIND TAB_ID PANE_ID>".to_string()
 }
