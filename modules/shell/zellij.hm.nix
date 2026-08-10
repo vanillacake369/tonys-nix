@@ -69,6 +69,7 @@
   };
 in {
   home.packages = [
+    zellijNav
     zestty
   ];
 
