@@ -194,16 +194,29 @@ keybinds clear-defaults=true {
             }
             SwitchToMode "normal"
         }
+        bind "Alt g" {
+            Run "sh" "-lc" "exec ~/.config/zellij/scripts/zellij-nav repo" {
+                floating true
+                close_on_exit false
+                width "80%"
+                height "70%"
+                x "10%"
+                y "15%"
+            }
+            SwitchToMode "normal"
+        }
         bind "Alt /" {
             LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm" {
                 floating true
                 move_to_focused_tab true
+                skip_plugin_cache true
                 "LOAD_ZELLIJ_BINDINGS" "false"
                 "Help / Keymap" "Alt /"
                 "Search / Command palette" "Alt Space"
                 "Search / Pane picker" "Alt P"
                 "Search / Tab picker" "Alt T"
                 "Search / Session picker" "Alt S"
+                # @ZELLIJ_FORGOT_PLUGIN_ENTRIES@
                 "Mode / Pane mode" "Alt p"
                 "Mode / Tab mode" "Alt t"
                 "Mode / Session mode" "Alt s"
