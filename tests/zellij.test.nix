@@ -35,6 +35,8 @@
   navRustToggle = builtins.readFile ../dotfiles/zellij/nav/src/feature/toggle.rs;
   navPluginCargo = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/Cargo.toml;
   navPluginRust = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/src/lib.rs;
+  navPluginMetadata = builtins.fromTOML (builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/zellij-plugin.toml);
+  zellijConfigBase = builtins.readFile ../dotfiles/zellij/config.kdl.base;
   zellijReadme = builtins.readFile ../dotfiles/zellij/README.md;
 
   directSection =
@@ -80,9 +82,11 @@ in {
         ''zellij-pane-picker --all''
         ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
         ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
+        ''skip_plugin_cache true''
+        ''exec ~/.config/zellij/scripts/zellij-nav repo''
       ]
       && !(lib.hasInfix ''bind "Alt 6"'' darwinConfig)
-      && !(lib.hasInfix ''bind "Alt g"'' darwinConfig)
+      && lib.hasInfix ''bind "Alt g"'' directSectionBody
     ))
     (assert' "zellij-config: picker shortcuts opt into protected plugin routing" (
       lib.count
@@ -90,6 +94,24 @@ in {
       (lib.splitString " " directSectionBody)
       >= 4
       && lib.hasInfix ''ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle'' directSectionBody
+    ))
+    (assert' "zellij-config: forgot plugin entries are generated from plugin metadata" (
+      navPluginMetadata.forgot
+      == [
+        {
+          label = "Plugin / zellij-nav-switcher";
+          keys = "Alt Space, Alt Shift P/T/S";
+        }
+        {
+          label = "Session / Repo picker";
+          keys = "Alt g, zr";
+        }
+      ]
+      && lib.hasInfix ''"Plugin / zellij-nav-switcher" "Alt Space, Alt Shift P/T/S"'' managedConfig
+      && lib.hasInfix ''"Session / Repo picker" "Alt g, zr"'' managedConfig
+      && !(lib.hasInfix ''"Plugin / zellij-nav-switcher" "Alt Space, Alt Shift P/T/S"'' zellijConfigBase)
+      && !(lib.hasInfix ''"Session / Repo picker" "Alt g, zr"'' zellijConfigBase)
+      && lib.hasInfix ''# @ZELLIJ_FORGOT_PLUGIN_ENTRIES@'' zellijConfigBase
     ))
     (assert' "zellij-config: removed custom leader and layout wiring" (
       !(lib.hasInfix "zellij-autolock" darwinConfig)
