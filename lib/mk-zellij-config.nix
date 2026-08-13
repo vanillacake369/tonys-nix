@@ -7,6 +7,41 @@
   pluginDir ? "~/.config/zellij/plugins",
 }: let
   base = builtins.readFile ../dotfiles/zellij/config.kdl.base;
+  metadataRoot = ../dotfiles/zellij;
+
+  collectPluginMetadata = path: let
+    entries = builtins.readDir path;
+    names = builtins.attrNames entries;
+    files =
+      builtins.filter
+      (name: entries.${name} == "regular" && name == "zellij-plugin.toml")
+      names;
+    dirs =
+      builtins.filter
+      (
+        name:
+          entries.${name}
+          == "directory"
+          && !(builtins.elem name ["target" ".git" ".direnv"])
+      )
+      names;
+  in
+    (map (name: path + "/${name}") files)
+    ++ builtins.concatLists (map (name: collectPluginMetadata (path + "/${name}")) dirs);
+
+  escapeKdlString = value:
+    builtins.replaceStrings ["\\" "\""] ["\\\\" "\\\""] value;
+
+  pluginMetadata =
+    map
+    (file: builtins.fromTOML (builtins.readFile file))
+    (collectPluginMetadata metadataRoot);
+
+  forgotPluginEntries = builtins.concatStringsSep "\n" (
+    map
+    (entry: "                \"${escapeKdlString entry.label}\" \"${escapeKdlString entry.keys}\"")
+    (builtins.concatLists (map (metadata: metadata.forgot or []) pluginMetadata))
+  );
 
   copyCommand =
     if isDarwin
@@ -34,6 +69,7 @@ in
               unbind "Ctrl space"
               unbind "Ctrl s"''
     ''default_shell "fish"''
+    "                # @ZELLIJ_FORGOT_PLUGIN_ENTRIES@"
     "file:~/.config/zellij/plugins"
   ]
   [
@@ -41,6 +77,7 @@ in
     kittyLine
     ctrlUnbinds
     ''default_shell "${fishPath}"''
+    forgotPluginEntries
     "file:${pluginDir}"
   ]
   base
