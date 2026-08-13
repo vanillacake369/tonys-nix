@@ -1,0 +1,7 @@
+[[forgot]]
+label = "Plugin / zellij-nav-switcher"
+keys = "Alt Space, Alt Shift P/T/S"
+
+[[forgot]]
+label = "Session / Repo picker"
+keys = "Alt g, zr"
