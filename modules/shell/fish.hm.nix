@@ -22,8 +22,9 @@
       zj = "zellij";
       zr = "zellij-nav repo";
       hm = "home-manager";
-      cdx = "codex -s danger-full-access -a never";
-      gmni = "agy --dangerously-skip-permissions";
+      codex = "agent-secret-env codex";
+      cdx = "agent-secret-env codex -s danger-full-access -a never";
+      gmni = "agent-secret-env agy --dangerously-skip-permissions";
     };
 
     shellAbbrs = {

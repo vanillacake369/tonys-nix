@@ -95,6 +95,15 @@
       mutatesFiles = true;
       argumentHint = "test target, source files, or documentation scope";
     };
+    todo-task-management = mkWorkflow {
+      name = "todo-task-management";
+      file = "todo-task-management.md";
+      description = "외부 todo MCP 서버를 통해 task를 조회하고 안전하게 관리한다";
+      role = "implementer";
+      needsNetwork = true;
+      needsMcp = ["ticktick"];
+      argumentHint = "todo query, task change request, or planning context";
+    };
   };
 
   renderNeeds = workflow:

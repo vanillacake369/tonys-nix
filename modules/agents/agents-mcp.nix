@@ -19,6 +19,11 @@ _: {
         command = "npx";
         args = ["-y" "@playwright/mcp@latest"];
       };
+      ticktick = {
+        url = "https://mcp.ticktick.com";
+        transport = "streamable-http";
+        bearerTokenEnvVar = "TICKTICK_MCP_TOKEN";
+      };
     };
   };
 }

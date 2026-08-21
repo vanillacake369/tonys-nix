@@ -114,20 +114,62 @@
       test-server = {
         command = "npx";
         args = ["-y" "test-mcp"];
+        url = null;
         headers = {"X-Key" = "val";};
+      };
+      remote-server = {
+        url = "https://mcp.example.test";
+        transport = "streamable-http";
+        args = [];
+        headers = {"X-Key" = "val";};
+        bearerTokenEnvVar = "EXAMPLE_MCP_TOKEN";
       };
     };
     rendered = mcpRender mockServers;
   in [
     (assert' "mcp-codex: has enabled flag" (rendered.codex.test-server.enabled == true))
+    (assert' "mcp-codex: stdio keeps command when url is null" (
+      rendered.codex.test-server.command
+      == "npx"
+      && rendered.codex.test-server.args == ["-y" "test-mcp"]
+      && !(rendered.codex.test-server ? url)
+    ))
     (assert' "mcp-codex: headers renamed to http_headers" (rendered.codex.test-server ? http_headers))
     (assert' "mcp-codex: original headers removed" (!(rendered.codex.test-server ? headers)))
+    (assert' "mcp-codex: remote bearer token uses env var" (
+      rendered.codex.remote-server.url
+      == "https://mcp.example.test"
+      && rendered.codex.remote-server.http_headers.X-Key == "val"
+      && rendered.codex.remote-server.bearer_token_env_var == "EXAMPLE_MCP_TOKEN"
+      && !(rendered.codex.remote-server ? args)
+      && !(rendered.codex.remote-server ? bearerTokenEnvVar)
+    ))
     (assert' "mcp-gemini: only command+args" (rendered.gemini.test-server
       == {
         command = "npx";
         args = ["-y" "test-mcp"];
       }))
-    (assert' "mcp-claude: pass-through" (rendered.claude == mockServers))
+    (assert' "mcp-gemini: streamable HTTP uses httpUrl" (
+      rendered.gemini.remote-server
+      == {
+        httpUrl = "https://mcp.example.test";
+        headers = {"X-Key" = "val";};
+      }
+    ))
+    (assert' "mcp-claude: stdio includes type" (
+      rendered.claude.test-server.type
+      == "stdio"
+      && rendered.claude.test-server.command == "npx"
+    ))
+    (assert' "mcp-claude: remote HTTP includes type" (
+      rendered.claude.remote-server
+      == {
+        headers = {"X-Key" = "val";};
+        type = "http";
+        url = "https://mcp.example.test";
+      }
+      && !(rendered.claude.remote-server ? args)
+    ))
   ];
 
   agentExporterTests = let
@@ -170,11 +212,13 @@
       builtins.elem "commit" commandWorkflowNames
       && builtins.elem "create-pull-request" commandWorkflowNames
       && builtins.elem "evidence-debug" commandWorkflowNames
+      && builtins.elem "todo-task-management" commandWorkflowNames
       && workflowBindings.commandWorkflows.commit.claudeCommand == "/commit"
     ))
     (assert' "workflow-bindings: exposes command workflows as Codex skills" (
       builtins.hasAttr "workflow-commit" codexBindings.skills
       && builtins.hasAttr "workflow-evidence-debug" codexBindings.skills
+      && builtins.hasAttr "workflow-todo-task-management" codexBindings.skills
       && lib.hasInfix "Source Claude command: `/commit`" codexBindings.skills.workflow-commit
       && lib.hasInfix "Source Claude command: `/evidence-debug`" codexBindings.skills.workflow-evidence-debug
     ))

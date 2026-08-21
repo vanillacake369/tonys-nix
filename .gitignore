@@ -40,7 +40,11 @@ scripts/*.env
 *_rsa
 *_ed25519
 credentials.json
-secrets/
+secrets/*
+!secrets/
+!secrets/README.md
+!secrets/secrets.yaml
+!secrets/age-key.txt.example
 *.password
 *.passwd
 

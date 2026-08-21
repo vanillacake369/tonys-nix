@@ -2,6 +2,7 @@
 {
   imports = [
     ./agents-mcp.nix
+    ./agents-secrets.hm.nix
     ./providers/claude/module.nix
     ./providers/codex/module.nix
     ./providers/gemini/module.nix
