@@ -1,9 +1,5 @@
 # Runtime secret environment for agent launchers.
-{
-  lib,
-  pkgs,
-  ...
-}: let
+{pkgs, ...}: let
   agentSecretEnv = pkgs.writeShellApplication {
     name = "agent-secret-env";
     runtimeInputs = [pkgs.sops];
