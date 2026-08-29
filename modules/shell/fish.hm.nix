@@ -88,6 +88,56 @@
         };
       })
       // (lib.optionalAttrs isDarwin {
+        dhost = {
+          body = ''
+            set -l cmd $argv[1]
+            set -l machine podman-machine-default
+
+            switch "$cmd"
+                case podman p
+                    if not type -q podman
+                        echo "podman not found"
+                        return 1
+                    end
+
+                    set -l podman_socket (podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}' $machine 2>/dev/null)
+                    if test -z "$podman_socket"; or not test -S "$podman_socket"
+                        echo "podman socket not available: $machine"
+                        return 1
+                    end
+
+                    set -Ux DOCKER_HOST "unix://$podman_socket"
+                    echo "DOCKER_HOST=$DOCKER_HOST"
+
+                case docker d
+                    set -e DOCKER_HOST
+                    set -eU DOCKER_HOST
+                    echo "DOCKER_HOST unset; docker default will be used"
+
+                case status s ""
+                    if set -q DOCKER_HOST
+                        echo "DOCKER_HOST=$DOCKER_HOST"
+                    else
+                        echo "DOCKER_HOST unset; docker default will be used"
+                    end
+
+                    if type -q podman
+                        set -l podman_socket (podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}' $machine 2>/dev/null)
+                        if test -n "$podman_socket"; and test -S "$podman_socket"
+                            echo "podman socket available: $podman_socket"
+                        else
+                            echo "podman socket unavailable: $machine"
+                        end
+                    else
+                        echo "podman not found"
+                    end
+
+                case '*'
+                    echo "usage: dhost podman|docker|status"
+                    return 2
+            end
+          '';
+        };
         systemdlog = {
           body = ''
             launchctl list | \
