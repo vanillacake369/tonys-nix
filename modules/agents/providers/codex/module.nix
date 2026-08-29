@@ -43,6 +43,9 @@ in {
       "hooks.state"
       "projects"
     ];
+    obsoleteFiles = [
+      "hooks.json"
+    ];
     render = {
       hooks,
       mcp,
