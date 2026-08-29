@@ -158,20 +158,12 @@ bind = "caps+2"
 exec = "focus-monitor 2"
 
 [[aerospace.bindings]]
-bind = "caps+3"
-exec = "focus-monitor 3"
-
-[[aerospace.bindings]]
 bind = "caps+shift+1"
 exec = ["move-node-to-monitor 1", "focus-monitor 1"]
 
 [[aerospace.bindings]]
 bind = "caps+shift+2"
 exec = ["move-node-to-monitor 2", "focus-monitor 2"]
-
-[[aerospace.bindings]]
-bind = "caps+shift+3"
-exec = ["move-node-to-monitor 3", "focus-monitor 3"]
 
 [[aerospace.bindings]]
 bind = "caps+tab"
@@ -202,28 +194,28 @@ bind = "caps+period"
 exec = "mode service"
 
 [[aerospace.workspace_assignments]]
+workspace = "Code"
+monitor = 1
+
+[[aerospace.workspace_assignments]]
+workspace = "Browser"
+monitor = 1
+
+[[aerospace.workspace_assignments]]
+workspace = "Terminal"
+monitor = 1
+
+[[aerospace.workspace_assignments]]
 workspace = "Docs"
 monitor = 1
 
 [[aerospace.workspace_assignments]]
-workspace = "Code"
-monitor = 2
-
-[[aerospace.workspace_assignments]]
-workspace = "Browser"
-monitor = 2
-
-[[aerospace.workspace_assignments]]
-workspace = "Terminal"
-monitor = 2
-
-[[aerospace.workspace_assignments]]
 workspace = "Music"
-monitor = 3
+monitor = 2
 
 [[aerospace.workspace_assignments]]
 workspace = "Schedule"
-monitor = 3
+monitor = 2
 
 [[aerospace.window_rules]]
 app_name_regex = "Obsidian"
