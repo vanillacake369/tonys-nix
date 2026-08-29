@@ -9,6 +9,7 @@
   mkdir = lib.getExe' pkgs.coreutils "mkdir";
   dirname = lib.getExe' pkgs.coreutils "dirname";
   rm = lib.getExe' pkgs.coreutils "rm";
+  date = lib.getExe' pkgs.coreutils "date";
   sponge = lib.getExe' pkgs.moreutils "sponge";
   pythonToml = pkgs.python3.withPackages (ps: [ps.tomli-w]);
   python = lib.getExe pythonToml;
@@ -19,6 +20,7 @@
     import os
 
     preserve_paths = os.environ["PRESERVE_KEYS"].splitlines()
+    obsolete_files = os.environ["OBSOLETE_FILES"].splitlines()
     target_path = pathlib.Path(os.environ["TARGET"])
     existing_path = pathlib.Path(os.environ["EXISTING"])
     source_path = pathlib.Path(os.environ["SOURCE"])
@@ -66,6 +68,17 @@
             value = get_path(backup_existing, path)
         if value is not None:
             set_path(merged, path, value)
+
+    hook_state = get_path(merged, "hooks.state")
+    if isinstance(hook_state, dict):
+        target_dir = target_path.parent
+        obsolete_prefixes = [
+            f"{target_dir / obsolete_file}:"
+            for obsolete_file in obsolete_files
+        ]
+        for state_key in list(hook_state.keys()):
+            if any(state_key.startswith(prefix) for prefix in obsolete_prefixes):
+                del hook_state[state_key]
 
     target_path.write_text(tomli_w.dumps(merged), encoding="utf-8")
   '';
@@ -122,13 +135,15 @@ in {
     target,
     source,
     preserveKeys ? [],
+    obsoleteFiles ? [],
     ...
   }:
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       TARGET="${target}"
       SOURCE="${source}"
+      TARGET_DIR="$(${dirname} "$TARGET")"
 
-      ${mkdir} -p "$(${dirname} "$TARGET")"
+      ${mkdir} -p "$TARGET_DIR"
 
       EXISTING="$TARGET"
       if [[ -f "$TARGET" || -L "$TARGET" ]]; then
@@ -146,7 +161,7 @@ in {
       fi
 
       if [[ -f "$EXISTING" ]]; then
-        PRESERVE_KEYS="${lib.concatStringsSep "\n" preserveKeys}" TARGET="$TARGET" SOURCE="$SOURCE" EXISTING="$EXISTING" OLD_BACKUP="$OLD_BACKUP" ${python} ${tomlMerge}
+        PRESERVE_KEYS="${lib.concatStringsSep "\n" preserveKeys}" OBSOLETE_FILES="${lib.concatStringsSep "\n" obsoleteFiles}" TARGET="$TARGET" SOURCE="$SOURCE" EXISTING="$EXISTING" OLD_BACKUP="$OLD_BACKUP" ${python} ${tomlMerge}
         if [[ -n "$OLD_BACKUP" ]]; then
           ${rm} "$OLD_BACKUP"
         fi
@@ -155,5 +170,13 @@ in {
       fi
 
       ${chmod} u+w "$TARGET"
+
+      for obsolete_name in ${lib.escapeShellArgs obsoleteFiles}; do
+        obsolete="$TARGET_DIR/$obsolete_name"
+        if [[ -f "$obsolete" || -L "$obsolete" ]]; then
+          ${cp} "$obsolete" "$obsolete.backup.$(${date} +%Y%m%d%H%M%S)"
+          ${rm} "$obsolete"
+        fi
+      done
     '';
 }
