@@ -14,6 +14,7 @@
       Docker TUI
       */
       # lazydocker
+      podman-tui
 
       /*
       Cloud tools
