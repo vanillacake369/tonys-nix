@@ -46,7 +46,13 @@ in {
       echo
       echo "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]"
       echo 'trusted_hash = "sha256:valid"'
+      echo
+      echo "[hooks.state.\"$HOME/.codex/hooks.json:stop:0:0\"]"
+      echo 'trusted_hash = "sha256:obsolete"'
     } >> "$HOME/.codex/config.toml"
+    cat > "$HOME/.codex/hooks.json" <<'JSON'
+    {"hooks":{"Stop":[{"hooks":[{"type":"command","command":"legacy"}]}]}}
+    JSON
 
     ${codexSyncScript}
 
@@ -60,8 +66,12 @@ in {
     grep -F "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]" "$HOME/.codex/config.toml"
     grep -F 'sha256:valid' "$HOME/.codex/config.toml"
     grep -F '/tmp/stale:post_tool_use:0:1' "$HOME/.codex/config.toml"
+    ! grep -F "$HOME/.codex/hooks.json:stop:0:0" "$HOME/.codex/config.toml"
+    ! grep -F 'sha256:obsolete' "$HOME/.codex/config.toml"
     grep -F 'agent-notify.sh codex' "$HOME/.codex/config.toml"
     ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
+    test ! -e "$HOME/.codex/hooks.json"
+    ls "$HOME"/.codex/hooks.json.backup.*
     test ${toString (builtins.length codexAgentFiles)} -ge 7
     ${agentFileChecks}
 
