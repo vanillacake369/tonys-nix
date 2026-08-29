@@ -41,6 +41,7 @@
       asciinema
       asciinema-agg
       vhs
+      ffmpeg # NOTE: temporary; remove after the mock interview
 
       # Database
       redli
