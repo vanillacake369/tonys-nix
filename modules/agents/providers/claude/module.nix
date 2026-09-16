@@ -20,7 +20,7 @@
   baseSettings = builtins.fromJSON (builtins.readFile ./settings.json);
 in {
   home.file = {
-    ".claude/commands".source = ./commands;
+    ".claude/commands".source = ../../source-of-truth/workflows/commands;
     ".claude/WORKFLOWS.md".text = source.workflows.sharedGuide;
     ".claude/AGENTS.md".source = source.sharedGuidePath;
     ".claude/agents".source = ./agents;

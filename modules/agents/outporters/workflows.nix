@@ -1,6 +1,6 @@
-# Provider-neutral workflow prompts rendered from Claude command sources.
+# Provider-neutral workflow prompts rendered from source-of-truth command sources.
 {lib}: let
-  commandDir = ../providers/claude/commands;
+  commandDir = ../source-of-truth/workflows/commands;
   join = lib.concatStringsSep;
 
   mkWorkflow = {
@@ -124,7 +124,7 @@
     Use this Codex skill when the user asks for the provider-neutral workflow
     `${workflow.name}` or the Claude slash command `${workflow.claudeCommand}`.
 
-    Source Claude command: `${workflow.claudeCommand}`
+    Claude command alias: `${workflow.claudeCommand}`
     Recommended role: `${workflow.role}`
     Argument hint: ${workflow.argumentHint}
     Required capabilities: ${
@@ -153,7 +153,7 @@
     # Shared Agent Workflows
 
     These workflows are provider-neutral bindings for curated prompts that are
-    currently stored as Claude slash commands.
+    exported to provider-native command surfaces.
 
     ${join "\n\n" (lib.mapAttrsToList (_: workflow: ''
         ## ${workflow.skillName}

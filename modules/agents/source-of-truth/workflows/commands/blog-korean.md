@@ -15,7 +15,7 @@ argument-hint: <블로그 주제> (예: Valkey 내부 자료구조, K8s Pod 시�
 
 # 톤 — 단일 source 참조
 
-본 스킬의 모든 톤 규칙은 `_blog-tone-spec.md` 단일 source 를 따른다. 본 스킬을 실행하기 전에 반드시 `modules/agents/providers/claude/commands/_blog-tone-spec.md` 또는 배포된 `~/.claude/commands/_blog-tone-spec.md` 를 Read 한다.
+본 스킬의 모든 톤 규칙은 `_blog-tone-spec.md` 단일 source 를 따른다. 본 스킬을 실행하기 전에 반드시 `modules/agents/source-of-truth/workflows/commands/_blog-tone-spec.md` 또는 배포된 `~/.claude/commands/_blog-tone-spec.md` 를 Read 한다.
 
 명세에는 다음이 포함된다.
 

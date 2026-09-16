@@ -1,1 +1,1 @@
-../../shared/AGENTS.md
+../../source-of-truth/shared/AGENTS.md
