@@ -9,15 +9,20 @@ use crate::feature::record_current::RecordPort;
 use crate::feature::repo::RepoPort;
 use crate::feature::sidecar::{LaunchFailure, LaunchRequest, RunnerStatus, SidecarPort};
 use crate::feature::toggle::{ApplyResult, LockGuard, Route, TogglePort};
+use lock::LeaseLock;
+use process::{
+    command_available, run_capture, run_launch, run_output, run_status, with_wezterm_socket,
+};
 use serde_json::Value;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-#[cfg(unix)]
-use std::os::unix::fs::FileTypeExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::{SystemTime, UNIX_EPOCH};
+
+mod lock;
+mod process;
 
 pub struct Runtime {
     state_dir: PathBuf,
@@ -1228,79 +1233,6 @@ fn current_pane_is_floating(rt: &Runtime) -> bool {
     })
 }
 
-struct LeaseLock<'a> {
-    rt: &'a Runtime,
-}
-
-impl<'a> LeaseLock<'a> {
-    fn acquire(rt: &'a Runtime) -> Result<Self, String> {
-        if fs::create_dir(&rt.lock_dir).is_ok() {
-            write_lock_meta(rt);
-            return Ok(Self { rt });
-        }
-
-        if !rt.lock_dir.exists() {
-            return Err("lock acquisition failure".to_string());
-        }
-
-        if stale_lock(rt) {
-            let _ = fs::remove_dir_all(&rt.lock_dir);
-            if fs::create_dir(&rt.lock_dir).is_ok() {
-                write_lock_meta(rt);
-                rt.log("navigation lease lock reclaimed reason=stale");
-                return Ok(Self { rt });
-            }
-        }
-
-        rt.log("lock acquisition failure");
-        Err("lock acquisition failure".to_string())
-    }
-}
-
-impl LockGuard for LeaseLock<'_> {}
-
-impl Drop for LeaseLock<'_> {
-    fn drop(&mut self) {
-        let _ = fs::remove_file(self.rt.lock_dir.join("created_at"));
-        let _ = fs::remove_file(self.rt.lock_dir.join("owner_pid"));
-        let _ = fs::remove_dir(&self.rt.lock_dir);
-    }
-}
-
-fn write_lock_meta(rt: &Runtime) {
-    let _ = fs::write(rt.lock_dir.join("created_at"), now_seconds().to_string());
-    let _ = fs::write(
-        rt.lock_dir.join("owner_pid"),
-        std::process::id().to_string(),
-    );
-}
-
-fn stale_lock(rt: &Runtime) -> bool {
-    let owner = fs::read_to_string(rt.lock_dir.join("owner_pid"))
-        .ok()
-        .and_then(|value| value.trim().parse::<u32>().ok());
-    if owner.is_some_and(|pid| !process_exists(pid)) {
-        rt.log(&format!(
-            "navigation lease lock reclaimed reason=dead-owner owner_pid={}",
-            owner.unwrap_or_default()
-        ));
-        return true;
-    }
-
-    let ttl = std::env::var("ZELLIJ_NAV_LOCK_LEASE_TTL_SECONDS")
-        .ok()
-        .and_then(|value| value.parse::<u64>().ok())
-        .unwrap_or(15);
-    let created = fs::read_to_string(rt.lock_dir.join("created_at"))
-        .ok()
-        .and_then(|value| value.trim().parse::<u64>().ok());
-    let expired = created.is_some_and(|created| now_seconds().saturating_sub(created) > ttl);
-    if expired {
-        rt.log("navigation lease lock reclaimed reason=ttl-expired");
-    }
-    expired
-}
-
 fn selectable_terminal(pane: &Value) -> bool {
     pane.get("is_plugin").and_then(Value::as_bool) == Some(false)
         && pane.get("is_selectable").and_then(Value::as_bool) == Some(true)
@@ -1391,34 +1323,6 @@ fn opt_arg(value: Option<u32>) -> String {
     value.map(|id| id.to_string()).unwrap_or_default()
 }
 
-fn run_output(command: &mut Command) -> String {
-    command
-        .output()
-        .ok()
-        .filter(|output| output.status.success())
-        .map(|output| String::from_utf8_lossy(&output.stdout).to_string())
-        .unwrap_or_default()
-}
-
-fn run_status(command: &mut Command) -> bool {
-    command
-        .status()
-        .map(|status| status.success())
-        .unwrap_or(false)
-}
-
-fn run_capture(command: &mut Command) -> Result<String, String> {
-    let output = command.output().map_err(|err| err.to_string())?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    let combined = format!("{stdout}{stderr}");
-
-    if output.status.success() {
-        return Ok(combined);
-    }
-    Err(combined)
-}
-
 fn compact_output(output: &str) -> String {
     output.split_whitespace().collect::<Vec<_>>().join(" ")
 }
@@ -1428,77 +1332,6 @@ fn non_empty_or_placeholder(value: &str) -> &str {
         return "<empty>";
     }
     value
-}
-
-fn run_launch(command: &mut Command) -> Result<String, LaunchFailure> {
-    let output = command.output().map_err(|err| LaunchFailure {
-        status: 1,
-        output: err.to_string(),
-    })?;
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    let combined = format!("{stdout}{stderr}");
-
-    if output.status.success() {
-        return Ok(combined);
-    }
-
-    Err(LaunchFailure {
-        status: output.status.code().unwrap_or(1) as u8,
-        output: combined,
-    })
-}
-
-fn with_wezterm_socket(command: &mut Command) {
-    let current_socket = std::env::var("WEZTERM_UNIX_SOCKET").ok();
-    if current_socket.as_deref().map(is_socket) == Some(true) {
-        return;
-    }
-
-    let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    let default_socket = std::env::var("ZELLIJ_NAV_WEZTERM_DEFAULT_SOCKET")
-        .map(PathBuf::from)
-        .unwrap_or_else(|_| {
-            std::env::var("XDG_DATA_HOME")
-                .map(PathBuf::from)
-                .unwrap_or_else(|_| PathBuf::from(home).join(".local/share"))
-                .join("wezterm/default-org.wezfurlong.wezterm")
-        });
-
-    if is_socket(&default_socket) {
-        command.env("WEZTERM_UNIX_SOCKET", default_socket);
-    }
-}
-
-#[cfg(unix)]
-fn is_socket(path: impl AsRef<Path>) -> bool {
-    fs::metadata(path)
-        .map(|metadata| metadata.file_type().is_socket())
-        .unwrap_or(false)
-}
-
-#[cfg(not(unix))]
-fn is_socket(_path: impl AsRef<Path>) -> bool {
-    false
-}
-
-fn command_available(command: &str) -> bool {
-    Command::new("sh")
-        .arg("-c")
-        .arg("command -v \"$ZELLIJ_NAV_COMMAND_CHECK\" >/dev/null 2>&1")
-        .env("ZELLIJ_NAV_COMMAND_CHECK", command)
-        .status()
-        .map(|status| status.success())
-        .unwrap_or(false)
-}
-
-fn process_exists(pid: u32) -> bool {
-    Command::new("kill")
-        .arg("-0")
-        .arg(pid.to_string())
-        .status()
-        .map(|status| status.success())
-        .unwrap_or(false)
 }
 
 fn now_seconds() -> u64 {
