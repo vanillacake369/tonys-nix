@@ -10,8 +10,8 @@
       inherit overlays;
       config.allowUnfree = true;
     };
-    isLinux = pkgs.stdenv.isLinux;
-    isDarwin = pkgs.stdenv.isDarwin;
+    isLinux = pkgs.stdenv.hostPlatform.isLinux;
+    isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   in {
     inherit pkgs isLinux isDarwin;
   };
