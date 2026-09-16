@@ -7,37 +7,38 @@
     }
     else throw "FAIL: ${name}";
 
-  darwinConfig = import ../lib/mk-zellij-config.nix {isDarwin = true;};
-  linuxConfig = import ../lib/mk-zellij-config.nix {isDarwin = false;};
-  managedConfig = import ../lib/mk-zellij-config.nix {
+  darwinConfig = import ../../lib/mk-zellij-config.nix {isDarwin = true;};
+  linuxConfig = import ../../lib/mk-zellij-config.nix {isDarwin = false;};
+  managedConfig = import ../../lib/mk-zellij-config.nix {
     isDarwin = true;
     fishPath = "/nix/store/test-fish/bin/fish";
     pluginDir = "/Users/test/.config/zellij/plugins";
   };
-  zellijModule = builtins.readFile ../modules/shell/zellij.hm.nix;
-  panePicker = builtins.readFile ../dotfiles/zellij/scripts/zellij-pane-picker;
-  contextToggle = builtins.readFile ../dotfiles/zellij/scripts/zellij-context-toggle;
-  diagnoseContext = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-diagnose-context;
-  navSidecar = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-sidecar;
-  navPluginSwitch = builtins.readFile ../dotfiles/zellij/scripts/zellij-nav-plugin-switch;
-  navRustCargo = builtins.readFile ../dotfiles/zellij/nav/Cargo.toml;
-  navRustCli = builtins.readFile ../dotfiles/zellij/nav/src/cli.rs;
-  navRustMain = builtins.readFile ../dotfiles/zellij/nav/src/main.rs;
-  navRustContextToggle = builtins.readFile ../dotfiles/zellij/nav/src/feature/context_toggle.rs;
-  navRustDiagnose = builtins.readFile ../dotfiles/zellij/nav/src/feature/diagnose.rs;
-  navRustHelper = builtins.readFile ../dotfiles/zellij/nav/src/feature/helper.rs;
-  navRustNavigate = builtins.readFile ../dotfiles/zellij/nav/src/feature/navigate.rs;
-  navRustOutbound = builtins.readFile ../dotfiles/zellij/nav/src/outbound/mod.rs;
-  navRustPicker = builtins.readFile ../dotfiles/zellij/nav/src/feature/picker.rs;
-  navRustPluginSwitch = builtins.readFile ../dotfiles/zellij/nav/src/feature/plugin_switch.rs;
-  navRustRecordCurrent = builtins.readFile ../dotfiles/zellij/nav/src/feature/record_current.rs;
-  navRustSidecar = builtins.readFile ../dotfiles/zellij/nav/src/feature/sidecar.rs;
-  navRustToggle = builtins.readFile ../dotfiles/zellij/nav/src/feature/toggle.rs;
-  navPluginCargo = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/Cargo.toml;
-  navPluginRust = builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/src/lib.rs;
-  navPluginMetadata = builtins.fromTOML (builtins.readFile ../dotfiles/zellij/nav/wasm/switcher/zellij-plugin.toml);
-  zellijConfigBase = builtins.readFile ../dotfiles/zellij/config.kdl.base;
-  zellijReadme = builtins.readFile ../dotfiles/zellij/README.md;
+  zellijModule = builtins.readFile ../../modules/shell/zellij.hm.nix;
+  zellijOverlay = builtins.readFile ../../modules/shell/zellij.overlay.nix;
+  panePicker = builtins.readFile ../../dotfiles/zellij/scripts/zellij-pane-picker;
+  contextToggle = builtins.readFile ../../dotfiles/zellij/scripts/zellij-context-toggle;
+  diagnoseContext = builtins.readFile ../../dotfiles/zellij/scripts/zellij-nav-diagnose-context;
+  navSidecar = builtins.readFile ../../dotfiles/zellij/scripts/zellij-nav-sidecar;
+  navPluginSwitch = builtins.readFile ../../dotfiles/zellij/scripts/zellij-nav-plugin-switch;
+  navRustCargo = builtins.readFile ../../dotfiles/zellij/nav/Cargo.toml;
+  navRustCli = builtins.readFile ../../dotfiles/zellij/nav/src/cli.rs;
+  navRustMain = builtins.readFile ../../dotfiles/zellij/nav/src/main.rs;
+  navRustContextToggle = builtins.readFile ../../dotfiles/zellij/nav/src/feature/context_toggle.rs;
+  navRustDiagnose = builtins.readFile ../../dotfiles/zellij/nav/src/feature/diagnose.rs;
+  navRustHelper = builtins.readFile ../../dotfiles/zellij/nav/src/feature/helper.rs;
+  navRustNavigate = builtins.readFile ../../dotfiles/zellij/nav/src/feature/navigate.rs;
+  navRustOutbound = builtins.readFile ../../dotfiles/zellij/nav/src/outbound/mod.rs;
+  navRustPicker = builtins.readFile ../../dotfiles/zellij/nav/src/feature/picker.rs;
+  navRustPluginSwitch = builtins.readFile ../../dotfiles/zellij/nav/src/feature/plugin_switch.rs;
+  navRustRecordCurrent = builtins.readFile ../../dotfiles/zellij/nav/src/feature/record_current.rs;
+  navRustSidecar = builtins.readFile ../../dotfiles/zellij/nav/src/feature/sidecar.rs;
+  navRustToggle = builtins.readFile ../../dotfiles/zellij/nav/src/feature/toggle.rs;
+  navPluginCargo = builtins.readFile ../../dotfiles/zellij/nav/wasm/switcher/Cargo.toml;
+  navPluginRust = builtins.readFile ../../dotfiles/zellij/nav/wasm/switcher/src/lib.rs;
+  navPluginMetadata = builtins.fromTOML (builtins.readFile ../../dotfiles/zellij/nav/wasm/switcher/zellij-plugin.toml);
+  zellijConfigBase = builtins.readFile ../../dotfiles/zellij/config.kdl.base;
+  zellijReadme = builtins.readFile ../../dotfiles/zellij/README.md;
 
   directSection =
     builtins.elemAt
@@ -73,6 +74,19 @@ in {
       && lib.hasInfix ''fish_features "no-query-term"'' linuxConfig
       && lib.hasInfix "keybinds clear-defaults=true" darwinConfig
       && lib.hasInfix ''bind "Ctrl g" { SwitchToMode "locked"; }'' darwinConfig
+    ))
+    (assert' "zellij-config: zellij 0.45 keybindings are explicit under cleared defaults" (
+      builtins.all (binding: lib.hasInfix binding darwinConfig) [
+        ''bind "Shift f" { ToggleFocusNoUiFullscreen; SwitchToMode "normal"; }''
+        ''bind "Shift s" { NewPane "stacked"; SwitchToMode "normal"; }''
+        ''bind "[" { FocusGuestSession; SwitchToMode "normal"; }''
+        ''bind "]" { FocusHostSession; SwitchToMode "normal"; }''
+        ''bind "f" { ToggleHostFullscreen; SwitchToMode "normal"; }''
+        ''bind "[" { ScrollToPreviousPrompt; }''
+        ''bind "]" { ScrollToNextPrompt; }''
+        ''bind "m" { SelectCommandAtScrollPosition; }''
+        ''bind "c" { CopyLastCommandOutput; SwitchToMode "normal"; }''
+      ]
     ))
     (assert' "zellij-config: direct shortcuts route to navigation entrypoints" (
       builtins.all (binding: lib.hasInfix binding directSectionBody) [
@@ -113,12 +127,32 @@ in {
       && !(lib.hasInfix ''"Session / Repo picker" "Alt g, zr"'' zellijConfigBase)
       && lib.hasInfix ''# @ZELLIJ_FORGOT_PLUGIN_ENTRIES@'' zellijConfigBase
     ))
+    (assert' "zellij-config: forgot plugin includes zellij 0.45 keymap reminders" (
+      builtins.all (entry: lib.hasInfix entry managedConfig) [
+        ''"Pane Mode / New stacked pane" "p -> Shift s"''
+        ''"Pane Mode / Toggle no-UI fullscreen" "p -> Shift f"''
+        ''"Move Mode / Move pane left" "m -> h, m -> Left"''
+        ''"Move Mode / Move pane right" "m -> l, m -> Right"''
+        ''"Move Mode / Move pane next" "m -> n, m -> Tab"''
+        ''"Move Mode / Move pane previous" "m -> p"''
+        ''"Tab Mode / Break pane to new tab" "t -> b"''
+        ''"Tab Mode / Break pane left" "t -> ["''
+        ''"Tab Mode / Break pane right" "t -> ]"''
+        ''"Scroll Mode / Previous prompt" "e -> ["''
+        ''"Scroll Mode / Next prompt" "e -> ]"''
+        ''"Scroll Mode / Select command" "e -> m"''
+        ''"Scroll Mode / Copy last command output" "e -> c"''
+        ''"Session Mode / Focus guest session" "s -> ["''
+        ''"Session Mode / Focus host session" "s -> ]"''
+        ''"Session Mode / Toggle host fullscreen" "s -> f"''
+      ]
+    ))
     (assert' "zellij-config: removed custom leader and layout wiring" (
       !(lib.hasInfix "zellij-autolock" darwinConfig)
       && !(lib.hasInfix ''bind "Alt z"'' darwinConfig)
       && !(lib.hasInfix ''SwitchToMode "tmux"'' darwinConfig)
-      && !(builtins.pathExists ../dotfiles/zellij/layouts/default.kdl)
-      && !(builtins.pathExists ../dotfiles/zellij/layouts/minimal.kdl)
+      && !(builtins.pathExists ../../dotfiles/zellij/layouts/default.kdl)
+      && !(builtins.pathExists ../../dotfiles/zellij/layouts/minimal.kdl)
       && !(lib.hasInfix "zjstatus" zellijModule)
       && !(lib.hasInfix "zjstatus" darwinConfig)
       && lib.hasInfix ''default_layout "compact"'' darwinConfig
@@ -128,9 +162,9 @@ in {
       && lib.hasInfix ''.config/zellij/scripts/zellij-context-toggle'' zellijModule
       && lib.hasInfix ''.config/zellij/scripts/zellij-nav-sidecar'' zellijModule
       && lib.hasInfix ''.config/zellij/scripts/zellij-nav-plugin-switch'' zellijModule
-      && lib.hasInfix ''source = "''${zellijNav}/bin/zellij-nav";'' zellijModule
+      && lib.hasInfix ''source = "''${pkgs.zellij-nav}/bin/zellij-nav";'' zellijModule
       && !(lib.hasInfix ''.config/zellij/scripts/zellij-nav-lib'' zellijModule)
-      && !(builtins.pathExists ../dotfiles/zellij/scripts/zellij-nav-lib)
+      && !(builtins.pathExists ../../dotfiles/zellij/scripts/zellij-nav-lib)
       && !(lib.hasInfix ''.config/zellij/scripts/zellij-nav-dispatch'' zellijModule)
     ))
     (assert' "zellij-navigation: local script shims are thin rust entrypoints" (
@@ -180,27 +214,37 @@ in {
       && lib.hasInfix ''wait_attached_requires_consecutive_counts_above_initial'' navRustSidecar
       && lib.hasInfix ''launch_uses_cli_spawn_before_start_route'' navRustSidecar
     ))
-    (assert' "zellij-navigation: wasm plugin stays packaged with rust toolchain target" (
+    (assert' "GIVEN zellij hm WHEN plugins are installed THEN wasm switcher is wired from package output" (
       lib.hasInfix ''.config/zellij/plugins/zellij-nav-switcher.wasm'' zellijModule
       && lib.hasInfix ''home.activation.zellijNavSwitcherPermissions'' zellijModule
-      && lib.hasInfix ''pkgs.rust-bin.stable.latest.default.override'' zellijModule
-      && lib.hasInfix ''targets = ["wasm32-wasip1"]'' zellijModule
-      && lib.hasInfix ''zellijWasmRustPlatform.buildRustPackage'' zellijModule
-      && lib.hasInfix ''zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher'' zellijModule
-      && lib.hasInfix ''src = cleanZellijSource zellijNavRoot ["target/" "wasm/"]'' zellijModule
-      && lib.hasInfix ''src = cleanZellijSource zellijNavSwitcherRoot ["target/"]'' zellijModule
-      && lib.hasInfix ''nativeBuildInputs = [pkgs.pkg-config]'' zellijModule
-      && lib.hasInfix ''OPENSSL_INCLUDE_DIR = "''${pkgs.openssl.dev}/include"'' zellijModule
-      && lib.hasInfix ''OPENSSL_LIB_DIR = "''${pkgs.openssl.out}/lib"'' zellijModule
-      && lib.hasInfix ''cargo build --offline --release --target wasm32-wasip1'' zellijModule
-      && !(builtins.pathExists ../dotfiles/zellij/plugins)
-      && lib.hasInfix ''zellij-tile = "0.44.3"'' navPluginCargo
+      && lib.hasInfix ''pkgs.zellij-nav'' zellijModule
+      && lib.hasInfix ''pkgs.zellij-room-wasm'' zellijModule
+    ))
+    (assert' "GIVEN zellij overlay WHEN wasm package is built THEN rust toolchain target is declared" (
+      lib.hasInfix ''prev.rust-bin.stable.latest.default.override'' zellijOverlay
+      && lib.hasInfix ''targets = ["wasm32-wasip1"]'' zellijOverlay
+      && lib.hasInfix ''zellijWasmRustPlatform.buildRustPackage'' zellijOverlay
+    ))
+    (assert' "GIVEN zellij overlay WHEN rust packages are built THEN clean sources exclude build artifacts" (
+      lib.hasInfix ''zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher'' zellijOverlay
+      && lib.hasInfix ''src = cleanZellijSource zellijNavRoot ["target/" "wasm/"]'' zellijOverlay
+      && lib.hasInfix ''src = cleanZellijSource zellijNavSwitcherRoot ["target/"]'' zellijOverlay
+    ))
+    (assert' "GIVEN zellij overlay WHEN wasm switcher links native dependencies THEN OpenSSL inputs are explicit" (
+      lib.hasInfix ''nativeBuildInputs = [prev.pkg-config]'' zellijOverlay
+      && lib.hasInfix ''OPENSSL_INCLUDE_DIR = "''${prev.openssl.dev}/include"'' zellijOverlay
+      && lib.hasInfix ''OPENSSL_LIB_DIR = "''${prev.openssl.out}/lib"'' zellijOverlay
+      && lib.hasInfix ''cargo build --offline --release --target wasm32-wasip1'' zellijOverlay
+    ))
+    (assert' "GIVEN zellij plugin source WHEN packaging switcher THEN plugin contract matches zellij 0.45" (
+      !(builtins.pathExists ../../dotfiles/zellij/plugins)
+      && lib.hasInfix ''zellij-tile = "0.45.1"'' navPluginCargo
       && lib.hasInfix ''switch_session_with_focus'' navPluginRust
       && lib.hasInfix ''cli_pipe_output'' navPluginRust
       && !(lib.hasInfix ''request_permission'' navPluginRust)
     ))
     (assert' "zellij-navigation: docs are compact readme-owned principles" (
-      !(builtins.pathExists ../dotfiles/zellij/docs)
+      !(builtins.pathExists ../../dotfiles/zellij/docs)
       && lib.hasInfix ''# Zellij Navigation'' zellijReadme
       && lib.hasInfix ''Bash는 entrypoint compatibility만 유지한다'' zellijReadme
       && lib.hasInfix ''Feature slice는 데이터 모델과 정책을 가까이 둔다'' zellijReadme

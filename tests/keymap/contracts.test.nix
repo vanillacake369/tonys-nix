@@ -7,14 +7,14 @@
     }
     else throw "FAIL: ${name}";
 
-  keymapDsl = builtins.readFile ../modules/keymap/binds.toml;
-  keymapModule = builtins.readFile ../modules/keymap/keymap.hm.nix;
+  keymapDsl = builtins.readFile ../../modules/keymap/binds.toml;
+  keymapModule = builtins.readFile ../../modules/keymap/keymap.hm.nix;
   spec = builtins.fromTOML keymapDsl;
 
-  aerospaceToml = import ../modules/keymap/to-aerospace.nix {
+  aerospaceToml = import ../../modules/keymap/to-aerospace.nix {
     inherit lib spec;
   };
-  karabinerJson = builtins.fromJSON (import ../modules/keymap/to-karabiner.nix {
+  karabinerJson = builtins.fromJSON (import ../../modules/keymap/to-karabiner.nix {
     inherit lib spec;
   });
   karabinerManipulators =
@@ -100,10 +100,10 @@
 in {
   results = [
     (assert' "keymaps: TOML DSL is the SSoT" (
-      builtins.pathExists ../modules/keymap/binds.toml
-      && !(builtins.pathExists ../modules/keymap/binds.nix)
-      && !(builtins.pathExists ../modules/keymap/pipeline.nix)
-      && !(builtins.pathExists ../modules/keymap/binds.generated.json)
+      builtins.pathExists ../../modules/keymap/binds.toml
+      && !(builtins.pathExists ../../modules/keymap/binds.nix)
+      && !(builtins.pathExists ../../modules/keymap/pipeline.nix)
+      && !(builtins.pathExists ../../modules/keymap/binds.generated.json)
       && lib.hasInfix "[aerospace.settings]" keymapDsl
       && lib.hasInfix "[karabiner.caps]" keymapDsl
       && lib.hasInfix "builtins.fromTOML" keymapModule
