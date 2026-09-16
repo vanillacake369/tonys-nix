@@ -11,10 +11,10 @@ keybinds clear-defaults=true {
         bind "down" { MoveFocus "down"; }
         bind "up" { MoveFocus "up"; }
         bind "right" { MoveFocus "right"; }
-        bind "c" { SwitchToMode "renamepane"; PaneNameInput 0; }
         bind "d" { NewPane "down"; SwitchToMode "normal"; }
         bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "Shift f" { ToggleFocusNoUiFullscreen; SwitchToMode "normal"; }
         bind "i" { TogglePanePinned; SwitchToMode "normal"; }
         bind "h" { MoveFocus "left"; }
         bind "j" { MoveFocus "down"; }
@@ -22,7 +22,9 @@ keybinds clear-defaults=true {
         bind "l" { MoveFocus "right"; }
         bind "n" { NewPane; SwitchToMode "normal"; }
         bind "p" { SwitchFocus; }
-        bind "r" { NewPane "right"; SwitchToMode "normal"; }
+        // bind "r" { NewPane "right"; SwitchToMode "normal"; }
+        bind "r" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "Shift s" { NewPane "stacked"; SwitchToMode "normal"; }
         bind "s" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
                 floating true
@@ -92,6 +94,7 @@ keybinds clear-defaults=true {
         bind "tab" { MovePane; }
     }
     scroll {
+        bind "c" { CopyLastCommandOutput; SwitchToMode "normal"; }
         bind "e" { EditScrollback; SwitchToMode "normal"; }
         bind "s" { SwitchToMode "entersearch"; SearchInput 0; }
     }
@@ -118,6 +121,9 @@ keybinds clear-defaults=true {
             SwitchToMode "normal"
         }
         bind "d" { Detach; }
+        bind "[" { FocusGuestSession; SwitchToMode "normal"; }
+        bind "]" { FocusHostSession; SwitchToMode "normal"; }
+        bind "f" { ToggleHostFullscreen; SwitchToMode "normal"; }
         bind "p" {
             LaunchOrFocusPlugin "plugin-manager" {
                 floating true
@@ -234,11 +240,29 @@ keybinds clear-defaults=true {
                 "Pane Mode / New pane" "p -> n"
                 "Pane Mode / Split right" "p -> r"
                 "Pane Mode / Split down" "p -> d"
+                "Pane Mode / New stacked pane" "p -> Shift s"
                 "Pane Mode / Close pane" "p -> x"
                 "Pane Mode / Rename pane" "p -> c"
-                "Pane / Toggle fullscreen" "Alt f"
+                "Pane Mode / Toggle fullscreen" "p -> f, Alt f"
+                "Pane Mode / Toggle no-UI fullscreen" "p -> Shift f"
                 "Pane / Toggle floating panes" "Alt w"
+                "Move Mode / Move pane left" "m -> h, m -> Left"
+                "Move Mode / Move pane down" "m -> j, m -> Down"
+                "Move Mode / Move pane up" "m -> k, m -> Up"
+                "Move Mode / Move pane right" "m -> l, m -> Right"
+                "Move Mode / Move pane next" "m -> n, m -> Tab"
+                "Move Mode / Move pane previous" "m -> p"
+                "Tab Mode / Break pane to new tab" "t -> b"
+                "Tab Mode / Break pane left" "t -> ["
+                "Tab Mode / Break pane right" "t -> ]"
+                "Scroll Mode / Previous prompt" "e -> ["
+                "Scroll Mode / Next prompt" "e -> ]"
+                "Scroll Mode / Select command" "e -> m"
+                "Scroll Mode / Copy last command output" "e -> c"
                 "Session Mode / Detach" "s -> d"
+                "Session Mode / Focus guest session" "s -> ["
+                "Session Mode / Focus host session" "s -> ]"
+                "Session Mode / Toggle host fullscreen" "s -> f"
                 "Session Mode / Configuration" "s -> c"
                 "Session Mode / Plugin manager" "s -> p"
                 "Session Mode / Session manager" "s -> w"
@@ -295,6 +319,9 @@ keybinds clear-defaults=true {
         bind "j" { ScrollDown; }
         bind "k" { ScrollUp; }
         bind "l" { PageScrollDown; }
+        bind "[" { ScrollToPreviousPrompt; }
+        bind "]" { ScrollToNextPrompt; }
+        bind "m" { SelectCommandAtScrollPosition; }
         bind "Ctrl s" { SwitchToMode "normal"; }
         bind "u" { HalfPageScrollUp; }
     }
@@ -340,22 +367,22 @@ load_plugins {
 // Options:
 //   - true
 //   - false (Default)
-// 
+//
 // simplified_ui true
  
 // Choose the theme that is specified in the themes section.
 // Default: default
-// 
+//
 // theme "dracula"
  
 // Choose the base input mode of zellij.
 // Default: normal
-// 
+//
 default_mode "normal"
  
 // Choose the path to the default shell that zellij will use for opening new panes
 // Default: $SHELL
-// 
+//
 default_shell "fish"
 
 env {
@@ -396,6 +423,23 @@ mouse_mode true
 //   - false
 // 
 // pane_frames false
+pane_frames true
+
+// The style of the pane frames when pane_frames is enabled.
+//
+// Options:
+//
+// "titles" (default) - a single title line above each pane
+// "full" - a full border around each pane (the pre-0.45.0 look)
+// "none" - no frames at all (identical to pane_frames false)
+pane_frame_style "titles"
+
+// Whether stacked panes display as a compact title list above the stack
+// Options:
+//   - true (default)
+//   - false (pre-0.45.0 behavior)
+//
+// stacked_pane_list false
  
 // When attaching to an existing session with other users,
 // should the session be mirrored (true)
@@ -518,11 +562,69 @@ copy_on_select true
 // 
 // support_kitty_keyboard_protocol false
 support_kitty_keyboard_protocol true
+
+// Enable or disable support for the Kitty Graphics Protocol, used to display images
+// (Requires restart)
+// Default: true (if the host terminal supports it)
+//
+// support_kitty_graphics_protocol false
+
+// Choose how to handle a nested Zellij session detected running inside a pane
+// Options:
+//   - ask (default)
+//   - fullscreen
+//   - descend
+//   - never
+//
+// nested_session_handling "ask"
  
 // Whether to stack panes when resizing beyond a certain size
 // Default: true
 // 
 // stacked_resize false
+
+// Whether scrolling a pane implicitly enters and exits Scroll mode
+// Default: true
+//
+// scroll_mode_sync false
+scroll_mode_sync false
+
+// Whether to enable mouse hover visual effects and pane grouping functionality
+// Default: true
+//
+// advanced_mouse_actions false
+
+// Whether Ctrl+ScrollWheel resizes panes
+// Default: true
+//
+// mouse_scroll_resize false
+
+// Whether to enable mouse hover visual effects
+// Default: true
+//
+// mouse_hover_effects false
+
+// Whether to show mouse hover help-text tips
+// Default: true
+//
+// mouse_hover_tips false
+
+// Whether triple-clicking inside command output marked by OSC 133 selects the
+// command and its output instead of the logical line
+// Default: true
+//
+// osc133_command_selection false
+
+// Characters that terminate a word when double-clicking to select it
+// Default: "[]{}<>()"
+//
+// word_separators "[]{}<>()"
+
+// Pin the session to a dark or light appearance when the host terminal does not
+// report its theme hue
+// Options: dark, light
+//
+// explicit_theme_hue "dark"
  
 // Whether to show tips on startup
 // Default: true
