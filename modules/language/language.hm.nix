@@ -35,6 +35,8 @@
         pkgs.jdt-language-server
         pkgs.google-java-format
         pkgs.lombok
+        pkgs.vscode-extensions.vscjava.vscode-java-debug
+        pkgs.vscode-extensions.vscjava.vscode-java-test
       ];
       format = "google-java-format --dry-run --set-exit-if-changed";
     };
@@ -75,6 +77,8 @@
       packages = [
         pkgs.lua54Packages.lua
         pkgs.lua54Packages.luaunit
+        pkgs.lua54Packages.busted
+        pkgs.lua54Packages.mobdebug
         pkgs.lua-language-server
         pkgs.stylua
         pkgs.selene
@@ -95,7 +99,6 @@
         pkgs.cargo-watch
         pkgs.cargo-expand
         pkgs.bacon
-        pkgs.lldb
       ];
       format = "cargo fmt --check";
       lint = "cargo clippy -- -D warnings";
@@ -124,6 +127,13 @@
       lint = "yamllint";
     };
 
+    helm = {
+      extensions = [];
+      packages = [
+        pkgs.helm-ls
+      ];
+    };
+
     toml = {
       extensions = ["toml"];
       packages = [
@@ -140,6 +150,7 @@
         pkgs.prettier
         pkgs.biome
         pkgs.pnpm
+        pkgs.vscode-js-debug
       ];
       format = "prettier --check";
       diagnose = "tsc --noEmit";
@@ -172,6 +183,7 @@
         pkgs.python313Packages.ruff
         pkgs.python313Packages.uvicorn
         pkgs.python313Packages.pip
+        pkgs.python313Packages.lizard
         pkgs.black
         pkgs.ruff
       ];
@@ -235,20 +247,7 @@ in {
     file.".gradle/gradle.properties".text = ''
       org.gradle.daemon.idletimeout=300000
     '';
-    # Required by neotest-java at runtime. Plugin doesn't bundle the JAR and
-    # otherwise prompts for `:NeotestJava setup` on every fresh machine.
-    #
-    # NOTE:
-    # [VERSION DRIFT]
-    # this is pinned to 6.0.3 (the version neotest-java expects
-    # as of plugin tag v0.37.3). When neotest-java updates and bumps its
-    # expected version, the symlink filename will no longer match and the
-    # plugin falls back to its interactive setup. Detection signal: `:Lazy log
-    # neotest-java` shows a version bump → update both URL and hash here (run
-    # `nix-prefetch-url` on the new URL to get the new hash).
-    file.".local/share/nvim/neotest-java/junit-platform-console-standalone-6.0.3.jar".source = pkgs.fetchurl {
-      url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/6.0.3/junit-platform-console-standalone-6.0.3.jar";
-      hash = "sha256-O6DWFQr3khShQR+eovvvhk7vaLaMiaF/ZywLib/506I=";
-    };
+    file.".local/share/nvim/neotest-java/junit-platform-console-standalone-6.0.3.jar".source =
+      pkgs.neotest-java-junit-platform-console-standalone;
   };
 }

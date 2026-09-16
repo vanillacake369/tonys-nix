@@ -24,6 +24,10 @@ _final: prev: {
   gradle = prev.gradle.override {
     gradle-unwrapped = prev.gradle-unwrapped.override {java = prev.zulu21;};
   };
+  neotest-java-junit-platform-console-standalone = prev.fetchurl {
+    url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/6.0.3/junit-platform-console-standalone-6.0.3.jar";
+    hash = "sha256-O6DWFQr3khShQR+eovvvhk7vaLaMiaF/ZywLib/506I=";
+  };
 
   # NOTE:
   # Node 기반 LSP와 formatter는 wrapper 안의 nodejs-slim까지 같이 탄다.
@@ -33,6 +37,46 @@ _final: prev: {
   prettier = prev.prettier.override {nodejs = prev.nodejs_24;};
   bash-language-server = prev.bash-language-server.override {nodejs-slim = prev.nodejs-slim_24;};
   pnpm = prev.pnpm.override {nodejs = prev.nodejs_24;};
+
+  lua54Packages = prev.lua54Packages.overrideScope (luaFinal: _luaPrev: {
+    mobdebug = luaFinal.callPackage (
+      {
+        buildLuarocksPackage,
+        fetchFromGitHub,
+        fetchurl,
+        luaAtLeast,
+        luaOlder,
+        luasocket,
+      }:
+        buildLuarocksPackage {
+          pname = "mobdebug";
+          version = "0.80-1";
+          knownRockspec =
+            (fetchurl {
+              url = "https://luarocks.org/mobdebug-0.80-1.rockspec";
+              hash = "sha256-FxtnsnQDm1ok8fki4sWR3AHPUPWOUGucEcoJsIFoMfk=";
+            }).outPath;
+          src = fetchFromGitHub {
+            owner = "pkulchenko";
+            repo = "MobDebug";
+            rev = "0.80";
+            hash = "sha256-Z3OoDXK5t1MQUHx8Muvp9Fl43yqDgxnWBuAQxEUYwrk=";
+          };
+
+          disabled = luaOlder "5.1" || luaAtLeast "5.5";
+
+          propagatedBuildInputs = [
+            luasocket
+          ];
+
+          meta = {
+            homepage = "https://github.com/pkulchenko/MobDebug";
+            description = "Remote debugger for the Lua programming language";
+            license.fullName = "MIT/X11";
+          };
+        }
+    ) {};
+  });
 
   # WARNING:
   # python-lsp-server는 현재 nixpkgs의 jedi 상한과 충돌한다. 이 relaxation은
