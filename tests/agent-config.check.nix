@@ -60,6 +60,7 @@ in {
     ! grep -E '^\[agents(\.|])' "$HOME/.codex/config.toml"
     grep -F 'status_line = [' "$HOME/.codex/config.toml"
     grep -F '"model-with-reasoning"' "$HOME/.codex/config.toml"
+    grep -F 'vim_mode_default = true' "$HOME/.codex/config.toml"
     grep -F 'status_line_use_colors = true' "$HOME/.codex/config.toml"
     grep -F '[projects.demo]' "$HOME/.codex/config.toml"
     grep -F 'trusted = true' "$HOME/.codex/config.toml"

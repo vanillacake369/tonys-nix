@@ -6,6 +6,7 @@ in rec {
 
   codexModel = "gpt-5.5";
   codexTui = {
+    vim_mode_default = true;
     status_line = [
       "model-with-reasoning"
       "current-dir"
