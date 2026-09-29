@@ -221,8 +221,4 @@
       ${lib.getExe pkgs.fish} -lc 'tide configure --auto --style=Lean --prompt_colors="True color" --prompt_connection=Disconnected --prompt_spacing=Compact --show_time=No --icons="Few icons" --transient=No --lean_prompt_height="One line" --finish="Overwrite your current tide config"'
     fi
   '';
-
-  home.file.".config/fish/completions/zellij.fish".source = pkgs.runCommand "zellij-fish-completion" {} ''
-    ${pkgs.zellij}/bin/zellij setup --generate-completion fish > "$out"
-  '';
 }
