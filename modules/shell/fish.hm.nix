@@ -164,6 +164,28 @@
 
       fish_add_path --move --prepend $HOME/.cargo/bin
 
+      ${lib.optionalString isDarwin ''
+        if type -q brew
+            set -l brew_prefix (brew --prefix)
+            set -l brew_completion_dirs \
+                $brew_prefix/share/fish/completions \
+                $brew_prefix/share/fish/vendor_completions.d
+
+            for formula in podman docker
+                set -l formula_prefix (brew --prefix $formula 2>/dev/null)
+                if test -n "$formula_prefix"
+                    set -a brew_completion_dirs $formula_prefix/share/fish/vendor_completions.d
+                end
+            end
+
+            for completion_dir in $brew_completion_dirs
+                if test -d $completion_dir; and not contains -- $completion_dir $fish_complete_path
+                    set -a fish_complete_path $completion_dir
+                end
+            end
+        end
+      ''}
+
       set -g fish_greeting
 
       bind \e\[H beginning-of-line
