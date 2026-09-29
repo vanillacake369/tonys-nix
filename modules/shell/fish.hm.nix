@@ -13,6 +13,8 @@
       cat = "bat --style=plain --paging=never";
       grep = "rg";
       clear = "clear -x";
+      pdm = "podman";
+      dck = "docker";
       k = "kubectl";
       m = "minikube";
       kctx = "kubectx";
@@ -22,6 +24,8 @@
       zj = "zellij";
       zr = "zellij-nav repo";
       hm = "home-manager";
+      tscl = "tailscale";
+      mtps = "multipass";
       codex = "agent-secret-env codex";
       cdx = "agent-secret-env codex -s danger-full-access -a never";
       gmni = "agent-secret-env agy --dangerously-skip-permissions";
