@@ -2,7 +2,7 @@
 # derivation attrsets. Check files receive the flake-level context they need,
 # while flake.nix only owns discovery and wiring.
 # Check files are functions over an explicit flake check context, currently:
-#   { pkgs, homeConfig, tests, ... } -> { <check-name> = derivation; }
+#   { pkgs, homeConfigs, tests, ... } -> { <check-name> = derivation; }
 # Usage: (import ./collect-checks.nix {inherit lib;}) ./tests context
 {lib}: dir: let
   collect = path: let
