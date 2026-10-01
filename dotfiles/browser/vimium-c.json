@@ -1,0 +1,49 @@
+{
+    "name": "Vimium C",
+    "@time": "9/30/2026, 10:30:00 PM",
+    "time": 1790778600000,
+    "environment": {
+        "extension": "2.12.2",
+        "platform": "mac",
+        "chromium": 154
+    },
+    "exclusionRules": [
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?google\\.com/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?leetcode\\.com/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?youtube\\.com/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?kodekloud\\.com/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?programmers\\.co\\.kr/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?neetcode\\.io/"
+        },
+        {
+            "passKeys": "",
+            "pattern": "^https?://(?:www\\.)?hackerrank\\.com/"
+        }
+    ],
+    "keyLayout": 2,
+    "keyMappings": [
+        "#!no-check",
+        "# Insert your preferred key mappings here.",
+        "map H previousTab",
+        "map L nextTab",
+        ""
+    ],
+    "vimSync": true
+}
