@@ -2,8 +2,9 @@
 # Zellij navigation helper lifecycle tests with stubbed zellij/fzf commands.
 
 setup_file() {
-  cargo build --manifest-path "$BATS_TEST_DIRNAME/../../dotfiles/zellij/nav/Cargo.toml"
-  export ZELLIJ_NAV_TEST_BIN="$BATS_TEST_DIRNAME/../../dotfiles/zellij/nav/target/debug/zellij-nav"
+  export ZELLIJ_NAV_TEST_TARGET="${BATS_FILE_TMPDIR:-/tmp}/zellij-nav-cargo-target"
+  CARGO_TARGET_DIR="$ZELLIJ_NAV_TEST_TARGET" cargo build --manifest-path "$BATS_TEST_DIRNAME/../../dotfiles/zellij/nav/Cargo.toml"
+  export ZELLIJ_NAV_TEST_BIN="$ZELLIJ_NAV_TEST_TARGET/debug/zellij-nav"
 }
 
 setup() {
@@ -12,6 +13,7 @@ setup() {
   mkdir -p "$TMPDIR" "$WORK/bin" "$WORK/state"
   export ZELLIJ_NAV_STATE_DIR="$WORK/state"
   export ZELLIJ_STUB_LOG="$WORK/zellij.log"
+  export ZELLIJ_STUB_CREATED_SESSIONS="$WORK/created-sessions"
   export ZELLIJ_STUB_LAYOUT_COPY="$WORK/sidecar-layout.kdl"
   export ZELLIJ_STUB_START_ATTACHED_FILE="$WORK/start-attached"
   export ZELLIJ_NAV_COMMAND="$ZELLIJ_NAV_TEST_BIN"
@@ -38,6 +40,15 @@ current [Created 1s ago] (current)
 target [Created 1s ago]
 old EXITED
 SESSIONS
+  [ -f "${ZELLIJ_STUB_CREATED_SESSIONS:?}" ] && cat "$ZELLIJ_STUB_CREATED_SESSIONS"
+  exit 0
+fi
+
+if [ "${1:-}" = "attach" ] && [ "${2:-}" = "--create-background" ]; then
+  if [ -n "${ZELLIJ_STUB_CREATE_FAIL_PATTERN:-}" ] && [[ "$3" == *"$ZELLIJ_STUB_CREATE_FAIL_PATTERN"* ]]; then
+    exit 1
+  fi
+  printf '%s [Created 0s ago]\n' "$3" >>"${ZELLIJ_STUB_CREATED_SESSIONS:?}"
   exit 0
 fi
 
@@ -407,6 +418,13 @@ fi
 exit 0
 EOF
   chmod +x "$WORK/bin/zellij"
+
+  cat >"$WORK/bin/project-sidecar" <<'EOF'
+#!/usr/bin/env bash
+printf 'project-sidecar %s\n' "$*" >>"${ZELLIJ_STUB_LOG:?}"
+exit "${ZELLIJ_STUB_PROJECT_SIDECAR_STATUS:-0}"
+EOF
+  chmod +x "$WORK/bin/project-sidecar"
 
 cat >"$WORK/bin/wezterm" <<'EOF'
 #!/usr/bin/env bash
@@ -957,6 +975,179 @@ EOF
   [ "$status" -eq 0 ]
 
   run grep -q -- "--configuration session=target,kind=tab,tab_id=1,pane_id=" "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+}
+
+@test "projects json deduplicates canonical paths and defaults layout to null" {
+  mkdir -p "$WORK/dev/api"
+  ln -s "$WORK/dev/api" "$WORK/dev/api-link"
+
+  run env HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" "$ZELLIJ_NAV_TEST_BIN" projects --json
+  [ "$status" -eq 0 ]
+  run jq -e 'length == 1 and .[0].display_name == "api" and .[0].session_name == "api" and .[0].layout == null' <<<"$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "projects json applies only the central layout mapping" {
+  mkdir -p "$WORK/dev/api" "$WORK/.config/zellij"
+  printf '{"api":"backend"}\n' >"$WORK/.config/zellij/project-layouts.json"
+
+  run env HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" "$ZELLIJ_NAV_TEST_BIN" projects --json
+  [ "$status" -eq 0 ]
+  run jq -e '.[0].layout == "backend"' <<<"$output"
+  [ "$status" -eq 0 ]
+}
+
+@test "auto project launches declared project descendants with global default layout" {
+  mkdir -p "$WORK/dev/api/src" "$WORK/work" "$WORK/.config/zellij"
+  printf '["%s/dev","%s/work"]\n' "$WORK" "$WORK" >"$WORK/.config/zellij/project-roots.json"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/dev/api/src" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create api$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q -- '--default-layout' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "auto project applies an explicit central layout" {
+  mkdir -p "$WORK/work/api" "$WORK/.config/zellij"
+  printf '{"api":"backend"}\n' >"$WORK/.config/zellij/project-layouts.json"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev:$WORK/work" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/work/api" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create api options --default-layout backend$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+}
+
+@test "auto project outside declared roots creates no sessions" {
+  mkdir -p "$WORK/dev/api" "$WORK/work/web" "$WORK/other/ignored"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev:$WORK/work" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/other" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 2 ]
+  run grep -q 'zellij attach --create' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "auto project creates only the cwd project and never its sibling" {
+  mkdir -p "$WORK/dev/api/src" "$WORK/dev/web"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/dev/api/src" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create api$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q 'web' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+  run grep -q 'zellij attach --create-background' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "auto project surfaces target creation failure without touching siblings" {
+  mkdir -p "$WORK/dev/api" "$WORK/dev/web"
+
+  run env HOME="$WORK" ZELLIJ=0 ZELLIJ_SESSION_NAME=current ZELLIJ_REPO_ROOTS="$WORK/dev" \
+    ZELLIJ_REAL_BINARY="$WORK/bin/zellij" ZELLIJ_NAV_SIDECAR_COMMAND="$WORK/bin/project-sidecar" \
+    ZELLIJ_STUB_CREATE_FAIL_PATTERN=api PATH="$WORK/bin:$PATH" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/dev/api" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -ne 0 ]
+  run grep -q 'zellij attach --create-background api$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q 'web' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "repo-to creates only the requested project on demand" {
+  mkdir -p "$WORK/dev/api" "$WORK/dev/web"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    "$ZELLIJ_NAV_TEST_BIN" repo-to api
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create api$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q 'web' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "repo picker creates only the selected project on demand" {
+  mkdir -p "$WORK/dev/api" "$WORK/dev/web"
+  cat >"$WORK/bin/fzf" <<'EOF'
+#!/usr/bin/env bash
+grep '/api$' | head -n 1
+EOF
+  chmod +x "$WORK/bin/fzf"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" PATH="$WORK/bin:$PATH" \
+    "$ZELLIJ_NAV_TEST_BIN" repo
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create api$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q 'web' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "repo picker cancellation creates no sessions" {
+  mkdir -p "$WORK/dev/api" "$WORK/dev/web"
+  cat >"$WORK/bin/fzf" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+  chmod +x "$WORK/bin/fzf"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" PATH="$WORK/bin:$PATH" \
+    "$ZELLIJ_NAV_TEST_BIN" repo
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "explicit project reload creates every missing project without attaching" {
+  mkdir -p "$WORK/dev/api" "$WORK/dev/web"
+
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    "$ZELLIJ_NAV_TEST_BIN" reload-projects
+  [ "$status" -eq 0 ]
+  run grep -E -c 'zellij attach --create-background (api|web)$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  [ "$output" -eq 2 ]
+  run grep -Eq 'zellij attach --create($| )|project-sidecar' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+
+  : >"$ZELLIJ_STUB_LOG"
+  run env -u ZELLIJ HOME="$WORK" ZELLIJ_REPO_ROOTS="$WORK/dev" ZELLIJ_REAL_BINARY="$WORK/bin/zellij" \
+    "$ZELLIJ_NAV_TEST_BIN" reload-projects
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create-background' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+}
+
+@test "auto project creates a missing session in background and launches its sidecar client" {
+  mkdir -p "$WORK/dev/api" "$WORK/.config/zellij"
+  printf '{"api":"backend"}\n' >"$WORK/.config/zellij/project-layouts.json"
+
+  run env HOME="$WORK" ZELLIJ=0 ZELLIJ_SESSION_NAME=current ZELLIJ_REPO_ROOTS="$WORK/dev" \
+    ZELLIJ_REAL_BINARY="$WORK/bin/zellij" ZELLIJ_NAV_SIDECAR_COMMAND="$WORK/bin/project-sidecar" PATH="$WORK/bin:$PATH" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/dev/api" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create-background api options --default-layout backend$' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+  run grep -q 'project-sidecar api session' "$ZELLIJ_STUB_LOG"
+  [ "$status" -eq 0 ]
+}
+
+@test "auto project launches a sidecar for an existing project session without background creation" {
+  mkdir -p "$WORK/dev/target"
+
+  run env HOME="$WORK" ZELLIJ=0 ZELLIJ_SESSION_NAME=current ZELLIJ_REPO_ROOTS="$WORK/dev" \
+    ZELLIJ_REAL_BINARY="$WORK/bin/zellij" ZELLIJ_NAV_SIDECAR_COMMAND="$WORK/bin/project-sidecar" PATH="$WORK/bin:$PATH" \
+    bash -c 'cd "$1" && exec "$2" auto-project' _ "$WORK/dev/target" "$ZELLIJ_NAV_TEST_BIN"
+  [ "$status" -eq 0 ]
+  run grep -q 'zellij attach --create-background' "$ZELLIJ_STUB_LOG"
+  [ "$status" -ne 0 ]
+  run grep -q -- 'project-sidecar target session' "$ZELLIJ_STUB_LOG"
   [ "$status" -eq 0 ]
 }
 
