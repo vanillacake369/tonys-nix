@@ -110,7 +110,7 @@ in {
     ))
     (assert' "keymaps: AeroSpace workspace policy is explicit" (
       spec.aerospace.settings.persistent_workspaces
-      == ["Docs" "Code" "Browser" "Terminal" "Music" "Schedule"]
+      == ["Database" "Code" "Browser" "Terminal" "Music" "Schedule"]
       && builtins.length spec.aerospace.workspace_assignments == 6
       && builtins.all (entry: builtins.elem entry.workspace spec.aerospace.settings.persistent_workspaces) spec.aerospace.workspace_assignments
     ))
