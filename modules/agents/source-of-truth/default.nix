@@ -26,7 +26,7 @@ in rec {
           hooks = [
             {
               type = "command";
-              command = "~/.claude/hooks/agent-notify.sh codex";
+              command = "~/.config/agents/hooks/agent-notify.sh codex";
               timeout = 5;
             }
           ];
