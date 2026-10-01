@@ -6,6 +6,13 @@
   ...
 }: let
   zellijPluginDir = "${config.home.homeDirectory}/.config/zellij/plugins";
+  projectRoots = [
+    "${config.home.homeDirectory}/dev"
+    "${config.home.homeDirectory}/work"
+  ];
+  # Keys may be a canonical project path or its basename. Missing entries are
+  # deliberately serialized as no override so Zellij uses default_layout.
+  projectLayouts = {};
   zellijConfig = import ../../lib/mk-zellij-config.nix {
     inherit isDarwin;
     fishPath = "${pkgs.fish}/bin/fish";
@@ -52,6 +59,31 @@ in {
     fi
   '';
 
+  programs.fish.functions.zellij = {
+    wraps = "${pkgs.zellij}/bin/zellij";
+    body = ''
+      if not status is-interactive
+          command ${pkgs.zellij}/bin/zellij $argv
+          return $status
+      end
+
+      if test (count $argv) -gt 0
+          command ${pkgs.zellij}/bin/zellij $argv
+          return $status
+      end
+
+      set -lx ZELLIJ_REAL_BINARY ${pkgs.zellij}/bin/zellij
+      set -lx ZELLIJ_NAV_SIDECAR_COMMAND $HOME/.config/zellij/scripts/zellij-nav-sidecar
+      ${pkgs.zellij-nav}/bin/zellij-nav auto-project
+      set -l auto_status $status
+      if test $auto_status -eq 2
+          command ${pkgs.zellij}/bin/zellij
+          return $status
+      end
+      return $auto_status
+    '';
+  };
+
   # NOTE:
   # zellij UI, helper scripts, wasm plugins, zestty bootstrap은 한 런타임 경계다.
   # 파일만 잘게 찢으면 activation 그래프는 얕아지지 않고 추적만 어려워진다.
@@ -80,6 +112,8 @@ in {
       executable = true;
     };
     ".config/zellij/plugins/zellij-nav-switcher.wasm".source = "${pkgs.zellij-nav-switcher}/share/zellij/plugins/zellij-nav-switcher.wasm";
+    ".config/zellij/project-roots.json".text = builtins.toJSON projectRoots;
+    ".config/zellij/project-layouts.json".text = builtins.toJSON projectLayouts;
     ".config/zellij/plugins/room.wasm".source = pkgs.zellij-room-wasm;
     ".config/zellij/plugins/zellij-forgot.wasm".source = pkgs.zellij-forgot-wasm;
     ".config/zellij/plugins/zestty.wasm".source = pkgs.zellij-zestty-wasm;
