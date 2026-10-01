@@ -36,10 +36,115 @@ MAC_SCHEDULE_DAYS := "MTWRFSU"
 NIX_CONF_SOURCE := justfile_directory() + "/dotfiles/nix/nix.conf"
 NIX_CONF_TARGET := "/etc/nix/nix.conf"
 AEROSPACE_CONFIG_PATH := "modules/keymap"
+BREWFILE := justfile_directory() + "/Brewfile"
+BREW_SYNC_DIR := justfile_directory() + "/.cache/brew"
+
+########### Public Command Surface ##########
+
+# NOTE:
+#   bare `just`는 조회용 help가 아니라 이 저장소의 의도적인 수렴 명령이다.
+#   모든 check가 통과한 경우에만 apply를 실행해 실패 상태의 구성이
+#   호스트에 반영되지 않도록 fail-closed 순서를 유지한다.
+# Run every check and apply the current login user's complete profile.
+[default]
+default:
+    #!/usr/bin/env bash
+    echo "[1/2] Running all checks"
+    just check all
+    echo "[2/2] Applying the current profile"
+    just apply all
+
+# Synchronize managed applications. Domains: brew, raycast.
+sync domain action="guide" target="local":
+    #!/usr/bin/env bash
+    case {{ quote(domain) }} in
+      brew)
+        case {{ quote(action) }} in
+          check|export|import) just brew {{ quote(action) }} {{ quote(target) }} ;;
+          *) echo "[x] Usage: just sync brew {check|export|import} [local|user@host]" >&2; exit 2 ;;
+        esac
+        ;;
+      raycast)
+        [[ {{ quote(target) }} == local ]] || { echo "[x] Raycast guide does not accept a target" >&2; exit 2; }
+        just raycast {{ quote(action) }}
+        ;;
+      *) echo "[x] Expected: just sync {brew|raycast} ..." >&2; exit 2 ;;
+    esac
+
+# Set up this machine. Actions: all, nix, home, agents, mac, completions.
+setup action:
+    #!/usr/bin/env bash
+    case {{ quote(action) }} in
+      all) just bootstrap ;;
+      nix) just install-nix && just system-link-nix-conf ;;
+      home) just install-home-manager && just apply home ;;
+      agents) just agent-login ;;
+      mac) just sync-local-integrations ;;
+      completions) just _setup-completions ;;
+      *) echo "[x] Expected: just setup {all|nix|home|agents|mac|completions}" >&2; exit 2 ;;
+    esac
+
+# Run quality gates. Targets: all, flake, hooks, lint.
+check target="all":
+    #!/usr/bin/env bash
+    case {{ quote(target) }} in
+      all) just lint && just test ;;
+      flake) just _test-flake ;;
+      hooks) just test-hooks ;;
+      lint) just lint ;;
+      *) echo "[x] Expected: just check {all|flake|hooks|lint}" >&2; exit 2 ;;
+    esac
+
+# Run maintenance operations. Domains: gc, health.
+maintenance domain action="auto":
+    #!/usr/bin/env bash
+    case {{ quote(domain) }} in
+      gc)
+        case {{ quote(action) }} in
+          auto) just gc ;;
+          force) just gc-force ;;
+          status) just gc-info ;;
+          *) echo "[x] Expected: just maintenance gc {auto|force|status}" >&2; exit 2 ;;
+        esac
+        ;;
+      health)
+        [[ {{ quote(action) }} == auto ]] || { echo "[x] Usage: just maintenance health" >&2; exit 2; }
+        just performance-test
+        ;;
+      *) echo "[x] Expected: just maintenance {gc|health}" >&2; exit 2 ;;
+    esac
+
+# Build or inspect image outputs. Actions: list, build, build-arch, build-all, show.
+image action="list" arg="" arch="":
+    #!/usr/bin/env bash
+    case {{ quote(action) }} in
+      list)
+        [[ -z {{ quote(arg) }} && -z {{ quote(arch) }} ]] || { echo "[x] Usage: just image list" >&2; exit 2; }
+        just list-image-formats
+        ;;
+      build)
+        [[ -n {{ quote(arg) }} && -z {{ quote(arch) }} ]] || { echo "[x] Usage: just image build <format>" >&2; exit 2; }
+        just build-image {{ quote(arg) }}
+        ;;
+      build-arch)
+        [[ -n {{ quote(arg) }} && -n {{ quote(arch) }} ]] || { echo "[x] Usage: just image build-arch <format> <arch>" >&2; exit 2; }
+        just build-image-arch {{ quote(arg) }} {{ quote(arch) }}
+        ;;
+      build-all)
+        [[ -z {{ quote(arg) }} && -z {{ quote(arch) }} ]] || { echo "[x] Usage: just image build-all" >&2; exit 2; }
+        just build-images
+        ;;
+      show)
+        [[ -z {{ quote(arg) }} && -z {{ quote(arch) }} ]] || { echo "[x] Usage: just image show" >&2; exit 2; }
+        just show-images
+        ;;
+      *) echo "[x] Expected: just image {list|build|build-arch|build-all|show}" >&2; exit 2 ;;
+    esac
 
 ########### Bootstrap ##########
 
 # Full first-time setup for the current machine.
+[private]
 bootstrap:
     #!/usr/bin/env bash
     just install-nix
@@ -47,10 +152,10 @@ bootstrap:
     just install-home-manager
     just bootstrap-uidmap
     just apply
-    just agent-login
     just gc
 
 # Authenticate missing AI providers via cli-proxy-api OAuth.
+[private]
 agent-login:
     #!/usr/bin/env bash
     AUTH_DIR="$HOME/.cli-proxy-api"
@@ -75,6 +180,7 @@ agent-login:
     echo "[✓] Agent login complete"
 
 # Install Nix if it is not available.
+[private]
 install-nix:
     #!/usr/bin/env bash
     if command -v nix >/dev/null 2>&1; then
@@ -86,6 +192,7 @@ install-nix:
     sh <(curl -L https://nixos.org/nix/install) --daemon
 
 # Prepare Home Manager. On fresh systems the real install happens via flake commands.
+[private]
 install-home-manager:
     #!/usr/bin/env bash
     if command -v home-manager >/dev/null 2>&1; then
@@ -100,6 +207,7 @@ install-home-manager:
     fi
 
 # Install uidmap only where it is relevant.
+[private]
 bootstrap-uidmap:
     #!/usr/bin/env bash
     case "{{ OS_TYPE }}" in
@@ -118,6 +226,7 @@ bootstrap-uidmap:
     esac
 
 # Install uidmap on Debian/Ubuntu style Linux hosts.
+[private]
 install-uidmap:
     #!/usr/bin/env bash
     if [[ "$(uname -s)" != "Linux" ]]; then
@@ -134,17 +243,45 @@ install-uidmap:
     sudo apt update
     sudo apt install -y uidmap
 
-# Apply the flake for the current platform.
-apply target=SYSTEM_ARCH:
+# Apply the current login user's profile. Scopes: all, home, system.
+apply scope="all" profile="":
     #!/usr/bin/env bash
-    echo "OS_TYPE={{ OS_TYPE }}, TARGET={{ target }}, HOSTNAME={{ HOSTNAME }}"
-    just apply-validate "{{ target }}"
-    just apply-system "{{ target }}"
-    just apply-home "{{ target }}"
-    just sync-local-integrations
+    scope={{ quote(scope) }}
+    profile={{ quote(profile) }}
+    system={{ quote(SYSTEM_ARCH) }}
+
+    case "$scope" in
+      x86_64-linux|aarch64-linux|aarch64-darwin)
+        echo "[!] Deprecated: use 'just apply all [profile]' instead of 'just apply $scope'" >&2
+        system="$scope"
+        scope=all
+        ;;
+    esac
+    case "$scope" in
+      all|home|system) ;;
+      *) echo "[x] Expected: just apply {all|home|system} [profile]" >&2; exit 2 ;;
+    esac
+    if [[ "$scope" == system && -n "$profile" ]]; then
+      echo "[x] A profile applies only to Home Manager; use 'just apply system'" >&2
+      exit 2
+    fi
+
+    just _apply-validate "$system"
+    if [[ "$scope" == all || "$scope" == system ]]; then
+      just _apply-system "$system"
+    fi
+    if [[ "$scope" == all || "$scope" == home ]]; then
+      [[ -n "$profile" ]] || profile="$(id -un)"
+      target="$(just _home-target "$profile" "$system" {{ quote(OS_TYPE) }})"
+      echo "User: $profile"
+      echo "Platform: {{ OS_TYPE }} ($system)"
+      echo "Target: $target"
+      just _apply-home "$target"
+    fi
 
 # Validate platform and target before applying any configuration.
-apply-validate target:
+[private]
+_apply-validate target:
     #!/usr/bin/env bash
     case "{{ OS_TYPE }}" in
       nixos|wsl|darwin|linux)
@@ -169,7 +306,8 @@ apply-validate target:
     esac
 
 # Apply system-level configuration for hosts that require it.
-apply-system target:
+[private]
+_apply-system target:
     #!/usr/bin/env bash
     if [[ "{{ OS_TYPE }}" != "nixos" ]]; then
       echo "[→] System apply skipped - not NixOS"
@@ -201,8 +339,53 @@ apply-system target:
       --flake .#"{{ HOSTNAME }}" \
       --impure
 
-# Apply the Home Manager profile for the requested target.
-apply-home target:
+# Resolve a login/profile name to an existing named Home Manager output.
+# NOTE:
+#   shell 로그인 사용자는 Just runtime에서만 판별하고 flake에 impure 값으로
+#   주입하지 않는다. user/<profile>.nix가 선언한 named output을 선택하는
+#   경계를 지켜야 동일한 flake가 로컬·CI에서 같은 결과로 평가된다.
+[private]
+_home-target profile system os:
+    #!/usr/bin/env bash
+    profile={{ quote(profile) }}
+    system={{ quote(system) }}
+    os={{ quote(os) }}
+    profile_file="{{ justfile_directory() }}/user/${profile}.nix"
+
+    if [[ ! "$profile" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
+      echo "[x] Invalid profile name: $profile" >&2
+      exit 2
+    fi
+    if [[ ! -f "$profile_file" ]]; then
+      echo "[x] Cannot find a Nix profile for login user '$profile'." >&2
+      echo "    Expected: user/${profile}.nix" >&2
+      echo "    Copy an existing user/*.nix profile, update its identity fields, and retry." >&2
+      exit 2
+    fi
+    if ! git -C "{{ justfile_directory() }}" ls-files --error-unmatch -- "user/${profile}.nix" >/dev/null 2>&1; then
+      echo "[x] user/${profile}.nix exists but is not visible to the Git-backed flake." >&2
+      echo "    Track it first: git add user/${profile}.nix" >&2
+      exit 2
+    fi
+
+    case "$os" in
+      nixos) target="hm-${profile}-nixos-${system}" ;;
+      wsl) target="hm-${profile}-wsl-${system}" ;;
+      darwin|linux) target="hm-${profile}-${system}" ;;
+      *) echo "[x] Unsupported platform for Home Manager apply: $os" >&2; exit 2 ;;
+    esac
+
+    if ! nix eval --json .#homeConfigurations --apply builtins.attrNames \
+      | jq -e --arg target "$target" 'index($target) != null' >/dev/null; then
+      echo "[x] Flake output not found: homeConfigurations.$target" >&2
+      echo "    Ensure user/${profile}.nix declares username = \"${profile}\"." >&2
+      exit 2
+    fi
+    printf '%s\n' "$target"
+
+# Apply an already-resolved Home Manager target.
+[private]
+_apply-home flake_target:
     #!/usr/bin/env bash
     if command -v home-manager >/dev/null 2>&1; then
       hm_cmd=(home-manager)
@@ -213,21 +396,7 @@ apply-home target:
       hm_fallback_cmd=(nix --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}" run home-manager/master -- switch --option substituters "{{ APPLY_FALLBACK_SUBSTITUTERS }}")
     fi
 
-    case "{{ OS_TYPE }}" in
-      nixos)
-    flake_target="hm-nixos-{{ target }}"
-    ;;
-      wsl)
-    flake_target="hm-wsl-{{ target }}"
-    ;;
-      darwin|linux)
-    flake_target="hm-{{ target }}"
-    ;;
-      *)
-    echo "[✗] Unsupported platform for Home Manager apply: {{ OS_TYPE }}"
-    exit 1
-    ;;
-    esac
+    flake_target={{ quote(flake_target) }}
 
     echo "[!] Applying Home Manager target: ${flake_target}"
     echo "Running: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
@@ -246,13 +415,162 @@ apply-home target:
     "${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back
 
 # Sync local desktop integrations after configuration changes are applied.
+[private]
 sync-local-integrations:
     #!/usr/bin/env bash
     just apply-fish
     just reload-aerospace-if-needed
     just setup-mac-power-schedule
 
+########### macOS Application Sync ##########
+
+# Manage the shared Brewfile locally or through an explicit Tailscale SSH target.
+[private]
+brew action target="local":
+    #!/usr/bin/env bash
+    case {{ quote(action) }} in
+      check) just _brew-check {{ quote(target) }} ;;
+      export) just _brew-export {{ quote(target) }} ;;
+      import) just _brew-import {{ quote(target) }} ;;
+      *) echo "[✗] Expected: just brew {check|export|import} [local|[user@]tailscale-host]"; exit 1 ;;
+    esac
+
+# Print the supported GUI workflow for Raycast configuration migration.
+[private]
+raycast action="guide":
+    #!/usr/bin/env bash
+    action={{ quote(action) }}
+    case "$action" in
+      export)
+        printf '%s\n' \
+          "Raycast configuration export requires the Raycast GUI:" \
+          "  1. Open Raycast on the source Mac." \
+          "  2. Run 'Export Settings & Data', or open Settings > Advanced > Export." \
+          "  3. Set or enter an export passphrase (at least 8 characters)." \
+          "  4. Save the encrypted .rayconfig file and transfer it securely." \
+          "" \
+          "Raycast has no supported headless CLI for this export."
+        ;;
+      import)
+        printf '%s\n' \
+          "Raycast configuration import requires the Raycast GUI:" \
+          "  1. On the target Mac, double-click the transferred .rayconfig file." \
+          "  2. Enter its export passphrase in Raycast." \
+          "  3. Select the categories to import and confirm." \
+          "  4. Run 'just sync raycast verify' for the manual verification checklist." \
+          "" \
+          "Import merges data; it does not make the target an exact overwrite of the source."
+        ;;
+      status|verify)
+        printf '%s\n' \
+          "Verify the imported configuration inside Raycast:" \
+          "  1. Open Settings and confirm expected extensions are installed and enabled." \
+          "  2. Check Settings, Aliases & Hotkeys for the expected shortcuts." \
+          "  3. Confirm representative Quicklinks, Snippets, and other selected categories." \
+          "  4. Run one imported command and one imported hotkey." \
+          "" \
+          "Raycast provides no supported CLI that can attest to a completed import."
+        ;;
+      guide)
+        printf '%s\n' \
+          "Raycast configuration migration is GUI-only." \
+          "Run one of:" \
+          "  just sync raycast export" \
+          "  just sync raycast import" \
+          "  just sync raycast verify"
+        ;;
+      *)
+        echo "[✗] Expected: just sync raycast {guide|export|import|verify}"
+        exit 2
+        ;;
+    esac
+
+[private]
+_brew-check target:
+    #!/usr/bin/env bash
+    target={{ quote(target) }}
+    case "$target" in
+      local)
+        HOMEBREW_NO_AUTO_UPDATE=1 brew bundle check --file "{{ BREWFILE }}" --no-upgrade
+        ;;
+      -*|*[[:space:][:cntrl:]]*|'')
+        echo "[✗] Invalid Brew target: $target"
+        exit 1
+        ;;
+      *)
+        tailscale ssh "$target" \
+          'HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle check --file=- --no-upgrade' < "{{ BREWFILE }}"
+        ;;
+    esac
+
+[private]
+_brew-import target:
+    #!/usr/bin/env bash
+    target={{ quote(target) }}
+    echo "[→] Brew import target: $target (additive, no upgrade, no cleanup)"
+    case "$target" in
+      local)
+        HOMEBREW_NO_AUTO_UPDATE=1 brew bundle install --file "{{ BREWFILE }}" --no-upgrade
+        ;;
+      -*|*[[:space:][:cntrl:]]*|'')
+        echo "[✗] Invalid Brew target: $target"
+        exit 1
+        ;;
+      *)
+        tailscale ssh "$target" \
+          'HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle install --file=- --no-upgrade' < "{{ BREWFILE }}"
+        ;;
+    esac
+
+[private]
+_brew-export target:
+    #!/usr/bin/env bash
+    target={{ quote(target) }}
+    case "$target" in
+      -*|*[[:space:][:cntrl:]]*|'')
+        echo "[✗] Invalid Brew target: $target"
+        exit 1
+        ;;
+    esac
+    mkdir -p "{{ BREW_SYNC_DIR }}"
+    target_label=remote
+    [[ "$target" == local ]] && target_label=local
+    candidate="{{ BREW_SYNC_DIR }}/Brewfile.${target_label}.$(date +%Y%m%d-%H%M%S)"
+    case "$target" in
+      local)
+        if ! HOMEBREW_NO_AUTO_UPDATE=1 brew bundle dump --file=- --force --no-describe > "$candidate"; then
+          unlink "$candidate" 2>/dev/null || true
+          exit 1
+        fi
+        ;;
+      *)
+        if ! tailscale ssh "$target" \
+          'HOMEBREW_NO_AUTO_UPDATE=1 /opt/homebrew/bin/brew bundle dump --file=- --force --no-describe' > "$candidate"; then
+          unlink "$candidate" 2>/dev/null || true
+          exit 1
+        fi
+        ;;
+    esac
+    if [[ ! -s "$candidate" ]]; then
+      unlink "$candidate" 2>/dev/null || true
+      echo "[✗] Brew export is empty"
+      exit 1
+    fi
+    diff -u "{{ BREWFILE }}" "$candidate" || true
+    if [[ -t 0 ]]; then
+      read -r -p "Replace Brewfile with this export? [y/N] " answer
+    else
+      answer="n"
+    fi
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      cp "$candidate" "{{ BREWFILE }}"
+      echo "[✓] Updated {{ BREWFILE }}"
+    else
+      echo "[→] Kept candidate at $candidate"
+    fi
+
 # Reload AeroSpace when its config changed in git and the local environment supports it.
+[private]
 reload-aerospace-if-needed:
     #!/usr/bin/env bash
     if [[ "{{ OS_TYPE }}" != "darwin" ]]; then
@@ -292,6 +610,7 @@ reload-aerospace-if-needed:
     exit 0
 
 # Ensure the Nix-provided fish is registered as a login shell.
+[private]
 apply-fish:
     #!/usr/bin/env bash
     fish_path="$HOME/.nix-profile/bin/fish"
@@ -323,6 +642,7 @@ apply-fish:
 ########### System Configuration ##########
 
 # Link the repository nix.conf into /etc/nix/nix.conf.
+[private]
 system-link-nix-conf:
     #!/usr/bin/env bash
     source_file="{{ NIX_CONF_SOURCE }}"
@@ -357,6 +677,7 @@ system-link-nix-conf:
     echo "[✓] nix.conf linked successfully"
 
 # Configure daily sleep and wake scheduling on macOS.
+[private]
 setup-mac-power-schedule:
     #!/usr/bin/env bash
     if [[ "{{ OS_TYPE }}" != "darwin" ]]; then
@@ -427,6 +748,7 @@ setup-mac-power-schedule:
     echo "    Cancel: sudo pmset repeat cancel"
 
 # Enable shared mount propagation for rootless Podman.
+[private]
 enable-shared-mount:
     #!/usr/bin/env bash
     propagation="$(findmnt -no PROPAGATION /)"
@@ -442,12 +764,14 @@ enable-shared-mount:
 ########### Maintenance ##########
 
 # Persist a GC run timestamp.
+[private]
 gc-record:
     #!/usr/bin/env bash
     date +%s > {{ GC_STATE_FILE }}
     echo "[✓] GC execution recorded at $(date)"
 
 # Run conditional garbage collection using age and disk pressure.
+[private]
 gc:
     #!/usr/bin/env bash
     days_since_gc=999
@@ -495,6 +819,7 @@ gc:
     fi
 
 # Run garbage collection immediately.
+[private]
 gc-force:
     #!/usr/bin/env bash
     echo "[!] Force running home manager GC"
@@ -515,6 +840,7 @@ gc-force:
     echo "[✓] Forced garbage collection & store optimization completed"
 
 # Show GC-related status for this machine.
+[private]
 gc-info:
     #!/usr/bin/env bash
     echo "=== Garbage Collection Status ==="
@@ -546,7 +872,13 @@ gc-info:
 ########### Quality Gate ##########
 
 # Run guard tests (nix eval) + shell hook tests (bats).
+[private]
 test: test-hooks
+    just _test-flake
+
+# Build every flake check for the current system.
+[private]
+_test-flake:
     #!/usr/bin/env bash
     nix eval .#checks.{{ SYSTEM_ARCH }} --apply builtins.attrNames --json | jq -r '.[]' | while IFS= read -r check; do
       echo "[!] Running flake check: $check"
@@ -563,7 +895,28 @@ test: test-hooks
       fi
     done
 
+# Install only Just's Fish completion; do not activate the Home Manager profile.
+[private]
+_setup-completions:
+    #!/usr/bin/env bash
+    source_file="{{ justfile_directory() }}/completions/just-tonys-nix.fish"
+    completion="$HOME/.config/fish/completions/just.fish"
+    mkdir -p "$(dirname "$completion")"
+    candidate="$(mktemp "${completion}.tmp.XXXXXX")"
+    trap 'rm -f "$candidate"' EXIT
+    cp "$source_file" "$candidate"
+
+    if [[ -f "$completion" ]] && cmp -s "$candidate" "$completion"; then
+      echo "[✓] Just Fish completion is already up to date: $completion"
+    else
+      chmod 0644 "$candidate"
+      mv -f "$candidate" "$completion"
+      echo "[✓] Installed Just Fish completion: $completion"
+    fi
+    echo "    tonys-nix candidates activate only inside this repository."
+
 # Run shell hook tests (bats). Falls back to `nix run` when bats is unbuilt.
+[private]
 test-hooks:
     #!/usr/bin/env bash
     hook_tests="$(find tests/hooks -maxdepth 1 -type f -name '*.bats' | sort)"
@@ -574,6 +927,7 @@ test-hooks:
     fi
 
 # Run linters (deadnix, statix, alejandra).
+[private]
 lint:
     #!/usr/bin/env bash
     echo "[!] deadnix (unused code)..."
@@ -586,6 +940,7 @@ lint:
 ########### Diagnostics ##########
 
 # Run a practical health check for this Nix setup.
+[private]
 performance-test:
     #!/usr/bin/env bash
     echo "=== Nix Performance Test ==="
@@ -646,6 +1001,7 @@ performance-test:
 ########### Images ##########
 
 # List supported image outputs.
+[private]
 list-image-formats:
     #!/usr/bin/env bash
     echo "Available image formats for {{ SYSTEM_ARCH }}:"
@@ -661,6 +1017,7 @@ list-image-formats:
     echo "Note: For containers, use official NixOS Docker images instead."
 
 # Build one image format for the current architecture.
+[private]
 build-image format:
     #!/usr/bin/env bash
     echo "[!] Building {{ format }} image for {{ SYSTEM_ARCH }}"
@@ -668,12 +1025,14 @@ build-image format:
     echo "[✓] Build complete: $(readlink result)"
 
 # Build one image format for a specific architecture.
+[private]
 build-image-arch format arch:
     echo "[!] Building {{ format }} image for {{ arch }}"
     nix build .#packages."{{ arch }}"."{{ format }}"
     echo "[✓] Build complete: $(readlink result)"
 
 # Build all supported image formats for the current architecture.
+[private]
 build-images:
     #!/usr/bin/env bash
     failed=()
@@ -696,6 +1055,7 @@ build-images:
     echo "[✓] All image formats built successfully"
 
 # Show local build artifacts produced by image builds.
+[private]
 show-images:
     #!/usr/bin/env bash
     echo "Built images in ./result*:"
@@ -704,11 +1064,13 @@ show-images:
 ########### Destructive / Legacy Cleanup ##########
 
 # Uninstall Home Manager from the current profile.
+[private]
 uninstall-home-manager:
     #!/usr/bin/env bash
     echo y | home-manager uninstall
 
 # Remove local editor and shell configs created by previous setups.
+[private]
 purge-local-configs:
     #!/usr/bin/env bash
     read -r -p "This removes local config directories and purges apt zsh. Continue? [y/N]: " confirm
