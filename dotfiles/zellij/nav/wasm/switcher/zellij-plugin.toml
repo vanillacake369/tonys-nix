@@ -4,4 +4,8 @@ keys = "Alt Space, Alt Shift P/T/S"
 
 [[forgot]]
 label = "Session / Repo picker"
-keys = "Alt g, zr"
+keys = "zr"
+
+[[forgot]]
+label = "Session / Reload projects"
+keys = "Alt s, r"
