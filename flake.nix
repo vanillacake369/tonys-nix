@@ -71,7 +71,6 @@
 
     homeConfigurations = (import ./lib/mk-home-entries.nix {inherit lib;}) {
       inherit supportedSystems userProfiles;
-      defaultProfile = "limjihoon";
       inherit (builders) mkHomeConfig;
     };
 
@@ -79,20 +78,25 @@
 
     checks = forAllSystems (system: let
       inherit (builders.mkSystem system) pkgs;
-      # WARNING:
-      # guard/home activation check는 기존 hm-${system} alias를 의도적으로
-      # 사용한다. named profile entry를 추가하더라도 mk-home-entries가 이
-      # 호환 alias를 유지하지 않으면, Home Manager config 자체는 맞아도
-      # 기존 CI와 사용자 명령이 깨진다.
-      homeConfig = homeConfigurations."hm-${system}";
+      homeConfigs =
+        lib.mapAttrs (
+          profileName: _: homeConfigurations."hm-${profileName}-${system}"
+        )
+        userProfiles;
       collectChecks = (import ./lib/collect-checks.nix {inherit lib;}) ./tests;
       tests = collectTests {inherit lib;};
     in
       collectChecks {
-        inherit pkgs homeConfig tests;
+        inherit lib pkgs homeConfigs tests;
       }
       // lib.optionalAttrs (builtins.elem system homeActivationCheckSystems) {
-        home-activation = homeConfig.activationPackage;
+        home-activations = pkgs.linkFarm "home-activations-${system}" (
+          lib.mapAttrsToList (profileName: homeConfig: {
+            name = profileName;
+            path = homeConfig.activationPackage;
+          })
+          homeConfigs
+        );
       });
   };
 }
