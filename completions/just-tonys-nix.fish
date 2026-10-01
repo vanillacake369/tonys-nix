@@ -74,6 +74,7 @@ end
 function __tonys_nix_check_actions
     printf '%s\t%s\n' \
         all 'Run lint, hook, and flake checks' \
+        core 'Prepare bootstrap runtime and run fast apply-gating checks' \
         flake 'Build every flake check for this system' \
         hooks 'Run Bats hook tests' \
         lint 'Run deadnix, statix, and alejandra'
