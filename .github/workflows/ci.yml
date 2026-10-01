@@ -44,17 +44,17 @@ jobs:
 
   build-check:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        target:
-          - hm-x86_64-linux
-          - hm-wsl-x86_64-linux
-          - hm-nixos-x86_64-linux
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - name: Build ${{ matrix.target }}
-        run: nix build .#homeConfigurations.${{ matrix.target }}.activationPackage --dry-run
+      - name: Build Linux Home Manager targets
+        run: |
+          nix eval --json .#homeConfigurations --apply builtins.attrNames \
+            | jq -r '.[] | select(endswith("-x86_64-linux"))' \
+            | while IFS= read -r target; do
+                echo "Checking $target"
+                nix build ".#homeConfigurations.${target}.activationPackage" --dry-run
+              done
