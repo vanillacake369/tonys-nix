@@ -1,0 +1,34 @@
+{
+  "exclusionRules": [
+    {
+      "passKeys": "",
+      "pattern": "http*://mail.google.com/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://leetcode.com/problems/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://www.youtube.com/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://learn.kodekloud.com/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://school.programmers.co.kr/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://neetcode.io/problems/*"
+    },
+    {
+      "passKeys": "",
+      "pattern": "http*://hackerrank.com/*"
+    }
+  ],
+  "keyMappings": "# Insert your preferred key mappings here.\nmap H previousTab\nmap L nextTab",
+  "settingsVersion": "2.4.2"
+}
