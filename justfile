@@ -43,14 +43,14 @@ BREW_SYNC_DIR := justfile_directory() + "/.cache/brew"
 
 # NOTE:
 #   bare `just`는 조회용 help가 아니라 이 저장소의 의도적인 수렴 명령이다.
-#   모든 check가 통과한 경우에만 apply를 실행해 실패 상태의 구성이
+#   core check가 통과한 경우에만 apply를 실행해 명백히 깨진 구성이
 #   호스트에 반영되지 않도록 fail-closed 순서를 유지한다.
-# Run every check and apply the current login user's complete profile.
+# Run core checks and apply the current login user's complete profile.
 [default]
 default:
     #!/usr/bin/env bash
-    echo "[1/2] Running all checks"
-    just check all
+    echo "[1/2] Preparing and checking core"
+    just check core
     echo "[2/2] Applying the current profile"
     just apply all
 
@@ -84,15 +84,16 @@ setup action:
       *) echo "[x] Expected: just setup {all|nix|home|agents|mac|completions}" >&2; exit 2 ;;
     esac
 
-# Run quality gates. Targets: all, flake, hooks, lint.
+# Run quality gates. Targets: all, core, flake, hooks, lint.
 check target="all":
     #!/usr/bin/env bash
     case {{ quote(target) }} in
       all) just lint && just test ;;
+      core) just _bootstrap-core && just lint && just _test-guard ;;
       flake) just _test-flake ;;
       hooks) just test-hooks ;;
       lint) just lint ;;
-      *) echo "[x] Expected: just check {all|flake|hooks|lint}" >&2; exit 2 ;;
+      *) echo "[x] Expected: just check {all|core|flake|hooks|lint}" >&2; exit 2 ;;
     esac
 
 # Run maintenance operations. Domains: gc, health.
@@ -154,6 +155,14 @@ bootstrap:
     just apply
     just gc
 
+# Prepare the minimum runtime needed for checks and apply on a plain machine.
+[private]
+_bootstrap-core:
+    #!/usr/bin/env bash
+    just install-nix
+    just system-link-nix-conf
+    just install-home-manager
+
 # Authenticate missing AI providers via cli-proxy-api OAuth.
 [private]
 agent-login:
@@ -184,23 +193,24 @@ agent-login:
 install-nix:
     #!/usr/bin/env bash
     if command -v nix >/dev/null 2>&1; then
-      echo "[✓] Nix is already installed"
+      echo "[✓] nix"
       exit 0
     fi
 
-    echo "[!] Installing Nix"
+    echo "[→] Installing Nix"
     sh <(curl -L https://nixos.org/nix/install) --daemon
+    echo "[✓] nix installed"
 
 # Prepare Home Manager. On fresh systems the real install happens via flake commands.
 [private]
 install-home-manager:
     #!/usr/bin/env bash
     if command -v home-manager >/dev/null 2>&1; then
-      echo "[✓] Home Manager is already installed"
+      echo "[✓] home-manager"
       exit 0
     fi
 
-    echo "[!] Home Manager not found - it will be bootstrapped via flake on apply"
+    echo "[→] home-manager via flake"
     if nix-channel --list 2>/dev/null | grep -q '^home-manager'; then
       echo "[!] Removing legacy home-manager channel"
       nix-channel --remove home-manager
@@ -273,9 +283,7 @@ apply scope="all" profile="":
     if [[ "$scope" == all || "$scope" == home ]]; then
       [[ -n "$profile" ]] || profile="$(id -un)"
       target="$(just _home-target "$profile" "$system" {{ quote(OS_TYPE) }})"
-      echo "User: $profile"
-      echo "Platform: {{ OS_TYPE }} ($system)"
-      echo "Target: $target"
+      echo "[→] Home Manager: $target"
       just _apply-home "$target"
     fi
 
@@ -294,7 +302,6 @@ _apply-validate target:
 
     case "{{ target }}" in
       x86_64-linux|aarch64-linux|aarch64-darwin)
-    echo "[✓] Apply target validated: {{ target }}"
     ;;
       unsupported)
     echo "[✗] Unsupported system architecture"
@@ -310,7 +317,6 @@ _apply-validate target:
 _apply-system target:
     #!/usr/bin/env bash
     if [[ "{{ OS_TYPE }}" != "nixos" ]]; then
-      echo "[→] System apply skipped - not NixOS"
       exit 0
     fi
 
@@ -375,8 +381,14 @@ _home-target profile system os:
       *) echo "[x] Unsupported platform for Home Manager apply: $os" >&2; exit 2 ;;
     esac
 
-    if ! nix eval --json .#homeConfigurations --apply builtins.attrNames \
-      | jq -e --arg target "$target" 'index($target) != null' >/dev/null; then
+    if command -v jq >/dev/null 2>&1; then
+      jq_cmd=(jq)
+    else
+      jq_cmd=(nix run nixpkgs#jq --)
+    fi
+
+    if ! nix eval --json .#homeConfigurations --apply builtins.attrNames 2>/dev/null \
+      | "${jq_cmd[@]}" -e --arg target "$target" 'index($target) != null' >/dev/null; then
       echo "[x] Flake output not found: homeConfigurations.$target" >&2
       echo "    Ensure user/${profile}.nix declares username = \"${profile}\"." >&2
       exit 2
@@ -398,21 +410,57 @@ _apply-home flake_target:
 
     flake_target={{ quote(flake_target) }}
 
-    echo "[!] Applying Home Manager target: ${flake_target}"
-    echo "Running: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
+    just _reclaim-matching-home-files "$flake_target"
+
     retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"
     attempt=1
     while (( attempt <= retry_threshold )); do
-      echo "[→] Attempt ${attempt}/${retry_threshold}: ${hm_cmd[*]} switch --flake .#${flake_target} -b back"
-      if "${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back; then
+      if output=$("${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back 2>&1); then
+        echo "[✓] Home Manager applied"
         exit 0
       fi
       echo "[!] Home Manager apply failed on attempt ${attempt}/${retry_threshold}"
+      printf '%s\n' "$output" >&2
       (( attempt++ ))
     done
 
     echo "[!] Falling back to substituters={{ APPLY_FALLBACK_SUBSTITUTERS }}"
-    "${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back
+    if output=$("${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back 2>&1); then
+      echo "[✓] Home Manager applied"
+    else
+      printf '%s\n' "$output" >&2
+      exit 1
+    fi
+
+# Remove unmanaged files that are byte-for-byte identical to the next
+# Home Manager generation, preventing pointless .back files on switch.
+[private]
+_reclaim-matching-home-files flake_target:
+    #!/usr/bin/env bash
+    flake_target={{ quote(flake_target) }}
+
+    if ! generation=$(nix build --print-out-paths ".#homeConfigurations.${flake_target}.activationPackage" --no-link 2>/dev/null); then
+      echo "[✗] Home Manager generation build failed: ${flake_target}" >&2
+      nix build ".#homeConfigurations.${flake_target}.activationPackage" --no-link >&2
+      exit 1
+    fi
+
+    home_files="${generation}/home-files"
+    [[ -e "$home_files" ]] || exit 0
+
+    reclaimed=0
+    while IFS= read -r -d '' managed; do
+      rel="${managed#${home_files}/}"
+      target="$HOME/$rel"
+      if [[ -f "$target" && ! -L "$target" ]] && cmp -s "$managed" "$target"; then
+        rm -f "$target"
+        ((reclaimed++))
+      fi
+    done < <(find "$home_files" \( -type f -o -type l \) -print0)
+
+    if (( reclaimed > 0 )); then
+      echo "[✓] Reclaimed matching Home Manager files: $reclaimed"
+    fi
 
 # Sync local desktop integrations after configuration changes are applied.
 [private]
@@ -661,7 +709,7 @@ system-link-nix-conf:
     if [[ -L "$target_file" ]]; then
       current_target=$(readlink "$target_file")
       if [[ "$current_target" == "$source_file" ]]; then
-    echo "[✓] nix.conf symlink already configured"
+    echo "[✓] nix.conf"
     exit 0
       fi
 
@@ -672,9 +720,9 @@ system-link-nix-conf:
       sudo mv "$target_file" "${target_file}.backup"
     fi
 
-    echo "[!] Linking $target_file -> $source_file"
+    echo "[→] Linking nix.conf"
     sudo ln -s "$source_file" "$target_file"
-    echo "[✓] nix.conf linked successfully"
+    echo "[✓] nix.conf"
 
 # Configure daily sleep and wake scheduling on macOS.
 [private]
@@ -876,11 +924,44 @@ gc-info:
 test: test-hooks
     just _test-flake
 
+# Build the fast repository contract check used before the default apply.
+[private]
+_test-guard:
+    #!/usr/bin/env bash
+    jq_r() {
+      if command -v jq >/dev/null 2>&1; then
+        jq -r "$@"
+      else
+        nix run nixpkgs#jq -- -r "$@"
+      fi
+    }
+
+    if ! out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.guard-tests" --no-link 2>/dev/null); then
+      echo "[✗] guard-tests" >&2
+      nix build ".#checks.{{ SYSTEM_ARCH }}.guard-tests" --no-link >&2
+      exit 1
+    fi
+    result=$(cat "$out")
+    total=$(echo "$result" | jq_r .total)
+    passed=$(echo "$result" | jq_r .passed)
+    if [[ "$total" == "$passed" ]]; then
+      echo "[✓] guard-tests $passed/$total"
+    else
+      echo "[✗] guard-tests $passed/$total" >&2
+      exit 1
+    fi
+
 # Build every flake check for the current system.
 [private]
 _test-flake:
     #!/usr/bin/env bash
-    nix eval .#checks.{{ SYSTEM_ARCH }} --apply builtins.attrNames --json | jq -r '.[]' | while IFS= read -r check; do
+    if command -v jq >/dev/null 2>&1; then
+      jq_cmd=(jq)
+    else
+      jq_cmd=(nix run nixpkgs#jq --)
+    fi
+
+    nix eval .#checks.{{ SYSTEM_ARCH }} --apply builtins.attrNames --json | "${jq_cmd[@]}" -r '.[]' | while IFS= read -r check; do
       echo "[!] Running flake check: $check"
       if ! out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.$check" --no-link); then
         echo "[✗] Flake check failed: $check"
@@ -888,8 +969,8 @@ _test-flake:
       fi
       if [[ "$check" == "guard-tests" ]]; then
         result=$(cat "$out")
-        total=$(echo "$result" | jq -r .total)
-        passed=$(echo "$result" | jq -r .passed)
+        total=$(echo "$result" | "${jq_cmd[@]}" -r .total)
+        passed=$(echo "$result" | "${jq_cmd[@]}" -r .passed)
         echo "[✓] $passed/$total guard tests passed"
         if [[ "$total" != "$passed" ]]; then exit 1; fi
       fi
@@ -930,12 +1011,30 @@ test-hooks:
 [private]
 lint:
     #!/usr/bin/env bash
-    echo "[!] deadnix (unused code)..."
-    deadnix --fail .
-    echo "[!] statix (anti-patterns)..."
-    statix check .
-    echo "[!] alejandra (formatting)..."
-    alejandra --check .
+    run_step() {
+      local label="$1"
+      local package="$2"
+      shift 2
+      local output
+      local command
+      if command -v "$label" >/dev/null 2>&1; then
+        command=("$label" "$@")
+      else
+        command=(nix run "nixpkgs#${package}" -- "$@")
+      fi
+
+      if output=$("${command[@]}" 2>&1); then
+        echo "[✓] $label"
+      else
+        echo "[✗] $label" >&2
+        printf '%s\n' "$output" >&2
+        exit 1
+      fi
+    }
+
+    run_step deadnix deadnix --fail .
+    run_step statix statix check .
+    run_step alejandra alejandra --check .
 
 ########### Diagnostics ##########
 
