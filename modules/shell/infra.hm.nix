@@ -19,7 +19,7 @@
       /*
       Cloud tools
       */
-      # awscli
+      awscli
       # ssm-session-manager-plugin
 
       /*
@@ -56,6 +56,7 @@
       trivy
       actionlint
       shellcheck
+      lazyssh
 
       /*
       Networking tools
