@@ -1,9 +1,10 @@
+---
 keys:
-  # Local development age recipient.
-  - &client age1q4lfv04ytr7d7s8g0l9pnpewpzhhw4fxlx7jn2txwr47tyjn8d3qnl0wa0
+    # Local development age recipient.
+    - &client age1q4lfv04ytr7d7s8g0l9pnpewpzhhw4fxlx7jn2txwr47tyjn8d3qnl0wa0
 
 creation_rules:
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
-    key_groups:
-      - age:
-          - *client
+    - path_regex: secrets/[^/]+\.(yaml|yml|toml|json|env|ini)$
+      key_groups:
+        - age:
+            - *client
