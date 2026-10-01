@@ -1,8 +1,10 @@
 {
+  lib,
   pkgs,
-  homeConfig,
+  homeConfigs,
   ...
-}: let
+}:
+lib.mapAttrs' (profileName: homeConfig: let
   codexSyncScript = homeConfig.config.home.activation.syncCodexConfig.data;
   codexAgentFiles = builtins.filter (entry: builtins.match "\\.codex/agents/.*\\.toml" entry.path != null) (
     builtins.attrValues (
@@ -25,8 +27,8 @@
     '')
     codexAgentFiles
   );
-in {
-  codex-settings-sync = pkgs.runCommand "codex-settings-sync" {} ''
+in
+  lib.nameValuePair "codex-settings-sync-${profileName}" (pkgs.runCommand "codex-settings-sync-${profileName}" {} ''
     set -euo pipefail
     export HOME="$PWD/home"
     mkdir -p "$HOME/.codex"
@@ -69,7 +71,7 @@ in {
     grep -F '/tmp/stale:post_tool_use:0:1' "$HOME/.codex/config.toml"
     ! grep -F "$HOME/.codex/hooks.json:stop:0:0" "$HOME/.codex/config.toml"
     ! grep -F 'sha256:obsolete' "$HOME/.codex/config.toml"
-    grep -F 'agent-notify.sh codex' "$HOME/.codex/config.toml"
+    grep -F '.config/agents/hooks/agent-notify.sh codex' "$HOME/.codex/config.toml"
     ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
     test ! -e "$HOME/.codex/hooks.json"
     ls "$HOME"/.codex/hooks.json.backup.*
@@ -77,5 +79,5 @@ in {
     ${agentFileChecks}
 
     touch "$out"
-  '';
-}
+  ''))
+homeConfigs
