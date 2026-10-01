@@ -97,10 +97,9 @@ in {
         ''ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle''
         ''LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm"''
         ''skip_plugin_cache true''
-        ''exec ~/.config/zellij/scripts/zellij-nav repo''
       ]
       && !(lib.hasInfix ''bind "Alt 6"'' darwinConfig)
-      && lib.hasInfix ''bind "Alt g"'' directSectionBody
+      && !(lib.hasInfix ''bind "Alt g"'' directSectionBody)
     ))
     (assert' "zellij-config: picker shortcuts opt into protected plugin routing" (
       lib.count
@@ -118,11 +117,18 @@ in {
         }
         {
           label = "Session / Repo picker";
-          keys = "Alt g, zr";
+          keys = "zr";
+        }
+        {
+          label = "Session / Reload projects";
+          keys = "Alt s, r";
         }
       ]
       && lib.hasInfix ''"Plugin / zellij-nav-switcher" "Alt Space, Alt Shift P/T/S"'' managedConfig
-      && lib.hasInfix ''"Session / Repo picker" "Alt g, zr"'' managedConfig
+      && lib.hasInfix ''"Session / Repo picker" "zr"'' managedConfig
+      && lib.hasInfix ''"Session / Reload projects" "Alt s, r"'' managedConfig
+      && lib.hasInfix ''exec ~/.config/zellij/scripts/zellij-nav reload-projects'' managedConfig
+      && lib.hasInfix ''close_on_exit true'' zellijConfigBase
       && !(lib.hasInfix ''"Plugin / zellij-nav-switcher" "Alt Space, Alt Shift P/T/S"'' zellijConfigBase)
       && !(lib.hasInfix ''"Session / Repo picker" "Alt g, zr"'' zellijConfigBase)
       && lib.hasInfix ''# @ZELLIJ_FORGOT_PLUGIN_ENTRIES@'' zellijConfigBase
@@ -188,6 +194,8 @@ in {
       && lib.hasInfix ''Some("diagnose")'' navRustCli
       && lib.hasInfix ''Some("plugin-switch")'' navRustCli
       && lib.hasInfix ''Some("sidecar-run")'' navRustCli
+      && lib.hasInfix ''Some("auto-project")'' navRustCli
+      && lib.hasInfix ''Some("reload-projects")'' navRustCli
       && lib.hasInfix ''zellij-pane-picker'' navRustCli
       && lib.hasInfix ''zellij-context-toggle'' navRustCli
       && lib.hasInfix ''zellij-nav-plugin-switch'' navRustCli
@@ -216,6 +224,9 @@ in {
     ))
     (assert' "GIVEN zellij hm WHEN plugins are installed THEN wasm switcher is wired from package output" (
       lib.hasInfix ''.config/zellij/plugins/zellij-nav-switcher.wasm'' zellijModule
+      && lib.hasInfix ''.config/zellij/project-layouts.json'' zellijModule
+      && lib.hasInfix ''.config/zellij/project-roots.json'' zellijModule
+      && lib.hasInfix ''projectLayouts = {};'' zellijModule
       && lib.hasInfix ''home.activation.zellijNavSwitcherPermissions'' zellijModule
       && lib.hasInfix ''pkgs.zellij-nav'' zellijModule
       && lib.hasInfix ''pkgs.zellij-room-wasm'' zellijModule
@@ -241,7 +252,17 @@ in {
       && lib.hasInfix ''zellij-tile = "0.45.1"'' navPluginCargo
       && lib.hasInfix ''switch_session_with_focus'' navPluginRust
       && lib.hasInfix ''cli_pipe_output'' navPluginRust
+      && !(lib.hasInfix ''FullHdAccess'' zellijModule)
       && !(lib.hasInfix ''request_permission'' navPluginRust)
+    ))
+    (assert' "zellij-navigation: fish auto-routes only plain project launches" (
+      lib.hasInfix ''programs.fish.functions.zellij'' zellijModule
+      && lib.hasInfix ''if not status is-interactive'' zellijModule
+      && lib.hasInfix ''if test (count $argv) -gt 0'' zellijModule
+      && lib.hasInfix ''zellij-nav auto-project'' zellijModule
+      && lib.hasInfix ''ZELLIJ_NAV_SIDECAR_COMMAND'' zellijModule
+      && lib.hasInfix ''if test $auto_status -eq 2'' zellijModule
+      && lib.hasInfix ''command ''${pkgs.zellij}/bin/zellij $argv'' zellijModule
     ))
     (assert' "zellij-navigation: docs are compact readme-owned principles" (
       !(builtins.pathExists ../../dotfiles/zellij/docs)
