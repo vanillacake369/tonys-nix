@@ -14,6 +14,7 @@ use process::{
     command_available, run_capture, run_launch, run_output, run_status, with_wezterm_socket,
 };
 use serde_json::Value;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
@@ -126,6 +127,113 @@ impl Runtime {
         output
             .lines()
             .any(|line| !line.contains("EXITED") && line.split_whitespace().next() == Some(session))
+    }
+
+    fn ensure_project_session(
+        &self,
+        project: &crate::feature::repo::Project,
+    ) -> Result<(), String> {
+        if self.session_exists(&project.connect_session_name) {
+            return Ok(());
+        }
+        let binary = std::env::var("ZELLIJ_REAL_BINARY").unwrap_or_else(|_| "zellij".into());
+        let mut create = Command::new(binary);
+        create
+            .args([
+                "attach",
+                "--create-background",
+                &project.connect_session_name,
+            ])
+            .current_dir(&project.path)
+            .env_remove("ZELLIJ")
+            .env_remove("ZELLIJ_SESSION_NAME")
+            .env_remove("ZELLIJ_PANE_ID");
+        if let Some(layout) = &project.layout {
+            create.args(["options", "--default-layout", layout]);
+        }
+        let status = create.status().map_err(|err| err.to_string())?;
+        if !status.success() && !self.session_exists(&project.connect_session_name) {
+            return Err(format!(
+                "project session create failed: {}",
+                project.connect_session_name
+            ));
+        }
+        self.wait_for_project_session(&project.connect_session_name)
+    }
+
+    fn wait_for_project_session(&self, session: &str) -> Result<(), String> {
+        for _ in 0..20 {
+            if self.session_exists(session) {
+                return Ok(());
+            }
+            std::thread::sleep(std::time::Duration::from_millis(50));
+        }
+        Err(format!("project session did not become ready: {session}"))
+    }
+
+    fn launch_internal_project(
+        &self,
+        project: &crate::feature::repo::Project,
+    ) -> Result<u8, String> {
+        if self.current_session().as_deref() == Some(&project.connect_session_name) {
+            self.log(&format!(
+                "auto project already current session={}",
+                project.connect_session_name
+            ));
+            return Ok(0);
+        }
+        self.ensure_project_session(project)?;
+        self.log(&format!(
+            "auto project sidecar attach session={} dir={}",
+            project.connect_session_name,
+            project.path.display()
+        ));
+        if !self.sidecar_command.exists() {
+            return Err(format!(
+                "missing Zellij sidecar command: {}",
+                self.sidecar_command.display()
+            ));
+        }
+        self.invoke_project_sidecar(&project.connect_session_name)
+    }
+
+    fn invoke_project_sidecar(&self, session: &str) -> Result<u8, String> {
+        let result = run_capture(
+            Command::new(&self.sidecar_command)
+                .arg(session)
+                .arg("session")
+                .arg("")
+                .arg(""),
+        );
+        match result {
+            Ok(output) => {
+                self.log(&format!(
+                    "auto project sidecar accepted output={}",
+                    non_empty_or_placeholder(&compact_output(&output))
+                ));
+                Ok(0)
+            }
+            Err(output) => Err(format!(
+                "auto project sidecar failed: {}",
+                non_empty_or_placeholder(&compact_output(&output))
+            )),
+        }
+    }
+
+    fn launch_external_project(
+        &self,
+        project: &crate::feature::repo::Project,
+    ) -> Result<u8, String> {
+        let binary = std::env::var("ZELLIJ_REAL_BINARY").unwrap_or_else(|_| "zellij".into());
+        let mut command = Command::new(binary);
+        command
+            .args(["attach", "--create", &project.connect_session_name])
+            .current_dir(&project.path);
+        if let Some(layout) = &project.layout {
+            command.args(["options", "--default-layout", layout]);
+        }
+        let status = command.status().map_err(|err| err.to_string())?;
+        Ok(status.code().unwrap_or(1) as u8)
     }
 
     fn panes(&self, session: &str) -> Vec<Value> {
@@ -581,36 +689,42 @@ impl RecordPort for Runtime {
 
 impl RepoPort for Runtime {
     fn repo_dirs(&self) -> Result<Vec<PathBuf>, String> {
-        let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-        let roots = std::env::var("ZELLIJ_REPO_ROOTS")
-            .ok()
-            .map(|value| {
-                value
-                    .split(':')
-                    .filter(|part| !part.is_empty())
-                    .map(PathBuf::from)
-                    .collect::<Vec<_>>()
-            })
-            .filter(|roots| !roots.is_empty())
-            .unwrap_or_else(|| vec![PathBuf::from(home).join("dev")]);
+        let home = PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()));
+        Ok(project_roots(&home)?
+            .into_iter()
+            .flat_map(project_children)
+            .collect())
+    }
 
-        let mut dirs = Vec::new();
-        for root in roots {
-            let Ok(entries) = fs::read_dir(&root) else {
-                continue;
-            };
-            for entry in entries.flatten() {
-                let path = entry.path();
-                let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
-                    continue;
-                };
-                if name.starts_with('.') || !path.is_dir() {
-                    continue;
-                }
-                dirs.push(path);
-            }
+    fn canonicalize_repo(&self, path: &Path) -> Result<PathBuf, String> {
+        fs::canonicalize(path).map_err(|err| err.to_string())
+    }
+
+    fn project_layouts(&self) -> Result<BTreeMap<String, String>, String> {
+        let path = std::env::var("ZELLIJ_PROJECT_LAYOUTS_CONFIG")
+            .map(PathBuf::from)
+            .unwrap_or_else(|_| {
+                PathBuf::from(std::env::var("HOME").unwrap_or_else(|_| ".".to_string()))
+                    .join(".config/zellij/project-layouts.json")
+            });
+        match fs::read_to_string(&path) {
+            Ok(contents) => serde_json::from_str(&contents)
+                .map_err(|err| format!("invalid project layouts config {}: {err}", path.display())),
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(BTreeMap::new()),
+            Err(err) => Err(format!(
+                "cannot read project layouts config {}: {err}",
+                path.display()
+            )),
         }
-        Ok(dirs)
+    }
+
+    fn active_sessions(&self) -> Result<BTreeSet<String>, String> {
+        let output = run_output(Command::new("zellij").args(["list-sessions", "--no-formatting"]));
+        Ok(output
+            .lines()
+            .filter(|line| !line.contains("EXITED"))
+            .filter_map(|line| line.split_whitespace().next().map(str::to_string))
+            .collect())
     }
 
     fn select_repo(&self, candidates: &str) -> Result<Option<String>, String> {
@@ -636,18 +750,97 @@ impl RepoPort for Runtime {
         Ok((!selection.is_empty()).then_some(selection))
     }
 
-    fn attach_session(&self, dir: &PathBuf, session: &str) -> Result<u8, String> {
-        let status = Command::new("zellij")
-            .args(["attach", "--create", session])
-            .current_dir(dir)
-            .status()
-            .map_err(|err| err.to_string())?;
-        Ok(status.code().unwrap_or(1) as u8)
+    fn current_dir(&self) -> Result<PathBuf, String> {
+        std::env::current_dir().map_err(|err| err.to_string())
+    }
+
+    fn ensure_project_session(
+        &self,
+        project: &crate::feature::repo::Project,
+    ) -> Result<(), String> {
+        Runtime::ensure_project_session(self, project)
+    }
+
+    fn launch_project_session(
+        &self,
+        project: &crate::feature::repo::Project,
+    ) -> Result<u8, String> {
+        if std::env::var_os("ZELLIJ").is_some() {
+            return self.launch_internal_project(project);
+        }
+        self.launch_external_project(project)
     }
 
     fn log(&self, message: &str) {
         Runtime::log(self, message);
     }
+}
+
+fn project_roots(home: &Path) -> Result<Vec<PathBuf>, String> {
+    if let Ok(value) = std::env::var("ZELLIJ_REPO_ROOTS") {
+        return Ok(roots_or_default(parse_root_list(&value), home));
+    }
+    configured_project_roots(home)
+}
+
+fn parse_root_list(value: &str) -> Vec<PathBuf> {
+    value
+        .split(':')
+        .filter(|part| !part.is_empty())
+        .map(PathBuf::from)
+        .collect()
+}
+
+fn configured_project_roots(home: &Path) -> Result<Vec<PathBuf>, String> {
+    let path = home.join(".config/zellij/project-roots.json");
+    match fs::read_to_string(&path) {
+        Ok(contents) => parse_project_roots_config(&path, &contents, home),
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => Ok(default_project_roots(home)),
+        Err(err) => Err(format!(
+            "cannot read project roots config {}: {err}",
+            path.display()
+        )),
+    }
+}
+
+fn parse_project_roots_config(
+    path: &Path,
+    contents: &str,
+    home: &Path,
+) -> Result<Vec<PathBuf>, String> {
+    let roots = serde_json::from_str(contents)
+        .map_err(|err| format!("invalid project roots config {}: {err}", path.display()))?;
+    Ok(roots_or_default(roots, home))
+}
+
+fn roots_or_default(roots: Vec<PathBuf>, home: &Path) -> Vec<PathBuf> {
+    if roots.is_empty() {
+        default_project_roots(home)
+    } else {
+        roots
+    }
+}
+
+fn default_project_roots(home: &Path) -> Vec<PathBuf> {
+    vec![home.join("dev")]
+}
+
+fn project_children(root: PathBuf) -> Vec<PathBuf> {
+    fs::read_dir(root)
+        .into_iter()
+        .flatten()
+        .flatten()
+        .map(|entry| entry.path())
+        .filter(|path| is_visible_directory(path))
+        .collect()
+}
+
+fn is_visible_directory(path: &Path) -> bool {
+    path.is_dir()
+        && path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .is_some_and(|name| !name.starts_with('.'))
 }
 
 impl DiagnosePort for Runtime {
