@@ -24,6 +24,9 @@ enum CliCommand {
     RepoTo {
         repo: String,
     },
+    ProjectsJson,
+    AutoProject,
+    ReloadProjects,
     Diagnose,
     PickerCandidates {
         mode: String,
@@ -82,21 +85,11 @@ impl CliCommand {
     fn parse(raw_args: Vec<String>) -> Result<Self, String> {
         let mut args = raw_args.into_iter().skip(1);
         let command = args.next();
+        if let Some(project_command) = Self::parse_project(command.as_deref(), &mut args) {
+            return Ok(project_command);
+        }
 
         match command.as_deref() {
-            Some("navigate") => Ok(Self::Navigate {
-                target_json: args.next().unwrap_or_default(),
-            }),
-            Some("record-current") => Ok(Self::RecordCurrent {
-                reason: args.next().unwrap_or_else(|| "external".to_string()),
-            }),
-            Some("repo") => match args.next() {
-                Some(repo) => Ok(Self::RepoTo { repo }),
-                None => Ok(Self::Repo),
-            },
-            Some("repo-to") => Ok(Self::RepoTo {
-                repo: args.next().unwrap_or_default(),
-            }),
             Some("toggle") => Ok(Self::Toggle),
             Some("context-toggle-run") => Ok(Self::ContextToggleRun),
             Some("diagnose") => Ok(Self::Diagnose),
@@ -148,6 +141,33 @@ impl CliCommand {
         }
     }
 
+    fn parse_project(
+        command: Option<&str>,
+        args: &mut impl Iterator<Item = String>,
+    ) -> Option<Self> {
+        match command {
+            Some("navigate") => Some(Self::Navigate {
+                target_json: args.next().unwrap_or_default(),
+            }),
+            Some("record-current") => Some(Self::RecordCurrent {
+                reason: args.next().unwrap_or_else(|| "external".to_string()),
+            }),
+            Some("repo") => Some(match args.next() {
+                Some(repo) => Self::RepoTo { repo },
+                None => Self::Repo,
+            }),
+            Some("repo-to") => Some(Self::RepoTo {
+                repo: args.next().unwrap_or_default(),
+            }),
+            Some("projects") if args.next().as_deref() == Some("--json") => {
+                Some(Self::ProjectsJson)
+            }
+            Some("auto-project") => Some(Self::AutoProject),
+            Some("reload-projects") => Some(Self::ReloadProjects),
+            _ => None,
+        }
+    }
+
     fn execute(self) -> Result<u8, String> {
         let runtime = outbound::Runtime::from_env();
 
@@ -158,6 +178,9 @@ impl CliCommand {
             Self::RecordCurrent { reason } => feature::record_current::run(&runtime, &reason),
             Self::Repo => feature::repo::run(&runtime),
             Self::RepoTo { repo } => feature::repo::run_to(&runtime, &repo),
+            Self::ProjectsJson => print_output(feature::repo::projects_json(&runtime)),
+            Self::AutoProject => feature::repo::auto_project(&runtime),
+            Self::ReloadProjects => feature::repo::reload_projects(&runtime),
             Self::Diagnose => print_output(feature::diagnose::run(&runtime)),
             Self::PickerCandidates { mode } => {
                 print_output(feature::picker::candidates(&runtime, &mode))
@@ -170,21 +193,7 @@ impl CliCommand {
             Self::PickerCommand { command_id } => {
                 feature::picker::run_command(&runtime, &command_id)
             }
-            Self::PickerPreview(args) => {
-                print!(
-                    "{}",
-                    feature::picker::preview(
-                        &runtime,
-                        &args.kind,
-                        &args.session,
-                        &args.tab_id,
-                        &args.pane_id,
-                        &args.command_id,
-                        &args.label,
-                    )
-                );
-                Ok(0)
-            }
+            Self::PickerPreview(args) => picker_preview(&runtime, args),
             Self::PickerRun {
                 mode,
                 preview_program,
@@ -343,6 +352,22 @@ fn print_output(result: Result<String, String>) -> Result<u8, String> {
     Ok(0)
 }
 
+fn picker_preview(runtime: &outbound::Runtime, args: PickerPreviewArgs) -> Result<u8, String> {
+    print!(
+        "{}",
+        feature::picker::preview(
+            runtime,
+            &args.kind,
+            &args.session,
+            &args.tab_id,
+            &args.pane_id,
+            &args.command_id,
+            &args.label,
+        )
+    );
+    Ok(0)
+}
+
 fn print_exit(exit: impl Into<ProcessExit>) -> Result<u8, String> {
     let exit = exit.into();
     print!("{}", exit.stdout);
@@ -387,5 +412,5 @@ fn exit(result: Result<u8, String>) -> ExitCode {
 }
 
 fn usage() -> String {
-    "usage: zellij-nav <toggle|context-toggle-run|navigate TARGET_JSON|record-current REASON|repo [REPO]|repo-to REPO|diagnose|picker-candidates MODE|picker-target SELECTION|picker-command COMMAND_ID|picker-preview KIND SESSION TAB_ID PANE_ID COMMAND_ID LABEL|picker-run MODE PREVIEW_PROGRAM|helper-focus-underlying|helper-close SESSION PANE_ID|plugin-switch SESSION KIND TAB_ID PANE_ID|sidecar-plan SESSION KIND TAB_ID PANE_ID|sidecar-prepare SESSION KIND TAB_ID PANE_ID|sidecar-wait-attached SESSION PREVIOUS_CLIENT_COUNT|sidecar-run SESSION KIND TAB_ID PANE_ID>".to_string()
+    "usage: zellij-nav <toggle|context-toggle-run|navigate TARGET_JSON|record-current REASON|repo [REPO]|repo-to REPO|projects --json|auto-project|reload-projects|diagnose|picker-candidates MODE|picker-target SELECTION|picker-command COMMAND_ID|picker-preview KIND SESSION TAB_ID PANE_ID COMMAND_ID LABEL|picker-run MODE PREVIEW_PROGRAM|helper-focus-underlying|helper-close SESSION PANE_ID|plugin-switch SESSION KIND TAB_ID PANE_ID|sidecar-plan SESSION KIND TAB_ID PANE_ID|sidecar-prepare SESSION KIND TAB_ID PANE_ID|sidecar-wait-attached SESSION PREVIOUS_CLIENT_COUNT|sidecar-run SESSION KIND TAB_ID PANE_ID>".to_string()
 }
