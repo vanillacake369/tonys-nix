@@ -2,6 +2,7 @@
   mcpRender = import ../../modules/agents/outporters/mcp.nix {inherit lib;};
   workflowBindings = import ../../modules/agents/outporters/workflows.nix {inherit lib;};
   agentSource = import ../../modules/agents/source-of-truth {inherit lib;};
+  agentMcp = (import ../../modules/agents/agents-mcp.nix {}).programs.mcp.servers;
   codexBindings = import ../../modules/agents/providers/codex/bindings.nix {inherit lib;};
   claudeBaseSettings = builtins.fromJSON (builtins.readFile ../../modules/agents/providers/claude/settings.json);
 
@@ -26,11 +27,13 @@
       args = [];
       headers = {"X-Key" = "val";};
       bearerTokenEnvVar = "EXAMPLE_MCP_TOKEN";
+      envHttpHeaders.Authorization = "EXAMPLE_MCP_AUTHORIZATION";
     };
   };
   rendered = mcpRender mockServers;
   sourceText = builtins.readFile ../../modules/agents/source-of-truth/default.nix;
   moduleText = builtins.readFile ../../modules/agents/agents-module.hm.nix;
+  secretsModuleText = builtins.readFile ../../modules/agents/agents-secrets.hm.nix;
   roleNames = builtins.attrNames codexBindings.roles;
   commandWorkflowNames = builtins.attrNames workflowBindings.commandWorkflows;
   sampleSettings = codexBindings.mkSettings {
@@ -54,6 +57,7 @@ in {
       == "https://mcp.example.test"
       && rendered.codex.remote-server.http_headers.X-Key == "val"
       && rendered.codex.remote-server.bearer_token_env_var == "EXAMPLE_MCP_TOKEN"
+      && rendered.codex.remote-server.env_http_headers.Authorization == "EXAMPLE_MCP_AUTHORIZATION"
       && !(rendered.codex.remote-server ? args)
       && !(rendered.codex.remote-server ? bearerTokenEnvVar)
     ))
@@ -84,6 +88,16 @@ in {
       && !(rendered.claude.remote-server ? args)
     ))
     (assert' "GIVEN agent source WHEN shared guide path is read THEN source owns shared guide" (agentSource.sharedGuidePath == ../../modules/agents/source-of-truth/shared/AGENTS.md))
+    (assert' "GIVEN agent MCP WHEN Atlassian is configured THEN official v2 endpoint and runtime auth are used" (
+      agentMcp.atlassian.url == "https://mcp.atlassian.com/v2/mcp"
+      && agentMcp.atlassian.envHttpHeaders.Authorization == "ATLASSIAN_MCP_AUTHORIZATION"
+    ))
+    (assert' "GIVEN agent secrets WHEN activation runs THEN platform SOPS identity and runtime auth are used" (
+      lib.hasInfix "AGENT_SOPS_AGE_KEY_FILE" secretsModuleText
+      && lib.hasInfix "export SOPS_AGE_KEY_FILE" secretsModuleText
+      && lib.hasInfix "Library/Application Support/sops/age/keys.txt" secretsModuleText
+      && lib.hasInfix ''ATLASSIAN_MCP_AUTHORIZATION="Basic $encoded"'' secretsModuleText
+    ))
     (assert' "GIVEN agent source WHEN Codex model is read THEN model is explicit" (agentSource.codexModel == "gpt-5.5"))
     (assert' "GIVEN provider hooks WHEN Codex stop hook is read THEN timeout uses seconds" (
       (builtins.head (builtins.head agentSource.providerHooks.codex.Stop).hooks).timeout == 5
@@ -91,10 +105,11 @@ in {
     (assert' "GIVEN provider hooks WHEN Gemini after-agent hook is read THEN timeout uses milliseconds" (
       (builtins.head (builtins.head agentSource.providerHooks.gemini.AfterAgent).hooks).timeout == 5000
     ))
-    (assert' "GIVEN agent module WHEN provider exporters are wired THEN all providers are imported directly" (
-      lib.hasInfix "./providers/claude/module.nix" moduleText
-      && lib.hasInfix "./providers/codex/module.nix" moduleText
-      && lib.hasInfix "./providers/gemini/module.nix" moduleText
+    (assert' "GIVEN agent module WHEN provider exporters are wired THEN only Codex is activated" (
+      lib.hasInfix "./providers/codex/module.nix" moduleText
+      && !(lib.hasInfix "./providers/claude/module.nix" moduleText)
+      && !(lib.hasInfix "./providers/gemini/module.nix" moduleText)
+      && !(lib.hasInfix "./agents-proxy.nix" moduleText)
     ))
     (assert' "GIVEN agent source WHEN source text is checked THEN shared exporter data stays focused" (
       lib.hasInfix "providerHooks" sourceText
