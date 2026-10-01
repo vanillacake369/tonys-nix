@@ -89,7 +89,8 @@ in {
     ))
     (assert' "GIVEN agent source WHEN shared guide path is read THEN source owns shared guide" (agentSource.sharedGuidePath == ../../modules/agents/source-of-truth/shared/AGENTS.md))
     (assert' "GIVEN agent MCP WHEN Atlassian is configured THEN official v2 endpoint and runtime auth are used" (
-      agentMcp.atlassian.url == "https://mcp.atlassian.com/v2/mcp"
+      agentMcp.atlassian.url
+      == "https://mcp.atlassian.com/v2/mcp"
       && agentMcp.atlassian.envHttpHeaders.Authorization == "ATLASSIAN_MCP_AUTHORIZATION"
     ))
     (assert' "GIVEN agent secrets WHEN activation runs THEN platform SOPS identity and runtime auth are used" (
