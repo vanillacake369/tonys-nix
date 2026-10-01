@@ -3,9 +3,7 @@
   imports = [
     ./agents-mcp.nix
     ./agents-secrets.hm.nix
-    ./providers/claude/module.nix
+    ./agents-hooks.nix
     ./providers/codex/module.nix
-    ./providers/gemini/module.nix
-    ./agents-proxy.nix
   ];
 }
