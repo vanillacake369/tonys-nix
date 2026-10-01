@@ -111,6 +111,24 @@
       diagnose = "cargo check";
     };
 
+    python = {
+      extensions = ["py" "pyi"];
+      packages = [
+        pkgs.uv
+        pkgs.python313Packages.python-lsp-server
+        pkgs.python313Packages.python
+        pkgs.python313Packages.pytest
+        pkgs.python313Packages.ruff
+        pkgs.python313Packages.uvicorn
+        pkgs.python313Packages.pip
+        pkgs.python313Packages.lizard
+        pkgs.black
+        pkgs.ruff
+      ];
+      format = "black --check";
+      lint = "ruff check";
+    };
+
     nix = {
       extensions = ["nix"];
       packages = [
@@ -180,22 +198,11 @@
       format = "terraform fmt -check";
     };
 
-    python = {
-      extensions = ["py" "pyi"];
+    pulumi = {
+      extensions = ["yaml" "yml"];
       packages = [
-        pkgs.uv
-        pkgs.python313Packages.python-lsp-server
-        pkgs.python313Packages.python
-        pkgs.python313Packages.pytest
-        pkgs.python313Packages.ruff
-        pkgs.python313Packages.uvicorn
-        pkgs.python313Packages.pip
-        pkgs.python313Packages.lizard
-        pkgs.black
-        pkgs.ruff
+        pkgs.pulumi
       ];
-      format = "black --check";
-      lint = "ruff check";
     };
 
     docker = {
