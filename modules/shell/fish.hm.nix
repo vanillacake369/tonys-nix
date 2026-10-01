@@ -203,6 +203,13 @@
       set -g fish_color_quote yellow
       set -g fish_color_redirection cyan
       set -g fish_color_end white
+
+      #########################################################################
+      ################ VPPLAB 백엔드 모듈 전역 환경변수 주입 ##################
+      #########################################################################
+      if test -r "$HOME/dev/env/global_env.sh"
+          source "$HOME/dev/env/global_env.sh"
+      end
     '';
 
     plugins =
@@ -221,4 +228,12 @@
       ${lib.getExe pkgs.fish} -lc 'tide configure --auto --style=Lean --prompt_colors="True color" --prompt_connection=Disconnected --prompt_spacing=Compact --show_time=No --icons="Few icons" --transient=No --lean_prompt_height="One line" --finish="Overwrite your current tide config"'
     fi
   '';
+  home.file.".config/fish/completions/zellij.fish".source = pkgs.runCommand "zellij-fish-completion" {} ''
+    ${pkgs.zellij}/bin/zellij setup --generate-completion fish > "$out"
+  '';
+
+  # Just's native dynamic completion discovers the nearest justfile. The
+  # additional candidates below are guarded by structural repository markers,
+  # so tonys-nix vocabulary never leaks into unrelated directories.
+  home.file.".config/fish/completions/just.fish".source = ../../completions/just-tonys-nix.fish;
 }
