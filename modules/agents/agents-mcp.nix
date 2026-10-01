@@ -1,12 +1,5 @@
 # MCP server definitions (Single Source of Truth)
-# Consumed by: codex (enableMcpIntegration), gemini (settings.mcpServers), claude (activation script)
-#
-# Versioning policy: MCP servers run via `npx ...@latest` and are therefore NOT
-# pinned by the Nix flake. This is intentional — these are runtime sidecars that
-# benefit from upstream fixes and are not part of the reproducible system closure.
-# The tradeoff (a remote npm fetch at first launch, version drift across machines)
-# is accepted. Pin a specific version here if reproducibility ever matters more
-# than freshness.
+# Consumed by the active Codex provider through the provider-native outporter.
 _: {
   programs.mcp = {
     enable = true;
@@ -23,6 +16,14 @@ _: {
         url = "https://mcp.ticktick.com";
         transport = "streamable-http";
         bearerTokenEnvVar = "TICKTICK_MCP_TOKEN";
+      };
+      atlassian = {
+        # Official Atlassian Remote MCP v2. OAuth is the default authentication
+        # path (`codex mcp login atlassian`). For non-interactive use, the
+        # launcher may provide an Authorization header through this env var.
+        url = "https://mcp.atlassian.com/v2/mcp";
+        transport = "streamable-http";
+        envHttpHeaders.Authorization = "ATLASSIAN_MCP_AUTHORIZATION";
       };
     };
   };
