@@ -17,6 +17,7 @@
     "disabled"
     "enabled"
     "headers"
+    "envHttpHeaders"
     "transport"
   ];
 
@@ -24,6 +25,7 @@
     "bearerTokenEnvVar"
     "disabled"
     "enabled"
+    "envHttpHeaders"
     "transport"
   ];
 
@@ -46,6 +48,9 @@
       })
       // (lib.optionalAttrs (srv ? bearerTokenEnvVar) {
         bearer_token_env_var = srv.bearerTokenEnvVar;
+      })
+      // (lib.optionalAttrs (srv ? envHttpHeaders && srv.envHttpHeaders != {}) {
+        env_http_headers = removeNulls srv.envHttpHeaders;
       })
       // {enabled = !(srv.disabled or false);};
   in
