@@ -132,6 +132,17 @@ keybinds clear-defaults=true {
             SwitchToMode "normal"
         }
         bind "q" { Quit; }
+        bind "r" {
+            Run "sh" "-lc" "exec ~/.config/zellij/scripts/zellij-nav reload-projects" {
+                floating true
+                close_on_exit true
+                width "60%"
+                height "30%"
+                x "20%"
+                y "35%"
+            }
+            SwitchToMode "normal"
+        }
         bind "w" {
             Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
                 floating true
@@ -197,17 +208,6 @@ keybinds clear-defaults=true {
                 height "80%"
                 x "5%"
                 y "10%"
-            }
-            SwitchToMode "normal"
-        }
-        bind "Alt g" {
-            Run "sh" "-lc" "exec ~/.config/zellij/scripts/zellij-nav repo" {
-                floating true
-                close_on_exit false
-                width "80%"
-                height "70%"
-                x "10%"
-                y "15%"
             }
             SwitchToMode "normal"
         }
@@ -416,6 +416,7 @@ default_layout "compact"
 //   - false
 // 
 mouse_mode true
+mouse_scroll_resize false
  
 // Toggle having pane frames around the panes
 // Options:
