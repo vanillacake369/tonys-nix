@@ -25,10 +25,14 @@ just setup all
 For an existing checkout:
 
 ```bash
-just                    # run all checks, then apply the login user's profile
+just                    # run core checks, then apply the login user's profile
 just apply home         # apply only Home Manager
 just check all          # run lint, hook, and flake checks without applying
 ```
+
+The default `just` path is intentionally bootstrappable: it checks or installs
+Nix, prepares the repository `nix.conf`, verifies the Home Manager execution
+path, runs the fast core gate, and then applies the selected profile.
 
 The current login name (`id -un`) selects `user/<login>.nix`. Profile files are
 exported as named flake outputs such as `hm-vpplab-aarch64-darwin`; there is no
@@ -77,9 +81,9 @@ runtime; the credential is not written to the Nix store or Codex config.
 ## Common Commands
 
 ```bash
-just                              # check all, then apply all
+just                              # prepare core runtime, check core, then apply all
 just apply [all|home|system] [profile] # default profile: current login user
-just check [all|flake|hooks|lint]
+just check [all|core|flake|hooks|lint]
 just setup <all|nix|home|agents|mac|completions>
 just maintenance gc [auto|force|status]
 just image list
