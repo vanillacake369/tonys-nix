@@ -26,15 +26,21 @@
       lint = "shellcheck -f gcc";
     };
 
+    # 기본 java/javac는 회사 프로젝트 기준을 제공
+    # Java 21 은 jdtls nvim lsp 래퍼를 위해
+    # 내부 의존성으로만 가져오도록 한다
     java = {
       extensions = ["java"];
       packages = [
-        pkgs.zulu21
+        # Project/runtime
+        pkgs.javaProjectJdk
         pkgs.gradle
         pkgs.maven
+        # LSP/tooling
         pkgs.jdt-language-server
         pkgs.google-java-format
         pkgs.lombok
+        # JDT LS debug/test bundles
         pkgs.vscode-extensions.vscjava.vscode-java-debug
         pkgs.vscode-extensions.vscjava.vscode-java-test
       ];
@@ -123,6 +129,7 @@
         pkgs.yamllint
         pkgs.yaml-language-server
         pkgs.yamlfmt
+        pkgs.helm-ls
       ];
       lint = "yamllint";
     };
@@ -234,7 +241,13 @@
 in {
   home = {
     sessionVariables = {
-      JAVA_HOME = "${pkgs.zulu21}";
+      # -----------------------------------------------------------------------
+      # Java project runtime
+      # -----------------------------------------------------------------------
+      #
+      # 터미널, Maven, Gradle 프로젝트는 Java 17을 기본값으로 본다.
+      # jdtls 등 Java 21이 필요한 도구는 overlay의 toolingJdk로 격리된다.
+      JAVA_HOME = "${pkgs.javaProjectJdk}";
       # Appended to every JVM (jdtls, gradle daemon, maven, ...). Survives
       # per-project `org.gradle.jvmargs` overrides, which would otherwise
       # replace (not merge) any encoding flag set in user gradle.properties.
