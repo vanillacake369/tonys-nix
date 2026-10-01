@@ -18,7 +18,7 @@ default_root_container_orientation = "auto"
 on_focused_monitor_changed = ["move-mouse monitor-lazy-center"]
 automatically_unhide_macos_hidden_apps = false
 persistent_workspaces = [
-  "Docs",
+  "Database",
   "Code",
   "Browser",
   "Terminal",
@@ -107,7 +107,7 @@ exec = "workspace Code"
 
 [[aerospace.bindings]]
 bind = "caps+d"
-exec = "workspace Docs"
+exec = "workspace Database"
 
 [[aerospace.bindings]]
 bind = "caps+m"
@@ -131,7 +131,7 @@ exec = ["move-node-to-workspace Code", "workspace Code"]
 
 [[aerospace.bindings]]
 bind = "caps+shift+d"
-exec = ["move-node-to-workspace Docs", "workspace Docs"]
+exec = ["move-node-to-workspace Database", "workspace Database"]
 
 [[aerospace.bindings]]
 bind = "caps+shift+m"
@@ -206,8 +206,8 @@ workspace = "Terminal"
 monitor = 1
 
 [[aerospace.workspace_assignments]]
-workspace = "Docs"
-monitor = 1
+workspace = "Database"
+monitor = 2
 
 [[aerospace.workspace_assignments]]
 workspace = "Music"
@@ -218,8 +218,8 @@ workspace = "Schedule"
 monitor = 2
 
 [[aerospace.window_rules]]
-app_name_regex = "Obsidian"
-run = "move-node-to-workspace Docs"
+app_name_regex = "DataGrip"
+run = "move-node-to-workspace Database"
 
 [[aerospace.window_rules]]
 app_name_regex = "Music"
@@ -666,13 +666,13 @@ to = "cmd+l"
 only = "browsers"
 
 [[karabiner.rules]]
-bind = "ctrl+e"
-to = "cmd+l"
+bind = "cmd+h"
+to = "cmd+y"
 only = "browsers"
 
 [[karabiner.rules]]
-bind = "ctrl+h"
-to = "cmd+h"
+bind = "ctrl+e"
+to = "cmd+l"
 only = "browsers"
 
 [[karabiner.rules]]
@@ -867,4 +867,4 @@ shell = "open -a 'TickTick'"
 
 [[karabiner.rules]]
 bind = "ctrl+cmd+d"
-shell = "open -a 'Obsidian'"
+shell = "open -a 'DataGrip'"
