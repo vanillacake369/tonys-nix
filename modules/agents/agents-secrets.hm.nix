@@ -9,7 +9,7 @@
         exit 64
       fi
 
-      secrets_file="''${AGENT_SECRETS_FILE:-$HOME/dev/tonys-nix/secrets/secrets.yaml}"
+      secrets_file="''${AGENT_SECRETS_FILE:-$HOME/dev/tonys-nix/secrets/mcp.yaml}"
       if [ "$(uname -s)" = "Darwin" ]; then
         default_age_key_file="$HOME/Library/Application Support/sops/age/keys.txt"
       else
