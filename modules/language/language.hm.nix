@@ -264,6 +264,10 @@ in {
     file.".claude/lang-tools.json".source = jsonFormat.generate "lang-tools.json" toolTable;
     file.".gradle/gradle.properties".text = ''
       org.gradle.daemon.idletimeout=300000
+      # Gradle daemon 이 Java 21(jdtls runtime)으로 실행돼도 Nix store 의
+      # 프로젝트 JDK 17 을 toolchain 으로 찾을 수 있게 경로를 명시한다.
+      # Nix JDK 는 macOS 표준 설치 폴더 밖이라 자동 탐지만으로는 부족하다.
+      org.gradle.java.installations.paths=${pkgs.javaProjectJdk}
     '';
     file.".local/share/nvim/neotest-java/junit-platform-console-standalone-6.0.3.jar".source =
       pkgs.neotest-java-junit-platform-console-standalone;
