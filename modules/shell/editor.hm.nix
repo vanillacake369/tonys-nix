@@ -2,7 +2,30 @@
   lib,
   pkgs,
   ...
-}: {
+}: let
+  luaRocksEnv = pkgs.lua5_1.withPackages (luaPackages: [
+    luaPackages.luarocks
+    luaPackages.luarocks-build-treesitter-parser
+  ]);
+  # Lazy.nvim은 플러그인 코드를 관리하고, LuaRocks는 rock 의존성만 설치한다.
+  # rest.nvim의 rockspec은 Lua 5.1 환경과 tree-sitter-http 빌드 백엔드를
+  # 요구하므로, Neovim 전용 도구 체인을 Nix로 고정해 시스템 Lua와 분리한다.
+  # 주의: Lazy의 hererocks를 끄고 이 luarocks 래퍼가 PATH에서 선택되어야 한다.
+  # 각 플러그인의 쓰기 가능한 rock 설치 경로는 Lazy가 계속 관리하며,
+  # 아래 Nix tree는 빌드 백엔드 같은 실행 도구를 제공하는 용도다.
+  # rocks.enabled = false 로 끄면 rest.nvim의 LuaRocks 의존성을 해결할 수 없다.
+  luaRocksConfig = pkgs.writeText "neovim-luarocks-config.lua" ''
+    rocks_trees = {{
+      name = "nix-runtime";
+      root = "${luaRocksEnv}";
+    }}
+  '';
+  # 별도 래퍼로 설정 파일을 지정해 일반 터미널의 LuaRocks 설정과 섞이지 않게 한다.
+  luaRocks = pkgs.writeShellScriptBin "luarocks" ''
+    export LUAROCKS_CONFIG=${luaRocksConfig}
+    exec ${luaRocksEnv}/bin/luarocks "$@"
+  '';
+in {
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -12,6 +35,10 @@
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
+    extraPackages = [
+      luaRocks
+      luaRocksEnv
+    ];
     # nvim-treesitter with all grammar derivations bundled into the wrapper's
     # rtp. Without this, the lua plugin loads but `vim.treesitter` can't find
     # any parser → treesitter-dependent tools (neotest, render-markdown,
