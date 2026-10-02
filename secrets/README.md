@@ -6,8 +6,7 @@ This directory keeps SOPS-managed secrets for this Home Manager/Nix setup.
 
 ```text
 secrets/
-├── secrets.yaml          # SOPS-encrypted secrets, safe to commit
-├── database.yaml         # SOPS-encrypted native YAML source
+├── mcp.yaml              # SOPS-encrypted MCP secrets, safe to commit
 ├── age-key.txt.example   # tracked template only
 └── README.md             # this document
 ```
@@ -17,7 +16,7 @@ secrets/
 Edit the encrypted secret file with:
 
 ```bash
-sops secrets/secrets.yaml
+sops secrets/mcp.yaml
 ```
 
 Expected TickTick entry:
@@ -30,13 +29,6 @@ ticktick:
 Do not paste the token into chat or write it into Nix files. The next integration
 step should read this secret at activation/runtime and expose it as
 `TICKTICK_MCP_TOKEN` without putting the value in the Nix store.
-
-`database.yaml` is the encrypted, native YAML source of truth for
-`~/.config/database/databases.toml`. Edit its `production` and `development`
-mappings with `sops secrets/database.yaml`. Home Manager decrypts the document,
-renders it as TOML, and atomically installs it with mode `0600`; plaintext never
-enters the Nix store. Because every activation replaces the runtime file, do not
-make persistent edits directly in `~/.config/database/databases.toml`.
 
 Atlassian's non-interactive MCP fallback expects these encrypted entries:
 
@@ -60,11 +52,11 @@ location (`~/Library/Application Support/sops/age/keys.txt` on macOS):
 
 ```bash
 just sops-age-key-pull
-sops --decrypt secrets/secrets.yaml >/dev/null
+sops --decrypt secrets/mcp.yaml >/dev/null
 ```
 
 Because the recipe uses SOPS's default location, direct commands such as
-`sops secrets/secrets.yaml` work without an environment variable.
+`sops secrets/mcp.yaml` work without an environment variable.
 `agent-secret-env` also supports overriding the identity for a single process
 with `AGENT_SOPS_AGE_KEY_FILE` or the standard `SOPS_AGE_KEY_FILE` variable.
 
