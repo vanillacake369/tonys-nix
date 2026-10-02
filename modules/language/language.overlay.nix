@@ -9,7 +9,7 @@ _final: prev: let
   #
   # 프로젝트 런타임과 개발 도구 런타임은 같은 역할이 아니다.
   # - projectJdk : 최신 jdtls 실행에 Java 21 이상이 필요하므로 추가
-  # - toolingJdk : 회사 프로젝트는 toolingJdk 기준으로 빌드
+  # - toolingJdk : editor and formatter tools run on a newer runtime
   # 둘을 하나로 합치면 프로젝트 호환성 또는
   # 에디터 진단 중 하나가 깨지므로
   # 별도의 두 값을 따로두어 각각의 관심사를 처리하도록 한다.
@@ -47,8 +47,8 @@ in {
   # Java project runtime
   # ---------------------------------------------------------------------------
   #
-  # 전역 gradle은 회사 프로젝트와 같은 Java 17에서 실행한다. 저장소에
-  # gradlew가 있으면 wrapper가 Gradle 버전을 고르고, 이 JDK 정책은 유지된다.
+  # Global Gradle runs on the project runtime. Repository-local gradlew
+  # wrappers still choose their own Gradle version while keeping this JDK.
   gradle = prev.gradle.override {java = projectJdk;};
   neotest-java-junit-platform-console-standalone = prev.fetchurl {
     url = "https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/6.0.3/junit-platform-console-standalone-6.0.3.jar";
