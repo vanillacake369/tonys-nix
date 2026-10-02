@@ -44,7 +44,7 @@ credentials.json
 secrets/*
 !secrets/
 !secrets/README.md
-!secrets/secrets.yaml
+!secrets/mcp.yaml
 !secrets/age-key.txt.example
 *.password
 *.passwd
