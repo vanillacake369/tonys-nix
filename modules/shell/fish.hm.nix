@@ -203,13 +203,6 @@
       set -g fish_color_quote yellow
       set -g fish_color_redirection cyan
       set -g fish_color_end white
-
-      #########################################################################
-      ################ VPPLAB 백엔드 모듈 전역 환경변수 주입 ##################
-      #########################################################################
-      if test -r "$HOME/dev/env/global_env.sh"
-          source "$HOME/dev/env/global_env.sh"
-      end
     '';
 
     plugins =
