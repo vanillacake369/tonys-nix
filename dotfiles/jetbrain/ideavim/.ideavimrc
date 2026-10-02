@@ -1,0 +1,6 @@
+" yank만 system clipboard로
+nnoremap y "+y
+xnoremap y "+y
+
+" yy도 정상적으로 한 줄 yank
+nnoremap yy "+yy
