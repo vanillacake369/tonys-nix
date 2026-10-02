@@ -1,11 +1,5 @@
-# Network configuration, firewall, and VPN
-{
-  config,
-  lib,
-  ...
-}: let
-  userHome = config.users.users.limjihoon.home;
-in {
+# Network configuration, firewall, and shared services
+{lib, ...}: {
   # Firewall of inbound traffic
   networking = {
     hostName = "nixos";
@@ -25,15 +19,8 @@ in {
     };
   };
 
-  # NFS and VPN services
+  # NFS services
   services = {
     nfs.server.enable = true;
-    openvpn.servers.hamaVPN = {
-      autoStart = false;
-      config = ''
-        config ${userHome}/my-nixos/openvpn/lonelynight1026.ovpn
-      '';
-      updateResolvConf = true;
-    };
   };
 }
