@@ -35,7 +35,7 @@ Nix, prepares the repository `nix.conf`, verifies the Home Manager execution
 path, runs the fast core gate, and then applies the selected profile.
 
 The current login name (`id -un`) selects `user/<login>.nix`. Profile files are
-exported as named flake outputs such as `hm-vpplab-aarch64-darwin`; there is no
+exported as named flake outputs such as `hm-<profile>-aarch64-darwin`; there is no
 implicit default profile. Run the repository-level `just` command without
 `sudo`. A missing or untracked profile is rejected before activation with
 creation or `git add` guidance.
