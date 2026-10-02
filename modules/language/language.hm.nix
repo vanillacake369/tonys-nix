@@ -26,9 +26,7 @@
       lint = "shellcheck -f gcc";
     };
 
-    # 기본 java/javac는 회사 프로젝트 기준을 제공
-    # Java 21 은 jdtls nvim lsp 래퍼를 위해
-    # 내부 의존성으로만 가져오도록 한다
+    # Java 21 is kept as the project JDK and for the jdtls Neovim wrapper.
     java = {
       extensions = ["java"];
       packages = [
