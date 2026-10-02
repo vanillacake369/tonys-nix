@@ -5,10 +5,6 @@
   ...
 }: let
   winUserDir = userProfile.windowsHome;
-  taskXmlName = "SystemIdleShutdown.xml";
-  taskName = "SystemIdleShutdown";
-  winXmlPath = "C:\\Users\\${userProfile.username}\\${taskXmlName}";
-  wslXmlPath = "${winUserDir}/${taskXmlName}";
 
   # Windows admin status is a runtime/activation concern, not a build-time fact:
   # the build host may differ from the activation host, and admin rights can
@@ -34,16 +30,6 @@ in {
           "${winUserDir}/shutdown_idle.ps1"
       else
         echo "No Windows admin access. Skipping shutdown script."
-      fi
-    '';
-
-    registerWindowsSchedulerTask = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      if ${adminCheck} >/dev/null 2>&1; then
-        run cp -f ${../../dotfiles/windows/scheduler/SystemIdleShutdown.xml} "${wslXmlPath}"
-        run /mnt/c/Windows/System32/schtasks.exe /create /tn "${taskName}" /xml "${winXmlPath}" /F
-        run rm -f "${wslXmlPath}"
-      else
-        echo "No Windows admin access. Skipping scheduled task registration."
       fi
     '';
   };
