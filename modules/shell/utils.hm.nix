@@ -21,6 +21,7 @@
       fd
       tree
       curl
+      httpie
       openssl
 
       # Git tools

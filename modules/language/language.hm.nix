@@ -66,12 +66,19 @@
       diagnose = "go build ./...";
     };
 
+    # NOTE :
+    # pkgs.gcc 를 추가하게되면
+    # clang-tools가 gcc를 찾지 못하는 문제가 발생한다
+    # NOTE :
+    # nvim-dap 의 C/C++ 설정 처리를 위해
+    # CodeLLDB adapter 제공을 하고자 vscode-lldb
+    # 를 추가해줘야한다
     c = {
       extensions = ["c" "h" "cpp" "hpp" "cc"];
       packages = [
-        # pkgs.gcc
         pkgs.clang-tools
         pkgs.bear
+        pkgs.vscode-extensions.vadimcn.vscode-lldb
       ];
       format = "clang-format --dry-run --Werror";
     };
@@ -223,10 +230,12 @@
   langPackages = lib.concatMap (l: l.packages) (lib.attrValues languages);
 
   # Tools not tied to a single language.
+  # nvim-treesitter parser builds
+  # shell hook test runner
   commonTools = with pkgs; [
-    tree-sitter # nvim-treesitter parser builds
+    tree-sitter
     gnumake
-    bats # shell hook test runner
+    bats
   ];
 
   # 확장자별 서식·린트·진단 도구 설정표. auto-lint.sh와 semantic-oracle.sh에서 사용한다.
