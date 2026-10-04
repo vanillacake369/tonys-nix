@@ -30,6 +30,8 @@ GC_DELETE_OLDER_THAN := "3"
 GC_STATE_FILE := ".nix-gc-state"
 APPLY_RETRY_THRESHOLD := "3"
 APPLY_FALLBACK_SUBSTITUTERS := "https://cache.nixos.org"
+OBSERVE_HEARTBEAT_SECONDS := "10"
+OBSERVE_ACTIVITY_MAX_CHARS := "160"
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
@@ -89,7 +91,12 @@ check target="all":
     #!/usr/bin/env bash
     case {{ quote(target) }} in
       all) just lint && just test ;;
-      core) just _bootstrap-core && just lint && just _test-guard ;;
+      core)
+        just _bootstrap-core
+        just lint
+        OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+          bash "{{ justfile_directory() }}/scripts/run-observed.sh" "Running guard tests" -- just _test-guard
+        ;;
       flake) just _test-flake ;;
       hooks) just test-hooks ;;
       lint) just lint ;;
@@ -276,9 +283,11 @@ apply scope="all" profile="":
       exit 2
     fi
 
-    just _apply-validate "$system"
+    OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+      bash "{{ justfile_directory() }}/scripts/run-observed.sh" "Validating apply target" -- just _apply-validate "$system"
     if [[ "$scope" == all || "$scope" == system ]]; then
-      just _apply-system "$system"
+      OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+        bash "{{ justfile_directory() }}/scripts/run-observed.sh" "Applying system configuration" -- just _apply-system "$system"
     fi
     if [[ "$scope" == all || "$scope" == home ]]; then
       [[ -n "$profile" ]] || profile="$(id -un)"
@@ -415,22 +424,25 @@ _apply-home flake_target:
     retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"
     attempt=1
     while (( attempt <= retry_threshold )); do
-      if output=$("${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back 2>&1); then
-        echo "[✓] Home Manager applied"
+      if OBSERVE_FAILURE_DETAIL=0 \
+        OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+        OBSERVE_SHOW_ACTIVITY=1 \
+        OBSERVE_ACTIVITY_MAX_CHARS="{{ OBSERVE_ACTIVITY_MAX_CHARS }}" \
+        bash "{{ justfile_directory() }}/scripts/run-observed.sh" \
+        "Activating Home Manager" "${attempt}/${retry_threshold}" -- \
+        "${hm_cmd[@]}" switch --flake ".#${flake_target}" -b back; then
         exit 0
       fi
-      echo "[!] Home Manager apply failed on attempt ${attempt}/${retry_threshold}"
-      printf '%s\n' "$output" >&2
       (( attempt++ ))
     done
 
     echo "[!] Falling back to substituters={{ APPLY_FALLBACK_SUBSTITUTERS }}"
-    if output=$("${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back 2>&1); then
-      echo "[✓] Home Manager applied"
-    else
-      printf '%s\n' "$output" >&2
-      exit 1
-    fi
+    OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+      OBSERVE_SHOW_ACTIVITY=1 \
+      OBSERVE_ACTIVITY_MAX_CHARS="{{ OBSERVE_ACTIVITY_MAX_CHARS }}" \
+      bash "{{ justfile_directory() }}/scripts/run-observed.sh" \
+      "Activating Home Manager with fallback cache" "fallback" -- \
+      "${hm_fallback_cmd[@]}" --flake ".#${flake_target}" -b back
 
 # Remove unmanaged files that are byte-for-byte identical to the next
 # Home Manager generation, preventing pointless .back files on switch.
@@ -439,11 +451,16 @@ _reclaim-matching-home-files flake_target:
     #!/usr/bin/env bash
     flake_target={{ quote(flake_target) }}
 
-    if ! generation=$(nix build --print-out-paths ".#homeConfigurations.${flake_target}.activationPackage" --no-link 2>/dev/null); then
-      echo "[✗] Home Manager generation build failed: ${flake_target}" >&2
-      nix build ".#homeConfigurations.${flake_target}.activationPackage" --no-link >&2
-      exit 1
-    fi
+    result_file=$(mktemp)
+    trap 'rm -f "$result_file"' EXIT
+    OBSERVE_RESULT_FILE="$result_file" \
+      OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+      OBSERVE_SHOW_ACTIVITY=1 \
+      OBSERVE_ACTIVITY_MAX_CHARS="{{ OBSERVE_ACTIVITY_MAX_CHARS }}" \
+      bash "{{ justfile_directory() }}/scripts/run-observed.sh" \
+      "Building Home Manager generation" -- \
+      nix build --print-build-logs --print-out-paths ".#homeConfigurations.${flake_target}.activationPackage" --no-link
+    generation=$(grep -E '^/nix/store/[^[:space:]]+$' "$result_file" | tail -n 1)
 
     home_files="${generation}/home-files"
     [[ -e "$home_files" ]] || exit 0
@@ -936,9 +953,8 @@ _test-guard:
       fi
     }
 
-    if ! out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.guard-tests" --no-link 2>/dev/null); then
+    if ! out=$(nix build --print-out-paths ".#checks.{{ SYSTEM_ARCH }}.guard-tests" --no-link); then
       echo "[✗] guard-tests" >&2
-      nix build ".#checks.{{ SYSTEM_ARCH }}.guard-tests" --no-link >&2
       exit 1
     fi
     result=$(cat "$out")
@@ -1015,7 +1031,6 @@ lint:
       local label="$1"
       local package="$2"
       shift 2
-      local output
       local command
       if command -v "$label" >/dev/null 2>&1; then
         command=("$label" "$@")
@@ -1023,13 +1038,8 @@ lint:
         command=(nix run "nixpkgs#${package}" -- "$@")
       fi
 
-      if output=$("${command[@]}" 2>&1); then
-        echo "[✓] $label"
-      else
-        echo "[✗] $label" >&2
-        printf '%s\n' "$output" >&2
-        exit 1
-      fi
+      OBSERVE_HEARTBEAT_SECONDS="{{ OBSERVE_HEARTBEAT_SECONDS }}" \
+        bash "{{ justfile_directory() }}/scripts/run-observed.sh" "$label" -- "${command[@]}"
     }
 
     run_step deadnix deadnix --fail .
