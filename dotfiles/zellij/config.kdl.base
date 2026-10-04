@@ -478,7 +478,11 @@ pane_frame_style "titles"
 // copy_command "xclip -selection clipboard" // x11
 // copy_command "wl-copy"                    // wayland
 // copy_command "pbcopy"                     // osx
-copy_command "pbcopy"
+// copy_command "pbcopy"
+// INFO : copy_command 를 주석처리한 이유는 명시적으로
+// OSC 52 를 사용하여 SSH 원격서버로 복붙 연동 가능케 하기 위함임
+// copy_command를 지정하지 않으면 
+// OSC 52를 기본 방식으로 사용하기 때문임
  
 // Choose the destination for copied text
 // Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
