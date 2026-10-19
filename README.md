@@ -45,17 +45,26 @@ creation or `git add` guidance.
 ```text
 flake.nix
   -> lib/mk-home-config.nix
+  -> tonys-agent-harness (pinned flake input)
   -> home.nix
   -> modules/*
-  -> modules/agents/*
 ```
 
-`modules/agents/` keeps agent behavior boring:
+Agent behavior is owned by the standalone
+[`tonys-agent-harness`](https://github.com/vanillacake369/tonys-agent-harness)
+flake:
 
-- A provider-neutral source of truth holds shared instructions, portable specs,
-  and reusable workflow material.
-- Outporters translate shared data into provider-native output shapes.
-- Provider modules stay thin and should not redefine behavioral policy.
+- `contract-*` files hold provider-neutral roles, workflows, permissions, and
+  engineering rules.
+- `config-*` files hold provider-neutral runtime configuration.
+- `runtime-*` files own local integration mechanics such as Home Manager,
+  activation, sync, hooks, and secrets.
+- Its provider modules/renderers translate shared data into provider-native output
+  shapes without redefining behavioral policy.
+
+This repository keeps only the project-level `AGENTS.md` contract and enables
+the pinned Home Manager adapter. Agent runtime changes are developed and tested
+in the harness repository, then adopted here by updating the flake input.
 
 ## Agent Harness
 
