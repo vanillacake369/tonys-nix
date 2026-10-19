@@ -57,12 +57,12 @@
   };
 
   # SystemD journal configuration for SSD optimization
-  services.journald.extraConfig = ''
-    SystemMaxUse=500M
-    SystemMaxFileSize=50M
-    SystemMaxFiles=10
-    MaxRetentionSec=1month
-  '';
+  services.journald.settings.Journal = {
+    SystemMaxUse = "500M";
+    SystemMaxFileSize = "50M";
+    SystemMaxFiles = 10;
+    MaxRetentionSec = "1month";
+  };
 
   # Logind configuration to prevent unwanted system actions
   services.logind = {
