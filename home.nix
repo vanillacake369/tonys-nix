@@ -8,6 +8,7 @@
   domainModules = import ./lib/discover-modules.nix {inherit lib;} ./modules;
 in {
   programs.home-manager.enable = true;
+  programs.tonys-agent-harness.enable = true;
   targets.genericLinux.enable = isLinux;
 
   imports =

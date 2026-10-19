@@ -6,6 +6,7 @@
 }:
 lib.mapAttrs' (profileName: homeConfig: let
   codexSyncScript = homeConfig.config.home.activation.syncCodexConfig.data;
+  kiroSeedScript = homeConfig.config.home.activation.seedKiroMcp.data;
   codexAgentFiles = builtins.filter (entry: builtins.match "\\.codex/agents/.*\\.toml" entry.path != null) (
     builtins.attrValues (
       builtins.mapAttrs (path: file: {
@@ -21,7 +22,7 @@ lib.mapAttrs' (profileName: homeConfig: let
       grep -F 'name = ' '${entry.source}'
       grep -F 'description = ' '${entry.source}'
       grep -F 'developer_instructions = ' '${entry.source}'
-      grep -F 'model = "gpt-5.5"' '${entry.source}'
+      grep -F 'model = "gpt-6.1-sol"' '${entry.source}'
       grep -F 'default_permissions = "agent-' '${entry.source}'
       ! grep -F 'config_file = ' '${entry.source}'
     '')
@@ -58,7 +59,7 @@ in
 
     ${codexSyncScript}
 
-    grep -F 'model = "gpt-5.5"' "$HOME/.codex/config.toml"
+    grep -F 'model = "gpt-6.1-sol"' "$HOME/.codex/config.toml"
     ! grep -E '^\[agents(\.|])' "$HOME/.codex/config.toml"
     grep -F 'status_line = [' "$HOME/.codex/config.toml"
     grep -F '"model-with-reasoning"' "$HOME/.codex/config.toml"
@@ -75,8 +76,32 @@ in
     ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
     test ! -e "$HOME/.codex/hooks.json"
     ls "$HOME"/.codex/hooks.json.backup.*
-    test ${toString (builtins.length codexAgentFiles)} -ge 7
+    test ${toString (builtins.length codexAgentFiles)} -eq 6
     ${agentFileChecks}
+
+    mkdir -p "$HOME/.kiro/settings"
+    rm -f "$HOME/.kiro/settings/mcp.json"
+    ${kiroSeedScript}
+    grep -F '"mcpServers"' "$HOME/.kiro/settings/mcp.json"
+    # Unsupported MCP execution adapters must seed an empty registry.
+    grep -F '"mcpServers": {}' "$HOME/.kiro/settings/mcp.json"
+    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
+
+    cat > "$HOME/.kiro/settings/mcp.json" <<'JSON'
+    {"mcpServers":{"custom":{"command":"custom-mcp","args":[]}}}
+    JSON
+    ${kiroSeedScript}
+    grep -F '"custom"' "$HOME/.kiro/settings/mcp.json"
+    ! grep -F '"context7"' "$HOME/.kiro/settings/mcp.json"
+    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
+
+    rm -f "$HOME/.kiro/settings/mcp.json"
+    echo '{"mcpServers":{"stale":{"command":"old"}}}' > "$PWD/stale-mcp.json"
+    ln -s "$PWD/stale-mcp.json" "$HOME/.kiro/settings/mcp.json"
+    ${kiroSeedScript}
+    test ! -L "$HOME/.kiro/settings/mcp.json"
+    grep -F '"mcpServers": {}' "$HOME/.kiro/settings/mcp.json"
+    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
 
     touch "$out"
   ''))
