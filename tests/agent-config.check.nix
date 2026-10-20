@@ -5,104 +5,29 @@
   ...
 }:
 lib.mapAttrs' (profileName: homeConfig: let
-  codexSyncScript = homeConfig.config.home.activation.syncCodexConfig.data;
-  kiroSeedScript = homeConfig.config.home.activation.seedKiroMcp.data;
-  codexAgentFiles = builtins.filter (entry: builtins.match "\\.codex/agents/.*\\.toml" entry.path != null) (
-    builtins.attrValues (
-      builtins.mapAttrs (path: file: {
-        inherit path;
-        inherit (file) source;
-      })
-      homeConfig.config.home.file
-    )
-  );
-  agentFileChecks = builtins.concatStringsSep "\n" (
-    map (entry: ''
-      echo "[!] Checking custom agent file: ${entry.path}"
-      grep -F 'name = ' '${entry.source}'
-      grep -F 'description = ' '${entry.source}'
-      grep -F 'developer_instructions = ' '${entry.source}'
-      grep -F 'model = "gpt-6.1-sol"' '${entry.source}'
-      grep -F 'default_permissions = "agent-' '${entry.source}'
-      ! grep -F 'config_file = ' '${entry.source}'
-    '')
-    codexAgentFiles
-  );
+  cfg = homeConfig.config.programs.tonys-agent-harness;
+  activation = homeConfig.config.home.activation.reconcileAgentHarness.data;
+  normalized = cfg.normalizedConfig;
+  normalizedFile = homeConfig.config.xdg.configFile."agent-harness/normalized.json".source;
 in
-  lib.nameValuePair "codex-settings-sync-${profileName}" (pkgs.runCommand "codex-settings-sync-${profileName}" {} ''
+  lib.nameValuePair "agent-harness-${profileName}" (pkgs.runCommand "agent-harness-${profileName}" {} ''
     set -euo pipefail
-    export HOME="$PWD/home"
-    mkdir -p "$HOME/.codex"
-
-    cat > "$HOME/.codex/config.toml" <<'TOML'
-    [tui]
-    status_line = ["old"]
-    status_line_use_colors = false
-
-    [projects.demo]
-    trusted = true
-
-    [hooks.state."/tmp/stale:post_tool_use:0:1"]
-    trusted_hash = "sha256:stale"
-    TOML
-    {
-      echo
-      echo "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]"
-      echo 'trusted_hash = "sha256:valid"'
-      echo
-      echo "[hooks.state.\"$HOME/.codex/hooks.json:stop:0:0\"]"
-      echo 'trusted_hash = "sha256:obsolete"'
-    } >> "$HOME/.codex/config.toml"
-    cat > "$HOME/.codex/hooks.json" <<'JSON'
-    {"hooks":{"Stop":[{"hooks":[{"type":"command","command":"legacy"}]}]}}
-    JSON
-
-    ${codexSyncScript}
-
-    grep -F 'model = "gpt-6.1-sol"' "$HOME/.codex/config.toml"
-    ! grep -E '^\[agents(\.|])' "$HOME/.codex/config.toml"
-    grep -F 'status_line = [' "$HOME/.codex/config.toml"
-    grep -F '"model-with-reasoning"' "$HOME/.codex/config.toml"
-    grep -F 'vim_mode_default = true' "$HOME/.codex/config.toml"
-    grep -F 'status_line_use_colors = true' "$HOME/.codex/config.toml"
-    grep -F '[projects.demo]' "$HOME/.codex/config.toml"
-    grep -F 'trusted = true' "$HOME/.codex/config.toml"
-    grep -F "[hooks.state.\"$HOME/.codex/config.toml:post_tool_use:0:0\"]" "$HOME/.codex/config.toml"
-    grep -F 'sha256:valid' "$HOME/.codex/config.toml"
-    grep -F '/tmp/stale:post_tool_use:0:1' "$HOME/.codex/config.toml"
-    ! grep -F "$HOME/.codex/hooks.json:stop:0:0" "$HOME/.codex/config.toml"
-    ! grep -F 'sha256:obsolete' "$HOME/.codex/config.toml"
-    grep -F '.config/agents/hooks/agent-notify.sh codex' "$HOME/.codex/config.toml"
-    ! grep -F 'status_line = ["old"]' "$HOME/.codex/config.toml"
-    test ! -e "$HOME/.codex/hooks.json"
-    ls "$HOME"/.codex/hooks.json.backup.*
-    test ${toString (builtins.length codexAgentFiles)} -eq 6
-    ${agentFileChecks}
-
-    mkdir -p "$HOME/.kiro/settings"
-    rm -f "$HOME/.kiro/settings/mcp.json"
-    ${kiroSeedScript}
-    grep -F '"mcpServers"' "$HOME/.kiro/settings/mcp.json"
-    # Unsupported MCP execution adapters must seed an empty registry.
-    grep -F '"mcpServers": {}' "$HOME/.kiro/settings/mcp.json"
-    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
-
-    cat > "$HOME/.kiro/settings/mcp.json" <<'JSON'
-    {"mcpServers":{"custom":{"command":"custom-mcp","args":[]}}}
-    JSON
-    ${kiroSeedScript}
-    grep -F '"custom"' "$HOME/.kiro/settings/mcp.json"
-    ! grep -F '"context7"' "$HOME/.kiro/settings/mcp.json"
-    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
-
-    rm -f "$HOME/.kiro/settings/mcp.json"
-    echo '{"mcpServers":{"stale":{"command":"old"}}}' > "$PWD/stale-mcp.json"
-    ln -s "$PWD/stale-mcp.json" "$HOME/.kiro/settings/mcp.json"
-    ${kiroSeedScript}
-    test ! -L "$HOME/.kiro/settings/mcp.json"
-    grep -F '"mcpServers": {}' "$HOME/.kiro/settings/mcp.json"
-    test "$(stat -c '%a' "$HOME/.kiro/settings/mcp.json")" = "600"
-
+    test '${toString cfg.projectRoot}' = '${toString ../.}'
+    test '${toString cfg.manifest}' = '${toString ../agent-harness.toml}'
+    grep -F '"spec_root":".codex"' '${normalizedFile}'
+    grep -F '"codex"' '${normalizedFile}'
+    grep -F '"claude"' '${normalizedFile}'
+    grep -F '"gemini"' '${normalizedFile}'
+    grep -F '"kiro"' '${normalizedFile}'
+    grep -F 'harness export' <<'SCRIPT'
+    ${activation}
+    SCRIPT
+    grep -F 'reconcile-guides' <<'SCRIPT'
+    ${activation}
+    SCRIPT
+    test '${if normalized.permissions.single_writer then "true" else "false"}' = true
+    test '${normalized.permissions.secret_access}' = deny
+    test '${if normalized.project.guides.enabled then "true" else "false"}' = true
     touch "$out"
   ''))
 homeConfigs
