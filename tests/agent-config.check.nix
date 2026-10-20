@@ -25,9 +25,17 @@ in
     grep -F 'reconcile-guides' <<'SCRIPT'
     ${activation}
     SCRIPT
-    test '${if normalized.permissions.single_writer then "true" else "false"}' = true
+    test '${
+      if normalized.permissions.single_writer
+      then "true"
+      else "false"
+    }' = true
     test '${normalized.permissions.secret_access}' = deny
-    test '${if normalized.project.guides.enabled then "true" else "false"}' = true
+    test '${
+      if normalized.project.guides.enabled
+      then "true"
+      else "false"
+    }' = true
     touch "$out"
   ''))
 homeConfigs
