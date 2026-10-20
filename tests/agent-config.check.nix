@@ -15,6 +15,12 @@ in
     test '${toString cfg.manifest}' = '${toString ../agent-harness.toml}'
     test '${toString cfg.instruction}' = '${toString ../AGENTS.md}'
     test '${cfg.workspaceRoot}' = '${homeConfig.config.home.homeDirectory}/dev/tonys-nix'
+    test '${
+      if cfg.secretLauncher.enable
+      then "true"
+      else "false"
+    }' = true
+    test '${cfg.secretLauncher.secretsFile}' = '${homeConfig.config.home.homeDirectory}/dev/tonys-nix/secrets/mcp.yaml'
     grep -F '"spec_root":".codex"' '${normalizedFile}'
     grep -F '"codex"' '${normalizedFile}'
     grep -F '"claude"' '${normalizedFile}'

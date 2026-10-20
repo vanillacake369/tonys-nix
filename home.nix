@@ -14,6 +14,10 @@ in {
     manifest = ./agent-harness.toml;
     instruction = ./AGENTS.md;
     workspaceRoot = "${config.home.homeDirectory}/dev/tonys-nix";
+    secretLauncher = {
+      enable = true;
+      secretsFile = "${config.home.homeDirectory}/dev/tonys-nix/secrets/mcp.yaml";
+    };
   };
   targets.genericLinux.enable = isLinux;
 

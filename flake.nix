@@ -8,7 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     tonys-agent-harness = {
-      url = "github:vanillacake369/tonys-agent-harness/60951ace6884579f654358067255fa1eacde137f";
+      url = "github:vanillacake369/tonys-agent-harness/615e52741fa683f53cece61910fdb6f7116ed87c";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     rust-overlay = {
