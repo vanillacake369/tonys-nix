@@ -119,16 +119,21 @@
     python = {
       extensions = ["py" "pyi"];
       packages = [
-        pkgs.uv
-        pkgs.python313Packages.python-lsp-server
-        pkgs.python313Packages.python
-        pkgs.python313Packages.pytest
-        pkgs.python313Packages.ruff
-        pkgs.python313Packages.uvicorn
-        pkgs.python313Packages.pip
-        pkgs.python313Packages.lizard
-        pkgs.black
-        pkgs.ruff
+        (pkgs.python314.withPackages (py: [
+          py.uv
+          py.pytest
+          py.sqlalchemy
+          py.pydantic
+          py.pydantic-settings
+          py.pyyaml
+          py.pymysql
+          py.testcontainers
+          py.python-lsp-server
+          py.ruff
+          py.uvicorn
+          py.pip
+          py.lizard
+        ]))
       ];
       format = "black --check";
       lint = "ruff check";
