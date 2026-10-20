@@ -27,7 +27,7 @@
       tscl = "tailscale";
       mtps = "multipass";
       codex = "agent-secret-env codex";
-      cdx = "agent-secret-env codex -s danger-full-access -a never";
+      cdx = "agent-secret-env codex -s workspace-write -a on-request";
       gmni = "agent-secret-env agy --dangerously-skip-permissions";
     };
 
