@@ -19,8 +19,14 @@
       /*
       Cloud tools
       */
-      awscli
-      # ssm-session-manager-plugin
+      # AWS 전체 리소스 제어
+      awscli2
+      # SSH 키 없이 EC2 서버 보안 원격 접속
+      ssm-session-manager-plugin
+      # AWS 액세스 키 로컬 금고 키체인에 암호화 보관
+      aws-vault
+      # 여러 AWS 계정·세션 브라우저 탭별로 동시 전환
+      granted
 
       /*
       Testing tools
