@@ -189,17 +189,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1792481131,
-        "narHash": "sha256-k90GCIeDY6KlpoxExDZEaE2vCkgHAF+pKFL7PFyLDfQ=",
+        "lastModified": 1792502388,
+        "narHash": "sha256-+9hYaWcEqCMgZJPblheDsq8TXfkEIJgkgk3g+Y0UOpo=",
         "owner": "vanillacake369",
         "repo": "tonys-agent-harness",
-        "rev": "5586f3d9264e9efbaacb2782b3446f3f0b16201e",
+        "rev": "30b319aa10034eba427e6783c25f47b27901587f",
         "type": "github"
       },
       "original": {
         "owner": "vanillacake369",
         "repo": "tonys-agent-harness",
-        "rev": "5586f3d9264e9efbaacb2782b3446f3f0b16201e",
         "type": "github"
       }
     },
