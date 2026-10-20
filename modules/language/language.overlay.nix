@@ -15,6 +15,7 @@ _final: prev: let
   # 별도의 두 값을 따로두어 각각의 관심사를 처리하도록 한다.
   projectJdk = prev.zulu17;
   toolingJdk = prev.zulu21;
+  inherit (prev) stdenv;
 in {
   # Home Manager도 같은 정책을 소비하도록 패키지 집합에 역할 이름을 공개한다.
   # projectJdk는 셸의 기본 JDK이고 toolingJdk는 도구 래퍼 내부 전용이다.
@@ -65,6 +66,32 @@ in {
   prettier = prev.prettier.override {nodejs = prev.nodejs_24;};
   bash-language-server = prev.bash-language-server.override {nodejs-slim = prev.nodejs-slim_24;};
   inherit (prev) pnpm;
+
+  # Bear 4.2.3의 process-tree signal integration test는 Darwin builder에서
+  # grandchild PID 기록 전에 타임아웃되는 비결정적 실패가 있다. 전체 check를
+  # 끄지 않고 해당 Cargo harness case만 Darwin에서 제외한다.
+  bear = prev.bear.overrideAttrs (old: {
+    cargoTestFlags =
+      (old.cargoTestFlags or [])
+      ++ prev.lib.optionals stdenv.hostPlatform.isDarwin [
+        "--"
+        "--skip"
+        "cases::exit_codes::signal_tears_down_build_process_tree"
+      ];
+    # nixpkgs 4.2.3 expression assumes the Linux cdylib suffix in postInstall.
+    # Preserve the upstream install layout while selecting Darwin's actual file.
+    postInstall =
+      builtins.replaceStrings
+      ["mv $out/lib/libexec.so $out/libexec/bear/lib/"]
+      [
+        "mv $out/lib/${
+          if stdenv.hostPlatform.isDarwin
+          then "libexec.dylib"
+          else "libexec.so"
+        } $out/libexec/bear/lib/"
+      ]
+      old.postInstall;
+  });
 
   lua54Packages = prev.lua54Packages.overrideScope (luaFinal: _luaPrev: {
     mobdebug = luaFinal.callPackage (
