@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   isLinux,
   isWsl,
@@ -10,8 +11,9 @@ in {
   programs.home-manager.enable = true;
   programs.tonys-agent-harness = {
     enable = true;
-    projectRoot = ./.;
     manifest = ./agent-harness.toml;
+    instruction = ./AGENTS.md;
+    workspaceRoot = "${config.home.homeDirectory}/dev/tonys-nix";
   };
   targets.genericLinux.enable = isLinux;
 

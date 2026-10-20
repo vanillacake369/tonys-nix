@@ -12,8 +12,9 @@ lib.mapAttrs' (profileName: homeConfig: let
 in
   lib.nameValuePair "agent-harness-${profileName}" (pkgs.runCommand "agent-harness-${profileName}" {} ''
     set -euo pipefail
-    test '${toString cfg.projectRoot}' = '${toString ../.}'
     test '${toString cfg.manifest}' = '${toString ../agent-harness.toml}'
+    test '${toString cfg.instruction}' = '${toString ../AGENTS.md}'
+    test '${cfg.workspaceRoot}' = '${homeConfig.config.home.homeDirectory}/dev/tonys-nix'
     grep -F '"spec_root":".codex"' '${normalizedFile}'
     grep -F '"codex"' '${normalizedFile}'
     grep -F '"claude"' '${normalizedFile}'
@@ -25,6 +26,10 @@ in
     grep -F 'reconcile-guides' <<'SCRIPT'
     ${activation}
     SCRIPT
+    grep -F -- '--workspace' <<'SCRIPT'
+    ${activation}
+    SCRIPT
+    test -x '${homeConfig.config.home.file.".config/agents/governance/pre-tool-gate.sh".source}'
     test '${
       if normalized.permissions.single_writer
       then "true"
