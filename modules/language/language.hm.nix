@@ -218,6 +218,7 @@
     docker = {
       extensions = ["dockerfile"];
       packages = [
+        pkgs.dockerfile-language-server
         pkgs.docker-compose-language-service
         pkgs.hadolint
       ];
