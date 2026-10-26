@@ -1,6 +1,150 @@
-" yank만 system clipboard로
+" ==========================================
+" Leader
+" ==========================================
+let mapleader = " "
+let maplocalleader = " "
+
+
+" ==========================================
+" Editor Options
+" ==========================================
+set number
+set relativenumber
+set scrolloff=5
+
+set incsearch
+set hlsearch
+set ignorecase
+set smartcase
+
+set ideajoin
+set ideamarks
+set idearefactormode=keep
+
+
+" ==========================================
+" Clipboard
+" ==========================================
+" Yank만 시스템 클립보드 사용
 nnoremap y "+y
 xnoremap y "+y
-
-" yy도 정상적으로 한 줄 yank
 nnoremap yy "+yy
+
+" Delete와 Change는 기본 레지스터 유지
+" IDE의 붙여넣기 기능 사용
+set clipboard=ideaput
+
+
+" ==========================================
+" IdeaVim Plugins
+" ==========================================
+set commentary
+set surround
+set argtextobj
+set textobj-entire
+
+
+" ==========================================
+" Navigation
+" ==========================================
+nnoremap <C-d> <C-d>zz
+nnoremap <C-u> <C-u>zz
+nnoremap <C-f> <C-f>zz
+nnoremap <C-b> <C-b>zz
+
+nnoremap n nzzzv
+nnoremap N Nzzzv
+
+
+" ==========================================
+" LSP / Code Navigation
+" ==========================================
+nmap gd <Action>(GotoDeclaration)
+nmap gD <Action>(GotoDeclaration)
+nmap grr <Action>(FindUsages)
+nmap gri <Action>(GotoImplementation)
+nmap grn <Action>(RenameElement)
+nmap gra <Action>(ShowIntentionActions)
+
+nmap K <Action>(QuickJavaDoc)
+nmap gO <Action>(FileStructurePopup)
+
+
+" ==========================================
+" Search / Files
+" ==========================================
+nmap <leader><Space> <Action>(GotoFile)
+nmap <leader>ff <Action>(GotoFile)
+nmap <leader>fb <Action>(Switcher)
+nmap <leader>fg <Action>(FindInPath)
+nmap <leader>fr <Action>(RecentFiles)
+
+nmap <leader>e <Action>(ActivateProjectToolWindow)
+nmap <leader>E <Action>(SelectInProjectView)
+
+nnoremap <leader>nh :nohlsearch<CR>
+
+
+" ==========================================
+" Code
+" ==========================================
+nmap <leader>cf <Action>(ReformatCode)
+xmap <leader>cf <Action>(ReformatCode)
+
+
+" ==========================================
+" Git
+" ==========================================
+nmap <leader>gb <Action>(Annotate)
+nmap <leader>gf <Action>(Vcs.ShowTabbedFileHistory)
+nmap <leader>gg <Action>(Vcs.QuickListPopupAction)
+
+nmap ]h <Action>(VcsShowNextChangeMarker)
+nmap [h <Action>(VcsShowPrevChangeMarker)
+
+
+" ==========================================
+" Debug
+" ==========================================
+nmap <leader>dc <Action>(Debug)
+nmap <leader>db <Action>(ToggleLineBreakpoint)
+nmap <leader>do <Action>(StepOver)
+nmap <leader>di <Action>(StepInto)
+nmap <leader>dO <Action>(StepOut)
+nmap <leader>dt <Action>(Stop)
+
+
+" ==========================================
+" Run / Test
+" ==========================================
+nmap <leader>rr <Action>(Run)
+nmap <leader>tt <Action>(RunClass)
+nmap <leader>tl <Action>(Rerun)
+
+
+" ==========================================
+" Buffers / Windows
+" ==========================================
+nmap <leader>bb <Action>(Switcher)
+nmap <leader>bd <Action>(CloseContent)
+
+nmap <S-h> <Action>(PreviousTab)
+nmap <S-l> <Action>(NextTab)
+
+nnoremap <leader>w- <C-w>s
+nnoremap <leader>w\| <C-w>v
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <C-w>l
+nnoremap <leader>wc <C-w>c
+
+
+" ==========================================
+" Visual Editing
+" ==========================================
+xnoremap < <gv
+xnoremap > >gv
+
+xnoremap J :m '>+1<CR>gv=gv
+xnoremap K :m '<-2<CR>gv=gv
