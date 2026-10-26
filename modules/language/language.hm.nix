@@ -242,6 +242,7 @@
     tree-sitter
     gnumake
     bats
+    codex
   ];
 
   # 확장자별 서식·린트·진단 도구 설정표. auto-lint.sh와 semantic-oracle.sh에서 사용한다.
