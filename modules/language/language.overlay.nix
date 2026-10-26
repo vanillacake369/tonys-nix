@@ -8,13 +8,13 @@ _final: prev: let
   # ---------------------------------------------------------------------------
   #
   # 프로젝트 런타임과 개발 도구 런타임은 같은 역할이 아니다.
-  # - projectJdk : 최신 jdtls 실행에 Java 21 이상이 필요하므로 추가
+  # - projectJdk : 프로젝트의 Java 17 런타임
   # - toolingJdk : editor and formatter tools run on a newer runtime
   # 둘을 하나로 합치면 프로젝트 호환성 또는
   # 에디터 진단 중 하나가 깨지므로
   # 별도의 두 값을 따로두어 각각의 관심사를 처리하도록 한다.
   projectJdk = prev.zulu17;
-  toolingJdk = prev.zulu21;
+  toolingJdk = prev.jdk25;
   inherit (prev) stdenv;
 in {
   # Home Manager도 같은 정책을 소비하도록 패키지 집합에 역할 이름을 공개한다.
@@ -38,9 +38,9 @@ in {
   # ---------------------------------------------------------------------------
   #
   # 에디터 도구는 JAVA_HOME=17인 셸에서도 독립적으로 기동해야 한다.
-  # jdtls와 같은 프로세스 트리에서 동작하는 formatter와 lombok도 21에 묶어
+  # jdtls와 같은 프로세스 트리에서 동작하는 formatter와 lombok도 25에 묶어
   # 도구별 classpath와 runtime이 조용히 갈라지는 것을 막는다.
-  jdt-language-server = prev.jdt-language-server.override {jdk = toolingJdk;};
+  jdt-language-server = prev.jdt-language-server.override {jdk25 = toolingJdk;};
   google-java-format = prev.google-java-format.override {jre = toolingJdk;};
   lombok = prev.lombok.override {jdk = toolingJdk;};
 

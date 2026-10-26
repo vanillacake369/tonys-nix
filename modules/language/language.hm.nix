@@ -267,7 +267,7 @@ in {
       # -----------------------------------------------------------------------
       #
       # 터미널, Maven, Gradle 프로젝트는 Java 17을 기본값으로 본다.
-      # jdtls 등 Java 21이 필요한 도구는 overlay의 toolingJdk로 격리된다.
+      # jdtls 등 Java 25가 필요한 도구는 overlay의 toolingJdk로 격리된다.
       JAVA_HOME = "${pkgs.javaProjectJdk}";
       # Appended to every JVM (jdtls, gradle daemon, maven, ...). Survives
       # per-project `org.gradle.jvmargs` overrides, which would otherwise
