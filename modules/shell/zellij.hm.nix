@@ -20,6 +20,7 @@
   };
 in {
   home.packages = [
+    pkgs.zellij
     pkgs.zellij-nav
     pkgs.zestty
   ];

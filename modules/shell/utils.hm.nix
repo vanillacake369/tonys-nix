@@ -24,17 +24,7 @@
       httpie
       openssl
 
-      # Git tools
-      # INFO :
-      # git 에 대해서는
-      # ./shell-core.nix 를 확인할 것
-      ghalint
-      lazygit
-      bfg-repo-cleaner
-      lefthook
-
       # Terminal tools
-      zellij
       fastfetch
       expect
 
@@ -42,7 +32,7 @@
       asciinema
       asciinema-agg
       vhs
-      ffmpeg # NOTE: temporary; remove after the mock interview
+      ffmpeg
 
       # Database
       redli
@@ -51,10 +41,15 @@
       sops
       age
       ssh-to-age
-      git-crypt
-      git-filter-repo
-      gh
       gnupg
+
+      # Monitoring and debugging
+      htop
+      btop
+      dust
+      ncdu
+      lsof
+      smartmontools
     ]
     ++ lib.optionals isDarwin [
       # Mac-specific tools
@@ -64,9 +59,14 @@
     ++ lib.optionals (isLinux && !isWsl) [
       # Native Linux only (not WSL)
       google-authenticator
+      wayland-utils
     ]
     ++ lib.optionals isLinux [
       # Linux-specific tools
+      # GDB has build issues on macOS and lldb is preferred there anyway
       xclip
+      gdb
+      psmisc
+      strace
     ];
 }
