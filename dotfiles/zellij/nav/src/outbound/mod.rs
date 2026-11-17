@@ -72,7 +72,7 @@ impl Runtime {
             lock_dir: state_dir.join(".navigation.lock"),
             state_dir,
             protected_pattern: std::env::var("ZELLIJ_NAV_PROTECTED_COMMAND_PATTERN")
-                .unwrap_or_else(|_| "(^|[[:space:]/])(codex|cdx)([[:space:]]|$)".to_string()),
+                .unwrap_or_else(|_| "a^".to_string()),
             protected_strategy: std::env::var("ZELLIJ_NAV_PROTECTED_STRATEGY")
                 .unwrap_or_else(|_| "block".to_string()),
             sidecar_command: std::env::var("ZELLIJ_NAV_SIDECAR_COMMAND")

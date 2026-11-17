@@ -11,9 +11,9 @@ optional WASM backend를 하나의 navigation boundary로 다룬다.
   logging은 Rust runtime이 소유한다.
 - Navigation state는 "현재 위치"가 아니라 "돌아갈 위치"를 기록한다. 그래서 picker
   이동과 context toggle은 같은 `previous-target` 계약을 공유한다.
-- Protected client는 기본적으로 보수적으로 다룬다. Codex/CDX 같은 long-running
-  client가 감지되면 same-client CLI mutation은 막고, plugin/sidecar 경로는 명시적인
-  strategy일 때만 사용한다.
+- Protected client는 기본적으로 보수적으로 다룬다. 장시간 실행 명령이 감지되면
+  same-client CLI mutation은 막고, plugin/sidecar 경로는 명시적인 strategy일 때만
+  사용한다.
 
 ## Structure
 

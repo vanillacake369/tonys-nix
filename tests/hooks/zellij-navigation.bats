@@ -12,6 +12,7 @@ setup() {
   export TMPDIR="$WORK/tmp"
   mkdir -p "$TMPDIR" "$WORK/bin" "$WORK/state"
   export ZELLIJ_NAV_STATE_DIR="$WORK/state"
+  export ZELLIJ_NAV_PROTECTED_COMMAND_PATTERN='(^|[[:space:]/])protected-shell([[:space:]]|$)'
   export ZELLIJ_STUB_LOG="$WORK/zellij.log"
   export ZELLIJ_STUB_CREATED_SESSIONS="$WORK/created-sessions"
   export ZELLIJ_STUB_LAYOUT_COPY="$WORK/sidecar-layout.kdl"
@@ -96,9 +97,9 @@ JSON
     "id": 1,
     "tab_id": 0,
     "tab_name": "Main",
-    "title": "codex",
-    "pane_command": "codex",
-    "terminal_command": "codex",
+    "title": "protected-shell",
+    "pane_command": "protected-shell",
+    "terminal_command": "protected-shell",
     "pane_cwd": "/work",
     "is_focused": true,
     "is_floating": false,
@@ -120,7 +121,7 @@ JSON
     "tab_name": "Main",
     "title": "sleep 1",
     "pane_command": "sleep 1",
-    "terminal_command": "cdx",
+    "terminal_command": "protected-shell",
     "pane_cwd": "/work",
     "is_focused": false,
     "is_floating": false,
@@ -169,8 +170,8 @@ JSON
     "tab_id": 0,
     "tab_name": "Main",
     "title": "self",
-    "pane_command": "codex",
-    "terminal_command": "codex",
+    "pane_command": "protected-shell",
+    "terminal_command": "protected-shell",
     "pane_cwd": "/self",
     "is_focused": true,
     "is_floating": false,
@@ -388,7 +389,7 @@ CLIENTS
   if [ "${ZELLIJ_STUB_PROTECTED_SELF:-0}" = "1" ]; then
     cat <<'CLIENTS'
 CLIENT_ID ZELLIJ_PANE_ID RUNNING_COMMAND
-1         terminal_1     codex -s danger-full-access -a never
+1         terminal_1     protected-shell --test-mode
 CLIENTS
   else
     cat <<'CLIENTS'
@@ -899,7 +900,7 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "protected codex context blocks picker navigation by default" {
+@test "protected command context blocks picker navigation by default" {
   run env ZELLIJ_PANE_ID=1 ZELLIJ_STUB_PROTECTED_SELF=1 bash "$PICKER" --sessions
   [ "$status" -eq 0 ]
 
@@ -927,7 +928,7 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "protected codex context can explicitly try plugin strategy but requires confirmation" {
+@test "protected command context can explicitly try plugin strategy but requires confirmation" {
   run env \
     ZELLIJ_PANE_ID=1 \
     ZELLIJ_STUB_PROTECTED_SELF=1 \
@@ -1151,7 +1152,7 @@ EOF
   [ "$status" -eq 0 ]
 }
 
-@test "protected codex context can opt in to sidecar fallback" {
+@test "protected command context can opt in to sidecar fallback" {
   run env \
     ZELLIJ_PANE_ID=1 \
     ZELLIJ_STUB_PROTECTED_SELF=1 \
