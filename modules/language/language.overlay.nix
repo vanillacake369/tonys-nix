@@ -57,7 +57,10 @@ in {
         --replace-fail "/bin/stty" "${prev.coreutils}/bin/stty"
     '';
 
-    env.CGO_ENABLED = if stdenv.hostPlatform.isDarwin then "1" else "0";
+    env.CGO_ENABLED =
+      if stdenv.hostPlatform.isDarwin
+      then "1"
+      else "0";
     ldflags = [
       "-s"
       "-w"
