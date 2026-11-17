@@ -14,7 +14,7 @@ setup() {
 
   # Build a minimal strategy-lint script that mirrors the mixin output.
   # Env-overridable: COMPLEXITY_DIR, STRATEGY_DIR (injected above).
-  # This script is a test double for the nix-generated strategy-lint-claude.sh.
+  # This script is a test double for the generated strategy-lint.sh.
   SCRIPT="$WORK/strategy-lint-test.sh"
   cat > "$SCRIPT" <<'SCRIPT_EOF'
 #!/usr/bin/env bash
@@ -30,8 +30,8 @@ case "$TOOL_NAME" in
   *) exit 0 ;;
 esac
 
-STRATEGY_DIR="${STRATEGY_DIR:-/tmp/claude-strategy}"
-COMPLEXITY_DIR="${COMPLEXITY_DIR:-/tmp/claude-complexity}"
+STRATEGY_DIR="${STRATEGY_DIR:-/tmp/strategy}"
+COMPLEXITY_DIR="${COMPLEXITY_DIR:-/tmp/complexity}"
 STRATEGY_FILE="$STRATEGY_DIR/$SESSION_ID.md"
 
 # No strategy file yet — allow (first-time pass)
