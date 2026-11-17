@@ -73,17 +73,16 @@ sync domain action="guide" target="local":
       *) echo "[x] Expected: just sync {brew|raycast} ..." >&2; exit 2 ;;
     esac
 
-# Set up this machine. Actions: all, nix, home, agents, mac, completions.
+# Set up this machine. Actions: all, nix, home, mac, completions.
 setup action:
     #!/usr/bin/env bash
     case {{ quote(action) }} in
       all) just bootstrap ;;
       nix) just install-nix && just system-link-nix-conf ;;
       home) just install-home-manager && just apply home ;;
-      agents) just agent-login ;;
       mac) just sync-local-integrations ;;
       completions) just _setup-completions ;;
-      *) echo "[x] Expected: just setup {all|nix|home|agents|mac|completions}" >&2; exit 2 ;;
+      *) echo "[x] Expected: just setup {all|nix|home|mac|completions}" >&2; exit 2 ;;
     esac
 
 # Run quality gates. Targets: all, core, flake, hooks, lint.
@@ -169,31 +168,6 @@ _bootstrap-core:
     just install-nix
     just system-link-nix-conf
     just install-home-manager
-
-# Authenticate missing AI providers via cli-proxy-api OAuth.
-[private]
-agent-login:
-    #!/usr/bin/env bash
-    AUTH_DIR="$HOME/.cli-proxy-api"
-    CONFIG="-config $AUTH_DIR/config.yaml"
-    has_auth() { ls "$AUTH_DIR"/$1-*.json 2>/dev/null | head -1 | grep -q .; }
-    MISSING=()
-    has_auth gemini || MISSING+=(gemini)
-    has_auth claude || MISSING+=(claude)
-    has_auth codex  || MISSING+=(codex)
-    if [[ ${#MISSING[@]} -eq 0 ]]; then
-        echo "[✓] All AI providers authenticated"
-        exit 0
-    fi
-    echo "[!] Missing auth: ${MISSING[*]}"
-    for p in "${MISSING[@]}"; do
-        case $p in
-            gemini) echo "[→] Logging in to Gemini (Google)..." && cli-proxy-api -login $CONFIG ;;
-            claude) echo "[→] Logging in to Claude (Anthropic)..." && cli-proxy-api -claude-login $CONFIG ;;
-            codex)  echo "[→] Logging in to Codex (OpenAI)..." && cli-proxy-api -codex-login $CONFIG ;;
-        esac
-    done
-    echo "[✓] Agent login complete"
 
 # Install Nix if it is not available.
 [private]

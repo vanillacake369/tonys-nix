@@ -500,9 +500,6 @@
   <action id="ViewBreakpoints">
     <keyboard-shortcut first-keystroke="shift ctrl f8" />
   </action>
-  <action id="com.anthropic.code.plugin.actions.SendToClaudeAction">
-    <keyboard-shortcut first-keystroke="ctrl meta k" />
-  </action>
   <action id="sql.ExtractFunctionAction">
     <keyboard-shortcut first-keystroke="ctrl meta m" />
   </action>

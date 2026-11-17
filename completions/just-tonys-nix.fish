@@ -66,7 +66,6 @@ function __tonys_nix_setup_actions
         all 'Run the complete first-time setup' \
         nix 'Install Nix and link nix.conf' \
         home 'Prepare and apply Home Manager' \
-        agents 'Authenticate configured AI providers' \
         mac 'Configure local macOS integrations' \
         completions 'Install only the Fish completion file'
 end

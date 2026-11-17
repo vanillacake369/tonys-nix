@@ -2,8 +2,7 @@
 #
 # `languages` is the single source consumed by:
 #   - home.packages          (every entry's `packages`)
-#   - ~/.claude/lang-tools.json  (ext → {format?,lint?,diagnose?}), read by
-#       auto-lint.sh (format/lint) + semantic-oracle.sh (diagnose)
+#   - the language-specific package set used by editors and project checks
 #
 # Per entry: extensions (json keys), packages (nix pkgs),
 #            format/lint/diagnose (optional shell command strings).
@@ -242,23 +241,7 @@
     tree-sitter
     gnumake
     bats
-    codex
   ];
-
-  # 확장자별 서식·린트·진단 도구 설정표. auto-lint.sh와 semantic-oracle.sh에서 사용한다.
-  toolEntry = l:
-    lib.filterAttrs (_: v: v != null) {
-      format = l.format or null;
-      lint = l.lint or null;
-      diagnose = l.diagnose or null;
-    };
-  toolTable =
-    lib.foldl'
-    (acc: l: acc // lib.genAttrs l.extensions (_: toolEntry l))
-    {}
-    (lib.attrValues languages);
-
-  jsonFormat = pkgs.formats.json {};
 in {
   home = {
     sessionVariables = {
@@ -277,7 +260,6 @@ in {
     };
     packages = langPackages ++ commonTools;
     file.".cargo/config.toml".source = ../../dotfiles/cargo/config.toml;
-    file.".claude/lang-tools.json".source = jsonFormat.generate "lang-tools.json" toolTable;
     file.".gradle/gradle.properties".text = ''
       org.gradle.daemon.idletimeout=300000
       # Gradle daemon 이 Java 21(jdtls runtime)으로 실행돼도 Nix store 의

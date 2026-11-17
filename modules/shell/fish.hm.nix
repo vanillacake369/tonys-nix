@@ -26,8 +26,6 @@
       hm = "home-manager";
       tscl = "tailscale";
       mtps = "multipass";
-      cdx = "agent-secret-env codex -s workspace-write -a on-request";
-      gmni = "agent-secret-env agy --dangerously-skip-permissions";
     };
 
     shellAbbrs = {
