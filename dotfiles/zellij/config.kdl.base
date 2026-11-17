@@ -22,6 +22,7 @@ keybinds clear-defaults=true {
         bind "l" { MoveFocus "right"; }
         bind "n" { NewPane; SwitchToMode "normal"; }
         bind "p" { SwitchFocus; }
+        bind ";" { FocusLastPane; }
         // bind "r" { NewPane "right"; SwitchToMode "normal"; }
         bind "r" { SwitchToMode "renamepane"; PaneNameInput 0; }
         bind "Shift s" { NewPane "stacked"; SwitchToMode "normal"; }
@@ -61,6 +62,8 @@ keybinds clear-defaults=true {
         bind "j" { GoToNextTab; }
         bind "k" { GoToPreviousTab; }
         bind "l" { GoToNextTab; }
+        bind "Shift h" { MoveTab "Left"; }
+        bind "Shift l" { MoveTab "Right"; }
         bind "n" { NewTab; SwitchToMode "normal"; }
         bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
         bind "s" { ToggleActiveSyncTab; SwitchToMode "normal"; }
@@ -238,11 +241,11 @@ keybinds clear-defaults=true {
                 "Layout / Previous swap layout" "Alt ["
                 "Layout / Next swap layout" "Alt ]"
                 "Pane Mode / New pane" "p -> n"
-                "Pane Mode / Split right" "p -> r"
                 "Pane Mode / Split down" "p -> d"
                 "Pane Mode / New stacked pane" "p -> Shift s"
                 "Pane Mode / Close pane" "p -> x"
-                "Pane Mode / Rename pane" "p -> c"
+                "Pane Mode / Focus last pane" "p -> ;"
+                "Pane Mode / Rename pane" "p -> r"
                 "Pane Mode / Toggle fullscreen" "p -> f, Alt f"
                 "Pane Mode / Toggle no-UI fullscreen" "p -> Shift f"
                 "Pane / Toggle floating panes" "Alt w"
@@ -252,6 +255,8 @@ keybinds clear-defaults=true {
                 "Move Mode / Move pane right" "m -> l, m -> Right"
                 "Move Mode / Move pane next" "m -> n, m -> Tab"
                 "Move Mode / Move pane previous" "m -> p"
+                "Tab Mode / Move tab left" "t -> Shift h"
+                "Tab Mode / Move tab right" "t -> Shift l"
                 "Tab Mode / Break pane to new tab" "t -> b"
                 "Tab Mode / Break pane left" "t -> ["
                 "Tab Mode / Break pane right" "t -> ]"
