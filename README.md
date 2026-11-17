@@ -5,14 +5,12 @@
 # tonys-nix
 
 Personal multi-platform Nix configuration for development machines, including
-shared agent instructions exported to Claude Code, Gemini CLI, and OpenAI Codex.
+shell, language tooling, and platform integration configuration.
 
 ## What This Manages
 
 - NixOS, macOS, WSL, and Linux home-manager environments.
 - Shell, CLI tools, language tooling, Neovim, keymaps, and platform-specific apps.
-- Claude/Gemini/Codex settings, MCP servers, roles, and workflow bindings.
-- Shared agent guidance kept in one provider-neutral source of truth.
 
 ## Quick Start
 
@@ -45,47 +43,13 @@ creation or `git add` guidance.
 ```text
 flake.nix
   -> lib/mk-home-config.nix
-  -> tonys-agent-harness (pinned flake input)
   -> home.nix
   -> modules/*
 ```
 
-Agent behavior is owned by the standalone
-[`tonys-agent-harness`](https://github.com/vanillacake369/tonys-agent-harness)
-flake:
-
-- `contract-*` files hold provider-neutral roles, workflows, permissions, and
-  engineering rules.
-- `config-*` files hold provider-neutral runtime configuration.
-- `runtime-*` files own local integration mechanics such as Home Manager,
-  activation, sync, hooks, and secrets.
-- Its provider modules/renderers translate shared data into provider-native output
-  shapes without redefining behavioral policy.
-
-This repository keeps only the project-level `AGENTS.md` contract and enables
-the pinned Home Manager adapter. Agent runtime changes are developed and tested
-in the harness repository, then adopted here by updating the flake input.
-
-## Agent Harness
-
-The agent system follows one rule: provider-specific files are export surfaces,
-not the source of truth. Shared behavior belongs in the provider-neutral layer;
-provider code may change format, naming, and integration mechanics only.
-
-### Atlassian MCP
-
-Home Manager configures the official Atlassian Remote MCP v2 endpoint. Complete
-the recommended OAuth flow once after applying the configuration:
-
-```bash
-codex mcp login atlassian
-codex mcp get atlassian
-```
-
-For non-interactive API-token authentication, store a rotated personal token at
-`atlassian.api_token` and its owner email at `atlassian.user_email` in the SOPS
-secrets file. `agent-secret-env` builds `ATLASSIAN_MCP_AUTHORIZATION` only at
-runtime; the credential is not written to the Nix store or Codex config.
+Provider integrations are intentionally paused in this repository. The
+preserved source and encrypted material are archived outside the Git worktree
+so they can be restored deliberately if the project is resumed.
 
 ## Common Commands
 
@@ -93,7 +57,7 @@ runtime; the credential is not written to the Nix store or Codex config.
 just                              # prepare core runtime, check core, then apply all
 just apply [all|home|system] [profile] # default profile: current login user
 just check [all|core|flake|hooks|lint]
-just setup <all|nix|home|agents|mac|completions>
+just setup <all|nix|home|mac|completions>
 just maintenance gc [auto|force|status]
 just image list
 just image build <format>
@@ -136,9 +100,6 @@ Import is selective, must be confirmed inside Raycast, and merges data rather
 than making the target Mac an exact overwrite of the source.
 
 ## Contributing
-
-Before changing agent behavior, start from the shared source of truth and keep
-provider-specific changes limited to export mechanics.
 
 Before submitting changes:
 

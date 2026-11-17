@@ -6,40 +6,13 @@ This directory keeps SOPS-managed secrets for this Home Manager/Nix setup.
 
 ```text
 secrets/
-├── mcp.yaml              # SOPS-encrypted MCP secrets, safe to commit
 ├── age-key.txt.example   # tracked template only
 └── README.md             # this document
 ```
 
-## Secret File
-
-Edit the encrypted secret file with:
-
-```bash
-sops secrets/mcp.yaml
-```
-
-Expected TickTick entry:
-
-```yaml
-ticktick:
-  mcp_token: <token managed by sops>
-```
-
-Do not paste the token into chat or write it into Nix files. The next integration
-step should read this secret at activation/runtime and expose it as
-`TICKTICK_MCP_TOKEN` without putting the value in the Nix store.
-
-Atlassian's non-interactive MCP fallback expects these encrypted entries:
-
-```yaml
-atlassian:
-  user_email: <API token owner>
-  api_token: <token managed by sops>
-```
-
-Interactive use should prefer `codex mcp login atlassian`. The launcher derives
-the Basic authorization header in memory only when both entries exist.
+The previously used encrypted secret file is intentionally not part of the
+active configuration. Any archived copy must remain encrypted and must not be
+pasted into chat or written into Nix files.
 
 ## Age Key
 
@@ -52,13 +25,8 @@ location (`~/Library/Application Support/sops/age/keys.txt` on macOS):
 
 ```bash
 just sops-age-key-pull
-sops --decrypt secrets/mcp.yaml >/dev/null
+sops --decrypt <archived-secret-file> >/dev/null
 ```
-
-Because the recipe uses SOPS's default location, direct commands such as
-`sops secrets/mcp.yaml` work without an environment variable.
-`agent-secret-env` also supports overriding the identity for a single process
-with `AGENT_SOPS_AGE_KEY_FILE` or the standard `SOPS_AGE_KEY_FILE` variable.
 
 If you use an existing age identity, keep this repository's `.sops.yaml`
 recipient in sync with that identity's public key.
