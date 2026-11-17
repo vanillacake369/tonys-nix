@@ -23,12 +23,6 @@ result-*
 *.swp
 *.swo
 
-# Claude dynamic data (keep local-only)
-dotfiles/claude/todos/
-dotfiles/claude/projects/
-dotfiles/claude/shell-snapshots/
-dotfiles/claude/statsig/
-
 # Security-sensitive files (credentials, keys, passwords)
 scripts/env.sh
 scripts/*.env
@@ -44,10 +38,20 @@ credentials.json
 secrets/*
 !secrets/
 !secrets/README.md
-!secrets/mcp.yaml
 !secrets/age-key.txt.example
 *.password
 *.passwd
+
+# Agents
+**/graphify*
+**/claude*
+**/codex*
+**/agent*
+**/*agent*
+**/.env.local
+**/langchain*
+**/llamaindex*
+**/autogen*
 
 # Development and runtime files
 .vscode/
@@ -58,8 +62,6 @@ node_modules/
 .cache/
 .tmp/
 tmp/
-.agent-context/
-
 # macOS specific
 .AppleDouble
 .LSOverride
@@ -69,6 +71,3 @@ Icon?
 # Windows specific
 Thumbs.db
 Desktop.ini
-AGENT_REPORT.md
-AGENT-LOG.md
-DEVOPS_ANALYSIS.md
