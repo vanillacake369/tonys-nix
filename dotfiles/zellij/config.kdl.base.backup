@@ -1,0 +1,642 @@
+//
+// Base Zellij config managed by this repository.
+//
+
+keybinds clear-defaults=true {
+    locked {
+        bind "Ctrl g" { SwitchToMode "normal"; }
+    }
+    pane {
+        bind "left" { MoveFocus "left"; }
+        bind "down" { MoveFocus "down"; }
+        bind "up" { MoveFocus "up"; }
+        bind "right" { MoveFocus "right"; }
+        bind "d" { NewPane "down"; SwitchToMode "normal"; }
+        bind "e" { TogglePaneEmbedOrFloating; SwitchToMode "normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
+        bind "Shift f" { ToggleFocusNoUiFullscreen; SwitchToMode "normal"; }
+        bind "i" { TogglePanePinned; SwitchToMode "normal"; }
+        bind "h" { MoveFocus "left"; }
+        bind "j" { MoveFocus "down"; }
+        bind "k" { MoveFocus "up"; }
+        bind "l" { MoveFocus "right"; }
+        bind "n" { NewPane; SwitchToMode "normal"; }
+        bind "p" { SwitchFocus; }
+        // bind "r" { NewPane "right"; SwitchToMode "normal"; }
+        bind "r" { SwitchToMode "renamepane"; PaneNameInput 0; }
+        bind "Shift s" { NewPane "stacked"; SwitchToMode "normal"; }
+        bind "s" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+                floating true
+                close_on_exit false
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "w" { ToggleFloatingPanes; SwitchToMode "normal"; }
+        bind "x" { CloseFocus; SwitchToMode "normal"; }
+        bind "z" { TogglePaneFrames; SwitchToMode "normal"; }
+    }
+    tab {
+        bind "left" { GoToPreviousTab; }
+        bind "down" { GoToNextTab; }
+        bind "up" { GoToPreviousTab; }
+        bind "right" { GoToNextTab; }
+        bind "1" { GoToTab 1; SwitchToMode "normal"; }
+        bind "2" { GoToTab 2; SwitchToMode "normal"; }
+        bind "3" { GoToTab 3; SwitchToMode "normal"; }
+        bind "4" { GoToTab 4; SwitchToMode "normal"; }
+        bind "5" { GoToTab 5; SwitchToMode "normal"; }
+        bind "6" { GoToTab 6; SwitchToMode "normal"; }
+        bind "7" { GoToTab 7; SwitchToMode "normal"; }
+        bind "8" { GoToTab 8; SwitchToMode "normal"; }
+        bind "9" { GoToTab 9; SwitchToMode "normal"; }
+        bind "[" { BreakPaneLeft; SwitchToMode "normal"; }
+        bind "]" { BreakPaneRight; SwitchToMode "normal"; }
+        bind "b" { BreakPane; SwitchToMode "normal"; }
+        bind "h" { GoToPreviousTab; }
+        bind "j" { GoToNextTab; }
+        bind "k" { GoToPreviousTab; }
+        bind "l" { GoToNextTab; }
+        bind "n" { NewTab; SwitchToMode "normal"; }
+        bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
+        bind "s" { ToggleActiveSyncTab; SwitchToMode "normal"; }
+        bind "x" { CloseTab; SwitchToMode "normal"; }
+        bind "tab" { ToggleTab; }
+    }
+    resize {
+        bind "left" { Resize "Increase left"; }
+        bind "down" { Resize "Increase down"; }
+        bind "up" { Resize "Increase up"; }
+        bind "right" { Resize "Increase right"; }
+        bind "+" { Resize "Increase"; }
+        bind "-" { Resize "Decrease"; }
+        bind "=" { Resize "Increase"; }
+        bind "h" { Resize "Increase left"; }
+        bind "j" { Resize "Increase down"; }
+        bind "k" { Resize "Increase up"; }
+        bind "l" { Resize "Increase right"; }
+    }
+    move {
+        bind "left" { MovePane "left"; }
+        bind "down" { MovePane "down"; }
+        bind "up" { MovePane "up"; }
+        bind "right" { MovePane "right"; }
+        bind "h" { MovePane "left"; }
+        bind "j" { MovePane "down"; }
+        bind "k" { MovePane "up"; }
+        bind "l" { MovePane "right"; }
+        bind "n" { MovePane; }
+        bind "p" { MovePaneBackwards; }
+        bind "tab" { MovePane; }
+    }
+    scroll {
+        bind "c" { CopyLastCommandOutput; SwitchToMode "normal"; }
+        bind "e" { EditScrollback; SwitchToMode "normal"; }
+        bind "s" { SwitchToMode "entersearch"; SearchInput 0; }
+    }
+    search {
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "n" { Search "down"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+        bind "p" { Search "up"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+    }
+    session {
+        bind "a" {
+            LaunchOrFocusPlugin "zellij:about" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "c" {
+            LaunchOrFocusPlugin "configuration" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "d" { Detach; }
+        bind "[" { FocusGuestSession; SwitchToMode "normal"; }
+        bind "]" { FocusHostSession; SwitchToMode "normal"; }
+        bind "f" { ToggleHostFullscreen; SwitchToMode "normal"; }
+        bind "p" {
+            LaunchOrFocusPlugin "plugin-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "normal"
+        }
+        bind "q" { Quit; }
+        bind "r" {
+            Run "sh" "-lc" "exec ~/.config/zellij/scripts/zellij-nav reload-projects" {
+                floating true
+                close_on_exit true
+                width "60%"
+                height "30%"
+                x "20%"
+                y "35%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "w" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --session-manager" {
+                floating true
+                close_on_exit false
+                borderless true
+                width "20%"
+                height "1"
+            }
+            SwitchToMode "normal"
+        }
+    }
+    shared_except "locked" {
+        bind "Alt +" { Resize "Increase"; }
+        bind "Alt -" { Resize "Decrease"; }
+        bind "Alt =" { Resize "Increase"; }
+        bind "Ctrl g" { SwitchToMode "locked"; }
+        unbind "Ctrl /"
+        unbind "Ctrl space"
+        unbind "Ctrl s"
+    }
+    shared_except "locked" "scroll" "search" "entersearch" "renametab" "renamepane" {
+        bind "Alt p" { SwitchToMode "pane"; }
+        bind "Alt Shift p" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --panes" {
+                floating true
+                close_on_exit false
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt t" { SwitchToMode "tab"; }
+        bind "Alt Shift t" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --tabs" {
+                floating true
+                close_on_exit false
+                width "80%"
+                height "70%"
+                x "10%"
+                y "15%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt s" { SwitchToMode "session"; }
+        bind "Alt Shift s" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --sessions" {
+                floating true
+                close_on_exit false
+                width "80%"
+                height "70%"
+                x "10%"
+                y "15%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt Space" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin exec ~/.config/zellij/scripts/zellij-pane-picker --all" {
+                floating true
+                close_on_exit false
+                width "90%"
+                height "80%"
+                x "5%"
+                y "10%"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt /" {
+            LaunchOrFocusPlugin "file:~/.config/zellij/plugins/zellij-forgot.wasm" {
+                floating true
+                move_to_focused_tab true
+                skip_plugin_cache true
+                "LOAD_ZELLIJ_BINDINGS" "false"
+                "Help / Keymap" "Alt /"
+                "Search / Command palette" "Alt Space"
+                "Search / Pane picker" "Alt P"
+                "Search / Tab picker" "Alt T"
+                "Search / Session picker" "Alt S"
+                # @ZELLIJ_FORGOT_PLUGIN_ENTRIES@
+                "Mode / Pane mode" "Alt p"
+                "Mode / Tab mode" "Alt t"
+                "Mode / Session mode" "Alt s"
+                "Mode / Resize mode" "Alt r"
+                "Mode / Move mode" "Alt m"
+                "Mode / Scroll mode" "Alt e"
+                "Navigation / Previous pane" "Alt N"
+                "Navigation / Previous explicit context" "Alt n"
+                "Navigation / Move left" "Alt h"
+                "Navigation / Move down" "Alt j"
+                "Navigation / Move up" "Alt k"
+                "Navigation / Move right" "Alt l"
+                "Layout / Previous swap layout" "Alt ["
+                "Layout / Next swap layout" "Alt ]"
+                "Pane Mode / New pane" "p -> n"
+                "Pane Mode / Split right" "p -> r"
+                "Pane Mode / Split down" "p -> d"
+                "Pane Mode / New stacked pane" "p -> Shift s"
+                "Pane Mode / Close pane" "p -> x"
+                "Pane Mode / Rename pane" "p -> c"
+                "Pane Mode / Toggle fullscreen" "p -> f, Alt f"
+                "Pane Mode / Toggle no-UI fullscreen" "p -> Shift f"
+                "Pane / Toggle floating panes" "Alt w"
+                "Move Mode / Move pane left" "m -> h, m -> Left"
+                "Move Mode / Move pane down" "m -> j, m -> Down"
+                "Move Mode / Move pane up" "m -> k, m -> Up"
+                "Move Mode / Move pane right" "m -> l, m -> Right"
+                "Move Mode / Move pane next" "m -> n, m -> Tab"
+                "Move Mode / Move pane previous" "m -> p"
+                "Tab Mode / Break pane to new tab" "t -> b"
+                "Tab Mode / Break pane left" "t -> ["
+                "Tab Mode / Break pane right" "t -> ]"
+                "Scroll Mode / Previous prompt" "e -> ["
+                "Scroll Mode / Next prompt" "e -> ]"
+                "Scroll Mode / Select command" "e -> m"
+                "Scroll Mode / Copy last command output" "e -> c"
+                "Session Mode / Detach" "s -> d"
+                "Session Mode / Focus guest session" "s -> ["
+                "Session Mode / Focus host session" "s -> ]"
+                "Session Mode / Toggle host fullscreen" "s -> f"
+                "Session Mode / Configuration" "s -> c"
+                "Session Mode / Plugin manager" "s -> p"
+                "Session Mode / Session manager" "s -> w"
+                "Session Mode / Quit" "s -> q"
+                "System / Lock" "Ctrl g"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt [" { PreviousSwapLayout; }
+        bind "Alt ]" { NextSwapLayout; }
+        bind "Alt N" { FocusPreviousPane; }
+        bind "Alt n" {
+            Run "sh" "-lc" "ZELLIJ_NAV_HELPER=1 ZELLIJ_NAV_PROTECTED_STRATEGY=plugin-sidecar ZELLIJ_NAV_FOCUS_UNDERLYING=1 exec ~/.config/zellij/scripts/zellij-context-toggle" {
+                floating true
+                close_on_exit false
+                borderless true
+                width "20%"
+                height "1"
+            }
+            SwitchToMode "normal"
+        }
+        bind "Alt r" { SwitchToMode "resize"; }
+        bind "Alt m" { SwitchToMode "move"; }
+        bind "Alt e" { SwitchToMode "scroll"; }
+        bind "Alt left" { MoveFocusOrTab "left"; }
+        bind "Alt down" { MoveFocus "down"; }
+        bind "Alt up" { MoveFocus "up"; }
+        bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Alt h" { MoveFocusOrTab "left"; }
+        bind "Alt j" { MoveFocus "down"; }
+        bind "Alt k" { MoveFocus "up"; }
+        bind "Alt l" { MoveFocusOrTab "right"; }
+        bind "Alt f" { ToggleFocusFullscreen; }
+        bind "Alt w" { ToggleFloatingPanes; }
+    }
+    shared_except "normal" "locked" "entersearch" {
+        bind "enter" { SwitchToMode "normal"; }
+    }
+    shared_except "normal" "locked" "entersearch" "renametab" "renamepane" {
+        bind "esc" { SwitchToMode "normal"; }
+    }
+    shared_among "scroll" "search" {
+        bind "PageDown" { PageScrollDown; }
+        bind "PageUp" { PageScrollUp; }
+        bind "left" { PageScrollUp; }
+        bind "down" { ScrollDown; }
+        bind "up" { ScrollUp; }
+        bind "right" { PageScrollDown; }
+        bind "Ctrl b" { PageScrollUp; }
+        bind "Ctrl c" { ScrollToBottom; SwitchToMode "normal"; }
+        bind "d" { HalfPageScrollDown; }
+        bind "Ctrl f" { PageScrollDown; }
+        bind "h" { PageScrollUp; }
+        bind "j" { ScrollDown; }
+        bind "k" { ScrollUp; }
+        bind "l" { PageScrollDown; }
+        bind "[" { ScrollToPreviousPrompt; }
+        bind "]" { ScrollToNextPrompt; }
+        bind "m" { SelectCommandAtScrollPosition; }
+        bind "Ctrl s" { SwitchToMode "normal"; }
+        bind "u" { HalfPageScrollUp; }
+    }
+    entersearch {
+        bind "Ctrl c" { SwitchToMode "scroll"; }
+        bind "esc" { SwitchToMode "scroll"; }
+        bind "enter" { SwitchToMode "search"; }
+    }
+    renametab {
+        bind "esc" { UndoRenameTab; SwitchToMode "tab"; }
+    }
+    shared_among "renametab" "renamepane" {
+        bind "Ctrl c" { SwitchToMode "normal"; }
+    }
+    renamepane {
+        bind "esc" { UndoRenamePane; SwitchToMode "pane"; }
+    }
+}
+
+// Plugin aliases - can be used to change the implementation of Zellij
+// changing these requires a restart to take effect
+plugins {
+    about location="zellij:about"
+    configuration location="zellij:configuration"
+    filepicker location="zellij:strider" {
+        cwd "/"
+    }
+    plugin-manager location="zellij:plugin-manager"
+    session-manager location="zellij:session-manager"
+    strider location="zellij:strider"
+    welcome-screen location="zellij:session-manager" {
+        welcome_screen true
+    }
+}
+
+// Plugins to load in the background when a new session starts
+// eg. "file:/path/to/my-plugin.wasm"
+// eg. "https://example.com/my-plugin.wasm"
+load_plugins {
+}
+
+// Use a simplified UI without special fonts (arrow glyphs)
+// Options:
+//   - true
+//   - false (Default)
+//
+// simplified_ui true
+ 
+// Choose the theme that is specified in the themes section.
+// Default: default
+//
+// theme "dracula"
+ 
+// Choose the base input mode of zellij.
+// Default: normal
+//
+default_mode "normal"
+ 
+// Choose the path to the default shell that zellij will use for opening new panes
+// Default: $SHELL
+//
+default_shell "fish"
+
+env {
+    fish_features "no-query-term"
+}
+ 
+// Choose the path to override cwd that zellij will use for opening new panes
+// 
+// default_cwd "/tmp"
+ 
+// The name of the default layout to load on startup
+// Default: "default"
+// 
+default_layout "compact"
+ 
+// The folder in which Zellij will look for layouts
+// (Requires restart)
+// 
+// layout_dir "/tmp"
+ 
+// The folder in which Zellij will look for themes
+// (Requires restart)
+// 
+// theme_dir "/tmp"
+ 
+// Toggle enabling the mouse mode.
+// On certain configurations, or terminals this could
+// potentially interfere with copying text.
+// Options:
+//   - true (default)
+//   - false
+// 
+mouse_mode true
+mouse_scroll_resize false
+ 
+// Toggle having pane frames around the panes
+// Options:
+//   - true (default, enabled)
+//   - false
+// 
+// pane_frames false
+pane_frames true
+
+// The style of the pane frames when pane_frames is enabled.
+//
+// Options:
+//
+// "titles" (default) - a single title line above each pane
+// "full" - a full border around each pane (the pre-0.45.0 look)
+// "none" - no frames at all (identical to pane_frames false)
+pane_frame_style "titles"
+
+// Whether stacked panes display as a compact title list above the stack
+// Options:
+//   - true (default)
+//   - false (pre-0.45.0 behavior)
+//
+// stacked_pane_list false
+ 
+// When attaching to an existing session with other users,
+// should the session be mirrored (true)
+// or should each user have their own cursor (false)
+// (Requires restart)
+// Default: false
+// 
+// mirror_session true
+ 
+// Choose what to do when zellij receives SIGTERM, SIGINT, SIGQUIT or SIGHUP
+// eg. when terminal window with an active zellij session is closed
+// (Requires restart)
+// Options:
+//   - detach (Default)
+//   - quit
+// 
+// on_force_close "quit"
+ 
+// Configure the scroll back buffer size
+// This is the number of lines zellij stores for each pane in the scroll back
+// buffer. Excess number of lines are discarded in a FIFO fashion.
+// (Requires restart)
+// Valid values: positive integers
+// Default value: 10000
+// 
+// scroll_buffer_size 3000
+
+// ** COPY/PASTE COMMAND :: X11 (USING WL-COPY WON'T WORK)**
+// Provide a command to execute when copying text. The text will be piped to
+// the stdin of the program to perform the copy. This can be used with
+// terminal emulators which do not support the OSC 52 ANSI control sequence
+// that will be used by default if this option is not set.
+// Examples:
+//
+// copy_command "xclip -selection clipboard" // x11
+// copy_command "wl-copy"                    // wayland
+// copy_command "pbcopy"                     // osx
+// copy_command "pbcopy"
+// INFO : copy_command 를 주석처리한 이유는 명시적으로
+// OSC 52 를 사용하여 SSH 원격서버로 복붙 연동 가능케 하기 위함임
+// copy_command를 지정하지 않으면 
+// OSC 52를 기본 방식으로 사용하기 때문임
+ 
+// Choose the destination for copied text
+// Allows using the primary selection buffer (on x11/wayland) instead of the system clipboard.
+// Does not apply when using copy_command.
+// Options:
+//   - system (default)
+//   - primary
+// 
+// copy_clipboard "primary"
+copy_clipboard "system"
+ 
+// Enable automatic copying (and clearing) of selection when releasing mouse
+// Default: true
+// 
+copy_on_select true
+ 
+// Path to the default editor to use to edit pane scrollbuffer
+// Default: $EDITOR or $VISUAL
+// scrollback_editor "/usr/bin/vim"
+ 
+// A fixed name to always give the Zellij session.
+// Consider also setting `attach_to_session true,`
+// otherwise this will error if such a session exists.
+// Default: <RANDOM>
+// 
+// session_name "My singleton session"
+ 
+// When `session_name` is provided, attaches to that session
+// if it is already running or creates it otherwise.
+// Default: false
+// 
+// attach_to_session true
+ 
+// Toggle between having Zellij lay out panes according to a predefined set of layouts whenever possible
+// Options:
+//   - true (default)
+//   - false
+// 
+// auto_layout false
+ 
+// Whether sessions should be serialized to the cache folder (including their tabs/panes, cwds and running commands) so that they can later be resurrected
+// Options:
+//   - true (default)
+//   - false
+// 
+// session_serialization false
+ 
+// Whether pane viewports are serialized along with the session, default is false
+// Options:
+//   - true
+//   - false (default)
+// 
+// serialize_pane_viewport false
+ 
+// Scrollback lines to serialize along with the pane viewport when serializing sessions, 0
+// defaults to the scrollback size. If this number is higher than the scrollback size, it will
+// also default to the scrollback size. This does nothing if `serialize_pane_viewport` is not true.
+// 
+// scrollback_lines_to_serialize 10000
+ 
+// Enable or disable the rendering of styled and colored underlines (undercurl).
+// May need to be disabled for certain unsupported terminals
+// (Requires restart)
+// Default: true
+// 
+// styled_underlines false
+ 
+// How often in seconds sessions are serialized
+// 
+// serialization_interval 10000
+ 
+// Enable or disable writing of session metadata to disk (if disabled, other sessions might not know
+// metadata info on this session)
+// (Requires restart)
+// Default: false
+// 
+// disable_session_metadata false
+ 
+// Enable or disable support for the enhanced Kitty Keyboard Protocol (the host terminal must also support it)
+// (Requires restart)
+// Default: true (if the host terminal supports it)
+// 
+// support_kitty_keyboard_protocol false
+support_kitty_keyboard_protocol true
+
+// Enable or disable support for the Kitty Graphics Protocol, used to display images
+// (Requires restart)
+// Default: true (if the host terminal supports it)
+//
+// support_kitty_graphics_protocol false
+
+// Choose how to handle a nested Zellij session detected running inside a pane
+// Options:
+//   - ask (default)
+//   - fullscreen
+//   - descend
+//   - never
+//
+// nested_session_handling "ask"
+ 
+// Whether to stack panes when resizing beyond a certain size
+// Default: true
+// 
+// stacked_resize false
+
+// Whether scrolling a pane implicitly enters and exits Scroll mode
+// Default: true
+//
+// scroll_mode_sync false
+scroll_mode_sync false
+
+// Whether to enable mouse hover visual effects and pane grouping functionality
+// Default: true
+//
+// advanced_mouse_actions false
+
+// Whether Ctrl+ScrollWheel resizes panes
+// Default: true
+//
+// mouse_scroll_resize false
+
+// Whether to enable mouse hover visual effects
+// Default: true
+//
+// mouse_hover_effects false
+
+// Whether to show mouse hover help-text tips
+// Default: true
+//
+// mouse_hover_tips false
+
+// Whether triple-clicking inside command output marked by OSC 133 selects the
+// command and its output instead of the logical line
+// Default: true
+//
+// osc133_command_selection false
+
+// Characters that terminate a word when double-clicking to select it
+// Default: "[]{}<>()"
+//
+// word_separators "[]{}<>()"
+
+// Pin the session to a dark or light appearance when the host terminal does not
+// report its theme hue
+// Options: dark, light
+//
+// explicit_theme_hue "dark"
+ 
+// Whether to show tips on startup
+// Default: true
+// 
+show_startup_tips false
+ 
+// Whether to show release notes on first version run
+// Default: true
+// 
+// show_release_notes false
