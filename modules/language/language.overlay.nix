@@ -22,7 +22,13 @@ in {
   javaProjectJdk = projectJdk;
   javaToolingJdk = toolingJdk;
 
-  terraform = prev.terraform.overrideAttrs (_old: rec {
+  # Keep this recipe self-contained.  `overrideAttrs` inherits the current
+  # nixpkgs Terraform recipe, including its Go module layout.  The 1.15.2
+  # vendor hash was produced as a normal vendor tree, whereas recent nixpkgs
+  # Terraform uses a file GOPROXY (`proxyVendor = true`).  Mixing those two
+  # contracts yields a cache that is valid but unreadable by the final build.
+  terraform = prev.buildGoModule rec {
+    pname = "terraform";
     version = "1.15.2";
     src = prev.fetchFromGitHub {
       owner = "hashicorp";
@@ -30,8 +36,55 @@ in {
       rev = "v${version}";
       hash = "sha256-jwmyZJHGfi2oO8FBebPKBQdXt61w02H6zbbqSXxMhMM=";
     };
+
+    # This exact hash is a `go mod vendor` tree, not a Go proxy cache.
+    proxyVendor = false;
     vendorHash = "sha256-Gv6V5aXqTuQoG1StbD/7Ln2QrLpMsW6fbUJUkyZMkvk=";
-  });
+
+    # Keep Nix-provided provider wrappers discoverable without inheriting the
+    # moving patch set from the current nixpkgs Terraform package.
+    postPatch = ''
+      substituteInPlace internal/command/init_run.go \
+        --replace-fail $'\t"fmt"\n\t"strings"' $'\t"fmt"\n\t"os"\n\t"strings"' \
+        --replace-fail $'\tif c.forceInitCopy {\n\t\tc.migrateState = true\n\t}\n' $'\tif c.forceInitCopy {\n\t\tc.migrateState = true\n\t}\n\n\tif val, ok := os.LookupEnv("NIX_TERRAFORM_PLUGIN_DIR"); ok {\n\t\tinitArgs.PluginPath = append(initArgs.PluginPath, val)\n\t}\n'
+    '';
+
+    # Terraform's vendored speakeasy package hardcodes /bin/stty, which is
+    # absent on Nix hosts.  This runs after the checked vendor tree is copied
+    # into the build source, so it intentionally does not change vendorHash.
+    postConfigure = ''
+      substituteInPlace vendor/github.com/bgentry/speakeasy/speakeasy_unix.go \
+        --replace-fail "/bin/stty" "${prev.coreutils}/bin/stty"
+    '';
+
+    env.CGO_ENABLED = if stdenv.hostPlatform.isDarwin then "1" else "0";
+    ldflags = [
+      "-s"
+      "-w"
+      "-X 'github.com/hashicorp/terraform/version.dev=no'"
+    ];
+
+    nativeBuildInputs = [prev.installShellFiles];
+    postInstall = ''
+      installShellCompletion --bash --name terraform <(echo complete -C terraform terraform)
+    '';
+
+    preCheck = ''
+      export HOME=$TMPDIR
+      export TF_SKIP_REMOTE_TESTS=1
+    '';
+    subPackages = ["."];
+
+    __darwinAllowLocalNetworking = true;
+
+    meta = {
+      description = "Tool for building, changing, and versioning infrastructure";
+      homepage = "https://www.terraform.io/";
+      changelog = "https://github.com/hashicorp/terraform/blob/v${version}/CHANGELOG.md";
+      license = prev.lib.licenses.bsl11;
+      mainProgram = "terraform";
+    };
+  };
 
   # ---------------------------------------------------------------------------
   # Java tooling runtime
@@ -69,7 +122,7 @@ in {
 
   # Bear 4.2.3의 process-tree signal integration test는 Darwin builder에서
   # grandchild PID 기록 전에 타임아웃되는 비결정적 실패가 있다. 전체 check를
-  # 끄지 않고 해당 Cargo harness case만 Darwin에서 제외한다.
+  # 끄지 않고 해당 Cargo test case만 Darwin에서 제외한다.
   bear = prev.bear.overrideAttrs (old: {
     cargoTestFlags =
       (old.cargoTestFlags or [])

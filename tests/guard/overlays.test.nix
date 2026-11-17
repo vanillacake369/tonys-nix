@@ -26,5 +26,10 @@ in {
       && lib.hasInfix "libexec.dylib" languageOverlay
       && !(lib.hasInfix "bear = prev.bear.overrideAttrs (_: { doCheck = false;" languageOverlay)
     ))
+    (assert' "GIVEN Terraform 1.15.2 is pinned WHEN nixpkgs Terraform changes THEN the pin owns its Go vendor layout" (
+      lib.hasInfix "terraform = prev.buildGoModule rec {" languageOverlay
+      && lib.hasInfix "proxyVendor = false;" languageOverlay
+      && !(lib.hasInfix "terraform = prev.terraform.overrideAttrs" languageOverlay)
+    ))
   ];
 }
