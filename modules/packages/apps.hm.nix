@@ -19,7 +19,6 @@
       hunspellDicts.ko-kr
     ]
     ++ lib.optionals isDarwin [
-      aldente
       jankyborders
       appcleaner
       wezterm
