@@ -7,10 +7,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    tonys-agent-harness = {
-      url = "github:vanillacake369/tonys-agent-harness";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -27,7 +23,6 @@
     nixpkgs,
     nixpkgs-neovim,
     home-manager,
-    tonys-agent-harness,
     rust-overlay,
     ...
   }: let
@@ -44,7 +39,7 @@
     # 이 파일은 입력을 연결하는 조합 계층으로만 유지한다.
     overlays =
       (import ./lib/collect-flake-overlays.nix {
-        inherit lib nixpkgs-neovim rust-overlay tonys-agent-harness;
+        inherit lib nixpkgs-neovim rust-overlay;
       })
       ./modules;
 
@@ -52,7 +47,7 @@
 
     builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
-      homeManagerModules = [tonys-agent-harness.homeManagerModules.default ./home.nix];
+      homeManagerModules = [./home.nix];
     };
     mkImages = import ./lib/mk-images.nix {
       inherit lib nixpkgs;

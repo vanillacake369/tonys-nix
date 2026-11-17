@@ -2,7 +2,6 @@
   lib,
   nixpkgs-neovim,
   rust-overlay,
-  tonys-agent-harness,
 }: modulesDir: let
   # NOTE:
   #   overlay 순서는 package API의 일부다. toolchain provider overlay는 로컬
@@ -20,7 +19,7 @@
       nixpkgs-neovim.legacyPackages.${prev.stdenv.hostPlatform.system}.neovim-unwrapped;
   };
 in
-  [tonys-agent-harness.overlays.default rustToolchainOverlay]
+  [rustToolchainOverlay]
   ++ moduleOverlays
   ++ [
     pinnedNeovimOverlay
