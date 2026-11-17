@@ -23,8 +23,6 @@
       curl
       httpie
       openssl
-
-      # Terminal tools
       fastfetch
       expect
 
@@ -50,6 +48,9 @@
       ncdu
       lsof
       smartmontools
+
+      # Task tickets
+      jira-cli-go
     ]
     ++ lib.optionals isDarwin [
       # Mac-specific tools
