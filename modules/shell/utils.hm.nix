@@ -1,5 +1,4 @@
 # General CLI utilities and tools
-# Core utilities, terminal tools, recording, database clients, platform-specific services
 {
   pkgs,
   lib,
@@ -8,66 +7,81 @@
   isLinux,
   ...
 }: {
-  # =============================================================================
-  # General CLI Utilities
-  # =============================================================================
   home.packages = with pkgs;
     [
-      # Core utilities
+      # File & Search
       bat
+      fd
+      ripgrep
+      tree
+
+      # Data Processing & Text
+      dasel
       jq
       moreutils
-      ripgrep
-      fd
-      tree
+      yq
+
+      # Network & Web
       curl
       httpie
       openssl
-      fastfetch
-      expect
 
-      # Recording
-      asciinema
-      asciinema-agg
-      vhs
-      ffmpeg
+      # Code Analysis & Linters
+      actionlint
+      ast-grep
+      shellcheck
+      yamllint
 
-      # Database
-      redli
+      # Benchmarking & Performance
+      hyperfine
+      time
 
-      # Secrets
-      sops
-      age
-      ssh-to-age
-      gnupg
-
-      # Monitoring and debugging
-      htop
+      # System Monitoring & Disk
       btop
       dust
-      ncdu
+      fastfetch
+      htop
       lsof
+      ncdu
       smartmontools
 
-      # Task tickets
+      # Security & Secrets
+      age
+      gnupg
+      sops
+      ssh-to-age
+
+      # Media & Terminal Recording
+      asciinema
+      asciinema-agg
+      ffmpeg
+      vhs
+
+      # Database & Productivity
+      expect
       jira-cli-go
+      redli
+      usql
     ]
     ++ lib.optionals isDarwin [
-      # Mac-specific tools
+      # macOS-specific
       pngpaste
       terminal-notifier
     ]
     ++ lib.optionals (isLinux && !isWsl) [
-      # Native Linux only (not WSL)
+      # Native Linux only (excluding WSL)
       google-authenticator
       wayland-utils
     ]
     ++ lib.optionals isLinux [
-      # Linux-specific tools
-      # GDB has build issues on macOS and lldb is preferred there anyway
-      xclip
+      # Linux-specific (including WSL)
+      # GDB has build issues on macOS
+      # and lldb is preferred there anyway
       gdb
+      perf
+      semgrep
       psmisc
       strace
+      xclip
     ];
 }

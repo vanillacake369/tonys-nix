@@ -346,6 +346,12 @@ keybinds clear-defaults=true {
     }
 }
 
+// session manager 
+// inbox 비활성화
+attention {
+    enabled false
+}
+
 // Plugin aliases - can be used to change the implementation of Zellij
 // changing these requires a restart to take effect
 plugins {
@@ -375,10 +381,14 @@ load_plugins {
 //
 // simplified_ui true
  
+// NOTE : Zellij 0.46.0 부터 기본 색상 Theme 이 바뀌었음.
+// 기존 테마 사용을 위해 "classic" 으로 지정함
+// 2026.11.18
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
 // theme "dracula"
+theme "classic"
  
 // Choose the base input mode of zellij.
 // Default: normal

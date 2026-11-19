@@ -14,42 +14,23 @@
   ...
 }: let
   languages = {
-    bash = {
-      extensions = ["sh" "bash"];
-      packages = [
-        pkgs.bash-language-server
-        pkgs.shfmt
-        pkgs.shellcheck
-      ];
-      format = "shfmt -d";
-      lint = "shellcheck -f gcc";
-    };
-
+    # =========================================================================
+    # 1. General-Purpose & Systems Languages
+    # =========================================================================
     # Java 21 is kept as the project JDK and for the jdtls Neovim wrapper.
     java = {
       extensions = ["java"];
       packages = [
-        # Project/runtime
         pkgs.javaProjectJdk
         pkgs.gradle
         pkgs.maven
-        # LSP/tooling
         pkgs.jdt-language-server
         pkgs.google-java-format
         pkgs.lombok
-        # JDT LS debug/test bundles
         pkgs.vscode-extensions.vscjava.vscode-java-debug
         pkgs.vscode-extensions.vscjava.vscode-java-test
       ];
       format = "google-java-format --dry-run --set-exit-if-changed";
-    };
-
-    just = {
-      extensions = ["just"];
-      packages = [
-        pkgs.just
-        pkgs.just-lsp
-      ];
     };
 
     go = {
@@ -63,38 +44,6 @@
       ];
       format = "gofmt -l";
       diagnose = "go build ./...";
-    };
-
-    # NOTE :
-    # pkgs.gcc 를 추가하게되면
-    # clang-tools가 gcc를 찾지 못하는 문제가 발생한다
-    # NOTE :
-    # nvim-dap 의 C/C++ 설정 처리를 위해
-    # CodeLLDB adapter 제공을 하고자 vscode-lldb
-    # 를 추가해줘야한다
-    c = {
-      extensions = ["c" "h" "cpp" "hpp" "cc"];
-      packages = [
-        pkgs.clang-tools
-        pkgs.bear
-        pkgs.vscode-extensions.vadimcn.vscode-lldb
-      ];
-      format = "clang-format --dry-run --Werror";
-    };
-
-    lua = {
-      extensions = ["lua"];
-      packages = [
-        pkgs.lua54Packages.lua
-        pkgs.lua54Packages.luaunit
-        pkgs.lua54Packages.busted
-        pkgs.lua54Packages.mobdebug
-        pkgs.lua-language-server
-        pkgs.stylua
-        pkgs.selene
-      ];
-      format = "stylua --check";
-      lint = "selene";
     };
 
     rust = {
@@ -113,6 +62,18 @@
       format = "cargo fmt --check";
       lint = "cargo clippy -- -D warnings";
       diagnose = "cargo check";
+    };
+
+    # NOTE: pkgs.gcc 추가 시 clang-tools가 gcc를 찾지 못하는 문제 발생
+    # NOTE: nvim-dap C/C++ 디버깅(CodeLLDB)을 위해 vscode-lldb 포함
+    c = {
+      extensions = ["c" "h" "cpp" "hpp" "cc"];
+      packages = [
+        pkgs.clang-tools
+        pkgs.bear
+        pkgs.vscode-extensions.vadimcn.vscode-lldb
+      ];
+      format = "clang-format --dry-run --Werror";
     };
 
     python = {
@@ -138,6 +99,111 @@
       lint = "ruff check";
     };
 
+    typescript = {
+      extensions = ["ts" "tsx" "js" "jsx" "mjs" "cjs"];
+      packages = [
+        pkgs.nodejs_24
+        pkgs.typescript-language-server
+        pkgs.prettier
+        pkgs.biome
+        pkgs.pnpm
+        pkgs.vscode-js-debug
+      ];
+      format = "prettier --check";
+      diagnose = "tsc --noEmit";
+    };
+
+    lua = {
+      extensions = ["lua"];
+      packages = [
+        pkgs.lua54Packages.lua
+        pkgs.lua54Packages.luaunit
+        pkgs.lua54Packages.busted
+        pkgs.lua54Packages.mobdebug
+        pkgs.lua-language-server
+        pkgs.stylua
+        pkgs.selene
+      ];
+      format = "stylua --check";
+      lint = "selene";
+    };
+
+    # =========================================================================
+    # 2. Shell Scripting & Task Runners
+    # =========================================================================
+    bash = {
+      extensions = ["sh" "bash"];
+      packages = [
+        pkgs.bash-language-server
+        pkgs.shfmt
+        pkgs.shellcheck
+      ];
+      format = "shfmt -d";
+      lint = "shellcheck -f gcc";
+    };
+
+    just = {
+      extensions = ["just"];
+      packages = [
+        pkgs.just
+        pkgs.just-lsp
+      ];
+    };
+
+    go-task = {
+      extensions = [];
+      packages = [
+        pkgs.go-task
+      ];
+    };
+
+    # =========================================================================
+    # 3. Infrastructure, Containers & DevOps
+    # =========================================================================
+    terraform = {
+      extensions = ["tf" "tfvars"];
+      packages = [
+        pkgs.terraform
+        pkgs.terraform-ls
+        pkgs.tflint
+      ];
+      format = "terraform fmt -check";
+    };
+
+    pulumi = {
+      extensions = [];
+      packages = [
+        pkgs.pulumi
+      ];
+    };
+
+    ansible = {
+      extensions = [];
+      packages = [
+        pkgs.ansible
+      ];
+    };
+
+    docker = {
+      extensions = ["dockerfile"];
+      packages = [
+        pkgs.dockerfile-language-server
+        pkgs.docker-compose-language-service
+        pkgs.hadolint
+      ];
+      lint = "hadolint";
+    };
+
+    helm = {
+      extensions = [];
+      packages = [
+        pkgs.helm-ls
+      ];
+    };
+
+    # =========================================================================
+    # 4. Configuration, Data Formats & Markup
+    # =========================================================================
     nix = {
       extensions = ["nix"];
       packages = [
@@ -156,16 +222,8 @@
         pkgs.yamllint
         pkgs.yaml-language-server
         pkgs.yamlfmt
-        pkgs.helm-ls
       ];
       lint = "yamllint";
-    };
-
-    helm = {
-      extensions = [];
-      packages = [
-        pkgs.helm-ls
-      ];
     };
 
     toml = {
@@ -174,54 +232,6 @@
         pkgs.taplo
       ];
       format = "taplo fmt --check";
-    };
-
-    typescript = {
-      extensions = ["ts" "tsx" "js" "jsx" "mjs" "cjs"];
-      packages = [
-        pkgs.nodejs_24
-        pkgs.typescript-language-server
-        pkgs.prettier
-        pkgs.biome
-        pkgs.pnpm
-        pkgs.vscode-js-debug
-      ];
-      format = "prettier --check";
-      diagnose = "tsc --noEmit";
-    };
-
-    ansible = {
-      extensions = [];
-      packages = [
-        pkgs.ansible
-      ];
-    };
-
-    terraform = {
-      extensions = ["tf" "tfvars"];
-      packages = [
-        pkgs.terraform
-        pkgs.terraform-ls
-        pkgs.tflint
-      ];
-      format = "terraform fmt -check";
-    };
-
-    pulumi = {
-      extensions = ["yaml" "yml"];
-      packages = [
-        pkgs.pulumi
-      ];
-    };
-
-    docker = {
-      extensions = ["dockerfile"];
-      packages = [
-        pkgs.dockerfile-language-server
-        pkgs.docker-compose-language-service
-        pkgs.hadolint
-      ];
-      lint = "hadolint";
     };
 
     html = {
