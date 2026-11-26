@@ -119,9 +119,7 @@ _darwin-config mode="apply":
     fi
     printf '%s\n' "$selected"
 
-# Build the selected outputs and show their store paths without activation.
-# Nix may populate its store or cache, but this recipe does not change system
-# configuration, Home Manager files, or the machine-local host binding.
+# Preview selected output builds without activating or changing host binding.
 plan scope="all" profile="":
     #!/usr/bin/env bash
     set -euo pipefail
