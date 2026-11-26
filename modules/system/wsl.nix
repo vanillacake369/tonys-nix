@@ -1,4 +1,4 @@
-# WSL-specific settings (JetBrains keymap linking moved to packages/jetbrains.nix)
+# WSL-specific settings (JetBrains keymap linking lives in jetbrains.hm.nix)
 {
   lib,
   userProfile,
