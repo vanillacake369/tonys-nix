@@ -225,5 +225,5 @@
   # Just's native dynamic completion discovers the nearest justfile. The
   # additional candidates below are guarded by structural repository markers,
   # so tonys-nix vocabulary never leaks into unrelated directories.
-  home.file.".config/fish/completions/just.fish".source = ../../completions/just-tonys-nix.fish;
+  home.file.".config/fish/completions/just.fish".source = ../completions/just-tonys-nix.fish;
 }

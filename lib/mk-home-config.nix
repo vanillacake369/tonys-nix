@@ -30,6 +30,8 @@
         homeManagerModules
         ++ [
           {
+            programs.home-manager.enable = true;
+            targets.genericLinux.enable = systemConfig.isLinux;
             home.username = userProfile.username;
             home.homeDirectory =
               if systemConfig.isDarwin

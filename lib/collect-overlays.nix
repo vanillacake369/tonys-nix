@@ -1,8 +1,7 @@
 # Auto-discovers *.overlay.nix files under `dir` (recursive) and imports them.
-# Convention: place foo.overlay.nix next to foo.nix to declare the overlays
-# foo.nix's packages need. Symlinked dirs are not followed (readDir reports
+# Convention: place foo.overlay.nix in pkgs/. Symlinked dirs are not followed (readDir reports
 # them as "symlink"), keeping recursion cycle-safe.
-# Usage: (import ./collect-overlays.nix {inherit lib;}) ./modules → [ overlay ... ]
+# Usage: (import ./collect-overlays.nix {inherit lib;}) ./pkgs → [ overlay ... ]
 {
   lib,
   overlayArgs ? {},

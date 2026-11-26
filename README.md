@@ -48,9 +48,11 @@ just apply home         # Home Manager만 적용
 just check all          # 린트, 훅 테스트, flake 체크
 ```
 
-로그인 이름(`id -un`)과 일치하는 `user/<login>.nix`가 Git에 추적되어 있어야
-합니다. 없다면 기존 프로필을 복사해 `username` 등을 수정하고 `git add`한 뒤
-다시 실행하세요. 프로필 파일은 공개 Git 입력이므로 공개 가능한 값만 넣으세요.
+로그인 이름(`id -un`)에 대응하는 `nodes/<profile>.nix`가 Git에 추적되어
+있어야 합니다. `limjihoon` 로그인은 `nodes/personal.nix`를 사용하며 기존
+`hm-limjihoon-*` 출력도 유지합니다. 새 로그인은 같은 이름의 프로필 파일을
+추가하고 `username` 등을 수정한 뒤 `git add`하세요. 프로필 파일은 공개 Git
+입력이므로 공개 가능한 값만 넣으세요.
 
 적용 전에 빌드 결과를 보려면 Nix가 설치된 상태에서 `just plan`을 실행합니다.
 Nix가 없다면 먼저 `just setup nix`로 설치할 수 있습니다. 이 명령은
@@ -58,10 +60,17 @@ Nix가 없다면 먼저 `just setup nix`로 설치할 수 있습니다. 이 명�
 
 ## 구성의 소유권
 
+`nodes/`는 사용자와 기기의 진입점, `modules/`는 Home Manager와 NixOS 설정,
+`pkgs/`는 overlay를 담습니다. 공유 정책과 생성 함수는 `lib/`, 설정 원본은
+`dotfiles/`, 검증과 실행 명령은 각각 `tests/`와 `recipes/`에 둡니다.
+Home Manager 모듈은 `*.home.nix`, NixOS 모듈은 `*.nixos.nix` 이름으로
+자동 탐색합니다. 구조 변경의 근거와 검증 순서는
+[`docs/specs/flat-layout/`](docs/specs/flat-layout/design.md)에 기록했습니다.
+
 | 위치 | 관리하는 내용 | Git 공개 여부 |
 | --- | --- | --- |
-| `flake.nix`, `modules/`, `home.nix`, `hosts/*.nix` | 공통 설정과 공유 가능한 호스트 구성 | 추적 |
-| `user/*.nix` | 이름이 지정된 Home Manager 프로필 | 추적 |
+| `flake.nix`, `modules/`, `pkgs/`, `nodes/*.nixos.nix`, `nodes/*.darwin.nix` | 공통 설정과 공유 가능한 호스트 구성 | 추적 |
+| `nodes/<profile>.nix` | 이름이 지정된 Home Manager 프로필 | 추적 |
 | `$XDG_CONFIG_HOME/tonys-nix/hosts/<LocalHostName>/` | 이 Mac의 구성 바인딩과 선택적 `darwin.nix` | 저장소 밖 |
 | `/etc/nixos/hardware-configuration.nix` | 해당 NixOS 기기의 하드웨어 스캔 | 저장소 밖 |
 | 비밀번호·토큰·개인키 | 저장소 밖의 별도 자격증명 위치 | 이 flake에 입력하지 않음 |
@@ -108,7 +117,7 @@ AI Provider 설정은 별도의 [Tony's Agent Harness](https://github.com/vanill
 
 ## macOS 호스트와 기기 로컬 설정
 
-`hosts/tonys-mac.nix`는 공유할 Homebrew 앱과 시스템 기본값을 선언합니다.
+`nodes/tonys-mac.darwin.nix`는 공유할 Homebrew 앱과 시스템 기본값을 선언합니다.
 `just`는 명시한 `DARWIN_CONFIG`, 저장된 `config-name` 바인딩, macOS
 `LocalHostName`과 일치하는 구성 순서로 선택합니다. 바인딩이 없고 선언된
 구성이 하나뿐이면 대화형 적용에서 한 번 확인하며, 여러 구성이 있으면
@@ -158,7 +167,7 @@ DARWIN_CONFIG=tonys-mac just apply system
 
 `plan`은 바인딩을 만들지 않으며, 마지막 적용 명령이 바인딩을 저장합니다.
 `just`는 로컬 모듈을 nix-darwin에 전달하고, 순수 flake 체크에서는 로컬
-모듈을 생략합니다. 다른 공유 구성을 추가한다면 `hosts/<name>.nix`와
+모듈을 생략합니다. 다른 공유 구성을 추가한다면 `nodes/<name>.darwin.nix`와
 `flake.nix`의 `darwinConfigurations` 출력, 로컬 모듈 연결 조건을 함께
 추가하세요.
 

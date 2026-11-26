@@ -49,13 +49,13 @@
       (import ./lib/collect-flake-overlays.nix {
         inherit lib nixpkgs-neovim nixpkgs-java rust-overlay;
       })
-      ./modules;
+      ./pkgs;
 
     userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./nodes;
 
     builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
-      homeManagerModules = [./home.nix];
+      homeManagerModules = (import ./lib/discover-modules.nix {inherit lib;} ./modules).homeManager;
     };
     mkImages = import ./lib/mk-images.nix {
       inherit lib nixpkgs;

@@ -3,7 +3,7 @@
   nixpkgs-neovim,
   nixpkgs-java,
   rust-overlay,
-}: modulesDir: let
+}: overlaysDir: let
   # NOTE:
   #   overlay 순서는 package API의 일부다. toolchain provider overlay는 로컬
   #   module overlay보다 먼저 적용해 module package가 그 API를 쓸 수 있게 한다.
@@ -13,7 +13,7 @@
       inherit lib;
       overlayArgs = {inherit nixpkgs-java;};
     }
-    modulesDir;
+    overlaysDir;
   rustToolchainOverlay = import rust-overlay;
   pinnedNeovimOverlay = _final: prev: {
     neovim-unwrapped =

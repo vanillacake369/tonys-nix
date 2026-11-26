@@ -1,6 +1,6 @@
 # Time zone, internationalization, and input methods
 {pkgs, ...}: let
-  localePolicy = import ./locale-policy.nix;
+  localePolicy = import ../lib/locale-policy.nix;
 in {
   # Set your time zone.
   time.timeZone = "Asia/Seoul";

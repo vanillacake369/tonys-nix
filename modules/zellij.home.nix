@@ -13,7 +13,7 @@
   # Keys may be a canonical project path or its basename. Missing entries are
   # deliberately serialized as no override so Zellij uses default_layout.
   projectLayouts = {};
-  zellijConfig = import ../../lib/mk-zellij-config.nix {
+  zellijConfig = import ../lib/mk-zellij-config.nix {
     inherit isDarwin;
     fishPath = "${pkgs.fish}/bin/fish";
     pluginDir = zellijPluginDir;

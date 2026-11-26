@@ -14,24 +14,24 @@ in {
   results = [
     (assert' "GIVEN modules directory WHEN home-manager entrypoints are discovered THEN result is a list" (builtins.isList discovered.homeManager))
     (assert' "GIVEN modules directory WHEN home-manager entrypoints are discovered THEN real modules are present" (builtins.length discovered.homeManager >= 5))
-    (assert' "GIVEN home-manager discovery WHEN entrypoints are returned THEN all entries use hm suffix" (
-      builtins.all (p: lib.hasSuffix ".hm.nix" (toString p)) discovered.homeManager
+    (assert' "GIVEN home-manager discovery WHEN entrypoints are returned THEN all entries use home suffix" (
+      builtins.all (p: lib.hasSuffix ".home.nix" (toString p)) discovered.homeManager
     ))
     (assert' "GIVEN package modules WHEN home-manager entrypoints are discovered THEN fonts module is included" (
-      builtins.any (p: lib.hasSuffix "/modules/packages/fonts.hm.nix" (toString p)) discovered.homeManager
+      builtins.any (p: lib.hasSuffix "/modules/fonts.home.nix" (toString p)) discovered.homeManager
     ))
     (assert' "GIVEN system modules WHEN home-manager entrypoints are discovered THEN locale module is included" (
-      builtins.any (p: lib.hasSuffix "/modules/system/locale.hm.nix" (toString p)) discovered.homeManager
+      builtins.any (p: lib.hasSuffix "/modules/locale.home.nix" (toString p)) discovered.homeManager
     ))
     (assert' "GIVEN shell modules WHEN home-manager entrypoints are discovered THEN concrete shell modules are included" (
-      builtins.any (p: lib.hasSuffix "/modules/shell/fish.hm.nix" (toString p)) discovered.homeManager
-      && builtins.any (p: lib.hasSuffix "/modules/shell/nix-config.hm.nix" (toString p)) discovered.homeManager
-      && builtins.any (p: lib.hasSuffix "/modules/shell/zellij.hm.nix" (toString p)) discovered.homeManager
+      builtins.any (p: lib.hasSuffix "/modules/fish.home.nix" (toString p)) discovered.homeManager
+      && builtins.any (p: lib.hasSuffix "/modules/nix-settings.home.nix" (toString p)) discovered.homeManager
+      && builtins.any (p: lib.hasSuffix "/modules/zellij.home.nix" (toString p)) discovered.homeManager
     ))
     (assert' "GIVEN shell modules WHEN home-manager entrypoints are discovered THEN synthetic shell entrypoints stay removed" (
       builtins.all (p:
-        !(lib.hasSuffix "/modules/shell/shell.hm.nix" (toString p))
-        && !(lib.hasSuffix "/modules/shell/shell-module.hm.nix" (toString p)))
+        !(lib.hasSuffix "/modules/shell.home.nix" (toString p))
+        && !(lib.hasSuffix "/modules/shell-module.home.nix" (toString p)))
       discovered.homeManager
     ))
     (assert' "GIVEN modules directory WHEN nixos entrypoints are discovered THEN result is a list" (builtins.isList discovered.nixos))

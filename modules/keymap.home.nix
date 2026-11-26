@@ -5,13 +5,13 @@
   isDarwin,
   ...
 }: let
-  spec = builtins.fromTOML (builtins.readFile ./binds.toml);
+  spec = builtins.fromTOML (builtins.readFile ../dotfiles/keymap/binds.toml);
 
-  karabinerJson = import ./to-karabiner.nix {
+  karabinerJson = import ../lib/keymap-to-karabiner.nix {
     inherit lib spec;
   };
 
-  aerospaceToml = import ./to-aerospace.nix {
+  aerospaceToml = import ../lib/keymap-to-aerospace.nix {
     inherit lib spec;
   };
 

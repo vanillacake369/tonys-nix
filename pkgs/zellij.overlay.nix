@@ -1,6 +1,6 @@
 _final: prev: let
-  zellijNavRoot = ../../dotfiles/zellij/nav;
-  zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher;
+  zellijNavRoot = ../dotfiles/zellij/nav;
+  zellijNavSwitcherRoot = ../dotfiles/zellij/nav/wasm/switcher;
   cleanZellijSource = src: excludePrefixes:
     prev.lib.cleanSourceWith {
       inherit src;
@@ -21,14 +21,14 @@ in {
     pname = "zellij-nav";
     version = "0.1.0";
     src = cleanZellijSource zellijNavRoot ["target/" "wasm/"];
-    cargoLock.lockFile = ../../dotfiles/zellij/nav/Cargo.lock;
+    cargoLock.lockFile = ../dotfiles/zellij/nav/Cargo.lock;
   };
 
   zellij-nav-switcher = zellijWasmRustPlatform.buildRustPackage {
     pname = "zellij-nav-switcher";
     version = "0.1.0";
     src = cleanZellijSource zellijNavSwitcherRoot ["target/"];
-    cargoLock.lockFile = ../../dotfiles/zellij/nav/wasm/switcher/Cargo.lock;
+    cargoLock.lockFile = ../dotfiles/zellij/nav/wasm/switcher/Cargo.lock;
     nativeBuildInputs = [prev.pkg-config];
     buildInputs = [prev.openssl];
     OPENSSL_INCLUDE_DIR = "${prev.openssl.dev}/include";

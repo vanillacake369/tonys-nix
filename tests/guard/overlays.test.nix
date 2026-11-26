@@ -12,14 +12,14 @@
     }
     else throw "FAIL: ${name}";
 
-  collected = collectOverlays ../../modules;
-  appsOverlay = builtins.readFile ../../modules/packages/apps.overlay.nix;
-  fontsOverlay = builtins.readFile ../../modules/packages/fonts.overlay.nix;
-  languageOverlay = builtins.readFile ../../modules/language/language.overlay.nix;
+  collected = collectOverlays ../../pkgs;
+  appsOverlay = builtins.readFile ../../pkgs/apps.overlay.nix;
+  fontsOverlay = builtins.readFile ../../pkgs/fonts.overlay.nix;
+  languageOverlay = builtins.readFile ../../pkgs/language.overlay.nix;
   flake = builtins.readFile ../../flake.nix;
 in {
   results = [
-    (assert' "GIVEN modules directory WHEN overlays are collected THEN overlay files are discovered" (builtins.length collected > 0))
+    (assert' "GIVEN pkgs directory WHEN overlays are collected THEN overlay files are discovered" (builtins.length collected > 0))
     (assert' "GIVEN collected overlays WHEN each entry is evaluated THEN all entries are overlay functions" (builtins.all builtins.isFunction collected))
     (assert' "GIVEN module overlays WHEN repository overlays are collected THEN expected overlay count is stable" (builtins.length collected == 4))
     (assert' "GIVEN apps overlay WHEN font packages exist THEN apps overlay does not own Jetendard" (!(lib.hasInfix "jetendard" appsOverlay)))

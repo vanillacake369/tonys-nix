@@ -275,7 +275,7 @@ in {
       RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
     };
     packages = langPackages ++ commonTools;
-    file.".cargo/config.toml".source = ../../dotfiles/cargo/config.toml;
+    file.".cargo/config.toml".source = ../dotfiles/cargo/config.toml;
     file.".gradle/gradle.properties".text = ''
       org.gradle.daemon.idletimeout=300000
       # Gradle daemon 이 Java 21(jdtls runtime)으로 실행돼도 Nix store 의

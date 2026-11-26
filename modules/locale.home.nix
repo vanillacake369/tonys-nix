@@ -1,5 +1,5 @@
 let
-  localePolicy = import ./locale-policy.nix;
+  localePolicy = import ../lib/locale-policy.nix;
 in {
   home.sessionVariables = localePolicy.homeSessionVariables;
 }

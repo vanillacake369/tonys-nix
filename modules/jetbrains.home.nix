@@ -34,7 +34,7 @@ in {
     ]);
 
   home.file = lib.mkIf isDarwin {
-    ".ideavimrc".source = ../../dotfiles/jetbrains/ideavim/.ideavimrc;
+    ".ideavimrc".source = ../dotfiles/jetbrains/ideavim/.ideavimrc;
   };
 
   # NOTE:
@@ -52,9 +52,9 @@ in {
       else "${userProfile.windowsHome}/AppData/Roaming/JetBrains";
     sourceKeymap =
       if isDarwin
-      then "${../../dotfiles/jetbrains/keymap/Mac.xml}"
-      else "${../../dotfiles/jetbrains/keymap/Windows.xml}";
-    sourceIdeaVim = "${../../dotfiles/jetbrains/ideavim/.ideavimrc}";
+      then "${../dotfiles/jetbrains/keymap/Mac.xml}"
+      else "${../dotfiles/jetbrains/keymap/Windows.xml}";
+    sourceIdeaVim = "${../dotfiles/jetbrains/ideavim/.ideavimrc}";
   in
     lib.hm.dag.entryAfter ["writeBoundary"] ''
       SOURCE_KEYMAP="${sourceKeymap}"

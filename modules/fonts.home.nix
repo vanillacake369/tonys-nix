@@ -4,7 +4,7 @@
   isDarwin,
   ...
 }: let
-  fontPolicy = import ./font-policy.nix;
+  fontPolicy = import ../lib/font-policy.nix;
   jetendardFonts = "${pkgs.jetendard}/${fontPolicy.jetendard.packageFontDir}";
 in {
   # Font SSoT: Home Manager owns font links without adding font packages to ~/.nix-profile.

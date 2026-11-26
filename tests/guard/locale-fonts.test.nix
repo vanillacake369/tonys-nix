@@ -1,10 +1,10 @@
 {lib}: let
-  fontPolicy = import ../../modules/packages/font-policy.nix;
-  localePolicy = import ../../modules/system/locale-policy.nix;
-  appsHm = builtins.readFile ../../modules/packages/apps.hm.nix;
-  nixConfigHm = builtins.readFile ../../modules/shell/nix-config.hm.nix;
-  localeHm = builtins.readFile ../../modules/system/locale.hm.nix;
-  weztermHm = builtins.readFile ../../modules/packages/wezterm.hm.nix;
+  fontPolicy = import ../../lib/font-policy.nix;
+  localePolicy = import ../../lib/locale-policy.nix;
+  appsHm = builtins.readFile ../../modules/apps.home.nix;
+  nixConfigHm = builtins.readFile ../../modules/nix-settings.home.nix;
+  localeHm = builtins.readFile ../../modules/locale.home.nix;
+  weztermHm = builtins.readFile ../../modules/wezterm.home.nix;
   weztermTemplate = builtins.readFile ../../dotfiles/wezterm/wezterm.lua;
 
   assert' = name: cond:

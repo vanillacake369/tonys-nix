@@ -45,8 +45,9 @@ collection already take a directory parameter, while recipe path checks are loca
 
 ## TO-BE boundary and ownership
 
-`flake.nix` selects named nodes, asks `lib/mk-home-config.nix` to combine discovered
-Home Manager modules, and asks `lib/collect-flake-overlays.nix` for `pkgs/` overlays.
+`flake.nix` selects named nodes and discovered Home Manager modules, passes those
+modules to `lib/mk-home-config.nix`, and asks `lib/collect-flake-overlays.nix` for
+`pkgs/` overlays.
 `nodes/tony.nixos.nix` owns NixOS bootstrap and discovers NixOS modules.
 `nodes/tonys-mac.darwin.nix` owns the shared Darwin options. `nodes/personal.nix`
 keeps `username = "limjihoon"`; `lib/mk-home-entries.nix` exposes both the historical

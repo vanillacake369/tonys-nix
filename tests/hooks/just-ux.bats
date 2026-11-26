@@ -328,7 +328,7 @@ EOF
 
 @test "Fish completion is dynamic and repository scoped" {
   run rg -n "just-tonys-nix.fish" \
-    "$REPO_ROOT/modules/shell/fish.hm.nix" "$REPO_ROOT/recipes/setup.just"
+    "$REPO_ROOT/modules/fish.home.nix" "$REPO_ROOT/recipes/setup.just"
   [ "$status" -eq 0 ]
 
   run rg -n "__tonys_nix_just_context|__tonys_nix_just_at|JUST_COMPLETE=fish|collect-user-profiles.nix" \
@@ -336,7 +336,7 @@ EOF
   [ "$status" -eq 0 ]
 
   run rg -n "/Users/vpplab/dev/tonys-nix" \
-    "$REPO_ROOT/modules/shell/fish.hm.nix" "$REPO_ROOT/completions/just-tonys-nix.fish"
+    "$REPO_ROOT/modules/fish.home.nix" "$REPO_ROOT/completions/just-tonys-nix.fish"
   [ "$status" -eq 1 ]
 
   run fish -c "complete -e -c just; source '$REPO_ROOT/completions/just-tonys-nix.fish'; complete -C 'just setup '"

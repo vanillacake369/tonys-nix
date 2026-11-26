@@ -1,7 +1,7 @@
 MAC_SLEEP_TIME := "02:00:00"
 MAC_WAKE_TIME := "06:30:00"
 MAC_SCHEDULE_DAYS := "MTWRFSU"
-AEROSPACE_CONFIG_PATH := "modules/keymap"
+AEROSPACE_CONFIG_PATH := "dotfiles/keymap"
 # Synchronize managed applications for this host.
 sync domain action="guide":
     #!/usr/bin/env bash
@@ -102,7 +102,7 @@ reload-aerospace-if-needed:
       exit 0
     fi
 
-    if [[ -z "$(git status --porcelain -- "{{ AEROSPACE_CONFIG_PATH }}")" ]]; then
+    if [[ -z "$(git status --porcelain -- "{{ AEROSPACE_CONFIG_PATH }}" modules/keymap.home.nix lib/keymap-to-aerospace.nix lib/keymap-to-karabiner.nix)" ]]; then
       echo "[→] AeroSpace reload skipped - no git changes in {{ AEROSPACE_CONFIG_PATH }}"
       exit 0
     fi

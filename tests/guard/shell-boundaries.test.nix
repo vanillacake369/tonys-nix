@@ -1,8 +1,8 @@
 {lib}: let
-  utilsHm = builtins.readFile ../../modules/shell/utils.hm.nix;
-  gitHm = builtins.readFile ../../modules/shell/git.hm.nix;
-  zellijHm = builtins.readFile ../../modules/shell/zellij.hm.nix;
-  languageHm = builtins.readFile ../../modules/language/language.hm.nix;
+  utilsHm = builtins.readFile ../../modules/utils.home.nix;
+  gitHm = builtins.readFile ../../modules/git.home.nix;
+  zellijHm = builtins.readFile ../../modules/zellij.home.nix;
+  languageHm = builtins.readFile ../../modules/language.home.nix;
 
   assert' = name: cond:
     if cond
@@ -14,7 +14,7 @@
 in {
   results = [
     (assert' "shell boundaries: monitoring is a utility concern" (
-      !(builtins.pathExists ../../modules/shell/monitor.hm.nix)
+      !(builtins.pathExists ../../modules/monitor.home.nix)
       && builtins.all (package: lib.hasInfix package utilsHm) [
         "htop"
         "btop"

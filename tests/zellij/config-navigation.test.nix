@@ -14,8 +14,8 @@
     fishPath = "/nix/store/test-fish/bin/fish";
     pluginDir = "/Users/test/.config/zellij/plugins";
   };
-  zellijModule = builtins.readFile ../../modules/shell/zellij.hm.nix;
-  zellijOverlay = builtins.readFile ../../modules/shell/zellij.overlay.nix;
+  zellijModule = builtins.readFile ../../modules/zellij.home.nix;
+  zellijOverlay = builtins.readFile ../../pkgs/zellij.overlay.nix;
   panePicker = builtins.readFile ../../dotfiles/zellij/scripts/zellij-pane-picker;
   contextToggle = builtins.readFile ../../dotfiles/zellij/scripts/zellij-context-toggle;
   diagnoseContext = builtins.readFile ../../dotfiles/zellij/scripts/zellij-nav-diagnose-context;
@@ -237,7 +237,7 @@ in {
       && lib.hasInfix ''zellijWasmRustPlatform.buildRustPackage'' zellijOverlay
     ))
     (assert' "GIVEN zellij overlay WHEN rust packages are built THEN clean sources exclude build artifacts" (
-      lib.hasInfix ''zellijNavSwitcherRoot = ../../dotfiles/zellij/nav/wasm/switcher'' zellijOverlay
+      lib.hasInfix ''zellijNavSwitcherRoot = ../dotfiles/zellij/nav/wasm/switcher'' zellijOverlay
       && lib.hasInfix ''src = cleanZellijSource zellijNavRoot ["target/" "wasm/"]'' zellijOverlay
       && lib.hasInfix ''src = cleanZellijSource zellijNavSwitcherRoot ["target/"]'' zellijOverlay
     ))

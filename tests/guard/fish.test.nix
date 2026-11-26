@@ -1,5 +1,5 @@
 {lib}: let
-  fishHm = builtins.readFile ../../modules/shell/fish.hm.nix;
+  fishHm = builtins.readFile ../../modules/fish.home.nix;
 
   assert' = name: cond:
     if cond
