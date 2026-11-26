@@ -63,6 +63,8 @@
     };
 
     hostnames = ["tony"];
+    localDarwinConfig = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_CONFIG";
+    localDarwinModule = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_MODULE";
     collectTests = (import ./lib/collect-tests.nix {inherit lib;}) ./tests;
   in rec {
     nixosConfigurations = lib.genAttrs hostnames (_:
@@ -74,10 +76,12 @@
 
     darwinConfigurations."tonys-mac" = nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
-      modules = [
-        {nixpkgs.overlays = overlays;}
-        ./hosts/tonys-mac.nix
-      ];
+      modules =
+        [
+          {nixpkgs.overlays = overlays;}
+          ./hosts/tonys-mac.nix
+        ]
+        ++ lib.optional (localDarwinConfig == "tonys-mac" && localDarwinModule != "") (/. + localDarwinModule);
     };
 
     apps.aarch64-darwin.darwin-rebuild = {

@@ -71,13 +71,23 @@ added only when the current Git root has this repository's structural markers.
 
 ## macOS App Sync
 
-`hosts/tonys-mac.nix` declares this Mac's Homebrew taps, formulae, and casks.
-`just sync brew` applies the nix-darwin configuration matching the current
-macOS LocalHostName, or the only declared configuration if there is one.
-With multiple configurations and no match, set `DARWIN_CONFIG=<name>` when
-running `just` or `just apply system`. System activation prompts for `sudo`;
-`just` passes the login user to nix-darwin for Homebrew activation, and Home
-Manager runs as that user. Activation installs missing entries;
+`hosts/tonys-mac.nix` declares the shared Homebrew taps, formulae, and casks.
+`just` selects a nix-darwin configuration only when its name matches the macOS
+LocalHostName or a machine-local binding. On an unmatched Mac with one declared
+configuration, the first interactive run asks to bind it; for a non-interactive
+run, use `DARWIN_CONFIG=tonys-mac just` once. The binding is stored in
+`~/.config/tonys-nix/hosts/<LocalHostName>/config-name` (or under
+`$XDG_CONFIG_HOME/tonys-nix/hosts/`). `DARWIN_CONFIG` updates that binding.
+
+Machine-specific, non-secret nix-darwin options belong in an optional
+`darwin.nix` next to the binding file. For example, a local network privacy
+exception can be declared there using `system.defaults.CustomSystemPreferences`.
+`just` passes that file to nix-darwin; pure flake checks omit it. Do not put
+credentials in the local module: evaluated values can appear in the Nix store.
+
+System activation prompts for `sudo`; `just` passes the login user to
+nix-darwin for Homebrew activation, and Home Manager runs as that user.
+Activation installs missing entries;
 it does not remove unmanaged software or upgrade existing formulae and casks.
 
 ```bash
@@ -85,8 +95,8 @@ just sync brew
 ```
 
 The first activation uses the pinned nix-darwin `darwin-rebuild` app from the
-flake. The declared Homebrew baseline is host-specific; add a matching
-`darwinConfigurations` output and `hosts/<name>.nix` module for another Mac.
+flake. For another Mac with a different shared baseline, add a matching
+`darwinConfigurations` output and `hosts/<name>.nix` module.
 
 Raycast does not provide a supported headless configuration export/import CLI.
 The Raycast recipes only print the supported GUI workflow and verification

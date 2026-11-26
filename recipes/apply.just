@@ -9,6 +9,88 @@ _preflight-default:
     set -euo pipefail
     just _apply-validate "{{ SYSTEM_ARCH }}"
     just _home-profile-check "$(id -un)"
+    if [[ "{{ OS_TYPE }}" == darwin ]]; then
+      just _darwin-config >/dev/null
+    fi
+
+# Bind a macOS LocalHostName to a declared nix-darwin configuration.
+# An explicit DARWIN_CONFIG confirms a new or changed binding. An exact name
+# needs no binding; a single unmatched candidate prompts once on a terminal.
+[private]
+_darwin-config:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    local_host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
+    if [[ ! "$local_host" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+      echo "[x] Invalid macOS host name: $local_host" >&2
+      exit 2
+    fi
+
+    repo="{{ justfile_directory() }}"
+    config_base="${XDG_CONFIG_HOME:-$HOME/.config}"
+    if [[ "$config_base" != /* ]]; then
+      echo "[x] XDG_CONFIG_HOME must be an absolute path" >&2
+      exit 2
+    fi
+    local_dir="$config_base/tonys-nix/hosts/$local_host"
+    binding="$local_dir/config-name"
+    selected="${DARWIN_CONFIG:-}"
+    persist=false
+
+    if [[ -n "$selected" ]]; then
+      persist=true
+    elif [[ -f "$binding" ]]; then
+      selected="$(cat "$binding")"
+    elif [[ -f "$repo/hosts/$local_host.nix" ]]; then
+      selected="$local_host"
+    else
+      candidates=()
+      while IFS= read -r path; do
+        candidates+=("${path#hosts/}")
+      done < <(git -C "$repo" ls-files 'hosts/*.nix')
+      if (( ${#candidates[@]} == 1 )); then
+        selected="${candidates[0]%.nix}"
+        if [[ ! -t 0 ]]; then
+          echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
+          echo "    Bind it once: DARWIN_CONFIG=$selected just" >&2
+          exit 2
+        fi
+        printf '[?] Bind macOS host %s to nix-darwin configuration %s? [y/N] ' "$local_host" "$selected" >&2
+        answer=""
+        read -r answer </dev/tty || true
+        if [[ "$answer" != y && "$answer" != Y && "$answer" != yes && "$answer" != YES ]]; then
+          echo "[x] Host binding was not confirmed" >&2
+          exit 2
+        fi
+        persist=true
+      else
+        echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
+        if (( ${#candidates[@]} > 0 )); then
+          printf '    Available: %s\n' "${candidates[*]%.nix}" >&2
+        fi
+        echo "    Select one once with DARWIN_CONFIG=<name> just" >&2
+        exit 2
+      fi
+    fi
+
+    if [[ ! "$selected" =~ ^[a-zA-Z0-9_-]+$ ]] \
+      || [[ ! -f "$repo/hosts/$selected.nix" ]] \
+      || ! git -C "$repo" ls-files --error-unmatch -- "hosts/$selected.nix" >/dev/null 2>&1; then
+      echo "[x] Unknown nix-darwin configuration: $selected" >&2
+      exit 2
+    fi
+
+    if [[ "$persist" == true && "$selected" != "$local_host" ]]; then
+      mkdir -p "$local_dir"
+      chmod 700 "$local_dir"
+      temporary="$(mktemp "$local_dir/.config-name.XXXXXX")"
+      trap 'rm -f "$temporary"' EXIT
+      printf '%s\n' "$selected" > "$temporary"
+      chmod 600 "$temporary"
+      mv -f "$temporary" "$binding"
+      echo "[✓] Bound macOS host $local_host to $selected in $binding" >&2
+    fi
+    printf '%s\n' "$selected"
 
 # Apply the current login user's profile. Scopes: all, home, system.
 apply scope="all" profile="":
@@ -39,6 +121,9 @@ apply scope="all" profile="":
     if [[ "$scope" == all || "$scope" == home ]]; then
       [[ -n "$profile" ]] || profile="$(id -un)"
       target="$(just _home-target "$profile" "$system" {{ quote(OS_TYPE) }})"
+    fi
+    if [[ "{{ OS_TYPE }}" == darwin && ( "$scope" == all || "$scope" == system ) ]]; then
+      just _darwin-config >/dev/null
     fi
     if [[ "$scope" == all || "$scope" == system ]]; then
       just _apply-system "$system"
@@ -79,34 +164,30 @@ _apply-system target:
     #!/usr/bin/env bash
     set -euo pipefail
     if [[ "{{ OS_TYPE }}" == "darwin" ]]; then
-      host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
-      if [[ ! "$host" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-        echo "[x] Invalid macOS host name: $host" >&2
-        exit 2
-      fi
+      host="$(just _darwin-config)"
       if command -v jq >/dev/null 2>&1; then
         jq_cmd=(jq)
       else
         jq_cmd=(nix run nixpkgs#jq --)
       fi
       configurations="$(nix eval --json --no-update-lock-file .#darwinConfigurations --apply builtins.attrNames)"
-      requested="${DARWIN_CONFIG:-}"
-      if [[ -n "$requested" ]]; then
-        host="$("${jq_cmd[@]}" -r --arg name "$requested" 'if index($name) then $name else empty end' <<< "$configurations")"
-      else
-        host="$("${jq_cmd[@]}" -r --arg name "$host" 'if index($name) then $name elif length == 1 then .[0] else empty end' <<< "$configurations")"
-      fi
-      if [[ -z "$host" ]]; then
+      if ! "${jq_cmd[@]}" -e --arg name "$host" 'index($name) != null' <<< "$configurations" >/dev/null; then
         echo "[x] Cannot select a nix-darwin configuration. Available: $("${jq_cmd[@]}" -r 'join(", ")' <<< "$configurations")" >&2
-        echo "    Run with DARWIN_CONFIG=<name> just apply system" >&2
         exit 2
       fi
       echo "[→] nix-darwin configuration: $host"
+      local_host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
+      local_module="${XDG_CONFIG_HOME:-$HOME/.config}/tonys-nix/hosts/$local_host/darwin.nix"
+      if [[ ! -f "$local_module" ]]; then
+        local_module=""
+      else
+        echo "[→] Local nix-darwin module: $local_module"
+      fi
       login_user="$(id -un)"
       if command -v darwin-rebuild >/dev/null 2>&1; then
-        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "$(command -v darwin-rebuild)" switch --flake ".#$host" --impure
+        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "TONYS_NIX_DARWIN_LOCAL_CONFIG=$host" "TONYS_NIX_DARWIN_LOCAL_MODULE=$local_module" "$(command -v darwin-rebuild)" switch --flake ".#$host" --impure
       else
-        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "$(command -v nix)" run .#darwin-rebuild -- switch --flake ".#$host" --impure
+        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "TONYS_NIX_DARWIN_LOCAL_CONFIG=$host" "TONYS_NIX_DARWIN_LOCAL_MODULE=$local_module" "$(command -v nix)" run .#darwin-rebuild -- switch --flake ".#$host" --impure
       fi
       exit 0
     fi

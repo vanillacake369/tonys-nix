@@ -89,6 +89,7 @@ EOF
   run "${JUST[@]}" --dry-run _preflight-default
   [ "$status" -eq 0 ]
   [[ "$output" == *'just _home-profile-check "$(id -un)"'* ]]
+  [[ "$output" == *'just _darwin-config'* ]]
 }
 
 @test "bare just rejects an unknown login before bootstrap" {
