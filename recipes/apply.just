@@ -32,9 +32,14 @@ _nixos-hardware-check path="/etc/nixos/hardware-configuration.nix":
 # An explicit DARWIN_CONFIG confirms a new or changed binding. An exact name
 # needs no binding; a single unmatched candidate prompts once on a terminal.
 [private]
-_darwin-config:
+_darwin-config mode="apply":
     #!/usr/bin/env bash
     set -euo pipefail
+    mode={{ quote(mode) }}
+    case "$mode" in
+      apply|plan) ;;
+      *) echo "[x] Expected Darwin config mode: apply or plan" >&2; exit 2 ;;
+    esac
     local_host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
     if [[ ! "$local_host" =~ ^[a-zA-Z0-9_-]+$ ]]; then
       echo "[x] Invalid macOS host name: $local_host" >&2
@@ -53,7 +58,9 @@ _darwin-config:
     persist=false
 
     if [[ -n "$selected" ]]; then
-      persist=true
+      if [[ "$mode" == apply ]]; then
+        persist=true
+      fi
     elif [[ -f "$binding" ]]; then
       selected="$(cat "$binding")"
     elif [[ -f "$repo/hosts/$local_host.nix" ]]; then
@@ -65,6 +72,11 @@ _darwin-config:
       done < <(git -C "$repo" ls-files 'hosts/*.nix')
       if (( ${#candidates[@]} == 1 )); then
         selected="${candidates[0]%.nix}"
+        if [[ "$mode" == plan ]]; then
+          echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
+          echo "    Preview with: DARWIN_CONFIG=$selected just plan" >&2
+          exit 2
+        fi
         if [[ ! -t 0 ]]; then
           echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
           echo "    Bind it once: DARWIN_CONFIG=$selected just" >&2
@@ -106,6 +118,99 @@ _darwin-config:
       echo "[✓] Bound macOS host $local_host to $selected in $binding" >&2
     fi
     printf '%s\n' "$selected"
+
+# Build the selected outputs and show their store paths without activation.
+# Nix may populate its store or cache, but this recipe does not change system
+# configuration, Home Manager files, or the machine-local host binding.
+plan scope="all" profile="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    scope={{ quote(scope) }}
+    profile={{ quote(profile) }}
+    system={{ quote(SYSTEM_ARCH) }}
+    os={{ quote(OS_TYPE) }}
+
+    case "$scope" in
+      all|home|system) ;;
+      *) echo "[x] Expected: just plan {all|home|system} [profile]" >&2; exit 2 ;;
+    esac
+    if [[ "$scope" == system && -n "$profile" ]]; then
+      echo "[x] A profile applies only to Home Manager; use 'just plan system'" >&2
+      exit 2
+    fi
+    just _apply-validate "$system"
+    if ! command -v nix >/dev/null 2>&1; then
+      echo "[x] Nix is required for plan. Install it first with 'just setup nix'." >&2
+      exit 2
+    fi
+
+    home_target=""
+    if [[ "$scope" != system ]]; then
+      [[ -n "$profile" ]] || profile="$(id -un)"
+      home_target="$(just _home-target "$profile" "$system" "$os")"
+    fi
+
+    if [[ "$scope" != home && "$os" == nixos ]]; then
+      just _nixos-hardware-check
+      just _nixos-output-check "{{ HOSTNAME }}"
+    fi
+    if [[ "$scope" != home && "$os" == darwin ]]; then
+      host="$(just _darwin-config plan)"
+      configurations="$(nix eval --json --no-update-lock-file .#darwinConfigurations --apply builtins.attrNames)"
+      if command -v jq >/dev/null 2>&1; then
+        jq_cmd=(jq)
+      else
+        jq_cmd=(nix run nixpkgs#jq --)
+      fi
+      if ! "${jq_cmd[@]}" -e --arg name "$host" 'index($name) != null' <<< "$configurations" >/dev/null; then
+        echo "[x] No nix-darwin output for $host: $configurations" >&2
+        exit 2
+      fi
+    fi
+
+    if [[ "$scope" != home && "$os" == darwin ]]; then
+      local_host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
+      local_module="${XDG_CONFIG_HOME:-$HOME/.config}/tonys-nix/hosts/$local_host/darwin.nix"
+      [[ -f "$local_module" ]] || local_module=""
+      echo "[→] darwinConfigurations.$host"
+      TONYS_NIX_DARWIN_USER="$(id -un)" TONYS_NIX_DARWIN_LOCAL_CONFIG="$host" \
+        TONYS_NIX_DARWIN_LOCAL_MODULE="$local_module" \
+        nix build --print-out-paths --no-link --no-update-lock-file --impure \
+        ".#darwinConfigurations.${host}.system"
+    elif [[ "$scope" != home && "$os" == nixos ]]; then
+      echo "[→] nixosConfigurations.{{ HOSTNAME }}"
+      nix build --print-out-paths --no-link --no-update-lock-file --impure \
+        ".#nixosConfigurations.{{ HOSTNAME }}.config.system.build.toplevel"
+    elif [[ "$scope" == system ]]; then
+      echo "[✓] No system configuration for $os"
+    fi
+
+    if [[ -n "$home_target" ]]; then
+      echo "[→] homeConfigurations.$home_target"
+      nix build --print-out-paths --no-link --no-update-lock-file \
+        ".#homeConfigurations.${home_target}.activationPackage"
+    fi
+
+# Verify that the running NixOS hostname selects a declared output.
+[private]
+_nixos-output-check host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    host={{ quote(host) }}
+    if [[ ! "$host" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+      echo "[x] Invalid NixOS hostname: $host" >&2
+      exit 2
+    fi
+    configurations="$(nix eval --json --no-update-lock-file .#nixosConfigurations --apply builtins.attrNames)"
+    if command -v jq >/dev/null 2>&1; then
+      jq_cmd=(jq)
+    else
+      jq_cmd=(nix run nixpkgs#jq --)
+    fi
+    if ! "${jq_cmd[@]}" -e --arg name "$host" 'index($name) != null' <<< "$configurations" >/dev/null; then
+      echo "[x] No NixOS output for $host. Available: $("${jq_cmd[@]}" -r 'join(", ")' <<< "$configurations")" >&2
+      exit 2
+    fi
 
 # Apply the current login user's profile. Scopes: all, home, system.
 apply scope="all" profile="":
@@ -211,6 +316,7 @@ _apply-system target:
     fi
 
     just _nixos-hardware-check
+    just _nixos-output-check "{{ HOSTNAME }}"
 
     echo "[!] Applying NixOS system configuration"
     retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"
@@ -282,7 +388,7 @@ _home-target profile system os:
       jq_cmd=(nix run nixpkgs#jq --)
     fi
 
-    if ! nix eval --json .#homeConfigurations --apply builtins.attrNames 2>/dev/null \
+    if ! nix eval --json --no-update-lock-file .#homeConfigurations --apply builtins.attrNames 2>/dev/null \
       | "${jq_cmd[@]}" -e --arg target "$target" 'index($target) != null' >/dev/null; then
       echo "[x] Flake output not found: homeConfigurations.$target" >&2
       echo "    Ensure user/${profile}.nix declares username = \"${profile}\"." >&2

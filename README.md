@@ -24,6 +24,7 @@ For an existing checkout:
 
 ```bash
 just                    # run core checks, then apply the login user's profile
+just plan               # resolve and build targets without activating them
 just apply home         # apply only Home Manager
 just check all          # run lint, hook, and flake checks without applying
 ```
@@ -44,6 +45,13 @@ before it bootstraps or activates anything. Generate and review that file on
 the target machine before the first run. The placeholder hardware values used
 for cross-platform flake evaluation are never accepted by the apply path.
 
+`just plan [all|home|system] [profile]` validates the selected outputs and
+builds them without `sudo`, system activation, Home Manager activation, or
+writing a macOS host binding. It prints the selected flake outputs and store
+paths. Builds can populate the Nix store and cache. This previews buildability,
+not a Terraform-style resource diff. On a new Mac, use
+`DARWIN_CONFIG=tonys-mac just plan` to preview before binding the host.
+
 ## Architecture In 60 Seconds
 
 ```text
@@ -61,6 +69,7 @@ so they can be restored deliberately if the project is resumed.
 
 ```bash
 just                              # prepare core runtime, check core, then apply all
+just plan [all|home|system] [profile] # validate and build without activation
 just apply [all|home|system] [profile] # default profile: current login user
 just check [all|core|flake|hooks|lint]
 just setup <all|nix|home|mac|completions>

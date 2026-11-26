@@ -118,14 +118,17 @@ EOF
   cat > "$BATS_TEST_TMPDIR/bin/just" <<'EOF'
 #!/usr/bin/env bash
 if [[ "$1" == _bootstrap-core ]]; then echo "unexpected bootstrap"; exit 99; fi
+if [[ "$1" == _nixos-hardware-check ]]; then
+  exec "$REAL_JUST" --justfile "$REPO_ROOT/justfile" _nixos-hardware-check "$MISSING_HARDWARE"
+fi
 if [[ "$1" == --justfile ]]; then exec "$REAL_JUST" "$@"; fi
 exec "$REAL_JUST" --justfile "$REPO_ROOT/justfile" --set OS_TYPE nixos "$@"
 EOF
   chmod +x "$BATS_TEST_TMPDIR/bin/just"
 
   run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
-    REPO_ROOT="$REPO_ROOT" "${JUST[@]}" --set OS_TYPE nixos _nixos-hardware-check \
-    "$BATS_TEST_TMPDIR/missing.nix"
+    REPO_ROOT="$REPO_ROOT" MISSING_HARDWARE="$BATS_TEST_TMPDIR/missing.nix" \
+    "${JUST[@]}" --set OS_TYPE nixos _preflight-default
   [ "$status" -eq 2 ]
   [[ "$output" == *"nixos-generate-config"* ]]
   [[ "$output" != *"unexpected bootstrap"* ]]
@@ -248,6 +251,57 @@ EOF
   run "${JUST[@]}" apply system vpplab
   [ "$status" -eq 2 ]
   [[ "$output" == *"profile applies only to Home Manager"* ]]
+}
+
+@test "plan builds selected Darwin outputs without sudo activation or a host binding write" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/scutil" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' work-mac
+EOF
+  cat > "$BATS_TEST_TMPDIR/bin/nix" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$NIX_CALLS"
+case "$*" in
+  *darwinConfigurations*attrNames*) printf '%s\n' '["tonys-mac"]' ;;
+  *homeConfigurations*attrNames*) printf '%s\n' '["hm-vpplab-aarch64-darwin"]' ;;
+  *'build '*) printf '%s\n' /nix/store/plan-result ;;
+esac
+EOF
+  cat > "$BATS_TEST_TMPDIR/bin/sudo" <<'EOF'
+#!/usr/bin/env bash
+echo 'unexpected sudo'
+exit 99
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/"*
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" NIX_CALLS="$BATS_TEST_TMPDIR/nix-calls" \
+    XDG_CONFIG_HOME="$BATS_TEST_TMPDIR/config" DARWIN_CONFIG=tonys-mac \
+    "${JUST[@]}" --set OS_TYPE darwin --set SYSTEM_ARCH aarch64-darwin plan all vpplab
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"darwinConfigurations.tonys-mac"* ]]
+  [[ "$output" == *"homeConfigurations.hm-vpplab-aarch64-darwin"* ]]
+  [[ "$output" != *"unexpected sudo"* ]]
+  [ ! -e "$BATS_TEST_TMPDIR/config/tonys-nix/hosts/work-mac/config-name" ]
+  run cat "$BATS_TEST_TMPDIR/nix-calls"
+  [[ "$output" == *'build '*'.#darwinConfigurations.tonys-mac.system'* ]]
+  [[ "$output" == *'build '*'.#homeConfigurations.hm-vpplab-aarch64-darwin.activationPackage'* ]]
+}
+
+@test "NixOS output validation rejects an unknown host before rebuild" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/nix" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' '["tony"]'
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/nix"
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" "${JUST[@]}" _nixos-output-check other-host
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"No NixOS output for other-host"* ]]
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" "${JUST[@]}" _nixos-output-check tony
+  [ "$status" -eq 0 ]
 }
 
 @test "public namespaces validate their subcommands" {

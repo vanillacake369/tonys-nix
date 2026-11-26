@@ -58,6 +58,27 @@ EOF
   [ "$output" = tonys-mac ]
 }
 
+@test "Darwin plan can select an explicit config without persisting a binding" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/scutil" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' work-mac
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/scutil"
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" XDG_CONFIG_HOME="$BATS_TEST_TMPDIR/config" \
+    DARWIN_CONFIG=tonys-mac just --justfile "$REPO_ROOT/justfile" _darwin-config plan
+  [ "$status" -eq 0 ]
+  [ "$output" = tonys-mac ]
+  [ ! -e "$BATS_TEST_TMPDIR/config/tonys-nix/hosts/work-mac/config-name" ]
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" XDG_CONFIG_HOME="$BATS_TEST_TMPDIR/config" \
+    just --justfile "$REPO_ROOT/justfile" _darwin-config plan
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"DARWIN_CONFIG=tonys-mac just plan"* ]]
+  [ ! -e "$BATS_TEST_TMPDIR/config/tonys-nix/hosts/work-mac/config-name" ]
+}
+
 @test "bare just stops before bootstrap on an unbound Darwin host" {
   mkdir "$BATS_TEST_TMPDIR/bin"
   cat > "$BATS_TEST_TMPDIR/bin/scutil" <<'EOF'
