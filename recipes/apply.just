@@ -11,6 +11,21 @@ _preflight-default:
     just _home-profile-check "$(id -un)"
     if [[ "{{ OS_TYPE }}" == darwin ]]; then
       just _darwin-config >/dev/null
+    elif [[ "{{ OS_TYPE }}" == nixos ]]; then
+      just _nixos-hardware-check
+    fi
+
+# A real NixOS machine must provide its own hardware scan before any setup.
+[private]
+_nixos-hardware-check path="/etc/nixos/hardware-configuration.nix":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    hardware={{ quote(path) }}
+    if [[ ! -f "$hardware" || ! -r "$hardware" ]]; then
+      echo "[x] Missing readable NixOS hardware configuration: $hardware" >&2
+      echo "    On this machine, run: sudo nixos-generate-config --show-hardware-config | sudo tee /etc/nixos/hardware-configuration.nix >/dev/null" >&2
+      echo "    Review /etc/nixos/hardware-configuration.nix before retrying." >&2
+      exit 2
     fi
 
 # Bind a macOS LocalHostName to a declared nix-darwin configuration.
@@ -195,12 +210,7 @@ _apply-system target:
       exit 0
     fi
 
-    echo "[!] Checking NixOS hardware configuration"
-    if [[ ! -f /etc/nixos/hardware-configuration.nix ]]; then
-      echo "[!] Generating /etc/nixos/hardware-configuration.nix"
-      sudo nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
-      echo "[✓] Generated /etc/nixos/hardware-configuration.nix"
-    fi
+    just _nixos-hardware-check
 
     echo "[!] Applying NixOS system configuration"
     retry_threshold="{{ APPLY_RETRY_THRESHOLD }}"

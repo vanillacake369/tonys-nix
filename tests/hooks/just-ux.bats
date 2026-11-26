@@ -113,6 +113,35 @@ EOF
   [[ "$output" != *"unexpected bootstrap"* ]]
 }
 
+@test "NixOS hardware preflight fails before bootstrap and never generates a configuration" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/just" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$1" == _bootstrap-core ]]; then echo "unexpected bootstrap"; exit 99; fi
+if [[ "$1" == --justfile ]]; then exec "$REAL_JUST" "$@"; fi
+exec "$REAL_JUST" --justfile "$REPO_ROOT/justfile" --set OS_TYPE nixos "$@"
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/just"
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
+    REPO_ROOT="$REPO_ROOT" "${JUST[@]}" --set OS_TYPE nixos _nixos-hardware-check \
+    "$BATS_TEST_TMPDIR/missing.nix"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"nixos-generate-config"* ]]
+  [[ "$output" != *"unexpected bootstrap"* ]]
+
+  printf '%s\n' '{}' > "$BATS_TEST_TMPDIR/hardware.nix"
+  run "${JUST[@]}" --set OS_TYPE nixos _nixos-hardware-check \
+    "$BATS_TEST_TMPDIR/hardware.nix"
+  [ "$status" -eq 0 ]
+
+  run "${JUST[@]}" --dry-run _preflight-default
+  [[ "$output" == *'_nixos-hardware-check'* ]]
+  run "${JUST[@]}" --dry-run _apply-system x86_64-linux
+  [[ "$output" == *'_nixos-hardware-check'* ]]
+  [[ "$output" != *'sudo nixos-generate-config'* ]]
+}
+
 @test "core checks bootstrap runtime before lint and guard contracts" {
   run "${JUST[@]}" --dry-run check core
   [ "$status" -eq 0 ]

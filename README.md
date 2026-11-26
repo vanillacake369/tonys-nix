@@ -39,6 +39,11 @@ implicit default profile. Run the repository-level `just` command without
 `sudo`. A missing or untracked profile is rejected before activation with
 creation or `git add` guidance.
 
+On NixOS, `just` requires a readable `/etc/nixos/hardware-configuration.nix`
+before it bootstraps or activates anything. Generate and review that file on
+the target machine before the first run. The placeholder hardware values used
+for cross-platform flake evaluation are never accepted by the apply path.
+
 ## Architecture In 60 Seconds
 
 ```text
