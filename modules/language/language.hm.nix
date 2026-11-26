@@ -163,9 +163,16 @@
     terraform = {
       extensions = ["tf" "tfvars"];
       packages = [
+        pkgs.opentofu
         pkgs.terraform
+        pkgs.terragrunt
         pkgs.terraform-ls
         pkgs.tflint
+        pkgs.tftui
+        pkgs.tenv
+        pkgs.tflint
+        pkgs.trivy
+        pkgs.infracost
       ];
       format = "terraform fmt -check";
     };
