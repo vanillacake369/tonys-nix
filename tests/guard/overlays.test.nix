@@ -1,5 +1,8 @@
 {lib}: let
-  collectOverlays = import ../../lib/collect-overlays.nix {inherit lib;};
+  collectOverlays = import ../../lib/collect-overlays.nix {
+    inherit lib;
+    overlayArgs = {nixpkgs-java = {};};
+  };
 
   assert' = name: cond:
     if cond
@@ -13,6 +16,7 @@
   appsOverlay = builtins.readFile ../../modules/packages/apps.overlay.nix;
   fontsOverlay = builtins.readFile ../../modules/packages/fonts.overlay.nix;
   languageOverlay = builtins.readFile ../../modules/language/language.overlay.nix;
+  flake = builtins.readFile ../../flake.nix;
 in {
   results = [
     (assert' "GIVEN modules directory WHEN overlays are collected THEN overlay files are discovered" (builtins.length collected > 0))
@@ -30,6 +34,12 @@ in {
       lib.hasInfix "terraform = prev.buildGoModule rec {" languageOverlay
       && lib.hasInfix "proxyVendor = false;" languageOverlay
       && !(lib.hasInfix "terraform = prev.terraform.overrideAttrs" languageOverlay)
+    ))
+    (assert' "GIVEN Java runtimes WHEN overlays are read THEN Temurin and Darwin Corretto meet the security floor" (
+      lib.hasInfix "temurin.temurin-bin-17" languageOverlay
+      && lib.hasInfix "temurin.temurin-bin-25" languageOverlay
+      && lib.hasInfix "17.0.21.1.2" languageOverlay
+      && lib.hasInfix "2786a2a72088ecf32aea5b3ec52099e6a7cff78f" flake
     ))
   ];
 }

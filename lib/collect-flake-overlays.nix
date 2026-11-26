@@ -1,6 +1,7 @@
 {
   lib,
   nixpkgs-neovim,
+  nixpkgs-java,
   rust-overlay,
 }: modulesDir: let
   # NOTE:
@@ -10,7 +11,7 @@
   moduleOverlays =
     import ./collect-overlays.nix {
       inherit lib;
-      overlayArgs = {};
+      overlayArgs = {inherit nixpkgs-java;};
     }
     modulesDir;
   rustToolchainOverlay = import rust-overlay;

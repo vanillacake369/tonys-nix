@@ -17,11 +17,19 @@
     # 동작이 한 번에 움직인다. 이 SHA는 의도적인 release valve이므로 bump는
     # editor smoke test와 함께 URL을 바꾸는 작업으로 취급한다.
     nixpkgs-neovim.url = "github:nixos/nixpkgs/d86da6ff1a3db2d1e667684c6f34c21896767b3e";
+    # Temurin 보안 릴리스가 기본 nixpkgs에 반영될 때까지 Java 패키지만 고정한다.
+    nixpkgs-java.url = "github:nixos/nixpkgs/2786a2a72088ecf32aea5b3ec52099e6a7cff78f";
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
     nixpkgs,
     nixpkgs-neovim,
+    nixpkgs-java,
+    nix-darwin,
     home-manager,
     rust-overlay,
     ...
@@ -39,7 +47,7 @@
     # 이 파일은 입력을 연결하는 조합 계층으로만 유지한다.
     overlays =
       (import ./lib/collect-flake-overlays.nix {
-        inherit lib nixpkgs-neovim rust-overlay;
+        inherit lib nixpkgs-neovim nixpkgs-java rust-overlay;
       })
       ./modules;
 

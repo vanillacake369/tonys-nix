@@ -79,7 +79,6 @@
       # and lldb is preferred there anyway
       gdb
       perf
-      semgrep
       psmisc
       strace
       xclip

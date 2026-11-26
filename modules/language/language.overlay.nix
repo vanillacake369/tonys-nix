@@ -1,5 +1,6 @@
-_final: prev: let
+{nixpkgs-java}: _final: prev: let
   inherit (prev) stdenv;
+  temurin = nixpkgs-java.legacyPackages.${stdenv.hostPlatform.system};
 
   # ---------------------------------------------------------------------------
   # Java Runtime Policy
@@ -11,12 +12,6 @@ _final: prev: let
   # - projectJdk : 프로젝트 빌드 및 실행용 Java 17 (17.0.21.1 이상)
   # - toolingJdk : jdtls, formatter, lombok 등 에디터 도구 전용 Java 25 (25.0.5.1 이상)
   # 둘을 하나로 합치면 프로젝트 호환성이나 에디터 진단 중 하나가 깨지므로 별도로 유지한다.
-  # NOTE :
-  # 나중에 temurin 보안 패치되면 아래 주석을 해제,
-  # projectJdk 와 toolingJdk 를 temurin 로 통합
-  # projectJdk = prev.temurin-bin-17;
-  # toolingJdk = prev.temurin-bin-25;
-
   mkCorretto = major: version: hash:
     prev.stdenvNoCC.mkDerivation {
       pname = "amazon-corretto-${major}";
@@ -62,12 +57,13 @@ _final: prev: let
     };
 
   projectJdk =
-    mkCorretto "17" "17.0.21.1.2"
-    "sha256-ER90OACVjksBP0alPH+G3UOggVoMqEB6Uu1pnS2FW2A=";
+    if stdenv.hostPlatform.isDarwin
+    then
+      mkCorretto "17" "17.0.21.1.2"
+      "sha256-ER90OACVjksBP0alPH+G3UOggVoMqEB6Uu1pnS2FW2A="
+    else temurin.temurin-bin-17;
 
-  toolingJdk =
-    mkCorretto "25" "25.0.5.1.2"
-    "sha256-6B5xw3WuObhfUJ0x0X507cjk/XJ3w3XHtLd/4m9z8jM=";
+  toolingJdk = temurin.temurin-bin-25;
 in {
   # Home Manager 셸 환경 및 도구 래퍼에서 소비할 역할별 JDK 노출
   javaProjectJdk = projectJdk;
