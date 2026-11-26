@@ -8,8 +8,14 @@ sync domain action="guide":
     case {{ quote(domain) }} in
       brew)
         case {{ quote(action) }} in
-          guide|sync) just apply system ;;
-          *) echo "[x] Usage: just sync brew sync" >&2; exit 2 ;;
+          guide|sync)
+            if [[ "{{ OS_TYPE }}" != darwin ]]; then
+              echo "[x] Homebrew sync requires macOS" >&2
+              exit 1
+            fi
+            just apply system
+            ;;
+          *) echo "[x] Usage: just sync brew" >&2; exit 2 ;;
         esac
         ;;
       raycast)

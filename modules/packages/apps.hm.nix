@@ -21,7 +21,6 @@
     ++ lib.optionals isDarwin [
       jankyborders
       appcleaner
-      wezterm
       aerospace
       hidden-bar
     ];

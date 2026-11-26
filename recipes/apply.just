@@ -69,6 +69,10 @@ _apply-system target:
     set -euo pipefail
     if [[ "{{ OS_TYPE }}" == "darwin" ]]; then
       host="$(scutil --get LocalHostName 2>/dev/null || hostname -s)"
+      if [[ ! "$host" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        echo "[x] Invalid macOS host name: $host" >&2
+        exit 2
+      fi
       echo "[→] nix-darwin host: $host"
       if command -v darwin-rebuild >/dev/null 2>&1; then
         darwin-rebuild switch --flake ".#$host"

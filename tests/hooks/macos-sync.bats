@@ -4,49 +4,38 @@ setup() {
   REPO_ROOT="$BATS_TEST_DIRNAME/../.."
 }
 
-@test "Brewfile contains the shared Mac baseline" {
-  run sed -n '1,120p' "$REPO_ROOT/Brewfile"
+@test "nix-darwin declares the current host Homebrew baseline" {
+  run sed -n '1,160p' "$REPO_ROOT/hosts/tonys-mac.nix"
   [ "$status" -eq 0 ]
-  [[ "$output" == *'brew "just"'* ]]
-  [[ "$output" == *'brew "tailscale"'* ]]
-  [[ "$output" == *'cask "brave-browser"'* ]]
-  [[ "$output" == *'cask "raycast"'* ]]
+  [[ "$output" == *'"just"'* ]]
+  [[ "$output" == *'name = "tailscale"'* ]]
+  [[ "$output" == *'"brave-browser"'* ]]
+  [[ "$output" == *'"raycast"'* ]]
+  [[ "$output" == *'"wezterm"'* ]]
+  [[ "$output" == *'cleanup = "none"'* ]]
 }
 
-@test "brew import is additive and skips upgrades" {
-  run just --justfile "$REPO_ROOT/justfile" --dry-run brew import
+@test "brew sync applies the current nix-darwin host" {
+  run just --justfile "$REPO_ROOT/justfile" --dry-run sync brew
   [ "$status" -eq 0 ]
-  [[ "$output" == *"_brew-import"* ]]
+  [[ "$output" == *"just apply system"* ]]
 
-  run just --justfile "$REPO_ROOT/justfile" --dry-run _brew-import local
+  run just --justfile "$REPO_ROOT/justfile" --dry-run _apply-system aarch64-darwin
   [ "$status" -eq 0 ]
-  [[ "$output" == *"brew bundle install"* ]]
-  [[ "$output" == *"--no-upgrade"* ]]
-  [[ "$output" != *"bundle cleanup"* ]]
+  [[ "$output" == *"scutil --get LocalHostName"* ]]
+  [[ "$output" == *'nix run .#darwin-rebuild'* ]]
 
-  run just --justfile "$REPO_ROOT/justfile" --dry-run \
-    _brew-import user@example-host
-  [ "$status" -eq 0 ]
-  [[ "$output" == *'target='*'user@example-host'* ]]
-  [[ "$output" == *'tailscale ssh "$target"'* ]]
+  run just --justfile "$REPO_ROOT/justfile" --set OS_TYPE linux sync brew
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"Homebrew sync requires macOS"* ]]
 }
 
-@test "Brew remote targets are arguments instead of host magic values" {
-  run rg -n "tonys-mac-air|vpp-mac-pro|limjihoon@|/Users/limjihoon" \
-    "$REPO_ROOT/justfile"
-  [ "$status" -eq 1 ]
-
-  run rg -n "RAYCAST_AIR_HOST|SOPS_AGE_AIR_HOST|SOPS_AGE_REMOTE_FILE" \
-    "$REPO_ROOT/justfile"
-  [ "$status" -eq 1 ]
-
-  run just --justfile "$REPO_ROOT/justfile" _brew-check "-bad"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Invalid Brew target"* ]]
-
-  run just --justfile "$REPO_ROOT/justfile" _brew-import "bad target"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Invalid Brew target"* ]]
+@test "brew sync no longer exposes remote Brewfile operations" {
+  run just --justfile "$REPO_ROOT/justfile" --list
+  [ "$status" -eq 0 ]
+  [[ "$output" != *"_brew-export"* ]]
+  [[ "$output" != *"_brew-import"* ]]
+  [[ "$output" != *"_brew-check"* ]]
 }
 
 @test "Raycast commands only print the supported GUI workflow" {
@@ -70,10 +59,9 @@ setup() {
   run just --justfile "$REPO_ROOT/justfile" --list
   [ "$status" -eq 0 ]
   [[ "$output" == *'sync domain action="guide"'* ]]
-  [[ "$output" != *"brew action"* ]]
   [[ "$output" != *'raycast action="guide"'* ]]
 
   run rg -n "configurationExport|_raycast-(export|import|status)|open -a Raycast" \
-    "$REPO_ROOT/justfile"
+    "$REPO_ROOT/recipes/sync.just"
   [ "$status" -eq 1 ]
 }

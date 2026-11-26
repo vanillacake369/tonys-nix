@@ -72,6 +72,19 @@
         modules = [./configuration.nix];
       });
 
+    darwinConfigurations."tonys-mac" = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      modules = [
+        {nixpkgs.overlays = overlays;}
+        ./hosts/tonys-mac.nix
+      ];
+    };
+
+    apps.aarch64-darwin.darwin-rebuild = {
+      type = "app";
+      program = "${nix-darwin.packages.aarch64-darwin.darwin-rebuild}/bin/darwin-rebuild";
+    };
+
     homeConfigurations = (import ./lib/mk-home-entries.nix {inherit lib;}) {
       inherit supportedSystems userProfiles;
       inherit (builders) mkHomeConfig;

@@ -45,3 +45,4 @@ jobs:
                 echo "Checking $target"
                 nix build ".#homeConfigurations.${target}.activationPackage" --dry-run
               done
+          nix eval --raw .#darwinConfigurations.tonys-mac.config.homebrew.brewfile >/dev/null

@@ -9,7 +9,7 @@ shell, language tooling, and platform integration configuration.
 
 ## What This Manages
 
-- NixOS, macOS, WSL, and Linux home-manager environments.
+- NixOS, nix-darwin, WSL, and Linux Home Manager environments.
 - Shell, CLI tools, language tooling, Neovim, keymaps, and platform-specific apps.
 
 ## Quick Start
@@ -70,19 +70,18 @@ added only when the current Git root has this repository's structural markers.
 
 ## macOS App Sync
 
-`Brewfile` is the additive shared baseline for the Apple Silicon Macs. It does
-not remove host-specific software or pin Homebrew's rolling package versions.
+`hosts/tonys-mac.nix` declares this Mac's Homebrew taps, formulae, and casks.
+`just sync brew` applies the nix-darwin configuration selected from the current
+macOS LocalHostName. Activation installs missing entries; it does not remove
+unmanaged software or upgrade existing formulae and casks.
 
 ```bash
-just sync brew export                # target -> candidate Brewfile
-just sync brew import                # repo Brewfile -> local Mac, additive
-just sync brew import user@host      # repo Brewfile -> remote Mac
-just sync brew check user@host       # verify the explicit remote target
+just sync brew
 ```
 
-Use `local` (the default) for the current Mac or pass any explicit
-`[user@]tailscale-host` target. The repository does not embed machine names,
-account names, or remote home-directory paths.
+The first activation uses the pinned nix-darwin `darwin-rebuild` app from the
+flake. The declared Homebrew baseline is host-specific; add a matching
+`darwinConfigurations` output and `hosts/<name>.nix` module for another Mac.
 
 Raycast does not provide a supported headless configuration export/import CLI.
 The Raycast recipes only print the supported GUI workflow and verification

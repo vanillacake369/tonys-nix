@@ -207,6 +207,11 @@ EOF
   [[ "$output" == *$'completions\tInstall only the Fish completion file'* ]]
   [[ "$output" == *$'home\tPrepare and apply Home Manager'* ]]
 
+  run fish -c "complete -e -c just; source '$REPO_ROOT/completions/just-tonys-nix.fish'; complete -C 'just sync brew '"
+  [ "$status" -eq 0 ]
+  [[ "$output" == "sync" ]]
+  [[ "$output" != *'Brewfile'* ]]
+
   run fish -c "complete -e -c just; source '$REPO_ROOT/completions/just-tonys-nix.fish'; complete -C 'just check '"
   [ "$status" -eq 0 ]
   [[ "$output" == *$'core\tPrepare bootstrap runtime and run fast apply-gating checks'* ]]

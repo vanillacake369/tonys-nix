@@ -37,20 +37,13 @@ function __tonys_nix_apply_actions
     printf '%s\t%s\n' \
         all 'Apply system and Home Manager configuration' \
         home 'Apply Home Manager configuration only' \
-        system 'Apply NixOS system configuration only'
+        system 'Apply this host system configuration only'
 end
 
 function __tonys_nix_sync_domains
     printf '%s\t%s\n' \
-        brew 'Manage the shared Brewfile' \
+        brew 'Apply this host Homebrew configuration' \
         raycast 'Show Raycast GUI migration guides'
-end
-
-function __tonys_nix_brew_actions
-    printf '%s\t%s\n' \
-        check 'Check target against the shared Brewfile' \
-        export 'Export target packages to a candidate Brewfile' \
-        import 'Install the shared Brewfile on the target'
 end
 
 function __tonys_nix_raycast_actions
@@ -111,7 +104,7 @@ complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 1' -a 
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 2; and __fish_seen_subcommand_from apply' -a '(__tonys_nix_apply_actions)'
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 3; and __fish_seen_subcommand_from apply home all' -a '(__tonys_nix_profiles)'
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 2; and __fish_seen_subcommand_from sync' -a '(__tonys_nix_sync_domains)'
-complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 3; and __fish_seen_subcommand_from brew' -a '(__tonys_nix_brew_actions)'
+complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 3; and __fish_seen_subcommand_from sync; and __fish_seen_subcommand_from brew' -a sync
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 3; and __fish_seen_subcommand_from raycast' -a '(__tonys_nix_raycast_actions)'
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 2; and __fish_seen_subcommand_from setup' -a '(__tonys_nix_setup_actions)'
 complete -c just -f -n '__tonys_nix_just_context; and __tonys_nix_just_at 2; and __fish_seen_subcommand_from check' -a '(__tonys_nix_check_actions)'
