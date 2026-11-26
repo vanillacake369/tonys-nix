@@ -109,7 +109,7 @@ EOF
   run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
     REPO_ROOT="$REPO_ROOT" "${JUST[@]}"
   [ "$status" -eq 2 ]
-  [[ "$output" == *"nodes/missing-user.nix"* ]]
+  [[ "$output" == *"profiles/missing-user.nix"* ]]
   [[ "$output" != *"unexpected bootstrap"* ]]
 }
 
@@ -203,7 +203,7 @@ EOF
   run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
     REPO_ROOT="$REPO_ROOT" "${JUST[@]}" apply all missing-user
   [ "$status" -eq 2 ]
-  [[ "$output" == *"nodes/missing-user.nix"* ]]
+  [[ "$output" == *"profiles/missing-user.nix"* ]]
   [[ "$output" != *"unexpected system activation"* ]]
 }
 
@@ -236,11 +236,25 @@ EOF
   [ "$output" = "hm-vpplab-nixos-x86_64-linux" ]
 }
 
+@test "missing output names point to the source profile" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/nix" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' '[]'
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/nix"
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" \
+    "${JUST[@]}" _home-target limjihoon x86_64-linux wsl
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"Ensure profiles/personal.nix exposes output name \"limjihoon\"."* ]]
+}
+
 @test "missing and unsafe profiles fail with guidance" {
   run "${JUST[@]}" _home-target missing-user aarch64-darwin darwin
   [ "$status" -eq 2 ]
-  [[ "$output" == *"nodes/missing-user.nix"* ]]
-  [[ "$output" == *"Copy an existing nodes/<profile>.nix profile"* ]]
+  [[ "$output" == *"profiles/missing-user.nix"* ]]
+  [[ "$output" == *"Copy an existing profiles/<profile>.nix profile"* ]]
 
   run "${JUST[@]}" _home-target ../escape aarch64-darwin darwin
   [ "$status" -eq 2 ]

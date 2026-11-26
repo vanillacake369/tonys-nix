@@ -3,7 +3,7 @@
   userProfiles,
   mkHomeConfig,
 }: let
-  # nodes/<profile>.nix의 파일명과 선택적 outputNames가 public profile key다.
+  # profiles/<profile>.nix의 파일명과 선택적 outputNames가 public profile key다.
   # hm-${profileName}-${system} 형태의 named output으로만 노출한다.
   mkNamedEntries = profileName: userProfile: system: [
     {

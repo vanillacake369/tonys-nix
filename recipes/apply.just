@@ -337,7 +337,7 @@ _apply-system target:
 # Resolve a login/profile name to an existing named Home Manager output.
 # NOTE:
 #   shell 로그인 사용자는 Just runtime에서만 판별하고 flake에 impure 값으로
-#   주입하지 않는다. nodes/<profile>.nix가 선언한 named output을 선택하는
+#   주입하지 않는다. profiles/<profile>.nix가 선언한 named output을 선택하는
 #   경계를 지켜야 동일한 flake가 로컬·CI에서 같은 결과로 평가된다.
 [private]
 _home-profile-check profile:
@@ -346,7 +346,7 @@ _home-profile-check profile:
     profile={{ quote(profile) }}
     profile_key="$profile"
     if [[ "$profile" == limjihoon ]]; then profile_key=personal; fi
-    profile_file="{{ justfile_directory() }}/nodes/${profile_key}.nix"
+    profile_file="{{ justfile_directory() }}/profiles/${profile_key}.nix"
 
     if [[ ! "$profile" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
       echo "[x] Invalid profile name: $profile" >&2
@@ -354,13 +354,13 @@ _home-profile-check profile:
     fi
     if [[ ! -f "$profile_file" ]]; then
       echo "[x] Cannot find a Nix profile for login user '$profile'." >&2
-      echo "    Expected: nodes/${profile_key}.nix" >&2
-      echo "    Copy an existing nodes/<profile>.nix profile, update its identity fields, and retry." >&2
+      echo "    Expected: profiles/${profile_key}.nix" >&2
+      echo "    Copy an existing profiles/<profile>.nix profile, update its identity fields, and retry." >&2
       exit 2
     fi
-    if ! git -C "{{ justfile_directory() }}" ls-files --error-unmatch -- "nodes/${profile_key}.nix" >/dev/null 2>&1; then
-      echo "[x] nodes/${profile_key}.nix exists but is not visible to the Git-backed flake." >&2
-      echo "    Track it first: git add nodes/${profile_key}.nix" >&2
+    if ! git -C "{{ justfile_directory() }}" ls-files --error-unmatch -- "profiles/${profile_key}.nix" >/dev/null 2>&1; then
+      echo "[x] profiles/${profile_key}.nix exists but is not visible to the Git-backed flake." >&2
+      echo "    Track it first: git add profiles/${profile_key}.nix" >&2
       exit 2
     fi
 
@@ -372,6 +372,8 @@ _home-target profile system os:
     profile={{ quote(profile) }}
     system={{ quote(system) }}
     os={{ quote(os) }}
+    profile_key="$profile"
+    if [[ "$profile" == limjihoon ]]; then profile_key=personal; fi
 
     just _home-profile-check "$profile"
 
@@ -391,7 +393,7 @@ _home-target profile system os:
     if ! nix eval --json --no-update-lock-file .#homeConfigurations --apply builtins.attrNames 2>/dev/null \
       | "${jq_cmd[@]}" -e --arg target "$target" 'index($target) != null' >/dev/null; then
       echo "[x] Flake output not found: homeConfigurations.$target" >&2
-      echo "    Ensure nodes/${profile_key}.nix exposes output name \"${profile}\"." >&2
+      echo "    Ensure profiles/${profile_key}.nix exposes output name \"${profile}\"." >&2
       exit 2
     fi
     printf '%s\n' "$target"

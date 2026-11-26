@@ -48,8 +48,8 @@ just apply home         # Home Manager만 적용
 just check all          # 린트, 훅 테스트, flake 체크
 ```
 
-로그인 이름(`id -un`)에 대응하는 `nodes/<profile>.nix`가 Git에 추적되어
-있어야 합니다. `limjihoon` 로그인은 `nodes/personal.nix`를 사용하며 기존
+로그인 이름(`id -un`)에 대응하는 `profiles/<profile>.nix`가 Git에 추적되어
+있어야 합니다. `limjihoon` 로그인은 `profiles/personal.nix`를 사용하며 기존
 `hm-limjihoon-*` 출력도 유지합니다. 새 로그인은 같은 이름의 프로필 파일을
 추가하고 `username` 등을 수정한 뒤 `git add`하세요. 프로필 파일은 공개 Git
 입력이므로 공개 가능한 값만 넣으세요.
@@ -60,17 +60,20 @@ Nix가 없다면 먼저 `just setup nix`로 설치할 수 있습니다. 이 명�
 
 ## 구성의 소유권
 
-`nodes/`는 사용자와 기기의 진입점, `modules/`는 Home Manager와 NixOS 설정,
-`pkgs/`는 overlay를 담습니다. 공유 정책과 생성 함수는 `lib/`, 설정 원본은
-`dotfiles/`, 검증과 실행 명령은 각각 `tests/`와 `recipes/`에 둡니다.
+`nodes/`는 기기의 시스템 진입점, `profiles/`는 사용자별 Home Manager 프로필,
+`modules/`는 Home Manager와 NixOS 설정, `pkgs/`는 overlay를 담습니다.
+공유 정책과 생성 함수는 `lib/`, 설정 원본은 `dotfiles/`, 검증과 실행 명령은
+각각 `tests/`와 `recipes/`에 둡니다.
 Home Manager 모듈은 `*.home.nix`, NixOS 모듈은 `*.nixos.nix` 이름으로
 자동 탐색합니다. 구조 변경의 근거와 검증 순서는
 [`docs/specs/flat-layout/`](docs/specs/flat-layout/design.md)에 기록했습니다.
+프로필과 호스트 분리의 판단 근거는
+[`docs/specs/profile-boundary/`](docs/specs/profile-boundary/assessment.md)에 기록했습니다.
 
 | 위치 | 관리하는 내용 | Git 공개 여부 |
 | --- | --- | --- |
 | `flake.nix`, `modules/`, `pkgs/`, `nodes/*.nixos.nix`, `nodes/*.darwin.nix` | 공통 설정과 공유 가능한 호스트 구성 | 추적 |
-| `nodes/<profile>.nix` | 이름이 지정된 Home Manager 프로필 | 추적 |
+| `profiles/<profile>.nix` | 이름이 지정된 Home Manager 프로필 | 추적 |
 | `$XDG_CONFIG_HOME/tonys-nix/hosts/<LocalHostName>/` | 이 Mac의 구성 바인딩과 선택적 `darwin.nix` | 저장소 밖 |
 | `/etc/nixos/hardware-configuration.nix` | 해당 NixOS 기기의 하드웨어 스캔 | 저장소 밖 |
 | 비밀번호·토큰·개인키 | 저장소 밖의 별도 자격증명 위치 | 이 flake에 입력하지 않음 |

@@ -51,7 +51,7 @@
       })
       ./pkgs;
 
-    userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./nodes;
+    userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./profiles;
 
     builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
