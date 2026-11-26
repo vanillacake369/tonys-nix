@@ -169,7 +169,6 @@
         pkgs.terraform-ls
         pkgs.tflint
         pkgs.tftui
-        pkgs.tenv
         pkgs.tflint
         pkgs.trivy
         pkgs.infracost

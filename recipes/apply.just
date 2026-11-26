@@ -73,11 +73,29 @@ _apply-system target:
         echo "[x] Invalid macOS host name: $host" >&2
         exit 2
       fi
-      echo "[→] nix-darwin host: $host"
-      if command -v darwin-rebuild >/dev/null 2>&1; then
-        darwin-rebuild switch --flake ".#$host"
+      if command -v jq >/dev/null 2>&1; then
+        jq_cmd=(jq)
       else
-        nix run .#darwin-rebuild -- switch --flake ".#$host"
+        jq_cmd=(nix run nixpkgs#jq --)
+      fi
+      configurations="$(nix eval --json --no-update-lock-file .#darwinConfigurations --apply builtins.attrNames)"
+      requested="${DARWIN_CONFIG:-}"
+      if [[ -n "$requested" ]]; then
+        host="$("${jq_cmd[@]}" -r --arg name "$requested" 'if index($name) then $name else empty end' <<< "$configurations")"
+      else
+        host="$("${jq_cmd[@]}" -r --arg name "$host" 'if index($name) then $name elif length == 1 then .[0] else empty end' <<< "$configurations")"
+      fi
+      if [[ -z "$host" ]]; then
+        echo "[x] Cannot select a nix-darwin configuration. Available: $("${jq_cmd[@]}" -r 'join(", ")' <<< "$configurations")" >&2
+        echo "    Run with DARWIN_CONFIG=<name> just apply system" >&2
+        exit 2
+      fi
+      echo "[→] nix-darwin configuration: $host"
+      login_user="$(id -un)"
+      if command -v darwin-rebuild >/dev/null 2>&1; then
+        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "$(command -v darwin-rebuild)" switch --flake ".#$host" --impure
+      else
+        sudo -H env "TONYS_NIX_DARWIN_USER=$login_user" "$(command -v nix)" run .#darwin-rebuild -- switch --flake ".#$host" --impure
       fi
       exit 0
     fi

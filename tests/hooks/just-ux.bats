@@ -68,14 +68,17 @@ EOF
 }
 
 @test "bare just runs core checks before applying all" {
+  run "${JUST[@]}" --show default
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'default: (check "core") && (apply "all")'* ]]
+
   run "${JUST[@]}" --dry-run
   [ "$status" -eq 0 ]
   [[ "$output" == *"just _bootstrap-core"* ]]
-  [[ "$output" == *"just apply all"* ]]
   [[ "$output" != *"mktemp"* ]]
   [[ "$output" != *".log"* ]]
   check_line="$(printf '%s\n' "$output" | grep -n 'just _bootstrap-core' | head -1 | cut -d: -f1)"
-  apply_line="$(printf '%s\n' "$output" | grep -n 'just apply all' | head -1 | cut -d: -f1)"
+  apply_line="$(printf '%s\n' "$output" | grep -n "scope='all'" | head -1 | cut -d: -f1)"
   [ "$check_line" -lt "$apply_line" ]
 }
 

@@ -32,5 +32,4 @@ import 'recipes/image.just'
 # 기본 실행은 core 검사를 통과한 현재 프로필만 적용한다.
 # 선행 recipe가 실패하면 적용을 시작하지 않는다.
 [default]
-default: (check "core")
-    just apply all
+default: (check "core") && (apply "all")

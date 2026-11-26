@@ -23,7 +23,11 @@ setup() {
   run just --justfile "$REPO_ROOT/justfile" --dry-run _apply-system aarch64-darwin
   [ "$status" -eq 0 ]
   [[ "$output" == *"scutil --get LocalHostName"* ]]
-  [[ "$output" == *'nix run .#darwin-rebuild'* ]]
+  [[ "$output" == *'darwinConfigurations --apply builtins.attrNames'* ]]
+  [[ "$output" == *'TONYS_NIX_DARWIN_USER=$login_user'* ]]
+  [[ "$output" == *'"$(command -v darwin-rebuild)" switch'* ]]
+  [[ "$output" == *'--impure'* ]]
+  [[ "$output" == *'run .#darwin-rebuild'* ]]
 
   run just --justfile "$REPO_ROOT/justfile" --set OS_TYPE linux sync brew
   [ "$status" -ne 0 ]

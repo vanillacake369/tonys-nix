@@ -1,10 +1,17 @@
-_: {
+_: let
+  localUser = builtins.getEnv "TONYS_NIX_DARWIN_USER";
+in {
   system.stateVersion = 6;
   nixpkgs.config.allowUnfree = true;
+  # just installs Nix and owns /etc/nix/nix.conf via system-link-nix-conf.
+  nix.enable = false;
 
   homebrew = {
     enable = true;
-    user = "limjihoon";
+    user =
+      if localUser != ""
+      then localUser
+      else "limjihoon";
     onActivation = {
       autoUpdate = false;
       cleanup = "none";

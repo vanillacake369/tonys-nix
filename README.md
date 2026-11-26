@@ -71,9 +71,13 @@ added only when the current Git root has this repository's structural markers.
 ## macOS App Sync
 
 `hosts/tonys-mac.nix` declares this Mac's Homebrew taps, formulae, and casks.
-`just sync brew` applies the nix-darwin configuration selected from the current
-macOS LocalHostName. Activation installs missing entries; it does not remove
-unmanaged software or upgrade existing formulae and casks.
+`just sync brew` applies the nix-darwin configuration matching the current
+macOS LocalHostName, or the only declared configuration if there is one.
+With multiple configurations and no match, set `DARWIN_CONFIG=<name>` when
+running `just` or `just apply system`. System activation prompts for `sudo`;
+`just` passes the login user to nix-darwin for Homebrew activation, and Home
+Manager runs as that user. Activation installs missing entries;
+it does not remove unmanaged software or upgrade existing formulae and casks.
 
 ```bash
 just sync brew
