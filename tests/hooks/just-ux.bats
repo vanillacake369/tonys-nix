@@ -109,7 +109,7 @@ EOF
   run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
     REPO_ROOT="$REPO_ROOT" "${JUST[@]}"
   [ "$status" -eq 2 ]
-  [[ "$output" == *"user/missing-user.nix"* ]]
+  [[ "$output" == *"nodes/missing-user.nix"* ]]
   [[ "$output" != *"unexpected bootstrap"* ]]
 }
 
@@ -203,7 +203,7 @@ EOF
   run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
     REPO_ROOT="$REPO_ROOT" "${JUST[@]}" apply all missing-user
   [ "$status" -eq 2 ]
-  [[ "$output" == *"user/missing-user.nix"* ]]
+  [[ "$output" == *"nodes/missing-user.nix"* ]]
   [[ "$output" != *"unexpected system activation"* ]]
 }
 
@@ -239,8 +239,8 @@ EOF
 @test "missing and unsafe profiles fail with guidance" {
   run "${JUST[@]}" _home-target missing-user aarch64-darwin darwin
   [ "$status" -eq 2 ]
-  [[ "$output" == *"user/missing-user.nix"* ]]
-  [[ "$output" == *"Copy an existing user/*.nix profile"* ]]
+  [[ "$output" == *"nodes/missing-user.nix"* ]]
+  [[ "$output" == *"Copy an existing nodes/<profile>.nix profile"* ]]
 
   run "${JUST[@]}" _home-target ../escape aarch64-darwin darwin
   [ "$status" -eq 2 ]

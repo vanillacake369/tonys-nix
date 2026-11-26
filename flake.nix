@@ -51,7 +51,7 @@
       })
       ./modules;
 
-    userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./user;
+    userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./nodes;
 
     builders = import ./lib/mk-home-config.nix {
       inherit nixpkgs home-manager overlays;
@@ -59,7 +59,7 @@
     };
     mkImages = import ./lib/mk-images.nix {
       inherit lib nixpkgs;
-      configModules = [./configuration.nix];
+      configModules = [./nodes/tony.nixos.nix];
     };
 
     hostnames = ["tony"];
@@ -71,7 +71,7 @@
       nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         inherit ((builders.mkSystem "x86_64-linux")) pkgs;
-        modules = [./configuration.nix];
+        modules = [./nodes/tony.nixos.nix];
       });
 
     darwinConfigurations."tonys-mac" = nix-darwin.lib.darwinSystem {
@@ -79,7 +79,7 @@
       modules =
         [
           {nixpkgs.overlays = overlays;}
-          ./hosts/tonys-mac.nix
+          ./nodes/tonys-mac.darwin.nix
         ]
         ++ lib.optional (localDarwinConfig == "tonys-mac" && localDarwinModule != "") (/. + localDarwinModule);
     };

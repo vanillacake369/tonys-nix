@@ -8,7 +8,7 @@ function __tonys_nix_just_context
     test -f "$root/flake.nix"; and \
         test -f "$root/justfile"; and \
         test -f "$root/lib/collect-user-profiles.nix"; and \
-        test -d "$root/user"
+        test -d "$root/nodes"
 end
 
 function __tonys_nix_just_at -a position
@@ -17,7 +17,7 @@ end
 
 function __tonys_nix_profiles
     set -l root (git rev-parse --show-toplevel 2>/dev/null); or return 1
-    for profile_file in $root/user/*.nix
+    for profile_file in $root/nodes/*.nix
         set -l profile (string replace -r '^.*/(.*)\.nix$' '$1' "$profile_file")
         printf '%s\tHome Manager profile\n' "$profile"
     end

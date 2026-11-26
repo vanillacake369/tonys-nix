@@ -63,15 +63,15 @@ _darwin-config mode="apply":
       fi
     elif [[ -f "$binding" ]]; then
       selected="$(cat "$binding")"
-    elif [[ -f "$repo/hosts/$local_host.nix" ]]; then
+    elif [[ -f "$repo/nodes/$local_host.darwin.nix" ]]; then
       selected="$local_host"
     else
       candidates=()
       while IFS= read -r path; do
-        candidates+=("${path#hosts/}")
-      done < <(git -C "$repo" ls-files 'hosts/*.nix')
+        candidates+=("${path#nodes/}")
+      done < <(git -C "$repo" ls-files 'nodes/*.darwin.nix')
       if (( ${#candidates[@]} == 1 )); then
-        selected="${candidates[0]%.nix}"
+        selected="${candidates[0]%.darwin.nix}"
         if [[ "$mode" == plan ]]; then
           echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
           echo "    Preview with: DARWIN_CONFIG=$selected just plan" >&2
@@ -93,7 +93,7 @@ _darwin-config mode="apply":
       else
         echo "[x] No nix-darwin configuration bound to macOS host '$local_host'." >&2
         if (( ${#candidates[@]} > 0 )); then
-          printf '    Available: %s\n' "${candidates[*]%.nix}" >&2
+          printf '    Available: %s\n' "${candidates[*]%.darwin.nix}" >&2
         fi
         echo "    Select one once with DARWIN_CONFIG=<name> just" >&2
         exit 2
@@ -101,8 +101,8 @@ _darwin-config mode="apply":
     fi
 
     if [[ ! "$selected" =~ ^[a-zA-Z0-9_-]+$ ]] \
-      || [[ ! -f "$repo/hosts/$selected.nix" ]] \
-      || ! git -C "$repo" ls-files --error-unmatch -- "hosts/$selected.nix" >/dev/null 2>&1; then
+      || [[ ! -f "$repo/nodes/$selected.darwin.nix" ]] \
+      || ! git -C "$repo" ls-files --error-unmatch -- "nodes/$selected.darwin.nix" >/dev/null 2>&1; then
       echo "[x] Unknown nix-darwin configuration: $selected" >&2
       exit 2
     fi
@@ -337,14 +337,16 @@ _apply-system target:
 # Resolve a login/profile name to an existing named Home Manager output.
 # NOTE:
 #   shell 로그인 사용자는 Just runtime에서만 판별하고 flake에 impure 값으로
-#   주입하지 않는다. user/<profile>.nix가 선언한 named output을 선택하는
+#   주입하지 않는다. nodes/<profile>.nix가 선언한 named output을 선택하는
 #   경계를 지켜야 동일한 flake가 로컬·CI에서 같은 결과로 평가된다.
 [private]
 _home-profile-check profile:
     #!/usr/bin/env bash
     set -euo pipefail
     profile={{ quote(profile) }}
-    profile_file="{{ justfile_directory() }}/user/${profile}.nix"
+    profile_key="$profile"
+    if [[ "$profile" == limjihoon ]]; then profile_key=personal; fi
+    profile_file="{{ justfile_directory() }}/nodes/${profile_key}.nix"
 
     if [[ ! "$profile" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
       echo "[x] Invalid profile name: $profile" >&2
@@ -352,13 +354,13 @@ _home-profile-check profile:
     fi
     if [[ ! -f "$profile_file" ]]; then
       echo "[x] Cannot find a Nix profile for login user '$profile'." >&2
-      echo "    Expected: user/${profile}.nix" >&2
-      echo "    Copy an existing user/*.nix profile, update its identity fields, and retry." >&2
+      echo "    Expected: nodes/${profile_key}.nix" >&2
+      echo "    Copy an existing nodes/<profile>.nix profile, update its identity fields, and retry." >&2
       exit 2
     fi
-    if ! git -C "{{ justfile_directory() }}" ls-files --error-unmatch -- "user/${profile}.nix" >/dev/null 2>&1; then
-      echo "[x] user/${profile}.nix exists but is not visible to the Git-backed flake." >&2
-      echo "    Track it first: git add user/${profile}.nix" >&2
+    if ! git -C "{{ justfile_directory() }}" ls-files --error-unmatch -- "nodes/${profile_key}.nix" >/dev/null 2>&1; then
+      echo "[x] nodes/${profile_key}.nix exists but is not visible to the Git-backed flake." >&2
+      echo "    Track it first: git add nodes/${profile_key}.nix" >&2
       exit 2
     fi
 
@@ -389,7 +391,7 @@ _home-target profile system os:
     if ! nix eval --json --no-update-lock-file .#homeConfigurations --apply builtins.attrNames 2>/dev/null \
       | "${jq_cmd[@]}" -e --arg target "$target" 'index($target) != null' >/dev/null; then
       echo "[x] Flake output not found: homeConfigurations.$target" >&2
-      echo "    Ensure user/${profile}.nix declares username = \"${profile}\"." >&2
+      echo "    Ensure nodes/${profile_key}.nix exposes output name \"${profile}\"." >&2
       exit 2
     fi
     printf '%s\n' "$target"

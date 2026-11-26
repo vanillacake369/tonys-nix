@@ -136,7 +136,7 @@ EOF
 }
 
 @test "nix-darwin declares the current host Homebrew baseline" {
-  run sed -n '1,160p' "$REPO_ROOT/hosts/tonys-mac.nix"
+  run sed -n '1,160p' "$REPO_ROOT/nodes/tonys-mac.darwin.nix"
   [ "$status" -eq 0 ]
   [[ "$output" == *'"just"'* ]]
   [[ "$output" == *'name = "tailscale"'* ]]

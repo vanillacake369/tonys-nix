@@ -22,7 +22,7 @@
       }
     ]
     # Auto-discovered nixos domain modules (*.nixos.nix convention)
-    ++ (import ./lib/discover-modules.nix {inherit lib;} ./modules).nixos;
+    ++ (import ../lib/discover-modules.nix {inherit lib;} ../modules).nixos;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

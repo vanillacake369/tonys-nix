@@ -3,7 +3,7 @@
   userProfiles,
   mkHomeConfig,
 }: let
-  # user/*.nix의 파일명이 public profile key다. 모든 entry는
+  # nodes/<profile>.nix의 파일명과 선택적 outputNames가 public profile key다.
   # hm-${profileName}-${system} 형태의 named output으로만 노출한다.
   mkNamedEntries = profileName: userProfile: system: [
     {
@@ -32,12 +32,16 @@
     lib.mapAttrsToList (
       profileName: userProfile: let
         username = userProfile.username or null;
+        outputNames = userProfile.outputNames or [profileName];
       in
-        if username != profileName
-        then builtins.throw "Profile '${profileName}' must declare username = \"${profileName}\""
-        else lib.flatten (map (mkNamedEntries profileName userProfile) supportedSystems)
+        if !(builtins.elem profileName outputNames) || !(builtins.elem username outputNames)
+        then builtins.throw "Profile '${profileName}' must expose its file key and username"
+        else lib.flatten (map (name: map (mkNamedEntries name userProfile) supportedSystems) outputNames)
     )
     userProfiles
   );
+  names = map (entry: entry.name) namedEntries;
 in
-  lib.listToAttrs namedEntries
+  if builtins.length names != builtins.length (lib.unique names)
+  then builtins.throw "Duplicate Home Manager output names"
+  else lib.listToAttrs namedEntries
