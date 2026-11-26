@@ -46,7 +46,11 @@ just                    # 사전 검사, 핵심 검사, 시스템과 홈 적용
 just plan               # 활성화 없이 대상과 빌드 결과 확인
 just apply home         # Home Manager만 적용
 just check all          # 린트, 훅 테스트, flake 체크
+nix fmt                 # Alejandra로 저장소의 Nix 파일 포맷
 ```
+
+`just check lint`는 deadnix, statix와 flake의 포맷 검사를 실행하며 파일을
+수정하지 않습니다. 포맷 설정은 `treefmt.nix` 한 곳에서 관리합니다.
 
 로그인 이름(`id -un`)에 대응하는 `profiles/<profile>.nix`가 Git에 추적되어
 있어야 합니다. `limjihoon` 로그인은 `profiles/personal.nix`를 사용하며 기존
@@ -69,6 +73,8 @@ Home Manager 모듈은 `*.home.nix`, NixOS 모듈은 `*.nixos.nix` 이름으로
 [`docs/specs/flat-layout/`](docs/specs/flat-layout/design.md)에 기록했습니다.
 프로필과 호스트 분리의 판단 근거는
 [`docs/specs/profile-boundary/`](docs/specs/profile-boundary/assessment.md)에 기록했습니다.
+선택적 Nix 도구 도입의 판단 근거는
+[`docs/specs/nix-tooling/`](docs/specs/nix-tooling/assessment.md)에 기록했습니다.
 
 | 위치 | 관리하는 내용 | Git 공개 여부 |
 | --- | --- | --- |

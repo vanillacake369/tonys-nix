@@ -65,7 +65,7 @@ test-hooks:
       nix run nixpkgs#bats -- $hook_tests
     fi
 
-# Run linters (deadnix, statix, alejandra).
+# Run linters and the flake's configured formatter check.
 [private]
 lint:
     #!/usr/bin/env bash
@@ -83,4 +83,5 @@ lint:
 
     run_tool deadnix --fail .
     run_tool statix check .
-    run_tool alejandra --check .
+    echo "[→] formatting"
+    nix build ".#checks.{{ SYSTEM_ARCH }}.formatting" --no-link

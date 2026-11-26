@@ -23,15 +23,21 @@
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
+    self,
     nixpkgs,
     nixpkgs-neovim,
     nixpkgs-java,
     nix-darwin,
     home-manager,
     rust-overlay,
+    treefmt-nix,
     ...
   }: let
     inherit (nixpkgs) lib;
@@ -66,7 +72,12 @@
     localDarwinConfig = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_CONFIG";
     localDarwinModule = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_MODULE";
     collectTests = (import ./lib/collect-tests.nix {inherit lib;}) ./tests;
+    treefmtEval =
+      forAllSystems (system:
+        treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix);
   in rec {
+    formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+
     nixosConfigurations = lib.genAttrs hostnames (_:
       nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -108,6 +119,9 @@
     in
       collectChecks {
         inherit lib pkgs homeConfigs tests;
+      }
+      // {
+        formatting = treefmtEval.${system}.config.build.check self;
       }
       // lib.optionalAttrs (builtins.elem system homeActivationCheckSystems) {
         home-activations = pkgs.linkFarm "home-activations-${system}" (
