@@ -28,9 +28,10 @@ just apply home         # apply only Home Manager
 just check all          # run lint, hook, and flake checks without applying
 ```
 
-The default `just` path is intentionally bootstrappable: it checks or installs
-Nix, prepares the repository `nix.conf`, verifies the Home Manager execution
-path, runs the fast core gate, and then applies the selected profile.
+The default `just` path first checks the platform and login profile without
+changing the machine. It then checks or installs Nix, prepares the repository
+`nix.conf`, verifies the Home Manager execution path, runs the fast core gate,
+resolves the Home Manager output, and applies the system and home configuration.
 
 The current login name (`id -un`) selects `user/<login>.nix`. Profile files are
 exported as named flake outputs such as `hm-<profile>-aarch64-darwin`; there is no

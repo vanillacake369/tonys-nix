@@ -29,7 +29,10 @@ import 'recipes/sync.just'
 import 'recipes/maintenance.just'
 import 'recipes/image.just'
 
-# 기본 실행은 core 검사를 통과한 현재 프로필만 적용한다.
+# 기본 실행은 대상의 정적 검사를 마친 뒤 런타임 준비와 검사를 수행한다.
 # 선행 recipe가 실패하면 적용을 시작하지 않는다.
 [default]
-default: (check "core") && (apply "all")
+default:
+    just _preflight-default
+    just check core
+    just apply all

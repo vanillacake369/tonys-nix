@@ -2,6 +2,14 @@ HOSTNAME := `hostname`
 APPLY_RETRY_THRESHOLD := "3"
 APPLY_FALLBACK_SUBSTITUTERS := "https://cache.nixos.org"
 
+# Reject unsupported platforms and missing login profiles before bootstrap.
+[private]
+_preflight-default:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just _apply-validate "{{ SYSTEM_ARCH }}"
+    just _home-profile-check "$(id -un)"
+
 # Apply the current login user's profile. Scopes: all, home, system.
 apply scope="all" profile="":
     #!/usr/bin/env bash
@@ -27,12 +35,15 @@ apply scope="all" profile="":
     fi
 
     just _apply-validate "$system"
+    target=""
+    if [[ "$scope" == all || "$scope" == home ]]; then
+      [[ -n "$profile" ]] || profile="$(id -un)"
+      target="$(just _home-target "$profile" "$system" {{ quote(OS_TYPE) }})"
+    fi
     if [[ "$scope" == all || "$scope" == system ]]; then
       just _apply-system "$system"
     fi
     if [[ "$scope" == all || "$scope" == home ]]; then
-      [[ -n "$profile" ]] || profile="$(id -un)"
-      target="$(just _home-target "$profile" "$system" {{ quote(OS_TYPE) }})"
       echo "[→] Home Manager: $target"
       just _apply-home "$target"
     fi
@@ -134,12 +145,10 @@ _apply-system target:
 #   주입하지 않는다. user/<profile>.nix가 선언한 named output을 선택하는
 #   경계를 지켜야 동일한 flake가 로컬·CI에서 같은 결과로 평가된다.
 [private]
-_home-target profile system os:
+_home-profile-check profile:
     #!/usr/bin/env bash
     set -euo pipefail
     profile={{ quote(profile) }}
-    system={{ quote(system) }}
-    os={{ quote(os) }}
     profile_file="{{ justfile_directory() }}/user/${profile}.nix"
 
     if [[ ! "$profile" =~ ^[a-z_][a-z0-9_-]*$ ]]; then
@@ -157,6 +166,17 @@ _home-target profile system os:
       echo "    Track it first: git add user/${profile}.nix" >&2
       exit 2
     fi
+
+# Resolve a validated login/profile name to an existing named Home Manager output.
+[private]
+_home-target profile system os:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    profile={{ quote(profile) }}
+    system={{ quote(system) }}
+    os={{ quote(os) }}
+
+    just _home-profile-check "$profile"
 
     case "$os" in
       nixos) target="hm-${profile}-nixos-${system}" ;;

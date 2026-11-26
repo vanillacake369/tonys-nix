@@ -70,16 +70,46 @@ EOF
 @test "bare just runs core checks before applying all" {
   run "${JUST[@]}" --show default
   [ "$status" -eq 0 ]
-  [[ "$output" == *'default: (check "core") && (apply "all")'* ]]
+  [[ "$output" == *'just _preflight-default'* ]]
+  [[ "$output" == *'just check core'* ]]
+  [[ "$output" == *'just apply all'* ]]
 
   run "${JUST[@]}" --dry-run
   [ "$status" -eq 0 ]
-  [[ "$output" == *"just _bootstrap-core"* ]]
+  [[ "$output" == *"just _preflight-default"* ]]
+  [[ "$output" == *"just check core"* ]]
   [[ "$output" != *"mktemp"* ]]
   [[ "$output" != *".log"* ]]
-  check_line="$(printf '%s\n' "$output" | grep -n 'just _bootstrap-core' | head -1 | cut -d: -f1)"
-  apply_line="$(printf '%s\n' "$output" | grep -n "scope='all'" | head -1 | cut -d: -f1)"
+  preflight_line="$(printf '%s\n' "$output" | grep -n 'just _preflight-default' | head -1 | cut -d: -f1)"
+  check_line="$(printf '%s\n' "$output" | grep -n 'just check core' | head -1 | cut -d: -f1)"
+  apply_line="$(printf '%s\n' "$output" | grep -n 'just apply all' | head -1 | cut -d: -f1)"
+  [ "$preflight_line" -lt "$check_line" ]
   [ "$check_line" -lt "$apply_line" ]
+
+  run "${JUST[@]}" --dry-run _preflight-default
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'just _home-profile-check "$(id -un)"'* ]]
+}
+
+@test "bare just rejects an unknown login before bootstrap" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/id" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$*" == "-un" ]]; then echo missing-user; else exec /usr/bin/id "$@"; fi
+EOF
+  cat > "$BATS_TEST_TMPDIR/bin/just" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$1" == _bootstrap-core ]]; then echo "unexpected bootstrap"; exit 99; fi
+if [[ "$1" == --justfile ]]; then exec "$REAL_JUST" "$@"; fi
+exec "$REAL_JUST" --justfile "$REPO_ROOT/justfile" "$@"
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/"*
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
+    REPO_ROOT="$REPO_ROOT" "${JUST[@]}"
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"user/missing-user.nix"* ]]
+  [[ "$output" != *"unexpected bootstrap"* ]]
 }
 
 @test "core checks bootstrap runtime before lint and guard contracts" {
@@ -111,6 +141,9 @@ EOF
   [ "$status" -eq 0 ]
   [[ "$output" == *'[→] Home Manager: $target'* ]]
   [[ "$output" == *'just _apply-validate'* ]]
+  target_line="$(printf '%s\n' "$output" | grep -n 'target="$(just _home-target' | head -1 | cut -d: -f1)"
+  system_line="$(printf '%s\n' "$output" | grep -n 'just _apply-system' | head -1 | cut -d: -f1)"
+  [ "$target_line" -lt "$system_line" ]
   [[ "$output" != *"User:"* ]]
   [[ "$output" != *"Platform:"* ]]
   [[ "$output" != *"Target:"* ]]
@@ -122,6 +155,23 @@ EOF
   run "${JUST[@]}" --dry-run _apply-system aarch64-darwin
   [ "$status" -eq 0 ]
   [[ "$output" != *"System apply skipped"* ]]
+}
+
+@test "apply all rejects a missing profile before system activation" {
+  mkdir "$BATS_TEST_TMPDIR/bin"
+  cat > "$BATS_TEST_TMPDIR/bin/just" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$1" == _apply-system ]]; then echo "unexpected system activation"; exit 99; fi
+if [[ "$1" == --justfile ]]; then exec "$REAL_JUST" "$@"; fi
+exec "$REAL_JUST" --justfile "$REPO_ROOT/justfile" "$@"
+EOF
+  chmod +x "$BATS_TEST_TMPDIR/bin/just"
+
+  run env PATH="$BATS_TEST_TMPDIR/bin:$PATH" REAL_JUST="$(command -v just)" \
+    REPO_ROOT="$REPO_ROOT" "${JUST[@]}" apply all missing-user
+  [ "$status" -eq 2 ]
+  [[ "$output" == *"user/missing-user.nix"* ]]
+  [[ "$output" != *"unexpected system activation"* ]]
 }
 
 @test "home apply reclaims matching managed files before backup overwrite" {
