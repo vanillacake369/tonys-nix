@@ -14,12 +14,8 @@ jobs:
         with:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-      - name: deadnix (unused code)
-        run: nix run nixpkgs#deadnix -- --fail .
-      - name: statix (anti-patterns)
-        run: nix run nixpkgs#statix -- check .
-      - name: alejandra (formatting)
-        run: nix run nixpkgs#alejandra -- --check .
+      - name: Lint
+        run: nix shell nixpkgs#just --command just check lint
 
   test:
     runs-on: ubuntu-latest
@@ -30,17 +26,7 @@ jobs:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - name: Guard tests
-        run: |
-          out=$(nix build --print-out-paths .#checks.x86_64-linux.guard-tests --no-link)
-          result=$(cat "$out")
-          echo "$result"
-          total=$(echo "$result" | jq .total)
-          passed=$(echo "$result" | jq .passed)
-          if [ "$total" != "$passed" ]; then
-            echo "FAIL: $passed/$total tests passed"
-            exit 1
-          fi
-          echo "OK: $passed/$total tests passed"
+        run: nix shell nixpkgs#just --command just _test-guard
 
   build-check:
     runs-on: ubuntu-latest
@@ -51,6 +37,7 @@ jobs:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
       - name: Build Linux Home Manager targets
+        shell: bash
         run: |
           nix eval --json .#homeConfigurations --apply builtins.attrNames \
             | jq -r '.[] | select(endswith("-x86_64-linux"))' \
