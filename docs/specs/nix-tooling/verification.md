@@ -1,7 +1,7 @@
 # Selective Nix tooling verification
 
-Assessment base: `f4012d6ccc3922c71ca932d7ac19eb6a2158314a`.
-Assessment commit: `703dcfd`. Implementation checks below ran 2026-11-27
+Assessment base: `3f4aef350ba3f06f672f31154556ae5054731ad0`.
+Assessment commit: `d1f3508`. Implementation checks below ran 2026-11-27
 from a staged worktree on macOS arm64 with Nix 2.35.2. The added
 `treefmt-nix` input was locked to
 `b7b56d3c8833016c650ca542b1230e6130299741` (2026-11-25), and its

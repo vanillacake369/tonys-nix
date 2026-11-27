@@ -2,7 +2,7 @@
 
 ## Specification and invariant
 
-Source: clean `bde5ca78f1ee35c016cb714526b79ea675356055`.
+Source: clean `d5272032718da4274b86088b430c942fc3315693`.
 Baseline `nix build --offline --no-update-lock-file
 .#checks.aarch64-darwin.guard-tests --no-link` passed. On `aarch64-darwin`,
 the selected baseline derivations were:

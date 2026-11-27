@@ -1,7 +1,7 @@
 # Host and profile boundary verification
 
-Assessment base: clean `92bea18cbe6ef7f5fd206a6315bd8aaa5193123d`.
-M1 assessment commit: `c66c95e`. M2 results below were observed on
+Assessment base: clean `1b3dcce62ad3c81aff6eef9b483a1e1c194c6e21`.
+M1 assessment commit: `4170c53`. M2 results below were observed on
 2026-11-27 before its implementation commit. No host or Home Manager activation
 was performed.
 

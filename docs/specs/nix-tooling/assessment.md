@@ -1,7 +1,7 @@
 # Selective Nix tooling assessment
 
 Assessed 2026-11-27 at clean source revision
-`f4012d6ccc3922c71ca932d7ac19eb6a2158314a` with Nix 2.35.2.
+`3f4aef350ba3f06f672f31154556ae5054731ad0` with Nix 2.35.2.
 `flake.lock` is tracked and clean. The design question is: which, if any, of
 the seven proposed tools removes a concrete gap in this repository without
 replacing working ownership and test contracts?

@@ -2,7 +2,7 @@
 
 ## 1. 현재 구조와 AS-IS 측정
 
-기준 리비전 `2067521`, 깨끗한 작업 트리. `flake.nix`은
+기준 리비전 `17bab76`, 깨끗한 작업 트리. `flake.nix`은
 `collect-flake-overlays` → `collect-overlays`를 거쳐 overlay를 로드하고,
 `collect-checks` → `tests/guard.check.nix`를 거쳐 단일 guard check를 만든다.
 `discover-modules`는 평면 `modules/`를 재귀 탐색한다.

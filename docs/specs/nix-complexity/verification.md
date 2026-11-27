@@ -1,6 +1,6 @@
 # Nix composition complexity — 검증
 
-2026-11-27, 기준 `2067521f55bf2b28532b2a47da0f0cbb7473bd5b`.
+2026-11-27, 기준 `17bab767e846bb507aa0ed62c755367ec4ee8aad`.
 코드 변경 전 작업 트리는 깨끗했다. 사용자 홈·시스템 활성화 및 원격 쓰기는 없었다.
 
 ## 정량 결과
@@ -26,7 +26,7 @@
 명시했다. NLOC는 토큰·인지 복잡도나 실행 시간의 대리 지표가 아니다.
 설치된 `lizard`는 Nix를 지원하지 않아 CCN 결과를 사용하지 않았다.
 구조 지표는 `tonys-agent-harness`의 `skl-pre-nix-complexity-ljh` 측정기
-(`23efdd0`)에서 `--base 2067521`과 위 7개 경로를 지정해 다시 확인했다.
+(`23efdd0`)에서 `--base 17bab76`과 위 7개 경로를 지정해 다시 확인했다.
 `decisions`는 파서 출력의 `if`, `assert`, `&&`, `||`, `->` 합계이며
 CCN이나 인지 복잡도 점수가 아니다.
 

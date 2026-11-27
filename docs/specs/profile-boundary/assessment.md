@@ -1,6 +1,6 @@
 # Host and profile ownership assessment
 
-Assessed 2026-11-27 against clean commit `92bea18cbe6ef7f5fd206a6315bd8aaa5193123d`.
+Assessed 2026-11-27 against clean commit `1b3dcce62ad3c81aff6eef9b483a1e1c194c6e21`.
 Local Nix: 2.35.2. The tracked `flake.lock` pins Home Manager at
 `2b13c9cb3aa20653e6f8ee0b7f8331a53ea9b0a9`, nix-darwin at
 `663d8b962a11cda261b6e9f14e03911fac94baf0`, and nixpkgs at

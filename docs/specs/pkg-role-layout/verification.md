@@ -1,6 +1,6 @@
 # Package role layout verification
 
-M1: `2a5fa0a77e5fa18dfb55b1424ba7d1b0b73a562b`.
+M1: `0ce7cb84ec13e4c51aa50539799edc2d86fce5cb`.
 M2 evidence below was collected on the staged implementation before its commit
 on 2026-11-27. No activation or remote write occurred.
 
@@ -13,7 +13,7 @@ on 2026-11-27. No activation or remote write occurred.
 | Repository quality gate remains | `just check all`, `git diff --cached --check` | `deadnix`, `statix`, formatting, 84 Bats hooks, 67 guard tests, and Darwin `home-activations` passed | Linux package builds were not run on this Darwin host | Accept M2 with stated platform limit |
 
 The Linux NixOS assertion was reproduced at M1 with a pinned
-`git+file://...?rev=2a5fa0a...` flake reference. It names
+`git+file://...?rev=0ce7cb8...` flake reference. It names
 `modules/virtualization.nixos.nix`, which this milestone did not edit. Its
 fix belongs to a separate Podman configuration change, not this package naming
 refactor.

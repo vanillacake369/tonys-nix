@@ -6,7 +6,7 @@ second discovery system or a new flake input.
 
 ## Decision question and evidence
 
-At clean local revision `bde5ca78f1ee35c016cb714526b79ea675356055`:
+At clean local revision `d5272032718da4274b86088b430c942fc3315693`:
 should `pkgs/` retain four broad overlays, gain role-named overlays, or become
 separate `pkgs/` and `overlays/` trees? Success means a reader can find an
 override by role, existing package attributes and platform behavior survive,
