@@ -46,16 +46,23 @@
     homeActivationCheckSystems = ["x86_64-linux" "aarch64-darwin"];
     forAllSystems = lib.genAttrs supportedSystems;
 
-    # NOTE:
-    # flake.nix는 repo 전체의 조립 루트다. discovery 규칙이나
-    # compatibility entry 생성 규칙을 여기서 직접 펼치면 flake가 곧
-    # 정책 저장소가 되어 다시 비대해진다. 복잡한 변환은 lib/에 두고,
-    # 이 파일은 입력을 연결하는 조합 계층으로만 유지한다.
-    overlays =
-      (import ./lib/collect-flake-overlays.nix {
-        inherit lib nixpkgs-neovim nixpkgs-java rust-overlay;
+    # Overlay 순서는 package API다. Rust를 먼저, Neovim runtime pin을 마지막에 둔다.
+    overlays = [
+      (import rust-overlay)
+      (import ./pkgs/bear.overlay.nix)
+      (import ./pkgs/java.overlay.nix {inherit nixpkgs-java;})
+      (import ./pkgs/jetendard.overlay.nix)
+      (import ./pkgs/lua-debugger.overlay.nix)
+      (import ./pkgs/node-tooling.overlay.nix)
+      (import ./pkgs/python-lsp.overlay.nix)
+      (import ./pkgs/terraform.overlay.nix)
+      (import ./pkgs/wayland-ime.overlay.nix)
+      (import ./pkgs/zellij.overlay.nix)
+      (_final: prev: {
+        neovim-unwrapped =
+          nixpkgs-neovim.legacyPackages.${prev.stdenv.hostPlatform.system}.neovim-unwrapped;
       })
-      ./pkgs;
+    ];
 
     userProfiles = (import ./lib/collect-user-profiles.nix {inherit lib;}) ./profiles;
 
@@ -68,7 +75,6 @@
       configModules = [./nodes/tony.nixos.nix];
     };
 
-    hostnames = ["tony"];
     localDarwinConfig = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_CONFIG";
     localDarwinModule = builtins.getEnv "TONYS_NIX_DARWIN_LOCAL_MODULE";
     collectTests = (import ./lib/collect-tests.nix {inherit lib;}) ./tests;
@@ -78,12 +84,11 @@
   in rec {
     formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 
-    nixosConfigurations = lib.genAttrs hostnames (_:
-      nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        inherit ((builders.mkSystem "x86_64-linux")) pkgs;
-        modules = [./nodes/tony.nixos.nix];
-      });
+    nixosConfigurations.tony = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      inherit ((builders.mkSystem "x86_64-linux")) pkgs;
+      modules = [./nodes/tony.nixos.nix];
+    };
 
     darwinConfigurations."tonys-mac" = nix-darwin.lib.darwinSystem {
       system = "aarch64-darwin";
@@ -109,18 +114,17 @@
 
     checks = forAllSystems (system: let
       inherit (builders.mkSystem system) pkgs;
+      tests = collectTests {inherit lib;};
       homeConfigs =
         lib.mapAttrs (
           profileName: _: homeConfigurations."hm-${profileName}-${system}"
         )
         userProfiles;
-      collectChecks = (import ./lib/collect-checks.nix {inherit lib;}) ./tests;
-      tests = collectTests {inherit lib;};
     in
-      collectChecks {
-        inherit lib pkgs homeConfigs tests;
-      }
-      // {
+      {
+        guard-tests = pkgs.runCommand "guard-tests" {} ''
+          echo '${builtins.toJSON tests.summary}' > "$out"
+        '';
         formatting = treefmtEval.${system}.config.build.check self;
       }
       // lib.optionalAttrs (builtins.elem system homeActivationCheckSystems) {

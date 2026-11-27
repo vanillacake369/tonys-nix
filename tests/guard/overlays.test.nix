@@ -1,9 +1,4 @@
 {lib}: let
-  collectOverlays = import ../../lib/collect-overlays.nix {
-    inherit lib;
-    overlayArgs = {nixpkgs-java = {};};
-  };
-
   assert' = name: cond:
     if cond
     then {
@@ -12,8 +7,17 @@
     }
     else throw "FAIL: ${name}";
 
-  collected = collectOverlays ../../pkgs;
   overlayNames = builtins.attrNames (builtins.readDir ../../pkgs);
+  collected =
+    map (
+      name: let
+        overlay = import (../../pkgs + "/${name}");
+      in
+        if name == "java.overlay.nix"
+        then overlay {nixpkgs-java = {};}
+        else overlay
+    )
+    overlayNames;
   waylandImeOverlay = builtins.readFile ../../pkgs/wayland-ime.overlay.nix;
   jetendardOverlay = builtins.readFile ../../pkgs/jetendard.overlay.nix;
   javaOverlay = builtins.readFile ../../pkgs/java.overlay.nix;
