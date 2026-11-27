@@ -1,254 +1,168 @@
-# Per-language tooling SSoT + home-manager wiring.
+# Language package lists, grouped for review and installed in attribute-name order.
 #
-# `languages` is the single source consumed by:
-#   - home.packages          (every entry's `packages`)
-#   - the language-specific package set used by editors and project checks
-#
-# Per entry: extensions (json keys), packages (nix pkgs),
-#            format/lint/diagnose (optional shell command strings).
-# nix is intentionally given no `diagnose`: live-oracle already runs
-# `nix flake check`, so duplicating it here would double-gate.
 {
   pkgs,
   lib,
   ...
 }: let
-  languages = {
+  languagePackages = {
     # =========================================================================
     # 1. General-Purpose & Systems Languages
     # =========================================================================
-    # Java 21 is kept as the project JDK and for the jdtls Neovim wrapper.
-    java = {
-      extensions = ["java"];
-      packages = [
-        pkgs.javaProjectJdk
-        pkgs.gradle
-        pkgs.maven
-        pkgs.jdt-language-server
-        pkgs.google-java-format
-        pkgs.lombok
-        pkgs.vscode-extensions.vscjava.vscode-java-debug
-        pkgs.vscode-extensions.vscjava.vscode-java-test
-      ];
-      format = "google-java-format --dry-run --set-exit-if-changed";
-    };
+    # Java 17은 프로젝트용, Java 25는 jdtls 등 편집기 도구용이다.
+    java = [
+      pkgs.javaProjectJdk
+      pkgs.gradle
+      pkgs.maven
+      pkgs.jdt-language-server
+      pkgs.google-java-format
+      pkgs.lombok
+      pkgs.vscode-extensions.vscjava.vscode-java-debug
+      pkgs.vscode-extensions.vscjava.vscode-java-test
+    ];
 
-    go = {
-      extensions = ["go"];
-      packages = [
-        pkgs.go
-        (lib.hiPrio pkgs.gotools)
-        pkgs.gopls
-        pkgs.golangci-lint
-        pkgs.delve
-      ];
-      format = "gofmt -l";
-      diagnose = "go build ./...";
-    };
+    go = [
+      pkgs.go
+      (lib.hiPrio pkgs.gotools)
+      pkgs.gopls
+      pkgs.golangci-lint
+      pkgs.delve
+    ];
 
-    rust = {
-      extensions = ["rs"];
-      packages = [
-        pkgs.cargo
-        pkgs.rustc
-        pkgs.rustfmt
-        pkgs.clippy
-        pkgs.rust-analyzer
-        pkgs.cargo-nextest
-        pkgs.cargo-watch
-        pkgs.cargo-expand
-        pkgs.bacon
-      ];
-      format = "cargo fmt --check";
-      lint = "cargo clippy -- -D warnings";
-      diagnose = "cargo check";
-    };
+    rust = [
+      pkgs.cargo
+      pkgs.rustc
+      pkgs.rustfmt
+      pkgs.clippy
+      pkgs.rust-analyzer
+      pkgs.cargo-nextest
+      pkgs.cargo-watch
+      pkgs.cargo-expand
+      pkgs.bacon
+    ];
 
     # NOTE: pkgs.gcc 추가 시 clang-tools가 gcc를 찾지 못하는 문제 발생
     # NOTE: nvim-dap C/C++ 디버깅(CodeLLDB)을 위해 vscode-lldb 포함
-    c = {
-      extensions = ["c" "h" "cpp" "hpp" "cc"];
-      packages = [
-        pkgs.clang-tools
-        pkgs.bear
-        pkgs.vscode-extensions.vadimcn.vscode-lldb
-      ];
-      format = "clang-format --dry-run --Werror";
-    };
+    c = [
+      pkgs.clang-tools
+      pkgs.bear
+      pkgs.vscode-extensions.vadimcn.vscode-lldb
+    ];
 
-    python = {
-      extensions = ["py" "pyi"];
-      packages = [
-        (pkgs.python314.withPackages (py: [
-          py.uv
-          py.pytest
-          py.sqlalchemy
-          py.pydantic
-          py.pydantic-settings
-          py.pyyaml
-          py.pymysql
-          py.testcontainers
-          py.python-lsp-server
-          py.ruff
-          py.uvicorn
-          py.pip
-          py.lizard
-        ]))
-      ];
-      format = "black --check";
-      lint = "ruff check";
-    };
+    python = [
+      (pkgs.python314.withPackages (py: [
+        py.uv
+        py.pytest
+        py.sqlalchemy
+        py.pydantic
+        py.pydantic-settings
+        py.pyyaml
+        py.pymysql
+        py.testcontainers
+        py.python-lsp-server
+        py.ruff
+        py.uvicorn
+        py.pip
+        py.lizard
+      ]))
+    ];
 
-    typescript = {
-      extensions = ["ts" "tsx" "js" "jsx" "mjs" "cjs"];
-      packages = [
-        pkgs.nodejs_24
-        pkgs.typescript-language-server
-        pkgs.prettier
-        pkgs.biome
-        pkgs.pnpm
-        pkgs.vscode-js-debug
-      ];
-      format = "prettier --check";
-      diagnose = "tsc --noEmit";
-    };
+    typescript = [
+      pkgs.nodejs_24
+      pkgs.typescript-language-server
+      pkgs.prettier
+      pkgs.biome
+      pkgs.pnpm
+      pkgs.vscode-js-debug
+    ];
 
-    lua = {
-      extensions = ["lua"];
-      packages = [
-        pkgs.lua54Packages.lua
-        pkgs.lua54Packages.luaunit
-        pkgs.lua54Packages.busted
-        pkgs.lua54Packages.mobdebug
-        pkgs.lua-language-server
-        pkgs.stylua
-        pkgs.selene
-      ];
-      format = "stylua --check";
-      lint = "selene";
-    };
+    lua = [
+      pkgs.lua54Packages.lua
+      pkgs.lua54Packages.luaunit
+      pkgs.lua54Packages.busted
+      pkgs.lua54Packages.mobdebug
+      pkgs.lua-language-server
+      pkgs.stylua
+      pkgs.selene
+    ];
 
     # =========================================================================
     # 2. Shell Scripting & Task Runners
     # =========================================================================
-    bash = {
-      extensions = ["sh" "bash"];
-      packages = [
-        pkgs.bash-language-server
-        pkgs.shfmt
-        pkgs.shellcheck
-      ];
-      format = "shfmt -d";
-      lint = "shellcheck -f gcc";
-    };
+    bash = [
+      pkgs.bash-language-server
+      pkgs.shfmt
+      pkgs.shellcheck
+    ];
 
-    just = {
-      extensions = ["just"];
-      packages = [
-        pkgs.just
-        pkgs.just-lsp
-      ];
-    };
+    just = [
+      pkgs.just
+      pkgs.just-lsp
+    ];
 
-    go-task = {
-      extensions = [];
-      packages = [
-        pkgs.go-task
-      ];
-    };
+    go-task = [
+      pkgs.go-task
+    ];
 
     # =========================================================================
     # 3. Infrastructure, Containers & DevOps
     # =========================================================================
-    terraform = {
-      extensions = ["tf" "tfvars"];
-      packages = [
-        pkgs.opentofu
-        pkgs.terraform
-        pkgs.terragrunt
-        pkgs.terraform-ls
-        pkgs.tflint
-        pkgs.tftui
-        pkgs.tflint
-        pkgs.trivy
-        pkgs.infracost
-      ];
-      format = "terraform fmt -check";
-    };
+    terraform = [
+      pkgs.opentofu
+      pkgs.terraform
+      pkgs.terragrunt
+      pkgs.terraform-ls
+      pkgs.tflint
+      pkgs.tftui
+      pkgs.tflint
+      pkgs.trivy
+      pkgs.infracost
+    ];
 
-    pulumi = {
-      extensions = [];
-      packages = [
-        pkgs.pulumi
-      ];
-    };
+    pulumi = [
+      pkgs.pulumi
+    ];
 
-    ansible = {
-      extensions = [];
-      packages = [
-        pkgs.ansible
-      ];
-    };
+    ansible = [
+      pkgs.ansible
+    ];
 
-    docker = {
-      extensions = ["dockerfile"];
-      packages = [
-        pkgs.dockerfile-language-server
-        pkgs.docker-compose-language-service
-        pkgs.hadolint
-      ];
-      lint = "hadolint";
-    };
+    docker = [
+      pkgs.dockerfile-language-server
+      pkgs.docker-compose-language-service
+      pkgs.hadolint
+    ];
 
-    helm = {
-      extensions = [];
-      packages = [
-        pkgs.helm-ls
-      ];
-    };
+    helm = [
+      pkgs.helm-ls
+    ];
 
     # =========================================================================
     # 4. Configuration, Data Formats & Markup
     # =========================================================================
-    nix = {
-      extensions = ["nix"];
-      packages = [
-        pkgs.nixd
-        pkgs.alejandra
-        pkgs.statix
-        pkgs.deadnix
-      ];
-      format = "alejandra --check";
-      lint = "statix check";
-    };
+    nix = [
+      pkgs.nixd
+      pkgs.alejandra
+      pkgs.statix
+      pkgs.deadnix
+    ];
 
-    yaml = {
-      extensions = ["yaml" "yml"];
-      packages = [
-        pkgs.yamllint
-        pkgs.yaml-language-server
-        pkgs.yamlfmt
-      ];
-      lint = "yamllint";
-    };
+    yaml = [
+      pkgs.yamllint
+      pkgs.yaml-language-server
+      pkgs.yamlfmt
+    ];
 
-    toml = {
-      extensions = ["toml"];
-      packages = [
-        pkgs.taplo
-      ];
-      format = "taplo fmt --check";
-    };
+    toml = [
+      pkgs.taplo
+    ];
 
-    html = {
-      extensions = ["html"];
-      packages = [
-        pkgs.vscode-langservers-extracted
-      ];
-    };
+    html = [
+      pkgs.vscode-langservers-extracted
+    ];
   };
 
-  langPackages = lib.concatMap (l: l.packages) (lib.attrValues languages);
+  langPackages = lib.concatLists (lib.attrValues languagePackages);
 
   # Tools not tied to a single language.
   # nvim-treesitter parser builds
