@@ -1,5 +1,8 @@
 # Flat layout verification and code axiom review
 
+This records the earlier four-overlay milestone. The current role-named overlay
+layout is specified in `docs/specs/pkg-role-layout/`.
+
 Assessment base: `afe2c93e118ec3c7fb762d6f39eb434fd79df0a4`. M1: `2e18c27`.
 M2: `b850035`. M3 observations below are from the staged working tree before its
 commit on 2026-11-26, Asia/Seoul.

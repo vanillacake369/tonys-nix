@@ -65,7 +65,9 @@ Nix가 없다면 먼저 `just setup nix`로 설치할 수 있습니다. 이 명�
 ## 구성의 소유권
 
 `nodes/`는 기기의 시스템 진입점, `profiles/`는 사용자별 Home Manager 프로필,
-`modules/`는 Home Manager와 NixOS 설정, `pkgs/`는 overlay를 담습니다.
+`modules/`는 Home Manager와 NixOS 설정, `pkgs/`는 패키지·도구 역할별 overlay를 담습니다.
+예를 들어 `pkgs/java.overlay.nix`는 Java 런타임과 도구,
+`pkgs/terraform.overlay.nix`는 Terraform 버전 정책을 소유합니다.
 공유 정책과 생성 함수는 `lib/`, 설정 원본은 `dotfiles/`, 검증과 실행 명령은
 각각 `tests/`와 `recipes/`에 둡니다.
 Home Manager 모듈은 `*.home.nix`, NixOS 모듈은 `*.nixos.nix` 이름으로
